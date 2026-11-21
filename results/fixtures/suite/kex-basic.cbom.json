@@ -279,63 +279,63 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ext_kex_basic::main; use: keygen; line: `let alice = EphemeralSecret::random();`; code: `EphemeralSecret::random`",
+            "additionalContext": "[reachable] [call] in ext_kex_basic::main; use: keygen; owner at src/main.rs:5:3-5:7 within 5:0-17:1; line: `let alice = EphemeralSecret::random();`; code: `EphemeralSecret::random`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "x25519_dalek::x25519::EphemeralSecret::random"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_kex_basic::main; from: setup, not a use; line: `let alice_public = PublicKey::from(&alice);`; code: `PublicKey::from`",
+            "additionalContext": "[reachable] [call] in ext_kex_basic::main; from: setup, not a use; owner at src/main.rs:5:3-5:7 within 5:0-17:1; line: `let alice_public = PublicKey::from(&alice);`; code: `PublicKey::from`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 23,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_kex_basic::main; use: keygen; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let bob = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `EphemeralPrivateKey::generate`",
+            "additionalContext": "[reachable] [call] in ext_kex_basic::main; use: keygen; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; owner at src/main.rs:5:3-5:7 within 5:0-17:1; line: `let bob = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `EphemeralPrivateKey::generate`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "ring::agreement::EphemeralPrivateKey::generate"
           },
           {
-            "additionalContext": "[reachable] [static] in ext_kex_basic::main; line: `let bob = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`",
+            "additionalContext": "[reachable] [static] in ext_kex_basic::main; owner at src/main.rs:5:3-5:7 within 5:0-17:1; line: `let bob = EphemeralPrivateKey::generate(&X25519, &rng).unwrap();`; code: `X25519`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::ec::curve25519::x25519::X25519"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_kex_basic::main; use: keyderive; line: `let alice_shared = alice.diffie_hellman(&PublicKey::from(bob_public));`; code: `diffie_hellman`",
+            "additionalContext": "[reachable] [call] in ext_kex_basic::main; use: keyderive; owner at src/main.rs:5:3-5:7 within 5:0-17:1; line: `let alice_shared = alice.diffie_hellman(&PublicKey::from(bob_public));`; code: `diffie_hellman`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "x25519_dalek::x25519::EphemeralSecret::diffie_hellman"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_kex_basic::main; from: setup, not a use; line: `let alice_shared = alice.diffie_hellman(&PublicKey::from(bob_public));`; code: `PublicKey::from`",
+            "additionalContext": "[reachable] [call] in ext_kex_basic::main; from: setup, not a use; owner at src/main.rs:5:3-5:7 within 5:0-17:1; line: `let alice_shared = alice.diffie_hellman(&PublicKey::from(bob_public));`; code: `PublicKey::from`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [static] in ext_kex_basic::main; line: `let peer = UnparsedPublicKey::new(&X25519, alice_public.as_bytes());`; code: `X25519`",
+            "additionalContext": "[reachable] [static] in ext_kex_basic::main; owner at src/main.rs:5:3-5:7 within 5:0-17:1; line: `let peer = UnparsedPublicKey::new(&X25519, alice_public.as_bytes());`; code: `X25519`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 39,
             "symbol": "ring::ec::curve25519::x25519::X25519"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_kex_basic::main; as_bytes: setup, not a use; line: `let peer = UnparsedPublicKey::new(&X25519, alice_public.as_bytes());`; code: `as_bytes`",
+            "additionalContext": "[reachable] [call] in ext_kex_basic::main; as_bytes: setup, not a use; owner at src/main.rs:5:3-5:7 within 5:0-17:1; line: `let peer = UnparsedPublicKey::new(&X25519, alice_public.as_bytes());`; code: `as_bytes`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 60,
             "symbol": "x25519_dalek::x25519::PublicKey::as_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_kex_basic::main; use: keyderive; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; line: `let bob_shared = agreement::agree_ephemeral(bob, &peer, |km| km.to_vec()).unwrap();`; code: `agreement::agree_ephemeral`",
+            "additionalContext": "[reachable] [call] in ext_kex_basic::main; use: keyderive; algorithm from ring::ec::curve25519::x25519::X25519 in the arguments; owner at src/main.rs:5:3-5:7 within 5:0-17:1; line: `let bob_shared = agreement::agree_ephemeral(bob, &peer, |km| km.to_vec()).unwrap();`; code: `agreement::agree_ephemeral`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 21,
@@ -497,7 +497,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:b4e8dcc8-ec9f-811c-878f-351495310835",
+  "serialNumber": "urn:uuid:7b2018ce-fdf2-80fb-add4-92cc29e73222",
   "specVersion": "1.7",
   "version": 1
 }

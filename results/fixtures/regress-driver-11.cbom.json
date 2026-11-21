@@ -102,21 +102,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [static] in t11::sha256_table; line: `Table { alg: &SHA256 }`; code: `SHA256`",
+            "additionalContext": "[present] [static] in t11::sha256_table; owner at src/main.rs:6:9-6:21 within 6:0-8:1; line: `Table { alg: &SHA256 }`; code: `SHA256`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in t11::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `t11::sha256_table`; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `digest`",
+            "additionalContext": "[reachable] [call] in t11::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `t11::sha256_table`; owner at src/main.rs:15:3-15:7 within 15:0-17:1; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t11::main; t11::TABLE -> ring::digest::SHA256; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `TABLE`",
+            "additionalContext": "[reachable] [via-static] in t11::main; t11::TABLE -> ring::digest::SHA256; owner at src/main.rs:15:3-15:7 within 15:0-17:1; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `TABLE`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 33,
@@ -168,21 +168,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t11::TABLE2; line: `static TABLE2: Table = Table { alg: &SHA384 };`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in t11::TABLE2; owner at src/main.rs:13:7-13:13 within 13:0-13:46; line: `static TABLE2: Table = Table { alg: &SHA384 };`; code: `SHA384`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 37,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in t11::main; use: digest; algorithm from ring::digest::SHA384, stored in `static t11::TABLE2`; member: table, stored by `static t11::TABLE2`; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `digest`",
+            "additionalContext": "[reachable] [call] in t11::main; use: digest; algorithm from ring::digest::SHA384, stored in `static t11::TABLE2`; member: table, stored by `static t11::TABLE2`; owner at src/main.rs:15:3-15:7 within 15:0-17:1; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 51,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t11::main; t11::TABLE2 -> ring::digest::SHA384; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `TABLE2`",
+            "additionalContext": "[reachable] [via-static] in t11::main; t11::TABLE2 -> ring::digest::SHA384; owner at src/main.rs:15:3-15:7 within 15:0-17:1; line: `println!(\"{:?} {:?}\", digest(TABLE.alg, b\"a\"), digest(TABLE2.alg, b\"b\"));`; code: `TABLE2`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 58,
@@ -316,7 +316,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c791035d-3f58-83cb-a91b-507af1e40c4d",
+  "serialNumber": "urn:uuid:3cf5a22c-cbe3-8bcd-ad94-e0daaf926b5f",
   "specVersion": "1.7",
   "version": 1
 }

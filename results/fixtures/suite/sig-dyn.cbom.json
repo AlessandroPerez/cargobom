@@ -105,49 +105,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <pilot_sig_dyn::Gov as pilot_sig_dyn::Suite>::signer; line: `&signature::ECDSA_P384_SHA384_ASN1_SIGNING`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in <pilot_sig_dyn::Gov as pilot_sig_dyn::Suite>::signer; owner at src/main.rs:13:7-13:13 within 13:4-15:5; line: `&signature::ECDSA_P384_SHA384_ASN1_SIGNING`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [static] in <pilot_sig_dyn::Gov as pilot_sig_dyn::Suite>::verifier; line: `&signature::ECDSA_P384_SHA384_ASN1`; code: `signature::ECDSA_P384_SHA384_ASN1`",
+            "additionalContext": "[reachable] [static] in <pilot_sig_dyn::Gov as pilot_sig_dyn::Suite>::verifier; owner at src/main.rs:16:7-16:15 within 16:4-18:5; line: `&signature::ECDSA_P384_SHA384_ASN1`; code: `signature::ECDSA_P384_SHA384_ASN1`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_dyn::main; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING, reaching the call from another function; member: dyn (dyn: `pilot_sig_dyn::Gov`, the only type coerced to `dyn pilot_sig_dyn::Suite` at src/main.rs:22); line: `let pkcs8 = EcdsaKeyPair::generate_pkcs8(suite.signer(), &rng).unwrap();`; code: `EcdsaKeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [call] in pilot_sig_dyn::main; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING, reaching the call from another function; member: dyn (dyn: `pilot_sig_dyn::Gov`, the only type coerced to `dyn pilot_sig_dyn::Suite` at src/main.rs:22); owner at src/main.rs:21:3-21:7 within 21:0-30:1; line: `let pkcs8 = EcdsaKeyPair::generate_pkcs8(suite.signer(), &rng).unwrap();`; code: `EcdsaKeyPair::generate_pkcs8`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_dyn::main; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING, reaching the call from another function; member: dyn (dyn: `pilot_sig_dyn::Gov`, the only type coerced to `dyn pilot_sig_dyn::Suite` at src/main.rs:22); key: computed (pilot_sig_dyn::Suite::signer) or rng (rand::SystemRandom::new); line: `let kp = EcdsaKeyPair::from_pkcs8(suite.signer(), pkcs8.as_ref(), &rng).unwrap();`; code: `EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in pilot_sig_dyn::main; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING, reaching the call from another function; member: dyn (dyn: `pilot_sig_dyn::Gov`, the only type coerced to `dyn pilot_sig_dyn::Suite` at src/main.rs:22); key: computed (pilot_sig_dyn::Suite::signer) or rng (rand::SystemRandom::new); owner at src/main.rs:21:3-21:7 within 21:0-30:1; line: `let kp = EcdsaKeyPair::from_pkcs8(suite.signer(), pkcs8.as_ref(), &rng).unwrap();`; code: `EcdsaKeyPair::from_pkcs8`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_dyn::main; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING, reaching the call from another function; member: dyn (dyn: `pilot_sig_dyn::Gov`, the only type coerced to `dyn pilot_sig_dyn::Suite` at src/main.rs:22); line: `let sig = kp.sign(&rng, msg).unwrap();`; code: `sign`",
+            "additionalContext": "[reachable] [call] in pilot_sig_dyn::main; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING, reaching the call from another function; member: dyn (dyn: `pilot_sig_dyn::Gov`, the only type coerced to `dyn pilot_sig_dyn::Suite` at src/main.rs:22); owner at src/main.rs:21:3-21:7 within 21:0-30:1; line: `let sig = kp.sign(&rng, msg).unwrap();`; code: `sign`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_dyn::main; new: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1, reaching the call from another function; member: dyn (dyn: `pilot_sig_dyn::Gov`, the only type coerced to `dyn pilot_sig_dyn::Suite` at src/main.rs:22); public-key: computed (pilot_sig_dyn::Suite::signer) or rng (rand::SystemRandom::new); line: `let pk = UnparsedPublicKey::new(suite.verifier(), kp.public_key().as_ref());`; code: `UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in pilot_sig_dyn::main; new: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1, reaching the call from another function; member: dyn (dyn: `pilot_sig_dyn::Gov`, the only type coerced to `dyn pilot_sig_dyn::Suite` at src/main.rs:22); public-key: computed (pilot_sig_dyn::Suite::signer) or rng (rand::SystemRandom::new); owner at src/main.rs:21:3-21:7 within 21:0-30:1; line: `let pk = UnparsedPublicKey::new(suite.verifier(), kp.public_key().as_ref());`; code: `UnparsedPublicKey::new`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_dyn::main; use: verify; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1, reaching the call from another function; member: dyn (dyn: `pilot_sig_dyn::Gov`, the only type coerced to `dyn pilot_sig_dyn::Suite` at src/main.rs:22); line: `println!(\"{}\", pk.verify(msg, sig.as_ref()).is_ok());`; code: `verify`",
+            "additionalContext": "[reachable] [call] in pilot_sig_dyn::main; use: verify; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1, reaching the call from another function; member: dyn (dyn: `pilot_sig_dyn::Gov`, the only type coerced to `dyn pilot_sig_dyn::Suite` at src/main.rs:22); owner at src/main.rs:21:3-21:7 within 21:0-30:1; line: `println!(\"{}\", pk.verify(msg, sig.as_ref()).is_ok());`; code: `verify`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 22,
@@ -207,14 +207,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in <pilot_sig_dyn::Gov as pilot_sig_dyn::Suite>::signer; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); line: `&signature::ECDSA_P384_SHA384_ASN1_SIGNING`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [component] in <pilot_sig_dyn::Gov as pilot_sig_dyn::Suite>::signer; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING -> ring::digest::SHA384); owner at src/main.rs:13:7-13:13 within 13:4-15:5; line: `&signature::ECDSA_P384_SHA384_ASN1_SIGNING`; code: `signature::ECDSA_P384_SHA384_ASN1_SIGNING`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [component] in <pilot_sig_dyn::Gov as pilot_sig_dyn::Suite>::verifier; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); line: `&signature::ECDSA_P384_SHA384_ASN1`; code: `signature::ECDSA_P384_SHA384_ASN1`",
+            "additionalContext": "[reachable] [component] in <pilot_sig_dyn::Gov as pilot_sig_dyn::Suite>::verifier; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); owner at src/main.rs:16:7-16:15 within 16:4-18:5; line: `&signature::ECDSA_P384_SHA384_ASN1`; code: `signature::ECDSA_P384_SHA384_ASN1`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 9,
@@ -354,7 +354,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9eef3929-a3bc-801b-8e1e-6703a16cd729",
+  "serialNumber": "urn:uuid:35ea57c4-ebbe-8e2a-b664-7a1878660739",
   "specVersion": "1.7",
   "version": 1
 }

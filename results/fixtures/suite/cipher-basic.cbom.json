@@ -228,14 +228,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 15); iv: hard-coded (all zero, 16 bytes, literal at line 15); line: `Ctr::new(&[0x11u8; 16].into(), &[0u8; 16].into()).apply_keystream(&mut stream);`; code: `Ctr::new`",
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 15); iv: hard-coded (all zero, 16 bytes, literal at line 15); owner at src/main.rs:9:3-9:7 within 9:0-17:1; line: `Ctr::new(&[0x11u8; 16].into(), &[0u8; 16].into()).apply_keystream(&mut stream);`; code: `Ctr::new`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "crypto_common::KeyIvInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; use: encrypt or decrypt; line: `Ctr::new(&[0x11u8; 16].into(), &[0u8; 16].into()).apply_keystream(&mut stream);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; use: encrypt or decrypt; owner at src/main.rs:9:3-9:7 within 9:0-17:1; line: `Ctr::new(&[0x11u8; 16].into(), &[0u8; 16].into()).apply_keystream(&mut stream);`; code: `apply_keystream`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 54,
@@ -306,28 +306,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 10); iv: hard-coded (16 bytes, literal at line 11); line: `let ct = CbcEnc::new(&key.into(), &iv.into()).encrypt_padded_vec_mut::<Pkcs7>(b\"block mode\");`; code: `CbcEnc::new`",
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 10); iv: hard-coded (16 bytes, literal at line 11); owner at src/main.rs:9:3-9:7 within 9:0-17:1; line: `let ct = CbcEnc::new(&key.into(), &iv.into()).encrypt_padded_vec_mut::<Pkcs7>(b\"block mode\");`; code: `CbcEnc::new`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "crypto_common::KeyIvInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; use: encrypt; line: `let ct = CbcEnc::new(&key.into(), &iv.into()).encrypt_padded_vec_mut::<Pkcs7>(b\"block mode\");`; code: `encrypt_padded_vec_mut`",
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; use: encrypt; owner at src/main.rs:9:3-9:7 within 9:0-17:1; line: `let ct = CbcEnc::new(&key.into(), &iv.into()).encrypt_padded_vec_mut::<Pkcs7>(b\"block mode\");`; code: `encrypt_padded_vec_mut`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 50,
             "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_vec_mut"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 10); iv: hard-coded (16 bytes, literal at line 11); line: `let pt = CbcDec::new(&key.into(), &iv.into()).decrypt_padded_vec_mut::<Pkcs7>(&ct).unwrap();`; code: `CbcDec::new`",
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 10); iv: hard-coded (16 bytes, literal at line 11); owner at src/main.rs:9:3-9:7 within 9:0-17:1; line: `let pt = CbcDec::new(&key.into(), &iv.into()).decrypt_padded_vec_mut::<Pkcs7>(&ct).unwrap();`; code: `CbcDec::new`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "crypto_common::KeyIvInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; use: decrypt; line: `let pt = CbcDec::new(&key.into(), &iv.into()).decrypt_padded_vec_mut::<Pkcs7>(&ct).unwrap();`; code: `decrypt_padded_vec_mut`",
+            "additionalContext": "[reachable] [call] in ext_cipher_basic::main; use: decrypt; owner at src/main.rs:9:3-9:7 within 9:0-17:1; line: `let pt = CbcDec::new(&key.into(), &iv.into()).decrypt_padded_vec_mut::<Pkcs7>(&ct).unwrap();`; code: `decrypt_padded_vec_mut`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 50,
@@ -508,7 +508,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:8fbd00a7-3b70-87d2-b4d3-ed33aad4d505",
+  "serialNumber": "urn:uuid:f6217513-8014-8b68-82e7-f0435c76b72b",
   "specVersion": "1.7",
   "version": 1
 }

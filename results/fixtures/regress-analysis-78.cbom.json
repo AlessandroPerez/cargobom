@@ -102,14 +102,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a78::Local::alg; `<a78::Def as a78::Local>::alg` instantiated by a78::main at src/main.rs:30:19; line: `trait Local { fn alg(&self) -> &'static Digest { &SHA1 } }`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a78::Local::alg; owner at src/main.rs:6:17-6:20 within 6:14-6:56; owner `<a78::Def as a78::Local>::alg` at src/main.rs:6:17-6:20 within 6:14-6:56; `<a78::Def as a78::Local>::alg` instantiated by a78::main at src/main.rs:30:19 (call, to 30:26 as `h(&Def)` line #c19db7fe, caller at src/main.rs:18:3-18:7 within 18:0-33:1); line: `trait Local { fn alg(&self) -> &'static Digest { &SHA1 } }`; code: `SHA1`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 50,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `<a78::Def as a78::Local>::alg`; line: `let _ = digest(h(&Def), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `<a78::Def as a78::Local>::alg`; owner at src/main.rs:18:3-18:7 within 18:0-33:1; line: `let _ = digest(h(&Def), &d);`; code: `digest`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 12,
@@ -165,63 +165,63 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <a78::Over as a78::Local>::alg; line: `impl Local for Over { fn alg(&self) -> &'static Digest { &SHA256 } }`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in <a78::Over as a78::Local>::alg; owner at src/main.rs:9:25-9:28 within 9:22-9:66; line: `impl Local for Over { fn alg(&self) -> &'static Digest { &SHA256 } }`; code: `SHA256`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 58,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(f(&Over), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; owner at src/main.rs:18:3-18:7 within 18:0-33:1; line: `let _ = digest(f(&Over), &d);`; code: `digest`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(apply(lpick::<Over>, &Over), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; owner at src/main.rs:18:3-18:7 within 18:0-33:1; line: `let _ = digest(apply(lpick::<Over>, &Over), &d);`; code: `digest`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(apply_gen(lpick::<Over>, &Over), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; owner at src/main.rs:18:3-18:7 within 18:0-33:1; line: `let _ = digest(apply_gen(lpick::<Over>, &Over), &d);`; code: `digest`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(TABLE[0](&Over), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; owner at src/main.rs:18:3-18:7 within 18:0-33:1; line: `let _ = digest(TABLE[0](&Over), &d);`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: dyn (dyn: `a78::Over`, the only type coerced to `dyn a78::Local` at src/main.rs:14); line: `let _ = digest(boxed(Over).alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: dyn (dyn: `a78::Over`, the only type coerced to `dyn a78::Local` at src/main.rs:14); owner at src/main.rs:18:3-18:7 within 18:0-33:1; line: `let _ = digest(boxed(Over).alg(), &d);`; code: `digest`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: dyn (dyn: `a78::Over`, the only type coerced to `dyn a78::Local` at src/main.rs:14); line: `let _ = digest(via_dyn(Over), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: dyn (dyn: `a78::Over`, the only type coerced to `dyn a78::Local` at src/main.rs:14); owner at src/main.rs:18:3-18:7 within 18:0-33:1; line: `let _ = digest(via_dyn(Over), &d);`; code: `digest`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(g(&Over), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a78::Over as a78::Local>::alg`; owner at src/main.rs:18:3-18:7 within 18:0-33:1; line: `let _ = digest(g(&Over), &d);`; code: `digest`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<a78::Over as a78::Local>::alg`; line: `let _ = digest(w(&Over), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<a78::Over as a78::Local>::alg`; owner at src/main.rs:18:3-18:7 within 18:0-33:1; line: `let _ = digest(w(&Over), &d);`; code: `digest`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
@@ -273,14 +273,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a78::main::{closure#0}; instantiated by a78::main at src/main.rs:31:90 as `|_: &Over| &SHA384`; line: `let w = if arg(1).is_empty() { lpick::<Over> as fn(&Over) -> &'static Digest } else { |_: &Over| &SHA384 };`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a78::main::{closure#0}; owner at src/main.rs:31:90-31:100 as `|_: &Over|` line #9c9a4ca6 within 31:90-31:108; instantiated by a78::main at src/main.rs:31:90 as `|_: &Over| &SHA384` (built, to 31:108 as `|_: &Over| &SHA384` line #9c9a4ca6, caller at src/main.rs:18:3-18:7 within 18:0-33:1); line: `let w = if arg(1).is_empty() { lpick::<Over> as fn(&Over) -> &'static Digest } else { |_: &Over| &SHA384 };`; code: `SHA384`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 102,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: fixed; line: `let _ = digest(w(&Over), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a78::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: fixed; owner at src/main.rs:18:3-18:7 within 18:0-33:1; line: `let _ = digest(w(&Over), &d);`; code: `digest`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
@@ -419,7 +419,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:3fc5d51e-c436-88c9-9f53-d46c43578da4",
+  "serialNumber": "urn:uuid:98295a27-2acf-863e-9676-eb4b58859822",
   "specVersion": "1.7",
   "version": 1
 }

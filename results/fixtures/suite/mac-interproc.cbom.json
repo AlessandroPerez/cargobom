@@ -103,28 +103,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ext_mac_interproc::session_key; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA512 in the arguments; key: hard-coded (14 bytes, literal at line 4); line: `hmac::Key::new(hmac::HMAC_SHA512, b\"session secret\")`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in ext_mac_interproc::session_key; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA512 in the arguments; key: hard-coded (14 bytes, literal at line 4); owner at src/main.rs:3:3-3:14 within 3:0-5:1; line: `hmac::Key::new(hmac::HMAC_SHA512, b\"session secret\")`; code: `hmac::Key::new`",
             "line": 4,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::hmac::Key::new"
           },
           {
-            "additionalContext": "[reachable] [static] in ext_mac_interproc::session_key; line: `hmac::Key::new(hmac::HMAC_SHA512, b\"session secret\")`; code: `hmac::HMAC_SHA512`",
+            "additionalContext": "[reachable] [static] in ext_mac_interproc::session_key; owner at src/main.rs:3:3-3:14 within 3:0-5:1; line: `hmac::Key::new(hmac::HMAC_SHA512, b\"session secret\")`; code: `hmac::HMAC_SHA512`",
             "line": 4,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "ring::hmac::HMAC_SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_interproc::authenticate; use: tag; algorithm from ring::hmac::HMAC_SHA512, reaching the call from another function; member: object, from `ext_mac_interproc::session_key`; line: `hmac::sign(key, msg)`; code: `hmac::sign`",
+            "additionalContext": "[reachable] [call] in ext_mac_interproc::authenticate; use: tag; algorithm from ring::hmac::HMAC_SHA512, reaching the call from another function; member: object, from `ext_mac_interproc::session_key`; owner at src/main.rs:7:3-7:15 within 7:0-9:1; line: `hmac::sign(key, msg)`; code: `hmac::sign`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::hmac::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_interproc::main; use: verify; algorithm from ring::hmac::HMAC_SHA512, reaching the call from another function; member: object, from `ext_mac_interproc::session_key`; line: `println!(\"{}\", hmac::verify(&key, b\"interproc\", tag.as_ref()).is_ok());`; code: `hmac::verify`",
+            "additionalContext": "[reachable] [call] in ext_mac_interproc::main; use: verify; algorithm from ring::hmac::HMAC_SHA512, reaching the call from another function; member: object, from `ext_mac_interproc::session_key`; owner at src/main.rs:11:3-11:7 within 11:0-15:1; line: `println!(\"{}\", hmac::verify(&key, b\"interproc\", tag.as_ref()).is_ok());`; code: `hmac::verify`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 19,
@@ -184,7 +184,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in ext_mac_interproc::session_key; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `hmac::Key::new(hmac::HMAC_SHA512, b\"session secret\")`; code: `hmac::HMAC_SHA512`",
+            "additionalContext": "[reachable] [component] in ext_mac_interproc::session_key; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); owner at src/main.rs:3:3-3:14 within 3:0-5:1; line: `hmac::Key::new(hmac::HMAC_SHA512, b\"session secret\")`; code: `hmac::HMAC_SHA512`",
             "line": 4,
             "location": "src/main.rs",
             "offset": 19,
@@ -324,7 +324,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9510e620-895e-8d47-9cb6-2a7a465b9312",
+  "serialNumber": "urn:uuid:29d2e11f-f3df-8a9f-8854-b8ac7608e29f",
   "specVersion": "1.7",
   "version": 1
 }

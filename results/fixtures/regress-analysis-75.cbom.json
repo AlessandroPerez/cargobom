@@ -102,28 +102,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <a75::A2 as a75::Assoc>::make; line: `impl Assoc for A2 { fn make() -> &'static Digest { &SHA1 } }`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in <a75::A2 as a75::Assoc>::make; owner at src/main.rs:29:23-29:27 within 29:20-29:58; line: `impl Assoc for A2 { fn make() -> &'static Digest { &SHA1 } }`; code: `SHA1`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 52,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [static] in a75::Base::base; `<a75::E2 as a75::Base>::base` instantiated by <a75::E2 as a75::Ext>::ext at src/main.rs:35:58 as `base`; instantiated by a75::main at src/main.rs:62:22 as `ext`; line: `trait Base { fn base(&self) -> &'static Digest { &SHA1 } }`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a75::Base::base; owner at src/main.rs:34:16-34:20 within 34:13-34:56; owner `<a75::E2 as a75::Base>::base` at src/main.rs:34:16-34:20 within 34:13-34:56; `<a75::E2 as a75::Base>::base` instantiated by <a75::E2 as a75::Ext>::ext at src/main.rs:35:58 as `base` (call, to 35:62 as `base` line #67264be1, caller at src/main.rs:35:21-35:24 within 35:18-35:66); instantiated by a75::main at src/main.rs:62:22 as `ext` (call, to 62:25 as `ext` line #2113bea1, caller at src/main.rs:49:3-49:7 within 49:0-71:1); line: `trait Base { fn base(&self) -> &'static Digest { &SHA1 } }`; code: `SHA1`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 50,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `<a75::A2 as a75::Assoc>::make`; line: `let _ = digest(assoc::<A2>(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `<a75::A2 as a75::Assoc>::make`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(assoc::<A2>(), &d);`; code: `digest`",
             "line": 59,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `<a75::E2 as a75::Base>::base`; line: `let _ = digest(E2.ext(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `<a75::E2 as a75::Base>::base`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(E2.ext(), &d);`; code: `digest`",
             "line": 62,
             "location": "src/main.rs",
             "offset": 12,
@@ -179,42 +179,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a75::Pick::alg; `<a75::Legacy as a75::Pick>::alg` instantiated by <a75::Legacy as a75::Pick>::via at src/main.rs:8:44 as `alg`; instantiated by a75::main at src/main.rs:52:26 as `via`; line: `fn alg(&self) -> &'static Digest { &SHA256 }`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a75::Pick::alg; owner at src/main.rs:7:7-7:10 within 7:4-7:48; owner `<a75::Legacy as a75::Pick>::alg` at src/main.rs:7:7-7:10 within 7:4-7:48; `<a75::Legacy as a75::Pick>::alg` instantiated by <a75::Legacy as a75::Pick>::via at src/main.rs:8:44 as `alg` (call, to 8:47 as `alg` line #ff67b5e7, caller at src/main.rs:8:7-8:10 within 8:4-8:51); instantiated by a75::main at src/main.rs:52:26 as `via` (call, to 52:29 as `via` line #c88dae42, caller at src/main.rs:49:3-49:7 within 49:0-71:1); line: `fn alg(&self) -> &'static Digest { &SHA256 }`; code: `SHA256`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 40,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::gsite::<a75::Legacy>; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; instantiated by a75::main at src/main.rs:70:28 as `gsite`; line: `fn gsite<T: Pick>(t: &T, d: &[u8]) { let _ = digest(t.via(), d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::gsite::<a75::Legacy>; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; owner at src/main.rs:47:3-47:8 within 47:0-47:66; instantiated by a75::main at src/main.rs:70:28 as `gsite` (call, to 70:33 as `gsite` line #b2aaa0ed, caller at src/main.rs:49:3-49:7 within 49:0-71:1); line: `fn gsite<T: Pick>(t: &T, d: &[u8]) { let _ = digest(t.via(), d); }`; code: `digest`",
             "line": 47,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; line: `let _ = digest(Legacy.via(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(Legacy.via(), &d);`; code: `digest`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; line: `let _ = digest(outer(&Legacy), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(outer(&Legacy), &d);`; code: `digest`",
             "line": 54,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; line: `let _ = digest(W(Legacy).alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(W(Legacy).alg(), &d);`; code: `digest`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; line: `let _ = digest(g.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<a75::Legacy as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(g.alg(), &d);`; code: `digest`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 12,
@@ -266,70 +266,70 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <a75::Fast as a75::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA384 } }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in <a75::Fast as a75::Pick>::alg; owner at src/main.rs:12:24-12:27 within 12:21-12:65; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA384 } }`; code: `SHA384`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 57,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::gsite::<a75::Fast>; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; instantiated by a75::main at src/main.rs:69:4 as `gsite`; line: `fn gsite<T: Pick>(t: &T, d: &[u8]) { let _ = digest(t.via(), d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::gsite::<a75::Fast>; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; owner at src/main.rs:47:3-47:8 within 47:0-47:66; instantiated by a75::main at src/main.rs:69:4 as `gsite` (call, to 69:9 as `gsite` line #595eca81, caller at src/main.rs:49:3-49:7 within 49:0-71:1); line: `fn gsite<T: Pick>(t: &T, d: &[u8]) { let _ = digest(t.via(), d); }`; code: `digest`",
             "line": 47,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(Fast.via(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(Fast.via(), &d);`; code: `digest`",
             "line": 51,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(outer(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(outer(&Fast), &d);`; code: `digest`",
             "line": 53,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(W(Fast).alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(W(Fast).alg(), &d);`; code: `digest`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(Holder.pick(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(Holder.pick(&Fast), &d);`; code: `digest`",
             "line": 57,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(clos(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(clos(&Fast), &d);`; code: `digest`",
             "line": 60,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(two::<Fast, A1>(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a75::Fast as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(two::<Fast, A1>(&Fast), &d);`; code: `digest`",
             "line": 63,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; line: `let _ = digest(by_ref(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a75::Fast as a75::Pick>::alg`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(by_ref(&Fast), &d);`; code: `digest`",
             "line": 66,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: dyn (dyn: `a75::Fast`, the only type coerced to `dyn a75::Pick` at src/main.rs:67); line: `let _ = digest(by_ref(p), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: dyn (dyn: `a75::Fast`, the only type coerced to `dyn a75::Pick` at src/main.rs:67); owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(by_ref(p), &d);`; code: `digest`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 12,
@@ -381,35 +381,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <a75::A1 as a75::Assoc>::make; line: `impl Assoc for A1 { fn make() -> &'static Digest { &SHA512 } }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in <a75::A1 as a75::Assoc>::make; owner at src/main.rs:28:23-28:27 within 28:20-28:60; line: `impl Assoc for A1 { fn make() -> &'static Digest { &SHA512 } }`; code: `SHA512`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 52,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in <a75::E1 as a75::Base>::base; line: `impl Base for E1 { fn base(&self) -> &'static Digest { &SHA512 } }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in <a75::E1 as a75::Base>::base; owner at src/main.rs:38:22-38:26 within 38:19-38:64; line: `impl Base for E1 { fn base(&self) -> &'static Digest { &SHA512 } }`; code: `SHA512`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 56,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a75::A1 as a75::Assoc>::make`; line: `let _ = digest(assoc::<A1>(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a75::A1 as a75::Assoc>::make`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(assoc::<A1>(), &d);`; code: `digest`",
             "line": 58,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a75::E1 as a75::Base>::base`; line: `let _ = digest(E1.ext(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<a75::E1 as a75::Base>::base`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(E1.ext(), &d);`; code: `digest`",
             "line": 61,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<a75::A1 as a75::Assoc>::make`; line: `let _ = digest(two::<Fast, A1>(&Fast), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a75::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<a75::A1 as a75::Assoc>::make`; owner at src/main.rs:49:3-49:7 within 49:0-71:1; line: `let _ = digest(two::<Fast, A1>(&Fast), &d);`; code: `digest`",
             "line": 63,
             "location": "src/main.rs",
             "offset": 12,
@@ -553,7 +553,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:577a1866-ff93-85d4-9f28-a5944f197a3d",
+  "serialNumber": "urn:uuid:01b21971-40d9-82d1-8f90-95b6aad57715",
   "specVersion": "1.7",
   "version": 1
 }

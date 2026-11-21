@@ -102,112 +102,112 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a133::BASE; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a133::BASE; owner at src/main.rs:6:6-6:10 within 6:0-6:52; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA1`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::OPT; a133::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const OPT: Option<Cfg> = Some(BASE);`; code: `BASE`",
+            "additionalContext": "[reachable] [via-static] in a133::OPT; a133::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:7:6-7:9 within 7:0-7:36; line: `const OPT: Option<Cfg> = Some(BASE);`; code: `BASE`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "a133::BASE"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::PAIR; a133::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const PAIR: (Cfg, &Digest) = (BASE, &SHA512);`; code: `BASE`",
+            "additionalContext": "[reachable] [via-static] in a133::PAIR; a133::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:8:6-8:10 within 8:0-8:45; line: `const PAIR: (Cfg, &Digest) = (BASE, &SHA512);`; code: `BASE`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "a133::BASE"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::CA; a133::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `const CA: Choice = Choice::A(BASE);`; code: `BASE`",
+            "additionalContext": "[reachable] [via-static] in a133::CA; a133::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:10:6-10:8 within 10:0-10:35; line: `const CA: Choice = Choice::A(BASE);`; code: `BASE`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "a133::BASE"
           },
           {
-            "additionalContext": "[reachable] [static] in a133::SPAIR; line: `static SPAIR: (Cfg, &Digest) = (Cfg { h: &SHA256, legacy: &SHA1 }, &SHA512);`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a133::SPAIR; owner at src/main.rs:11:7-11:12 within 11:0-11:76; line: `static SPAIR: (Cfg, &Digest) = (Cfg { h: &SHA256, legacy: &SHA1 }, &SHA512);`; code: `SHA1`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 59,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::WRAPPED; a133::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `static WRAPPED: Cfg = wrap(BASE);`; code: `BASE`",
+            "additionalContext": "[reachable] [via-static] in a133::WRAPPED; a133::BASE -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:13:7-13:14 within 13:0-13:33; line: `static WRAPPED: Cfg = wrap(BASE);`; code: `BASE`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "a133::BASE"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::OPT -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(OPT.unwrap().h, &d);`; code: `OPT`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::OPT -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(OPT.unwrap().h, &d);`; code: `OPT`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::OPT"
           },
           {
-            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `const a133::PAIR`; member: table, stored by `const a133::PAIR`; line: `let _ = digest(PAIR.0.legacy, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `const a133::PAIR`; member: table, stored by `const a133::PAIR`; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(PAIR.0.legacy, &d);`; code: `digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(PAIR.0.legacy, &d);`; code: `PAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(PAIR.0.legacy, &d);`; code: `PAIR`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::PAIR"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(PAIR.1, &d);`; code: `PAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(PAIR.1, &d);`; code: `PAIR`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::PAIR"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::CA -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let a = match CA { Choice::A(c) => c.h, Choice::B(x) => x };`; code: `CA`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::CA -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let a = match CA { Choice::A(c) => c.h, Choice::B(x) => x };`; code: `CA`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "a133::CA"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(SPAIR.0.h, &d);`; code: `SPAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(SPAIR.0.h, &d);`; code: `SPAIR`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::SPAIR"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(SPAIR.1, &d);`; code: `SPAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(SPAIR.1, &d);`; code: `SPAIR`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::SPAIR"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::WRAPPED -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(WRAPPED.h, &d);`; code: `WRAPPED`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::WRAPPED -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(WRAPPED.h, &d);`; code: `WRAPPED`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::WRAPPED"
           },
           {
-            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `const a133::BASE`; member: table, stored by `const a133::BASE`; line: `let _ = digest(WRAPPED.legacy, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, stored in `const a133::BASE`; member: table, stored by `const a133::BASE`; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(WRAPPED.legacy, &d);`; code: `digest`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::WRAPPED -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(WRAPPED.legacy, &d);`; code: `WRAPPED`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::WRAPPED -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(WRAPPED.legacy, &d);`; code: `WRAPPED`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 19,
@@ -263,28 +263,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a133::SPAIR; line: `static SPAIR: (Cfg, &Digest) = (Cfg { h: &SHA256, legacy: &SHA1 }, &SHA512);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a133::SPAIR; owner at src/main.rs:11:7-11:12 within 11:0-11:76; line: `static SPAIR: (Cfg, &Digest) = (Cfg { h: &SHA256, legacy: &SHA1 }, &SHA512);`; code: `SHA256`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 42,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA256, stored in `static a133::SPAIR`; member: table, stored by `static a133::SPAIR`; line: `let _ = digest(SPAIR.0.h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA256, stored in `static a133::SPAIR`; member: table, stored by `static a133::SPAIR`; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(SPAIR.0.h, &d);`; code: `digest`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA256; line: `let _ = digest(SPAIR.0.h, &d);`; code: `SPAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA256; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(SPAIR.0.h, &d);`; code: `SPAIR`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::SPAIR"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA256; line: `let _ = digest(SPAIR.1, &d);`; code: `SPAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA256; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(SPAIR.1, &d);`; code: `SPAIR`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 19,
@@ -336,98 +336,98 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a133::BASE; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a133::BASE; owner at src/main.rs:6:6-6:10 within 6:0-6:52; line: `const BASE: Cfg = Cfg { h: &SHA384, legacy: &SHA1 };`; code: `SHA384`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 28,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::OPT; a133::BASE -> ring::digest::SHA384; line: `const OPT: Option<Cfg> = Some(BASE);`; code: `BASE`",
+            "additionalContext": "[reachable] [via-static] in a133::OPT; a133::BASE -> ring::digest::SHA384; owner at src/main.rs:7:6-7:9 within 7:0-7:36; line: `const OPT: Option<Cfg> = Some(BASE);`; code: `BASE`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "a133::BASE"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::PAIR; a133::BASE -> ring::digest::SHA384; line: `const PAIR: (Cfg, &Digest) = (BASE, &SHA512);`; code: `BASE`",
+            "additionalContext": "[reachable] [via-static] in a133::PAIR; a133::BASE -> ring::digest::SHA384; owner at src/main.rs:8:6-8:10 within 8:0-8:45; line: `const PAIR: (Cfg, &Digest) = (BASE, &SHA512);`; code: `BASE`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "a133::BASE"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::CA; a133::BASE -> ring::digest::SHA384; line: `const CA: Choice = Choice::A(BASE);`; code: `BASE`",
+            "additionalContext": "[reachable] [via-static] in a133::CA; a133::BASE -> ring::digest::SHA384; owner at src/main.rs:10:6-10:8 within 10:0-10:35; line: `const CA: Choice = Choice::A(BASE);`; code: `BASE`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "a133::BASE"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::WRAPPED; a133::BASE -> ring::digest::SHA384; line: `static WRAPPED: Cfg = wrap(BASE);`; code: `BASE`",
+            "additionalContext": "[reachable] [via-static] in a133::WRAPPED; a133::BASE -> ring::digest::SHA384; owner at src/main.rs:13:7-13:14 within 13:0-13:33; line: `static WRAPPED: Cfg = wrap(BASE);`; code: `BASE`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "a133::BASE"
           },
           {
-            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a133::BASE`; member: table, stored by `const a133::BASE`; line: `let _ = digest(OPT.unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a133::BASE`; member: table, stored by `const a133::BASE`; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(OPT.unwrap().h, &d);`; code: `digest`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::OPT -> ring::digest::SHA384; line: `let _ = digest(OPT.unwrap().h, &d);`; code: `OPT`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::OPT -> ring::digest::SHA384; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(OPT.unwrap().h, &d);`; code: `OPT`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::OPT"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA384; line: `let _ = digest(PAIR.0.legacy, &d);`; code: `PAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA384; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(PAIR.0.legacy, &d);`; code: `PAIR`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::PAIR"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA384; line: `let _ = digest(PAIR.1, &d);`; code: `PAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA384; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(PAIR.1, &d);`; code: `PAIR`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::PAIR"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::CA -> ring::digest::SHA384; line: `let a = match CA { Choice::A(c) => c.h, Choice::B(x) => x };`; code: `CA`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::CA -> ring::digest::SHA384; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let a = match CA { Choice::A(c) => c.h, Choice::B(x) => x };`; code: `CA`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "a133::CA"
           },
           {
-            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a133::CA`; member: table, stored by `const a133::CA`; line: `let _ = digest(a, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a133::CA`; member: table, stored by `const a133::CA`; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(a, &d);`; code: `digest`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a133::BASE`; member: table, stored by `const a133::BASE`; line: `let _ = digest(WRAPPED.h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA384, stored in `const a133::BASE`; member: table, stored by `const a133::BASE`; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(WRAPPED.h, &d);`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::WRAPPED -> ring::digest::SHA384; line: `let _ = digest(WRAPPED.h, &d);`; code: `WRAPPED`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::WRAPPED -> ring::digest::SHA384; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(WRAPPED.h, &d);`; code: `WRAPPED`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::WRAPPED"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::WRAPPED -> ring::digest::SHA384; line: `let _ = digest(WRAPPED.legacy, &d);`; code: `WRAPPED`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::WRAPPED -> ring::digest::SHA384; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(WRAPPED.legacy, &d);`; code: `WRAPPED`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 19,
@@ -479,56 +479,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a133::PAIR; line: `const PAIR: (Cfg, &Digest) = (BASE, &SHA512);`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in a133::PAIR; owner at src/main.rs:8:6-8:10 within 8:0-8:45; line: `const PAIR: (Cfg, &Digest) = (BASE, &SHA512);`; code: `SHA512`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 37,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in a133::SPAIR; line: `static SPAIR: (Cfg, &Digest) = (Cfg { h: &SHA256, legacy: &SHA1 }, &SHA512);`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in a133::SPAIR; owner at src/main.rs:11:7-11:12 within 11:0-11:76; line: `static SPAIR: (Cfg, &Digest) = (Cfg { h: &SHA256, legacy: &SHA1 }, &SHA512);`; code: `SHA512`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 68,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA512; line: `let _ = digest(PAIR.0.legacy, &d);`; code: `PAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA512; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(PAIR.0.legacy, &d);`; code: `PAIR`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::PAIR"
           },
           {
-            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA512, stored in `const a133::PAIR`; member: table, stored by `const a133::PAIR`; line: `let _ = digest(PAIR.1, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA512, stored in `const a133::PAIR`; member: table, stored by `const a133::PAIR`; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(PAIR.1, &d);`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA512; line: `let _ = digest(PAIR.1, &d);`; code: `PAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::PAIR -> ring::digest::SHA512; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(PAIR.1, &d);`; code: `PAIR`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::PAIR"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA512; line: `let _ = digest(SPAIR.0.h, &d);`; code: `SPAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA512; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(SPAIR.0.h, &d);`; code: `SPAIR`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a133::SPAIR"
           },
           {
-            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA512, stored in `static a133::SPAIR`; member: table, stored by `static a133::SPAIR`; line: `let _ = digest(SPAIR.1, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a133::main; use: digest; algorithm from ring::digest::SHA512, stored in `static a133::SPAIR`; member: table, stored by `static a133::SPAIR`; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(SPAIR.1, &d);`; code: `digest`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA512; line: `let _ = digest(SPAIR.1, &d);`; code: `SPAIR`",
+            "additionalContext": "[reachable] [via-static] in a133::main; a133::SPAIR -> ring::digest::SHA512; owner at src/main.rs:15:3-15:7 within 15:0-26:1; line: `let _ = digest(SPAIR.1, &d);`; code: `SPAIR`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 19,
@@ -672,7 +672,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:0eca5193-8b75-8944-a818-421ed82153e1",
+  "serialNumber": "urn:uuid:91c80314-a58c-8a0e-be10-044086f4a62e",
   "specVersion": "1.7",
   "version": 1
 }

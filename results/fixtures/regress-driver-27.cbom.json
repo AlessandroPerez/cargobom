@@ -102,14 +102,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin one] in <one::Failed as core::fmt::Debug>::fmt; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `write!(f, \"{:?}\", digest(&SHA1_FOR_LEGACY_USE_ONLY, &self.0).as_ref())`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin one] in <one::Failed as core::fmt::Debug>::fmt; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; owner at src/bin/one.rs:6:7-6:10 within 6:4-8:5; line: `write!(f, \"{:?}\", digest(&SHA1_FOR_LEGACY_USE_ONLY, &self.0).as_ref())`; code: `digest`",
             "line": 7,
             "location": "src/bin/one.rs",
             "offset": 26,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] [artifacts: bin one] in <one::Failed as core::fmt::Debug>::fmt; line: `write!(f, \"{:?}\", digest(&SHA1_FOR_LEGACY_USE_ONLY, &self.0).as_ref())`; code: `SHA1_FOR_LEGACY_USE_ONLY`",
+            "additionalContext": "[reachable] [static] [artifacts: bin one] in <one::Failed as core::fmt::Debug>::fmt; owner at src/bin/one.rs:6:7-6:10 within 6:4-8:5; line: `write!(f, \"{:?}\", digest(&SHA1_FOR_LEGACY_USE_ONLY, &self.0).as_ref())`; code: `SHA1_FOR_LEGACY_USE_ONLY`",
             "line": 7,
             "location": "src/bin/one.rs",
             "offset": 34,
@@ -169,14 +169,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] [artifacts: bin one] in one::main; line: `let _ = d27::shared(&SHA256, &d);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] [artifacts: bin one] in one::main; owner at src/bin/one.rs:10:3-10:7 within 10:0-15:1; line: `let _ = d27::shared(&SHA256, &d);`; code: `SHA256`",
             "line": 12,
             "location": "src/bin/one.rs",
             "offset": 25,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin one, bin two, lib d27] in d27::shared; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `one::main`; line: `pub fn shared(a: &'static Algorithm, d: &[u8]) -> usize { digest(a, d).as_ref().len() } // SHA-256, SHA-384: bin one, bin two, lib d27`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin one, bin two, lib d27] in d27::shared; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: caller, passed by `one::main`; owner at src/lib.rs:5:7-5:13 within 5:0-5:87; line: `pub fn shared(a: &'static Algorithm, d: &[u8]) -> usize { digest(a, d).as_ref().len() } // SHA-256, SHA-384: bin one, bin two, lib d27`; code: `digest`",
             "line": 5,
             "location": "src/lib.rs",
             "offset": 58,
@@ -240,14 +240,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] [artifacts: bin two] in two::main; line: `let _ = d27::shared(&ring::digest::SHA384, &d);`; code: `ring::digest::SHA384`",
+            "additionalContext": "[reachable] [static] [artifacts: bin two] in two::main; owner at src/bin/two.rs:2:3-2:7 within 2:0-5:1; line: `let _ = d27::shared(&ring::digest::SHA384, &d);`; code: `ring::digest::SHA384`",
             "line": 4,
             "location": "src/bin/two.rs",
             "offset": 25,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin one, bin two, lib d27] in d27::shared; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `two::main`; line: `pub fn shared(a: &'static Algorithm, d: &[u8]) -> usize { digest(a, d).as_ref().len() } // SHA-256, SHA-384: bin one, bin two, lib d27`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin one, bin two, lib d27] in d27::shared; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `two::main`; owner at src/lib.rs:5:7-5:13 within 5:0-5:87; line: `pub fn shared(a: &'static Algorithm, d: &[u8]) -> usize { digest(a, d).as_ref().len() } // SHA-256, SHA-384: bin one, bin two, lib d27`; code: `digest`",
             "line": 5,
             "location": "src/lib.rs",
             "offset": 58,
@@ -311,14 +311,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: lib d27] in d27::only_lib; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `pub fn only_lib(d: &[u8]) -> usize { digest(&SHA512, d).as_ref().len() } // SHA-512: lib d27`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: lib d27] in d27::only_lib; use: digest; algorithm from ring::digest::SHA512 in the arguments; owner at src/lib.rs:6:7-6:15 within 6:0-6:72; line: `pub fn only_lib(d: &[u8]) -> usize { digest(&SHA512, d).as_ref().len() } // SHA-512: lib d27`; code: `digest`",
             "line": 6,
             "location": "src/lib.rs",
             "offset": 37,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] [artifacts: lib d27] in d27::only_lib; line: `pub fn only_lib(d: &[u8]) -> usize { digest(&SHA512, d).as_ref().len() } // SHA-512: lib d27`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] [artifacts: lib d27] in d27::only_lib; owner at src/lib.rs:6:7-6:15 within 6:0-6:72; line: `pub fn only_lib(d: &[u8]) -> usize { digest(&SHA512, d).as_ref().len() } // SHA-512: lib d27`; code: `SHA512`",
             "line": 6,
             "location": "src/lib.rs",
             "offset": 45,
@@ -474,7 +474,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d92334ec-8c4c-8fdf-950d-0c4b3cebd70f",
+  "serialNumber": "urn:uuid:7cbd8116-020f-8418-b9eb-4daf189f3b05",
   "specVersion": "1.7",
   "version": 1
 }

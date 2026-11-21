@@ -502,14 +502,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in d31::Limiter::nonce; use: digest; line: `let h = Sha256::digest(self.ctr.to_le_bytes());`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in d31::Limiter::nonce; use: digest; owner at src/main.rs:14:7-14:12 within 14:4-19:5; line: `let h = Sha256::digest(self.ctr.to_le_bytes());`; code: `Sha256::digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in d31::main; use: digest; line: `let key: [u8; 32] = Sha256::digest(std::env::args().collect::<String>()).into();`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in d31::main; use: digest; owner at src/main.rs:32:3-32:7 within 32:0-41:1; line: `let key: [u8; 32] = Sha256::digest(std::env::args().collect::<String>()).into();`; code: `Sha256::digest`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 24,
@@ -561,14 +561,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in d31::Limiter::seal; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let cipher = XChaCha20Poly1305::new_from_slice(&self.key).unwrap();`; code: `XChaCha20Poly1305::new_from_slice`",
+            "additionalContext": "[reachable] [call] in d31::Limiter::seal; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:21:7-21:11 within 21:4-29:5; line: `let cipher = XChaCha20Poly1305::new_from_slice(&self.key).unwrap();`; code: `XChaCha20Poly1305::new_from_slice`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in d31::Limiter::seal; use: encrypt; nonce: computed (d31::Limiter::nonce); line: `let tag = cipher.encrypt_in_place_detached(iv, b\"\", body).unwrap();`; code: `encrypt_in_place_detached`",
+            "additionalContext": "[reachable] [call] in d31::Limiter::seal; use: encrypt; nonce: computed (d31::Limiter::nonce); owner at src/main.rs:21:7-21:11 within 21:4-29:5; line: `let tag = cipher.encrypt_in_place_detached(iv, b\"\", body).unwrap();`; code: `encrypt_in_place_detached`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 25,
@@ -798,7 +798,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d2bc1c0c-019a-8536-8c0a-793a36a78871",
+  "serialNumber": "urn:uuid:41ed114e-84ca-8771-a6e7-ebb168df5f1a",
   "specVersion": "1.7",
   "version": 1
 }

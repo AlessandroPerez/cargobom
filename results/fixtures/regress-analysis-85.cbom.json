@@ -102,21 +102,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in a85::h; use: digest; algorithm ring::digest::SHA1_FOR_LEGACY_USE_ONLY only through code or data no entry point reaches; line: `fn h(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
+            "additionalContext": "[present] [call] in a85::h; use: digest; algorithm ring::digest::SHA1_FOR_LEGACY_USE_ONLY only through code or data no entry point reaches; owner at src/main.rs:9:3-9:4 within 9:0-9:60; line: `fn h(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] in a85::dead; line: `fn dead(d: &[u8]) { let mut x: &'static Digest = &SHA1; (0..arg(9).len()).for_each(|_| x = &SHA512); h(x, d); }`; code: `SHA1`",
+            "additionalContext": "[present] [static] in a85::dead; owner at src/main.rs:11:3-11:7 within 11:0-11:111; line: `fn dead(d: &[u8]) { let mut x: &'static Digest = &SHA1; (0..arg(9).len()).for_each(|_| x = &SHA512); h(x, d); }`; code: `SHA1`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 50,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [static] in a85::main::{closure#1}; instantiated by a85::main at src/main.rs:34:26 as `|s| *s = &SHA1`; line: `w.iter_mut().for_each(|s| *s = &SHA1);`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a85::main::{closure#1}; owner at src/main.rs:34:26-34:29 as `|s|` line #52625f7d within 34:26-34:40; instantiated by a85::main at src/main.rs:34:26 as `|s| *s = &SHA1` (built, to 34:40 as `|s| *s = &SHA1` line #52625f7d, caller at src/main.rs:14:3-14:7 within 14:0-36:1); line: `w.iter_mut().for_each(|s| *s = &SHA1);`; code: `SHA1`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 36,
@@ -172,77 +172,77 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a85::fill; line: `fn fill(m: &mut HashMap<u8, &'static Digest>) { m.insert(1, &SHA256); }`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a85::fill; owner at src/main.rs:7:3-7:7 within 7:0-7:71; line: `fn fill(m: &mut HashMap<u8, &'static Digest>) { m.insert(1, &SHA256); }`; code: `SHA256`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 61,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::h; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `a85::main`; line: `fn h(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::h; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `a85::main`; owner at src/main.rs:9:3-9:4 within 9:0-9:60; line: `fn h(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a85::loop_param; line: `fn loop_param(extra: &'static Digest, d: &[u8]) { for a in [&SHA256, extra] { let _ = digest(a, d); } }`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a85::loop_param; owner at src/main.rs:12:3-12:13 within 12:0-12:103; line: `fn loop_param(extra: &'static Digest, d: &[u8]) { for a in [&SHA256, extra] { let _ = digest(a, d); } }`; code: `SHA256`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 61,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::loop_param; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `fn loop_param(extra: &'static Digest, d: &[u8]) { for a in [&SHA256, extra] { let _ = digest(a, d); } }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::loop_param; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); owner at src/main.rs:12:3-12:13 within 12:0-12:103; line: `fn loop_param(extra: &'static Digest, d: &[u8]) { for a in [&SHA256, extra] { let _ = digest(a, d); } }`; code: `digest`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 86,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a85::main; line: `let mut x: &'static Digest = &SHA256;`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a85::main; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `let mut x: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 34,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 34,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(arr[0], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `let _ = digest(arr[0], &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: container, possible (a value `std::collections::hash::map::HashMap::insert` puts in it); line: `let _ = digest(m[&1], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: container, possible (a value `std::collections::hash::map::HashMap::insert` puts in it); owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `let _ = digest(m[&1], &d);`; code: `digest`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a85::main; line: `h(&SHA256, &d);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a85::main; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `h(&SHA256, &d);`; code: `SHA256`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 7,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in a85::main; line: `w.push(&SHA256);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a85::main; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `w.push(&SHA256);`; code: `SHA256`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; line: `for a in w.iter() { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA256 in the arguments; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `for a in w.iter() { let _ = digest(a, &d); }`; code: `digest`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 32,
@@ -294,70 +294,70 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a85::one; line: `fn one() -> Vec<&'static Digest> { vec![&SHA384] }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a85::one; owner at src/main.rs:8:3-8:6 within 8:0-8:50; line: `fn one() -> Vec<&'static Digest> { vec![&SHA384] }`; code: `SHA384`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 41,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::loop_param; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: container, possible (a value `core::iter::traits::collect::IntoIterator::into_iter` puts in it); line: `fn loop_param(extra: &'static Digest, d: &[u8]) { for a in [&SHA256, extra] { let _ = digest(a, d); } }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::loop_param; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: container, possible (a value `core::iter::traits::collect::IntoIterator::into_iter` puts in it); owner at src/main.rs:12:3-12:13 within 12:0-12:103; line: `fn loop_param(extra: &'static Digest, d: &[u8]) { for a in [&SHA256, extra] { let _ = digest(a, d); } }`; code: `digest`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 86,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a85::main; line: `let arr = [x, &SHA384];`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a85::main; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `let arr = [x, &SHA384];`; code: `SHA384`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 34,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(arr[0], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA384 in the arguments; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `let _ = digest(arr[0], &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a85::main; line: `let mut v = vec![&SHA384];`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a85::main; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `let mut v = vec![&SHA384];`; code: `SHA384`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; line: `for a in &v { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `for a in &v { let _ = digest(a, &d); }`; code: `digest`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: container, possible (a value `vec![..]` puts in it); line: `let _ = digest(one()[0], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: container, possible (a value `vec![..]` puts in it); owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `let _ = digest(one()[0], &d);`; code: `digest`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a85::main; line: `loop_param(&SHA384, &d);`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a85::main; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `loop_param(&SHA384, &d);`; code: `SHA384`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; line: `while let Some(a) = it.next() { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 1 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `while let Some(a) = it.next() { let _ = digest(a, &d); }`; code: `digest`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 44,
@@ -409,42 +409,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in a85::h; use: digest; algorithm ring::digest::SHA512 only through code or data no entry point reaches; line: `fn h(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
+            "additionalContext": "[present] [call] in a85::h; use: digest; algorithm ring::digest::SHA512 only through code or data no entry point reaches; owner at src/main.rs:9:3-9:4 within 9:0-9:60; line: `fn h(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] in a85::dead::{closure#0}; line: `fn dead(d: &[u8]) { let mut x: &'static Digest = &SHA1; (0..arg(9).len()).for_each(|_| x = &SHA512); h(x, d); }`; code: `SHA512`",
+            "additionalContext": "[present] [static] in a85::dead::{closure#0}; owner at src/main.rs:11:83-11:86 as `|_|` line #7b8cc100 within 11:83-11:98; line: `fn dead(d: &[u8]) { let mut x: &'static Digest = &SHA1; (0..arg(9).len()).for_each(|_| x = &SHA512); h(x, d); }`; code: `SHA512`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 92,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in a85::main::{closure#0}; instantiated by a85::main at src/main.rs:17:31 as `|_| x = &SHA512`; line: `(0..arg(1).len()).for_each(|_| x = &SHA512);`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in a85::main::{closure#0}; owner at src/main.rs:17:31-17:34 as `|_|` line #d9c69f51 within 17:31-17:46; instantiated by a85::main at src/main.rs:17:31 as `|_| x = &SHA512` (built, to 17:46 as `|_| x = &SHA512` line #d9c69f51, caller at src/main.rs:14:3-14:7 within 14:0-36:1); line: `(0..arg(1).len()).for_each(|_| x = &SHA512);`; code: `SHA512`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 40,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `for a in arr.iter() { let _ = digest(a, &d); }`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 34,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA512 in the arguments; line: `let _ = digest(arr[0], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm one of 3 that may reach the call: ring::digest::SHA512 in the arguments; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `let _ = digest(arr[0], &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a85::main; line: `if let Some(s) = v.first_mut().as_mut() { **s = &SHA512; }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in a85::main; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `if let Some(s) = v.first_mut().as_mut() { **s = &SHA512; }`; code: `SHA512`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 53,
@@ -495,21 +495,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `core::slice::<impl [T]>::first_mut` is not followed; line: `for a in &v { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `core::slice::<impl [T]>::first_mut` is not followed; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `for a in &v { let _ = digest(a, &d); }`; code: `digest`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `core::slice::<impl [T]>::first_mut` is not followed; line: `while let Some(a) = it.next() { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `core::slice::<impl [T]>::first_mut` is not followed; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `while let Some(a) = it.next() { let _ = digest(a, &d); }`; code: `digest`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 44,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `core::slice::<impl [T]>::iter_mut` is not followed; line: `for a in w.iter() { let _ = digest(a, &d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a85::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `core::slice::<impl [T]>::iter_mut` is not followed; owner at src/main.rs:14:3-14:7 within 14:0-36:1; line: `for a in w.iter() { let _ = digest(a, &d); }`; code: `digest`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 32,
@@ -662,7 +662,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:95f47f74-b92d-887f-b93d-c64119a12eb4",
+  "serialNumber": "urn:uuid:1f44a916-7da1-8796-87ae-e663779f24eb",
   "specVersion": "1.7",
   "version": 1
 }

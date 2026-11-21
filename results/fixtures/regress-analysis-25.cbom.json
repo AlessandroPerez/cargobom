@@ -288,14 +288,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; ikm: hard-coded (1 bytes, literal at app/src/main.rs:9) or parameter (argument 0 of the enclosing function); line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; ikm: hard-coded (1 bytes, literal at app/src/main.rs:9) or parameter (argument 0 of the enclosing function); owner at lib1/src/lib.rs:1:7-1:13 within 1:0-6:1; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
             "line": 2,
             "location": "lib1/src/lib.rs",
             "offset": 13,
             "symbol": "hkdf::Hkdf::<H, I>::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [call] [artifacts: bin app, lib lib1] in lib1::derive; use: keyderive; owner at lib1/src/lib.rs:1:7-1:13 within 1:0-6:1; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
             "line": 4,
             "location": "lib1/src/lib.rs",
             "offset": 7,
@@ -363,14 +363,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; owner at lib1/src/lib.rs:1:7-1:13 within 1:0-6:1; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
             "line": 2,
             "location": "lib1/src/lib.rs",
             "offset": 13,
             "symbol": "hkdf::Hkdf::<H, I>::new"
           },
           {
-            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; owner at lib1/src/lib.rs:1:7-1:13 within 1:0-6:1; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
             "line": 4,
             "location": "lib1/src/lib.rs",
             "offset": 7,
@@ -434,21 +434,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin app] in app::main; use: digest; line: `let d = hashing::Sha256::digest(b\"x\");`; code: `hashing::Sha256::digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin app] in app::main; use: digest; owner at app/src/main.rs:7:3-7:7 within 7:0-10:1; line: `let d = hashing::Sha256::digest(b\"x\");`; code: `hashing::Sha256::digest`",
             "line": 8,
             "location": "app/src/main.rs",
             "offset": 12,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
+            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; owner at lib1/src/lib.rs:1:7-1:13 within 1:0-6:1; line: `let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, ikm);`; code: `hkdf::Hkdf::<sha2::Sha256>::new`",
             "line": 2,
             "location": "lib1/src/lib.rs",
             "offset": 13,
             "symbol": "hkdf::Hkdf::<H, I>::new"
           },
           {
-            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [component] [artifacts: bin app, lib lib1] in lib1::derive; part of HKDF-SHA-256; owner at lib1/src/lib.rs:1:7-1:13 within 1:0-6:1; line: `hk.expand(b\"i\", &mut out).unwrap();`; code: `expand`",
             "line": 4,
             "location": "lib1/src/lib.rs",
             "offset": 7,
@@ -508,7 +508,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: lib lib1] in lib1::unused; use: digest; line: `sha2::Sha512_256::digest(d).into()`; code: `sha2::Sha512_256::digest`",
+            "additionalContext": "[reachable] [call] [artifacts: lib lib1] in lib1::unused; use: digest; owner at lib1/src/lib.rs:7:7-7:13 within 7:0-10:1; line: `sha2::Sha512_256::digest(d).into()`; code: `sha2::Sha512_256::digest`",
             "line": 9,
             "location": "lib1/src/lib.rs",
             "offset": 4,
@@ -706,7 +706,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:17fa61b3-1737-8fb0-a278-6468a1f43778",
+  "serialNumber": "urn:uuid:48ad3361-1561-8f43-baf0-4b040a535874",
   "specVersion": "1.7",
   "version": 1
 }

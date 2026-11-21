@@ -222,28 +222,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in threads::mac; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 21) or parameter (argument 0 of the enclosing function); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in threads::mac; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 21) or parameter (argument 0 of the enclosing function); owner at src/main.rs:10:3-10:6 within 10:0-14:1; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in threads::mac; use: tag; line: `m.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in threads::mac; use: tag; owner at src/main.rs:10:3-10:6 within 10:0-14:1; line: `m.update(data);`; code: `update`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in threads::mac; use: tag; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in threads::mac; use: tag; owner at src/main.rs:10:3-10:6 within 10:0-14:1; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in threads::mac; into_bytes: setup, not a use; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`",
+            "additionalContext": "[reachable] [call] in threads::mac; into_bytes: setup, not a use; owner at src/main.rs:10:3-10:6 within 10:0-14:1; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 17,
@@ -303,35 +303,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in threads::hash; use: digest; line: `Sha256::digest(data).to_vec()`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in threads::hash; use: digest; owner at src/main.rs:6:3-6:7 within 6:0-8:1; line: `Sha256::digest(data).to_vec()`; code: `Sha256::digest`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [component] in threads::mac; part of HMAC-SHA-256; owner at src/main.rs:10:3-10:6 within 10:0-14:1; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key).unwrap();`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `m.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [component] in threads::mac; part of HMAC-SHA-256; owner at src/main.rs:10:3-10:6 within 10:0-14:1; line: `m.update(data);`; code: `update`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`",
+            "additionalContext": "[reachable] [component] in threads::mac; part of HMAC-SHA-256; owner at src/main.rs:10:3-10:6 within 10:0-14:1; line: `m.finalize().into_bytes().to_vec()`; code: `finalize`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in threads::mac; part of HMAC-SHA-256; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`",
+            "additionalContext": "[reachable] [component] in threads::mac; part of HMAC-SHA-256; owner at src/main.rs:10:3-10:6 within 10:0-14:1; line: `m.finalize().into_bytes().to_vec()`; code: `into_bytes`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 17,
@@ -492,7 +492,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:4cfc0104-87c4-8342-897a-aa8e65465ebc",
+  "serialNumber": "urn:uuid:e04df3ec-b374-8957-a53d-a617aeb0d0ec",
   "specVersion": "1.7",
   "version": 1
 }

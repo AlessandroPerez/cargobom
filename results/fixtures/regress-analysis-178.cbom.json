@@ -658,28 +658,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 30); iv: hard-coded (16 bytes, literal at line 29); line: `let c4 = cbc::Encryptor::<aes::Aes128>::new(&k16.into(), &iv.into())`; code: `cbc::Encryptor::<aes::Aes128>::new`",
+            "additionalContext": "[reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 30); iv: hard-coded (16 bytes, literal at line 29); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let c4 = cbc::Encryptor::<aes::Aes128>::new(&k16.into(), &iv.into())`; code: `cbc::Encryptor::<aes::Aes128>::new`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "crypto_common::KeyIvInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; line: `.encrypt_padded_vec::<Pkcs7>(msg);`; code: `encrypt_padded_vec`",
+            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `.encrypt_padded_vec::<Pkcs7>(msg);`; code: `encrypt_padded_vec`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "cipher::block::BlockModeEncrypt::encrypt_padded_vec"
           },
           {
-            "additionalContext": "[reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 30); iv: hard-coded (16 bytes, literal at line 29); line: `let p4 = cbc::Decryptor::<aes::Aes128>::new(&k16.into(), &iv.into())`; code: `cbc::Decryptor::<aes::Aes128>::new`",
+            "additionalContext": "[reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 30); iv: hard-coded (16 bytes, literal at line 29); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let p4 = cbc::Decryptor::<aes::Aes128>::new(&k16.into(), &iv.into())`; code: `cbc::Decryptor::<aes::Aes128>::new`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "crypto_common::KeyIvInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a178::main; use: decrypt; line: `.decrypt_padded_vec::<Pkcs7>(&c4)`; code: `decrypt_padded_vec`",
+            "additionalContext": "[reachable] [call] in a178::main; use: decrypt; owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `.decrypt_padded_vec::<Pkcs7>(&c4)`; code: `decrypt_padded_vec`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 9,
@@ -749,14 +749,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (literal at line 16); line: `let b = Aes128Gcm::new_from_slice(&key[..16]).unwrap();`; code: `Aes128Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (literal at line 16); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let b = Aes128Gcm::new_from_slice(&key[..16]).unwrap();`; code: `Aes128Gcm::new_from_slice`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 17); line: `b.encrypt_in_place(&n12.into(), b\"aad\", &mut buf).unwrap();`; code: `encrypt_in_place`",
+            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 17); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `b.encrypt_in_place(&n12.into(), b\"aad\", &mut buf).unwrap();`; code: `encrypt_in_place`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 6,
@@ -833,14 +833,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 30); line: `aes::Aes128::new(&k16.into()).encrypt_block(&mut block);`; code: `aes::Aes128::new`",
+            "additionalContext": "[reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (16 bytes, literal at line 30); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `aes::Aes128::new(&k16.into()).encrypt_block(&mut block);`; code: `aes::Aes128::new`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; line: `aes::Aes128::new(&k16.into()).encrypt_block(&mut block);`; code: `encrypt_block`",
+            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `aes::Aes128::new(&k16.into()).encrypt_block(&mut block);`; code: `encrypt_block`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 34,
@@ -903,14 +903,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 16); iv: hard-coded (16 bytes, literal at line 29); line: `let mut stream = ctr::Ctr128BE::<aes::Aes256>::new(&key.into(), &iv.into());`; code: `ctr::Ctr128BE::<aes::Aes256>::new`",
+            "additionalContext": "[reachable] [call] in a178::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 16); iv: hard-coded (16 bytes, literal at line 29); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let mut stream = ctr::Ctr128BE::<aes::Aes256>::new(&key.into(), &iv.into());`; code: `ctr::Ctr128BE::<aes::Aes256>::new`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "crypto_common::KeyIvInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a178::main; use: encrypt or decrypt; line: `stream.apply_keystream(&mut s);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in a178::main; use: encrypt or decrypt; owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `stream.apply_keystream(&mut s);`; code: `apply_keystream`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 11,
@@ -981,21 +981,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let a = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 16); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let a = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 17); line: `let c1 = a.encrypt(&n12.into(), msg).unwrap();`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 17); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let c1 = a.encrypt(&n12.into(), msg).unwrap();`; code: `encrypt`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in a178::main; use: decrypt; nonce: hard-coded (12 bytes, literal at line 17); line: `let p1 = a.decrypt(&n12.into(), c1.as_ref()).unwrap();`; code: `decrypt`",
+            "additionalContext": "[reachable] [call] in a178::main; use: decrypt; nonce: hard-coded (12 bytes, literal at line 17); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let p1 = a.decrypt(&n12.into(), c1.as_ref()).unwrap();`; code: `decrypt`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 15,
@@ -1071,14 +1071,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let c = ChaCha20Poly1305::new_from_slice(&key).unwrap();`; code: `ChaCha20Poly1305::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 16); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let c = ChaCha20Poly1305::new_from_slice(&key).unwrap();`; code: `ChaCha20Poly1305::new_from_slice`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 17); line: `let c2 = c.encrypt(&n12.into(), msg).unwrap();`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 17); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let c2 = c.encrypt(&n12.into(), msg).unwrap();`; code: `encrypt`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 15,
@@ -1150,14 +1150,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let x = XChaCha20Poly1305::new_from_slice(&key).unwrap();`; code: `XChaCha20Poly1305::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a178::main; new_from_slice: setup, not a use; key: hard-coded (32 bytes, literal at line 16); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let x = XChaCha20Poly1305::new_from_slice(&key).unwrap();`; code: `XChaCha20Poly1305::new_from_slice`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (24 bytes, literal at line 18); line: `let c3 = x.encrypt(&n24.into(), msg).unwrap();`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a178::main; use: encrypt; nonce: hard-coded (24 bytes, literal at line 18); owner at src/main.rs:13:3-13:7 within 13:0-45:1; line: `let c3 = x.encrypt(&n24.into(), msg).unwrap();`; code: `encrypt`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 15,
@@ -1465,7 +1465,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:13381a5f-d036-8f64-a73c-07ab41a7ae8e",
+  "serialNumber": "urn:uuid:707c67fb-b3af-84f4-a047-6b64541827e9",
   "specVersion": "1.7",
   "version": 1
 }

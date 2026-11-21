@@ -102,56 +102,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a121::Pick::alg; `<a121::Slow as a121::Pick>::alg` instantiated by <for<'a> fn(&'a a121::Slow) -> &'static ring::digest::Algorithm {<a121::Slow as a121::Pick>::alg} as core::ops::function::FnOnce<(&a121::Slow,)>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; instantiated by core::option::Option::<..>::map::<..>; instantiated by a121::main at src/main.rs:26:30 as `map`; line: `trait Pick { fn alg(&self) -> &'static Digest { &SHA1 } }`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a121::Pick::alg; owner at src/main.rs:6:16-6:19 within 6:13-6:55; owner `<a121::Slow as a121::Pick>::alg` at src/main.rs:6:16-6:19 within 6:13-6:55; `<a121::Slow as a121::Pick>::alg` instantiated by <for<'a> fn(&'a a121::Slow) -> &'static ring::digest::Algorithm {<a121::Slow as a121::Pick>::alg} as core::ops::function::FnOnce<(&a121::Slow,)>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4 (call, to 250:70 as `extern \"rust-call\" fn call_once(self, args: Args) -> Self::O` line #3f47b1c8, caller at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:26-250:35 within 250:4-250:70); instantiated by core::option::Option::<..>::map::<..>; instantiated by a121::main at src/main.rs:26:30 as `map` (call, to 26:33 as `map` line #82e203e7, caller at src/main.rs:16:3-16:7 within 16:0-35:1); line: `trait Pick { fn alg(&self) -> &'static Digest { &SHA1 } }`; code: `SHA1`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 49,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: object, from `<a121::Slow as a121::Pick>::alg`; line: `let _ = digest(s.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: object, from `<a121::Slow as a121::Pick>::alg`; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(s.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `digest`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(h.as_ref().map(Hold::get).unwrap_or(&SHA1), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(h.as_ref().map(Hold::get).unwrap_or(&SHA1), &d);`; code: `digest`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a121::main; line: `let _ = digest(h.as_ref().map(Hold::get).unwrap_or(&SHA1), &d);`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a121::main; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(h.as_ref().map(Hold::get).unwrap_or(&SHA1), &d);`; code: `SHA1`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 56,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(o.map(keep).map(keep).unwrap_or(&SHA1), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.map(keep).map(keep).unwrap_or(&SHA1), &d);`; code: `digest`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a121::main; line: `let _ = digest(o.map(keep).map(keep).unwrap_or(&SHA1), &d);`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a121::main; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.map(keep).map(keep).unwrap_or(&SHA1), &d);`; code: `SHA1`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 52,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(o.as_ref().map(Clone::clone).unwrap_or(&SHA1), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.as_ref().map(Clone::clone).unwrap_or(&SHA1), &d);`; code: `digest`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a121::main; line: `let _ = digest(o.as_ref().map(Clone::clone).unwrap_or(&SHA1), &d);`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in a121::main; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.as_ref().map(Clone::clone).unwrap_or(&SHA1), &d);`; code: `SHA1`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 59,
@@ -207,98 +207,98 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a121::main; line: `let o: Option<&'static Digest> = if arg(1).is_empty() { None } else { Some(&SHA256) };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a121::main; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let o: Option<&'static Digest> = if arg(1).is_empty() { None } else { Some(&SHA256) };`; code: `SHA256`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 80,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(o.unwrap_or_else(fallback), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.unwrap_or_else(fallback), &d);`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(o.or_else(|| Some(fallback())).unwrap(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.or_else(|| Some(fallback())).unwrap(), &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(*g.get_or_insert_with(fallback), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(*g.get_or_insert_with(fallback), &d);`; code: `digest`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(f.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(f.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a121::main; line: `let _ = digest(f.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a121::main; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(f.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `SHA256`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 56,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(s.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(s.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `digest`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a121::main; line: `let _ = digest(s.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a121::main; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(s.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `SHA256`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 56,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(f.as_ref().map(alg_of).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(f.as_ref().map(alg_of).unwrap_or(&SHA256), &d);`; code: `digest`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a121::main; line: `let _ = digest(f.as_ref().map(alg_of).unwrap_or(&SHA256), &d);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a121::main; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(f.as_ref().map(alg_of).unwrap_or(&SHA256), &d);`; code: `SHA256`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 53,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a121::keep`; line: `let _ = digest(o.map(keep).map(keep).unwrap_or(&SHA1), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a121::keep`; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.map(keep).map(keep).unwrap_or(&SHA1), &d);`; code: `digest`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a121::wrap_ok`; line: `let _ = digest(r.and_then(wrap_ok).unwrap_or(&SHA384), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a121::wrap_ok`; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(r.and_then(wrap_ok).unwrap_or(&SHA384), &d);`; code: `digest`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a121::keep`; line: `let _ = digest(o.map_or_else(fallback, keep), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `a121::keep`; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.map_or_else(fallback, keep), &d);`; code: `digest`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(o.as_ref().map(Clone::clone).unwrap_or(&SHA1), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.as_ref().map(Clone::clone).unwrap_or(&SHA1), &d);`; code: `digest`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 12,
@@ -350,49 +350,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <a121::Fast as a121::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA384 } }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in <a121::Fast as a121::Pick>::alg; owner at src/main.rs:8:24-8:27 within 8:21-8:65; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA384 } }`; code: `SHA384`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 57,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a121::Fast as a121::Pick>::alg`; line: `let _ = digest(f.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a121::Fast as a121::Pick>::alg`; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(f.as_ref().map(Pick::alg).unwrap_or(&SHA256), &d);`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a121::Fast as a121::Pick>::alg`; line: `let _ = digest(f.as_ref().map(alg_of).unwrap_or(&SHA256), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<a121::Fast as a121::Pick>::alg`; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(f.as_ref().map(alg_of).unwrap_or(&SHA256), &d);`; code: `digest`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a121::main; line: `let h = if arg(3).is_empty() { None } else { Some(Hold { h: &SHA384 }) };`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a121::main; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let h = if arg(3).is_empty() { None } else { Some(Hold { h: &SHA384 }) };`; code: `SHA384`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 65,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `a121::main` stores in the field); line: `let _ = digest(h.as_ref().map(Hold::get).unwrap_or(&SHA1), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: type-join, possible (a value `a121::main` stores in the field); owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(h.as_ref().map(Hold::get).unwrap_or(&SHA1), &d);`; code: `digest`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(r.and_then(wrap_ok).unwrap_or(&SHA384), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(r.and_then(wrap_ok).unwrap_or(&SHA384), &d);`; code: `digest`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a121::main; line: `let _ = digest(r.and_then(wrap_ok).unwrap_or(&SHA384), &d);`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a121::main; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(r.and_then(wrap_ok).unwrap_or(&SHA384), &d);`; code: `SHA384`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 50,
@@ -444,35 +444,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a121::fallback; line: `fn fallback() -> &'static Digest { &SHA512 }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in a121::fallback; owner at src/main.rs:4:3-4:11 within 4:0-4:44; line: `fn fallback() -> &'static Digest { &SHA512 }`; code: `SHA512`",
             "line": 4,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `a121::fallback`; line: `let _ = digest(o.unwrap_or_else(fallback), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `a121::fallback`; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.unwrap_or_else(fallback), &d);`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `a121::fallback`; line: `let _ = digest(o.or_else(|| Some(fallback())).unwrap(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `a121::fallback`; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.or_else(|| Some(fallback())).unwrap(), &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `a121::fallback`; line: `let _ = digest(*g.get_or_insert_with(fallback), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `a121::fallback`; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(*g.get_or_insert_with(fallback), &d);`; code: `digest`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `a121::fallback`; line: `let _ = digest(o.map_or_else(fallback, keep), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a121::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `a121::fallback`; owner at src/main.rs:16:3-16:7 within 16:0-35:1; line: `let _ = digest(o.map_or_else(fallback, keep), &d);`; code: `digest`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 12,
@@ -616,7 +616,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:64fd5df8-8430-8f6a-852b-a9ed6ca6d396",
+  "serialNumber": "urn:uuid:0b25076d-f65c-8fe7-b15c-4ee9c135bb70",
   "specVersion": "1.7",
   "version": 1
 }

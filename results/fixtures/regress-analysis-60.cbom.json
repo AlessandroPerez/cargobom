@@ -102,7 +102,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [static] in a60::Pick::alg; line: `trait Pick { fn alg(&self) -> &'static Digest { &SHA256 } }`; code: `SHA256`",
+            "additionalContext": "[present] [static] in a60::Pick::alg; owner at src/main.rs:5:16-5:19 within 5:13-5:57; line: `trait Pick { fn alg(&self) -> &'static Digest { &SHA256 } }`; code: `SHA256`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 49,
@@ -154,21 +154,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <a60::Fast as a60::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA384 } }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in <a60::Fast as a60::Pick>::alg; owner at src/main.rs:7:24-7:27 within 7:21-7:65; line: `impl Pick for Fast { fn alg(&self) -> &'static Digest { &SHA384 } }`; code: `SHA384`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 57,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a60::pass; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a60::Fast as a60::Pick>::alg`; line: `fn pass(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a60::pass; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a60::Fast as a60::Pick>::alg`; owner at src/main.rs:8:3-8:7 within 8:0-8:63; line: `fn pass(a: &'static Digest, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 48,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a60::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a60::Fast as a60::Pick>::alg`; line: `let _ = digest(Fast.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a60::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `<a60::Fast as a60::Pick>::alg`; owner at src/main.rs:10:3-10:7 within 10:0-14:1; line: `let _ = digest(Fast.alg(), &d);`; code: `digest`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 12,
@@ -302,7 +302,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:8d5e969e-5bb7-8e63-a9dd-2676d88c1592",
+  "serialNumber": "urn:uuid:9347fc11-56a0-8573-97e5-408ccd986d88",
   "specVersion": "1.7",
   "version": 1
 }

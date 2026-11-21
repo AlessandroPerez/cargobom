@@ -122,21 +122,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] [artifacts: bin v15] in v15::LOCAL; line: `const LOCAL: &ring::digest::Algorithm = &SHA1;`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] [artifacts: bin v15] in v15::LOCAL; owner at src/main.rs:6:6-6:11 within 6:0-6:46; line: `const LOCAL: &ring::digest::Algorithm = &SHA1;`; code: `SHA1`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 41,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `let _ = digest(LOCAL, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(LOCAL, &d);`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; v15::LOCAL -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; line: `let _ = digest(LOCAL, &d);`; code: `LOCAL`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; v15::LOCAL -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(LOCAL, &d);`; code: `LOCAL`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 19,
@@ -196,42 +196,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] [artifacts: bin v15, lib picklib] in picklib::TABLE; line: `pub static TABLE: [&Algorithm; 2] = [&SHA256, &SHA384];`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] [artifacts: bin v15, lib picklib] in picklib::TABLE; owner at picklib/src/lib.rs:4:11-4:16 within 4:0-4:55; line: `pub static TABLE: [&Algorithm; 2] = [&SHA256, &SHA384];`; code: `SHA256`",
             "line": 4,
             "location": "picklib/src/lib.rs",
             "offset": 38,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] [artifacts: bin v15, lib picklib] in picklib::inner::DEEP; line: `pub mod inner { pub static DEEP: &ring::digest::Algorithm = &ring::digest::SHA256; }`; code: `ring::digest::SHA256`",
+            "additionalContext": "[reachable] [static] [artifacts: bin v15, lib picklib] in picklib::inner::DEEP; owner at picklib/src/lib.rs:5:27-5:31 within 5:16-5:82; line: `pub mod inner { pub static DEEP: &ring::digest::Algorithm = &ring::digest::SHA256; }`; code: `ring::digest::SHA256`",
             "line": 5,
             "location": "picklib/src/lib.rs",
             "offset": 61,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(DEEP, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(DEEP, &d);`; code: `digest`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::inner::DEEP -> ring::digest::SHA256; line: `let _ = digest(DEEP, &d);`; code: `DEEP`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::inner::DEEP -> ring::digest::SHA256; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(DEEP, &d);`; code: `DEEP`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "picklib::inner::DEEP"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm one of the 2 in `picklib::TABLE`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let _ = digest(picklib::TABLE[i], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm one of the 2 in `picklib::TABLE`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(picklib::TABLE[i], &d);`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::TABLE -> ring::digest::SHA256; line: `let _ = digest(picklib::TABLE[i], &d);`; code: `picklib::TABLE`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::TABLE -> ring::digest::SHA256; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(picklib::TABLE[i], &d);`; code: `picklib::TABLE`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 19,
@@ -291,42 +291,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] [artifacts: bin v15] in picklib::CALG; line: `pub const CALG: &Algorithm = &SHA384;`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] [artifacts: bin v15] in picklib::CALG; owner at picklib/src/lib.rs:3:10-3:14 within 3:0-3:37; line: `pub const CALG: &Algorithm = &SHA384;`; code: `SHA384`",
             "line": 3,
             "location": "picklib/src/lib.rs",
             "offset": 30,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] [artifacts: bin v15, lib picklib] in picklib::TABLE; line: `pub static TABLE: [&Algorithm; 2] = [&SHA256, &SHA384];`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] [artifacts: bin v15, lib picklib] in picklib::TABLE; owner at picklib/src/lib.rs:4:11-4:16 within 4:0-4:55; line: `pub static TABLE: [&Algorithm; 2] = [&SHA256, &SHA384];`; code: `SHA384`",
             "line": 4,
             "location": "picklib/src/lib.rs",
             "offset": 47,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _ = digest(X, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(X, &d);`; code: `digest`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::CALG -> ring::digest::SHA384; line: `let _ = digest(X, &d);`; code: `X`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::CALG -> ring::digest::SHA384; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(X, &d);`; code: `X`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "picklib::CALG"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm one of the 2 in `picklib::TABLE`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `let _ = digest(picklib::TABLE[i], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm one of the 2 in `picklib::TABLE`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(picklib::TABLE[i], &d);`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::TABLE -> ring::digest::SHA384; line: `let _ = digest(picklib::TABLE[i], &d);`; code: `picklib::TABLE`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::TABLE -> ring::digest::SHA384; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(picklib::TABLE[i], &d);`; code: `picklib::TABLE`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 19,
@@ -386,35 +386,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] [artifacts: bin v15, lib picklib] in picklib::ALG; line: `pub static ALG: &Algorithm = &SHA512;`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] [artifacts: bin v15, lib picklib] in picklib::ALG; owner at picklib/src/lib.rs:2:11-2:14 within 2:0-2:37; line: `pub static ALG: &Algorithm = &SHA512;`; code: `SHA512`",
             "line": 2,
             "location": "picklib/src/lib.rs",
             "offset": 30,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(picklib::ALG, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(picklib::ALG, &d);`; code: `digest`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::ALG -> ring::digest::SHA512; line: `let _ = digest(picklib::ALG, &d);`; code: `picklib::ALG`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::ALG -> ring::digest::SHA512; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(picklib::ALG, &d);`; code: `picklib::ALG`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "picklib::ALG"
           },
           {
-            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::ALG -> ring::digest::SHA512; line: `let a = picklib::ALG;`; code: `picklib::ALG`",
+            "additionalContext": "[reachable] [via-static] [artifacts: bin v15] in v15::main; picklib::ALG -> ring::digest::SHA512; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let a = picklib::ALG;`; code: `picklib::ALG`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "picklib::ALG"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; line: `let _ = digest(a, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin v15] in v15::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; owner at src/main.rs:10:3-10:7 within 10:0-20:1; line: `let _ = digest(a, &d);`; code: `digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 12,
@@ -577,7 +577,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:ced20ff8-4730-89cc-82e1-1b3449f1f12a",
+  "serialNumber": "urn:uuid:619ee537-4966-814d-87e6-7d5fdc4209e8",
   "specVersion": "1.7",
   "version": 1
 }

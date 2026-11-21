@@ -102,7 +102,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in pilot_kdf_container::main; part of PBKDF2-SHA-1 (ring::pbkdf2::PBKDF2_HMAC_SHA1 -> ring::hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY); line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA1`",
+            "additionalContext": "[reachable] [component] in pilot_kdf_container::main; part of PBKDF2-SHA-1 (ring::pbkdf2::PBKDF2_HMAC_SHA1 -> ring::hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY); owner at src/main.rs:8:3-8:7 within 8:0-15:1; line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA1`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 44,
@@ -158,7 +158,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in pilot_kdf_container::main; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "additionalContext": "[reachable] [component] in pilot_kdf_container::main; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); owner at src/main.rs:8:3-8:7 within 8:0-15:1; line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 70,
@@ -214,21 +214,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in pilot_kdf_container::main; line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA1`",
+            "additionalContext": "[reachable] [static] in pilot_kdf_container::main; owner at src/main.rs:8:3-8:7 within 8:0-15:1; line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA1`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 44,
             "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA1"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_container::main; use: keyderive; algorithm one of 2 that may reach the call: ring::pbkdf2::PBKDF2_HMAC_SHA1 in the arguments; member: container, possible (an element of the container the call reads); salt: hard-coded (6 bytes, literal at line 11); password: hard-coded (12 bytes, literal at line 11); line: `pbkdf2::derive(prfs[0], rounds(4096), b\"salt-a\", b\"old password\", &mut legacy);`; code: `pbkdf2::derive`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_container::main; use: keyderive; algorithm one of 2 that may reach the call: ring::pbkdf2::PBKDF2_HMAC_SHA1 in the arguments; member: container, possible (an element of the container the call reads); salt: hard-coded (6 bytes, literal at line 11); password: hard-coded (12 bytes, literal at line 11); owner at src/main.rs:8:3-8:7 within 8:0-15:1; line: `pbkdf2::derive(prfs[0], rounds(4096), b\"salt-a\", b\"old password\", &mut legacy);`; code: `pbkdf2::derive`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::pbkdf2::derive"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_container::main; use: keyderive; algorithm one of 2 that may reach the call: ring::pbkdf2::PBKDF2_HMAC_SHA1 in the arguments; member: container, possible (an element of the container the call reads); salt: hard-coded (6 bytes, literal at line 13); password: hard-coded (12 bytes, literal at line 13); line: `pbkdf2::derive(prfs[1], rounds(310_000), b\"salt-b\", b\"new password\", &mut current);`; code: `pbkdf2::derive`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_container::main; use: keyderive; algorithm one of 2 that may reach the call: ring::pbkdf2::PBKDF2_HMAC_SHA1 in the arguments; member: container, possible (an element of the container the call reads); salt: hard-coded (6 bytes, literal at line 13); password: hard-coded (12 bytes, literal at line 13); owner at src/main.rs:8:3-8:7 within 8:0-15:1; line: `pbkdf2::derive(prfs[1], rounds(310_000), b\"salt-b\", b\"new password\", &mut current);`; code: `pbkdf2::derive`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 4,
@@ -296,21 +296,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in pilot_kdf_container::main; line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "additionalContext": "[reachable] [static] in pilot_kdf_container::main; owner at src/main.rs:8:3-8:7 within 8:0-15:1; line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 70,
             "symbol": "ring::pbkdf2::PBKDF2_HMAC_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_container::main; use: keyderive; algorithm one of 2 that may reach the call: ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; member: container, possible (an element of the container the call reads); salt: hard-coded (6 bytes, literal at line 11); password: hard-coded (12 bytes, literal at line 11); line: `pbkdf2::derive(prfs[0], rounds(4096), b\"salt-a\", b\"old password\", &mut legacy);`; code: `pbkdf2::derive`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_container::main; use: keyderive; algorithm one of 2 that may reach the call: ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; member: container, possible (an element of the container the call reads); salt: hard-coded (6 bytes, literal at line 11); password: hard-coded (12 bytes, literal at line 11); owner at src/main.rs:8:3-8:7 within 8:0-15:1; line: `pbkdf2::derive(prfs[0], rounds(4096), b\"salt-a\", b\"old password\", &mut legacy);`; code: `pbkdf2::derive`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::pbkdf2::derive"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_container::main; use: keyderive; algorithm one of 2 that may reach the call: ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; member: container, possible (an element of the container the call reads); salt: hard-coded (6 bytes, literal at line 13); password: hard-coded (12 bytes, literal at line 13); line: `pbkdf2::derive(prfs[1], rounds(310_000), b\"salt-b\", b\"new password\", &mut current);`; code: `pbkdf2::derive`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_container::main; use: keyderive; algorithm one of 2 that may reach the call: ring::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; member: container, possible (an element of the container the call reads); salt: hard-coded (6 bytes, literal at line 13); password: hard-coded (12 bytes, literal at line 13); owner at src/main.rs:8:3-8:7 within 8:0-15:1; line: `pbkdf2::derive(prfs[1], rounds(310_000), b\"salt-b\", b\"new password\", &mut current);`; code: `pbkdf2::derive`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 4,
@@ -378,7 +378,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in pilot_kdf_container::main; part of PBKDF2-SHA-1 (ring::pbkdf2::PBKDF2_HMAC_SHA1 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY); line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA1`",
+            "additionalContext": "[reachable] [component] in pilot_kdf_container::main; part of PBKDF2-SHA-1 (ring::pbkdf2::PBKDF2_HMAC_SHA1 -> ring::digest::SHA1_FOR_LEGACY_USE_ONLY); owner at src/main.rs:8:3-8:7 within 8:0-15:1; line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA1`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 44,
@@ -438,7 +438,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in pilot_kdf_container::main; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "additionalContext": "[reachable] [component] in pilot_kdf_container::main; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); owner at src/main.rs:8:3-8:7 within 8:0-15:1; line: `let prfs: Vec<pbkdf2::Algorithm> = vec![pbkdf2::PBKDF2_HMAC_SHA1, pbkdf2::PBKDF2_HMAC_SHA256];`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 70,
@@ -606,7 +606,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c81d148d-a260-8f96-bd65-4ea050eb5467",
+  "serialNumber": "urn:uuid:c76f0f1d-1df6-82e5-8503-f8a6b4eb0af7",
   "specVersion": "1.7",
   "version": 1
 }

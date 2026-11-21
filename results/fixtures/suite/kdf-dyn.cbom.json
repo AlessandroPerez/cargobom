@@ -102,7 +102,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in <pilot_kdf_dyn::Interactive as pilot_kdf_dyn::KdfProfile>::prf; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA256 }`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "additionalContext": "[reachable] [component] in <pilot_kdf_dyn::Interactive as pilot_kdf_dyn::KdfProfile>::prf; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::hmac::HMAC_SHA256); owner at src/main.rs:13:7-13:10 within 13:4-13:69; line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA256 }`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 41,
@@ -158,7 +158,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in <pilot_kdf_dyn::Archival as pilot_kdf_dyn::KdfProfile>::prf; part of PBKDF2-SHA-512 (ring::pbkdf2::PBKDF2_HMAC_SHA512 -> ring::hmac::HMAC_SHA512); line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA512 }`; code: `pbkdf2::PBKDF2_HMAC_SHA512`",
+            "additionalContext": "[reachable] [component] in <pilot_kdf_dyn::Archival as pilot_kdf_dyn::KdfProfile>::prf; part of PBKDF2-SHA-512 (ring::pbkdf2::PBKDF2_HMAC_SHA512 -> ring::hmac::HMAC_SHA512); owner at src/main.rs:18:7-18:10 within 18:4-18:69; line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA512 }`; code: `pbkdf2::PBKDF2_HMAC_SHA512`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 41,
@@ -214,7 +214,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_dyn::derive_key; use: keyderive; algorithm one of 2 that may reach the call from other functions: ring::pbkdf2::PBKDF2_HMAC_SHA256; member: dyn, possible (dyn: `pilot_kdf_dyn::Interactive` is coerced to `dyn pilot_kdf_dyn::KdfProfile` at src/main.rs:29); salt: hard-coded (8 bytes, literal at line 24); password: hard-coded (2 bytes, literal at line 31) or parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(p.prf(), NonZeroU32::new(600_000).unwrap(), b\"dyn-salt\", pw, &mut out);`; code: `pbkdf2::derive`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_dyn::derive_key; use: keyderive; algorithm one of 2 that may reach the call from other functions: ring::pbkdf2::PBKDF2_HMAC_SHA256; member: dyn, possible (dyn: `pilot_kdf_dyn::Interactive` is coerced to `dyn pilot_kdf_dyn::KdfProfile` at src/main.rs:29); salt: hard-coded (8 bytes, literal at line 24); password: hard-coded (2 bytes, literal at line 31) or parameter (argument 1 of the enclosing function); owner at src/main.rs:22:3-22:13 within 22:0-26:1; line: `pbkdf2::derive(p.prf(), NonZeroU32::new(600_000).unwrap(), b\"dyn-salt\", pw, &mut out);`; code: `pbkdf2::derive`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 4,
@@ -282,7 +282,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <pilot_kdf_dyn::Interactive as pilot_kdf_dyn::KdfProfile>::prf; line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA256 }`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "additionalContext": "[reachable] [static] in <pilot_kdf_dyn::Interactive as pilot_kdf_dyn::KdfProfile>::prf; owner at src/main.rs:13:7-13:10 within 13:4-13:69; line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA256 }`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 41,
@@ -334,7 +334,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_dyn::derive_key; use: keyderive; algorithm one of 2 that may reach the call from other functions: ring::pbkdf2::PBKDF2_HMAC_SHA512; member: dyn, possible (dyn: `pilot_kdf_dyn::Archival` is coerced to `dyn pilot_kdf_dyn::KdfProfile` at src/main.rs:30); salt: hard-coded (8 bytes, literal at line 24); password: hard-coded (2 bytes, literal at line 31) or parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(p.prf(), NonZeroU32::new(600_000).unwrap(), b\"dyn-salt\", pw, &mut out);`; code: `pbkdf2::derive`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_dyn::derive_key; use: keyderive; algorithm one of 2 that may reach the call from other functions: ring::pbkdf2::PBKDF2_HMAC_SHA512; member: dyn, possible (dyn: `pilot_kdf_dyn::Archival` is coerced to `dyn pilot_kdf_dyn::KdfProfile` at src/main.rs:30); salt: hard-coded (8 bytes, literal at line 24); password: hard-coded (2 bytes, literal at line 31) or parameter (argument 1 of the enclosing function); owner at src/main.rs:22:3-22:13 within 22:0-26:1; line: `pbkdf2::derive(p.prf(), NonZeroU32::new(600_000).unwrap(), b\"dyn-salt\", pw, &mut out);`; code: `pbkdf2::derive`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 4,
@@ -402,7 +402,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <pilot_kdf_dyn::Archival as pilot_kdf_dyn::KdfProfile>::prf; line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA512 }`; code: `pbkdf2::PBKDF2_HMAC_SHA512`",
+            "additionalContext": "[reachable] [static] in <pilot_kdf_dyn::Archival as pilot_kdf_dyn::KdfProfile>::prf; owner at src/main.rs:18:7-18:10 within 18:4-18:69; line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA512 }`; code: `pbkdf2::PBKDF2_HMAC_SHA512`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 41,
@@ -454,7 +454,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in <pilot_kdf_dyn::Interactive as pilot_kdf_dyn::KdfProfile>::prf; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA256 }`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "additionalContext": "[reachable] [component] in <pilot_kdf_dyn::Interactive as pilot_kdf_dyn::KdfProfile>::prf; part of PBKDF2-SHA-256 (ring::pbkdf2::PBKDF2_HMAC_SHA256 -> ring::digest::SHA256); owner at src/main.rs:13:7-13:10 within 13:4-13:69; line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA256 }`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 41,
@@ -510,7 +510,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in <pilot_kdf_dyn::Archival as pilot_kdf_dyn::KdfProfile>::prf; part of PBKDF2-SHA-512 (ring::pbkdf2::PBKDF2_HMAC_SHA512 -> ring::digest::SHA512); line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA512 }`; code: `pbkdf2::PBKDF2_HMAC_SHA512`",
+            "additionalContext": "[reachable] [component] in <pilot_kdf_dyn::Archival as pilot_kdf_dyn::KdfProfile>::prf; part of PBKDF2-SHA-512 (ring::pbkdf2::PBKDF2_HMAC_SHA512 -> ring::digest::SHA512); owner at src/main.rs:18:7-18:10 within 18:4-18:69; line: `fn prf(&self) -> pbkdf2::Algorithm { pbkdf2::PBKDF2_HMAC_SHA512 }`; code: `pbkdf2::PBKDF2_HMAC_SHA512`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 41,
@@ -688,7 +688,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e89481c5-6499-8d87-86da-5462f17dd744",
+  "serialNumber": "urn:uuid:768c515a-6d6d-8d5b-b814-6e19fccaaeb8",
   "specVersion": "1.7",
   "version": 1
 }

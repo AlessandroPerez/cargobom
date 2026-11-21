@@ -536,21 +536,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t7::b64_env; new_from_slice: setup, not a use; key: environment (std::env::var); line: `let _c = Aes256Gcm::new_from_slice(&key);`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t7::b64_env; new_from_slice: setup, not a use; key: environment (std::env::var); owner at src/main.rs:6:3-6:10 within 6:0-10:1; line: `let _c = Aes256Gcm::new_from_slice(&key);`; code: `Aes256Gcm::new_from_slice`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t7::seeded; new_from_slice: setup, not a use; key: hard-coded (seed of rng::Rng::gen: literal at line 13); line: `let c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in t7::seeded; new_from_slice: setup, not a use; key: hard-coded (seed of rng::Rng::gen: literal at line 13); owner at src/main.rs:12:3-12:9 within 12:0-17:1; line: `let c = Aes256Gcm::new_from_slice(&key).unwrap();`; code: `Aes256Gcm::new_from_slice`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in t7::seeded; use: encrypt; nonce: hard-coded (default value); line: `let _ = c.encrypt(&Default::default(), &b\"x\"[..]);`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in t7::seeded; use: encrypt; nonce: hard-coded (default value); owner at src/main.rs:12:3-12:9 within 12:0-17:1; line: `let _ = c.encrypt(&Default::default(), &b\"x\"[..]);`; code: `encrypt`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 14,
@@ -625,7 +625,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t7::seeded; use: generate; line: `let key: [u8; 32] = rng.gen();`; code: `gen`",
+            "additionalContext": "[reachable] [call] in t7::seeded; use: generate; owner at src/main.rs:12:3-12:9 within 12:0-17:1; line: `let key: [u8; 32] = rng.gen();`; code: `gen`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 28,
@@ -860,7 +860,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:01085292-87b8-8e5e-8f30-a70fe53856e2",
+  "serialNumber": "urn:uuid:bd598344-318c-845b-b46e-228cf32edd5e",
   "specVersion": "1.7",
   "version": 1
 }

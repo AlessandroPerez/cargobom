@@ -261,35 +261,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a164::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 6); line: `let _ = poly1305::Poly1305::new(&k.into()).compute_unpadded(&d); // Poly1305`; code: `poly1305::Poly1305::new`",
+            "additionalContext": "[reachable] [call] in a164::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 6); owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `let _ = poly1305::Poly1305::new(&k.into()).compute_unpadded(&d); // Poly1305`; code: `poly1305::Poly1305::new`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a164::main; use: tag; line: `let _ = poly1305::Poly1305::new(&k.into()).compute_unpadded(&d); // Poly1305`; code: `compute_unpadded`",
+            "additionalContext": "[reachable] [call] in a164::main; use: tag; owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `let _ = poly1305::Poly1305::new(&k.into()).compute_unpadded(&d); // Poly1305`; code: `compute_unpadded`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 47,
             "symbol": "poly1305::Poly1305::compute_unpadded"
           },
           {
-            "additionalContext": "[reachable] [call] in a164::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 6); line: `let mut p = poly1305::Poly1305::new(&k.into());`; code: `poly1305::Poly1305::new`",
+            "additionalContext": "[reachable] [call] in a164::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 6); owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `let mut p = poly1305::Poly1305::new(&k.into());`; code: `poly1305::Poly1305::new`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a164::main; use: tag; line: `p.update_padded(&d); // Poly1305`; code: `update_padded`",
+            "additionalContext": "[reachable] [call] in a164::main; use: tag; owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `p.update_padded(&d); // Poly1305`; code: `update_padded`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "universal_hash::UniversalHash::update_padded"
           },
           {
-            "additionalContext": "[reachable] [call] in a164::main; use: tag; line: `let _ = p.finalize(); // Poly1305`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a164::main; use: tag; owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `let _ = p.finalize(); // Poly1305`; code: `finalize`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 14,
@@ -348,14 +348,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a164::main; use: tag; algorithm unresolved: the type `ghash::GHash` of ghash 0.5.1, which the knowledge base does not name; line: `g.update_padded(&d); // an unknown MAC (GHASH)`; code: `update_padded`",
+            "additionalContext": "[reachable] [call] in a164::main; use: tag; algorithm unresolved: the type `ghash::GHash` of ghash 0.5.1, which the knowledge base does not name; owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `g.update_padded(&d); // an unknown MAC (GHASH)`; code: `update_padded`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "universal_hash::UniversalHash::update_padded"
           },
           {
-            "additionalContext": "[reachable] [call] in a164::main; use: tag; algorithm unresolved: the type `ghash::GHash` of ghash 0.5.1, which the knowledge base does not name; line: `let _ = g.finalize(); // an unknown MAC (GHASH)`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a164::main; use: tag; algorithm unresolved: the type `ghash::GHash` of ghash 0.5.1, which the knowledge base does not name; owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `let _ = g.finalize(); // an unknown MAC (GHASH)`; code: `finalize`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 14,
@@ -411,14 +411,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a164::main; use: tag; algorithm unresolved: the type `polyval::backend::autodetect::Polyval` of polyval 0.6.2, which the knowledge base does not name; line: `v.update_padded(&d); // an unknown MAC (POLYVAL)`; code: `update_padded`",
+            "additionalContext": "[reachable] [call] in a164::main; use: tag; algorithm unresolved: the type `polyval::backend::autodetect::Polyval` of polyval 0.6.2, which the knowledge base does not name; owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `v.update_padded(&d); // an unknown MAC (POLYVAL)`; code: `update_padded`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "universal_hash::UniversalHash::update_padded"
           },
           {
-            "additionalContext": "[reachable] [call] in a164::main; use: verify; algorithm unresolved: the type `polyval::backend::autodetect::Polyval` of polyval 0.6.2, which the knowledge base does not name; line: `let _ = v.verify(&[0u8; 16].into()); // an unknown MAC (POLYVAL)`; code: `verify`",
+            "additionalContext": "[reachable] [call] in a164::main; use: verify; algorithm unresolved: the type `polyval::backend::autodetect::Polyval` of polyval 0.6.2, which the knowledge base does not name; owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `let _ = v.verify(&[0u8; 16].into()); // an unknown MAC (POLYVAL)`; code: `verify`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 14,
@@ -471,7 +471,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a164::main; new: setup, not a use; algorithm unresolved: the type `ghash::GHash` of ghash 0.5.1, which the knowledge base does not name; key: hard-coded (16 bytes, literal at line 11); line: `let mut g = ghash::GHash::new(&h.into());`; code: `ghash::GHash::new`",
+            "additionalContext": "[reachable] [call] in a164::main; new: setup, not a use; algorithm unresolved: the type `ghash::GHash` of ghash 0.5.1, which the knowledge base does not name; key: hard-coded (16 bytes, literal at line 11); owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `let mut g = ghash::GHash::new(&h.into());`; code: `ghash::GHash::new`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 16,
@@ -532,7 +532,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a164::main; new: setup, not a use; algorithm unresolved: the type `polyval::backend::autodetect::Polyval` of polyval 0.6.2, which the knowledge base does not name; key: hard-coded (16 bytes, literal at line 11); line: `let mut v = polyval::Polyval::new(&h.into());`; code: `polyval::Polyval::new`",
+            "additionalContext": "[reachable] [call] in a164::main; new: setup, not a use; algorithm unresolved: the type `polyval::backend::autodetect::Polyval` of polyval 0.6.2, which the knowledge base does not name; key: hard-coded (16 bytes, literal at line 11); owner at src/main.rs:4:3-4:7 within 4:0-18:1; line: `let mut v = polyval::Polyval::new(&h.into());`; code: `polyval::Polyval::new`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 16,
@@ -729,7 +729,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:1f0e0972-465c-8288-92e5-5a6f17be0a8f",
+  "serialNumber": "urn:uuid:8a81c386-6f11-8b80-b996-054aa7d4efa8",
   "specVersion": "1.7",
   "version": 1
 }

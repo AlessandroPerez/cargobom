@@ -899,21 +899,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <cmac::CmacCore<aes::autodetect::Aes128> as digest::core_api::UpdateCore>::update_blocks; encrypt_with_backend_mut: setup, not a use; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::Update>::update::{closure#0} at digest-0.10.7/src/core_api/wrapper.rs:150:50 as `update_blocks`; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::Update>::update at digest-0.10.7/src/core_api/wrapper.rs:150:36; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::mac::Mac>::update at digest-0.10.7/src/mac.rs:116:8 as `Update::update`; instantiated by a182::main at src/main.rs:18:6 as `update`; line: `cipher.encrypt_with_backend_mut(Ctx { state, blocks })`; code: `encrypt_with_backend_mut`",
+            "additionalContext": "[reachable] [call] in <cmac::CmacCore<aes::autodetect::Aes128> as digest::core_api::UpdateCore>::update_blocks; encrypt_with_backend_mut: setup, not a use; owner at cmac-0.7.2/src/lib.rs:144:7-144:20 within 144:4-166:5; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::Update>::update::{closure#0} at digest-0.10.7/src/core_api/wrapper.rs:150:50 as `update_blocks` (call, to 150:63 as `update_blocks` line #3f949906, caller at digest-0.10.7/src/core_api/wrapper.rs:150:36-150:44 as `|blocks|` line #16e863f8 within 150:36-150:71); instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::Update>::update at digest-0.10.7/src/core_api/wrapper.rs:150:36 (built, to 150:71 as `|blocks| core.update_blocks(blocks)` line #16e863f8, caller at digest-0.10.7/src/core_api/wrapper.rs:148:7-148:13 within 148:4-151:5); instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::mac::Mac>::update at digest-0.10.7/src/mac.rs:116:8 as `Update::update` (call, to 116:22 as `Update::update` line #778fa24b, caller at digest-0.10.7/src/mac.rs:115:7-115:13 within 115:4-117:5); instantiated by a182::main at src/main.rs:18:6 as `update` (call, to 18:12 as `update` line #557226bd, caller at src/main.rs:13:3-13:7 within 13:0-25:1); line: `cipher.encrypt_with_backend_mut(Ctx { state, blocks })`; code: `encrypt_with_backend_mut`",
             "line": 165,
             "location": "cmac-0.7.2/src/lib.rs",
             "offset": 15,
             "symbol": "cipher::block::BlockEncryptMut::encrypt_with_backend_mut"
           },
           {
-            "additionalContext": "[reachable] [call] in <cmac::CmacCore<aes::autodetect::Aes128> as digest::core_api::FixedOutputCore>::finalize_fixed_core; use: encrypt; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::FixedOutput>::finalize_into at digest-0.10.7/src/core_api/wrapper.rs:172:13 as `finalize_fixed_core`; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::FixedOutput>::finalize_fixed at digest-0.10.7/src/lib.rs:101:13 as `finalize_into`; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::mac::Mac>::finalize at digest-0.10.7/src/mac.rs:127:27 as `finalize_fixed`; instantiated by a182::main at src/main.rs:19:16 as `finalize`; line: `cipher.encrypt_block_mut(&mut subkey);`; code: `encrypt_block_mut`",
+            "additionalContext": "[reachable] [call] in <cmac::CmacCore<aes::autodetect::Aes128> as digest::core_api::FixedOutputCore>::finalize_fixed_core; use: encrypt; owner at cmac-0.7.2/src/lib.rs:188:7-188:26 within 188:4-207:5; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::FixedOutput>::finalize_into at digest-0.10.7/src/core_api/wrapper.rs:172:13 as `finalize_fixed_core` (call, to 172:32 as `finalize_fixed_core` line #babf0595, caller at digest-0.10.7/src/core_api/wrapper.rs:170:7-170:20 within 170:4-173:5); instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::FixedOutput>::finalize_fixed at digest-0.10.7/src/lib.rs:101:13 as `finalize_into` (call, to 101:26 as `finalize_into` line #c82aa7e6, caller at digest-0.10.7/src/lib.rs:99:7-99:21 within 99:4-103:5); instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::mac::Mac>::finalize at digest-0.10.7/src/mac.rs:127:27 as `finalize_fixed` (call, to 127:41 as `finalize_fixed` line #d7975044, caller at digest-0.10.7/src/mac.rs:126:7-126:15 within 126:4-128:5); instantiated by a182::main at src/main.rs:19:16 as `finalize` (call, to 19:24 as `finalize` line #e9e91039, caller at src/main.rs:13:3-13:7 within 13:0-25:1); line: `cipher.encrypt_block_mut(&mut subkey);`; code: `encrypt_block_mut`",
             "line": 194,
             "location": "cmac-0.7.2/src/lib.rs",
             "offset": 15,
             "symbol": "cipher::block::BlockEncryptMut::encrypt_block_mut"
           },
           {
-            "additionalContext": "[reachable] [call] in <cmac::CmacCore<aes::autodetect::Aes128> as digest::core_api::FixedOutputCore>::finalize_fixed_core; use: encrypt; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::FixedOutput>::finalize_into at digest-0.10.7/src/core_api/wrapper.rs:172:13 as `finalize_fixed_core`; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::FixedOutput>::finalize_fixed at digest-0.10.7/src/lib.rs:101:13 as `finalize_into`; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::mac::Mac>::finalize at digest-0.10.7/src/mac.rs:127:27 as `finalize_fixed`; instantiated by a182::main at src/main.rs:19:16 as `finalize`; line: `cipher.encrypt_block_mut(state);`; code: `encrypt_block_mut`",
+            "additionalContext": "[reachable] [call] in <cmac::CmacCore<aes::autodetect::Aes128> as digest::core_api::FixedOutputCore>::finalize_fixed_core; use: encrypt; owner at cmac-0.7.2/src/lib.rs:188:7-188:26 within 188:4-207:5; instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::FixedOutput>::finalize_into at digest-0.10.7/src/core_api/wrapper.rs:172:13 as `finalize_fixed_core` (call, to 172:32 as `finalize_fixed_core` line #babf0595, caller at digest-0.10.7/src/core_api/wrapper.rs:170:7-170:20 within 170:4-173:5); instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::FixedOutput>::finalize_fixed at digest-0.10.7/src/lib.rs:101:13 as `finalize_into` (call, to 101:26 as `finalize_into` line #c82aa7e6, caller at digest-0.10.7/src/lib.rs:99:7-99:21 within 99:4-103:5); instantiated by <digest::core_api::wrapper::CoreWrapper<cmac::CmacCore<aes::autodetect::Aes128>> as digest::mac::Mac>::finalize at digest-0.10.7/src/mac.rs:127:27 as `finalize_fixed` (call, to 127:41 as `finalize_fixed` line #d7975044, caller at digest-0.10.7/src/mac.rs:126:7-126:15 within 126:4-128:5); instantiated by a182::main at src/main.rs:19:16 as `finalize` (call, to 19:24 as `finalize` line #e9e91039, caller at src/main.rs:13:3-13:7 within 13:0-25:1); line: `cipher.encrypt_block_mut(state);`; code: `encrypt_block_mut`",
             "line": 205,
             "location": "cmac-0.7.2/src/lib.rs",
             "offset": 15,
@@ -964,7 +964,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a182::main; use: digest; algorithm unresolved: the type `ripemd::Ripemd160Core` of ripemd 0.1.3, a crypto package the knowledge base does not model; line: `let d = Ripemd160::digest(data);`; code: `Ripemd160::digest`",
+            "additionalContext": "[reachable] [call] in a182::main; use: digest; algorithm unresolved: the type `ripemd::Ripemd160Core` of ripemd 0.1.3, a crypto package the knowledge base does not model; owner at src/main.rs:13:3-13:7 within 13:0-25:1; line: `let d = Ripemd160::digest(data);`; code: `Ripemd160::digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
@@ -1019,21 +1019,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a182::main; new_from_slice: setup, not a use; algorithm unresolved: the type `cmac::CmacCore` of cmac 0.7.2, a crypto package the knowledge base does not model; key: hard-coded (16 bytes, literal at line 17); line: `let mut m = Cmac::<aes::Aes128>::new_from_slice(b\"0123456789abcdef\").unwrap();`; code: `Cmac::<aes::Aes128>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a182::main; new_from_slice: setup, not a use; algorithm unresolved: the type `cmac::CmacCore` of cmac 0.7.2, a crypto package the knowledge base does not model; key: hard-coded (16 bytes, literal at line 17); owner at src/main.rs:13:3-13:7 within 13:0-25:1; line: `let mut m = Cmac::<aes::Aes128>::new_from_slice(b\"0123456789abcdef\").unwrap();`; code: `Cmac::<aes::Aes128>::new_from_slice`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a182::main; use: tag; algorithm unresolved: the type `cmac::CmacCore` of cmac 0.7.2, a crypto package the knowledge base does not model; line: `m.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in a182::main; use: tag; algorithm unresolved: the type `cmac::CmacCore` of cmac 0.7.2, a crypto package the knowledge base does not model; owner at src/main.rs:13:3-13:7 within 13:0-25:1; line: `m.update(data);`; code: `update`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in a182::main; use: tag; algorithm unresolved: the type `cmac::CmacCore` of cmac 0.7.2, a crypto package the knowledge base does not model; line: `let tag = m.finalize().into_bytes();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a182::main; use: tag; algorithm unresolved: the type `cmac::CmacCore` of cmac 0.7.2, a crypto package the knowledge base does not model; owner at src/main.rs:13:3-13:7 within 13:0-25:1; line: `let tag = m.finalize().into_bytes();`; code: `finalize`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 16,
@@ -1096,7 +1096,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a182::main; use: keygen; algorithm unresolved: `rsa::key::RsaPrivateKey::new` of rsa 0.8.2, a version the knowledge base does not cover; rng: rng (rngs::thread::thread_rng); line: `let key = RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `RsaPrivateKey::new`",
+            "additionalContext": "[reachable] [call] in a182::main; use: keygen; algorithm unresolved: `rsa::key::RsaPrivateKey::new` of rsa 0.8.2, a version the knowledge base does not cover; rng: rng (rngs::thread::thread_rng); owner at src/main.rs:13:3-13:7 within 13:0-25:1; line: `let key = RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `RsaPrivateKey::new`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 14,
@@ -1155,7 +1155,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a182::main; use: sign; algorithm unresolved: the type `rsa::pkcs1v15::SigningKey` of rsa 0.8.2, a version the knowledge base does not cover; rng: rng (rngs::thread::thread_rng); line: `let sig = signer.sign_with_rng(&mut rng, data).to_vec();`; code: `sign_with_rng`",
+            "additionalContext": "[reachable] [call] in a182::main; use: sign; algorithm unresolved: the type `rsa::pkcs1v15::SigningKey` of rsa 0.8.2, a version the knowledge base does not cover; rng: rng (rngs::thread::thread_rng); owner at src/main.rs:13:3-13:7 within 13:0-25:1; line: `let sig = signer.sign_with_rng(&mut rng, data).to_vec();`; code: `sign_with_rng`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 21,
@@ -1471,7 +1471,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e2ba23c6-e6d1-82e2-a11f-315b02894791",
+  "serialNumber": "urn:uuid:9068a643-2b53-819e-9491-bbe2eb3384ba",
   "specVersion": "1.7",
   "version": 1
 }

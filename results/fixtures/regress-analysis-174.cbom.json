@@ -553,14 +553,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; salt: hard-coded (4 bytes, literal at line 36); ikm: environment (std::env::args); line: `let hk = hkdf::Hkdf::<Sha256>::new(Some(b\"salt\"), data);`; code: `hkdf::Hkdf::<Sha256>::new`",
+            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; salt: hard-coded (4 bytes, literal at line 36); ikm: environment (std::env::args); owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let hk = hkdf::Hkdf::<Sha256>::new(Some(b\"salt\"), data);`; code: `hkdf::Hkdf::<Sha256>::new`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "hkdf::GenericHkdf::<H>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; line: `hk.expand(b\"info\", &mut okm).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `hk.expand(b\"info\", &mut okm).unwrap();`; code: `expand`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 7,
@@ -624,35 +624,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 32); line: `let mut s = SimpleHmac::<sha1::Sha1>::new_from_slice(b\"key\").unwrap();`; code: `SimpleHmac::<sha1::Sha1>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 32); owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let mut s = SimpleHmac::<sha1::Sha1>::new_from_slice(b\"key\").unwrap();`; code: `SimpleHmac::<sha1::Sha1>::new_from_slice`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: tag; line: `s.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in a174::main; use: tag; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `s.update(data);`; code: `update`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: tag; line: `let t3 = s.finalize().into_bytes();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a174::main; use: tag; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let t3 = s.finalize().into_bytes();`; code: `finalize`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; into_bytes: setup, not a use; line: `let t3 = s.finalize().into_bytes();`; code: `into_bytes`",
+            "additionalContext": "[reachable] [call] in a174::main; into_bytes: setup, not a use; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let t3 = s.finalize().into_bytes();`; code: `into_bytes`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of PBKDF2-SHA-1-4096-16; line: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>(data, b\"salt\", 4_096, &mut k3).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>`",
+            "additionalContext": "[reachable] [component] in a174::main; part of PBKDF2-SHA-1-4096-16; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>(data, b\"salt\", 4_096, &mut k3).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 4,
@@ -712,42 +712,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 23); line: `let mut m = Hmac::<Sha256>::new_from_slice(b\"key\").unwrap();`; code: `Hmac::<Sha256>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 23); owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let mut m = Hmac::<Sha256>::new_from_slice(b\"key\").unwrap();`; code: `Hmac::<Sha256>::new_from_slice`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: tag; line: `m.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in a174::main; use: tag; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `m.update(data);`; code: `update`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: tag; line: `let tag = m.finalize().into_bytes();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a174::main; use: tag; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let tag = m.finalize().into_bytes();`; code: `finalize`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; into_bytes: setup, not a use; line: `let tag = m.finalize().into_bytes();`; code: `into_bytes`",
+            "additionalContext": "[reachable] [call] in a174::main; into_bytes: setup, not a use; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let tag = m.finalize().into_bytes();`; code: `into_bytes`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<Sha256>::new(Some(b\"salt\"), data);`; code: `hkdf::Hkdf::<Sha256>::new`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HKDF-SHA-256; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let hk = hkdf::Hkdf::<Sha256>::new(Some(b\"salt\"), data);`; code: `hkdf::Hkdf::<Sha256>::new`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "hkdf::GenericHkdf::<H>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HKDF-SHA-256; line: `hk.expand(b\"info\", &mut okm).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HKDF-SHA-256; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `hk.expand(b\"info\", &mut okm).unwrap();`; code: `expand`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 7,
@@ -807,28 +807,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 29); line: `let mut r = HmacReset::<Sha384>::new_from_slice(b\"key\").unwrap();`; code: `HmacReset::<Sha384>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 29); owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let mut r = HmacReset::<Sha384>::new_from_slice(b\"key\").unwrap();`; code: `HmacReset::<Sha384>::new_from_slice`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: tag; line: `r.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in a174::main; use: tag; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `r.update(data);`; code: `update`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: tag; line: `let t2 = r.finalize_reset().into_bytes();`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] in a174::main; use: tag; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let t2 = r.finalize_reset().into_bytes();`; code: `finalize_reset`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "digest::mac::Mac::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; into_bytes: setup, not a use; line: `let t2 = r.finalize_reset().into_bytes();`; code: `into_bytes`",
+            "additionalContext": "[reachable] [call] in a174::main; into_bytes: setup, not a use; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let t2 = r.finalize_reset().into_bytes();`; code: `into_bytes`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 32,
@@ -889,21 +889,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 26); line: `let mut v = Hmac::<Sha512>::new_from_slice(b\"key\").unwrap();`; code: `Hmac::<Sha512>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a174::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 26); owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let mut v = Hmac::<Sha512>::new_from_slice(b\"key\").unwrap();`; code: `Hmac::<Sha512>::new_from_slice`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: tag; line: `v.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in a174::main; use: tag; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `v.update(data);`; code: `update`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: verify; line: `let ok = v.verify_slice(&tag).is_ok();`; code: `verify_slice`",
+            "additionalContext": "[reachable] [call] in a174::main; use: verify; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let ok = v.verify_slice(&tag).is_ok();`; code: `verify_slice`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 15,
@@ -963,7 +963,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: digest; line: `let d7 = md5::Md5::digest(data);`; code: `md5::Md5::digest`",
+            "additionalContext": "[reachable] [call] in a174::main; use: digest; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let d7 = md5::Md5::digest(data);`; code: `md5::Md5::digest`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 13,
@@ -1019,7 +1019,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 44); line: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>(data, b\"salt\", 4_096, &mut k3).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>`",
+            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 44); owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>(data, b\"salt\", 4_096, &mut k3).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 4,
@@ -1083,7 +1083,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 41); line: `pbkdf2::pbkdf2_hmac::<Sha256>(data, b\"salt\", 600_000, &mut k1);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
+            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 41); owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `pbkdf2::pbkdf2_hmac::<Sha256>(data, b\"salt\", 600_000, &mut k1);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 4,
@@ -1147,7 +1147,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 42); line: `let k2 = pbkdf2::pbkdf2_hmac_array::<Sha512, 20>(data, b\"salt\", 1_000);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha512, 20>`",
+            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 42); owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let k2 = pbkdf2::pbkdf2_hmac_array::<Sha512, 20>(data, b\"salt\", 1_000);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha512, 20>`",
             "line": 42,
             "location": "src/main.rs",
             "offset": 13,
@@ -1211,42 +1211,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: digest; line: `let d6 = sha1::Sha1::digest(data);`; code: `sha1::Sha1::digest`",
+            "additionalContext": "[reachable] [call] in a174::main; use: digest; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let d6 = sha1::Sha1::digest(data);`; code: `sha1::Sha1::digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-1; line: `let mut s = SimpleHmac::<sha1::Sha1>::new_from_slice(b\"key\").unwrap();`; code: `SimpleHmac::<sha1::Sha1>::new_from_slice`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-1; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let mut s = SimpleHmac::<sha1::Sha1>::new_from_slice(b\"key\").unwrap();`; code: `SimpleHmac::<sha1::Sha1>::new_from_slice`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-1; line: `s.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-1; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `s.update(data);`; code: `update`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-1; line: `let t3 = s.finalize().into_bytes();`; code: `finalize`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-1; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let t3 = s.finalize().into_bytes();`; code: `finalize`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-1; line: `let t3 = s.finalize().into_bytes();`; code: `into_bytes`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-1; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let t3 = s.finalize().into_bytes();`; code: `into_bytes`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-1; line: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>(data, b\"salt\", 4_096, &mut k3).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-1; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>(data, b\"salt\", 4_096, &mut k3).unwrap();`; code: `pbkdf2::pbkdf2::<Hmac<sha1::Sha1>>`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 4,
@@ -1302,7 +1302,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: digest; line: `let d4 = Sha224::digest(data);`; code: `Sha224::digest`",
+            "additionalContext": "[reachable] [call] in a174::main; use: digest; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let d4 = Sha224::digest(data);`; code: `Sha224::digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 13,
@@ -1354,56 +1354,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: digest; line: `let d1 = Sha256::digest(data);`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in a174::main; use: digest; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let d1 = Sha256::digest(data);`; code: `Sha256::digest`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-256; line: `let mut m = Hmac::<Sha256>::new_from_slice(b\"key\").unwrap();`; code: `Hmac::<Sha256>::new_from_slice`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-256; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let mut m = Hmac::<Sha256>::new_from_slice(b\"key\").unwrap();`; code: `Hmac::<Sha256>::new_from_slice`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-256; line: `m.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-256; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `m.update(data);`; code: `update`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-256; line: `let tag = m.finalize().into_bytes();`; code: `finalize`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-256; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let tag = m.finalize().into_bytes();`; code: `finalize`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-256; line: `let tag = m.finalize().into_bytes();`; code: `into_bytes`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-256; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let tag = m.finalize().into_bytes();`; code: `into_bytes`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HKDF-SHA-256; line: `let hk = hkdf::Hkdf::<Sha256>::new(Some(b\"salt\"), data);`; code: `hkdf::Hkdf::<Sha256>::new`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HKDF-SHA-256; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let hk = hkdf::Hkdf::<Sha256>::new(Some(b\"salt\"), data);`; code: `hkdf::Hkdf::<Sha256>::new`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "hkdf::GenericHkdf::<H>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HKDF-SHA-256; line: `hk.expand(b\"info\", &mut okm).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HKDF-SHA-256; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `hk.expand(b\"info\", &mut okm).unwrap();`; code: `expand`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 7,
             "symbol": "hkdf::GenericHkdf::<H>::expand"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of PBKDF2-SHA-256-600000-32; line: `pbkdf2::pbkdf2_hmac::<Sha256>(data, b\"salt\", 600_000, &mut k1);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
+            "additionalContext": "[reachable] [component] in a174::main; part of PBKDF2-SHA-256-600000-32; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `pbkdf2::pbkdf2_hmac::<Sha256>(data, b\"salt\", 600_000, &mut k1);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 4,
@@ -1455,35 +1455,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: digest; line: `let d3 = Sha384::digest(data);`; code: `Sha384::digest`",
+            "additionalContext": "[reachable] [call] in a174::main; use: digest; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let d3 = Sha384::digest(data);`; code: `Sha384::digest`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-384; line: `let mut r = HmacReset::<Sha384>::new_from_slice(b\"key\").unwrap();`; code: `HmacReset::<Sha384>::new_from_slice`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-384; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let mut r = HmacReset::<Sha384>::new_from_slice(b\"key\").unwrap();`; code: `HmacReset::<Sha384>::new_from_slice`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-384; line: `r.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-384; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `r.update(data);`; code: `update`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-384; line: `let t2 = r.finalize_reset().into_bytes();`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-384; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let t2 = r.finalize_reset().into_bytes();`; code: `finalize_reset`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "digest::mac::Mac::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-384; line: `let t2 = r.finalize_reset().into_bytes();`; code: `into_bytes`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-384; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let t2 = r.finalize_reset().into_bytes();`; code: `into_bytes`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 32,
@@ -1535,7 +1535,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: digest; line: `let d5 = Sha512_256::digest(data);`; code: `Sha512_256::digest`",
+            "additionalContext": "[reachable] [call] in a174::main; use: digest; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let d5 = Sha512_256::digest(data);`; code: `Sha512_256::digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 13,
@@ -1587,49 +1587,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; new: setup, not a use; line: `let mut h = Sha512::new();`; code: `Sha512::new`",
+            "additionalContext": "[reachable] [call] in a174::main; new: setup, not a use; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let mut h = Sha512::new();`; code: `Sha512::new`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: digest; line: `h.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in a174::main; use: digest; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `h.update(data);`; code: `update`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::digest::Digest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: digest; line: `let d2 = h.finalize();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a174::main; use: digest; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let d2 = h.finalize();`; code: `finalize`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "digest::digest::Digest::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-512; line: `let mut v = Hmac::<Sha512>::new_from_slice(b\"key\").unwrap();`; code: `Hmac::<Sha512>::new_from_slice`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-512; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let mut v = Hmac::<Sha512>::new_from_slice(b\"key\").unwrap();`; code: `Hmac::<Sha512>::new_from_slice`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-512; line: `v.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-512; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `v.update(data);`; code: `update`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-512; line: `let ok = v.verify_slice(&tag).is_ok();`; code: `verify_slice`",
+            "additionalContext": "[reachable] [component] in a174::main; part of HMAC-SHA-512; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let ok = v.verify_slice(&tag).is_ok();`; code: `verify_slice`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "digest::mac::Mac::verify_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in a174::main; part of PBKDF2-SHA-512-1000-20; line: `let k2 = pbkdf2::pbkdf2_hmac_array::<Sha512, 20>(data, b\"salt\", 1_000);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha512, 20>`",
+            "additionalContext": "[reachable] [component] in a174::main; part of PBKDF2-SHA-512-1000-20; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let k2 = pbkdf2::pbkdf2_hmac_array::<Sha512, 20>(data, b\"salt\", 1_000);`; code: `pbkdf2::pbkdf2_hmac_array::<Sha512, 20>`",
             "line": 42,
             "location": "src/main.rs",
             "offset": 13,
@@ -1681,14 +1681,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; new: setup, not a use; line: `let params = scrypt::Params::new(15, 8, 1).unwrap();`; code: `scrypt::Params::new`",
+            "additionalContext": "[reachable] [call] in a174::main; new: setup, not a use; owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `let params = scrypt::Params::new(15, 8, 1).unwrap();`; code: `scrypt::Params::new`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "scrypt::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 48); line: `scrypt::scrypt(data, b\"salt\", &params, &mut k4).unwrap();`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 48); owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `scrypt::scrypt(data, b\"salt\", &params, &mut k4).unwrap();`; code: `scrypt::scrypt`",
             "line": 48,
             "location": "src/main.rs",
             "offset": 4,
@@ -1752,7 +1752,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 50); line: `scrypt::scrypt(data, b\"salt\", &scrypt::Params::RECOMMENDED, &mut k5).unwrap();`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in a174::main; use: keyderive; password: environment (std::env::args); salt: hard-coded (4 bytes, literal at line 50); owner at src/main.rs:9:3-9:7 within 9:0-56:1; line: `scrypt::scrypt(data, b\"salt\", &scrypt::Params::RECOMMENDED, &mut k5).unwrap();`; code: `scrypt::scrypt`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 4,
@@ -2092,7 +2092,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9bde10cc-e4bf-8919-8303-052f7987be76",
+  "serialNumber": "urn:uuid:2e8ba0a5-5015-85c7-86a0-b7dd340f438a",
   "specVersion": "1.7",
   "version": 1
 }

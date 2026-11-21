@@ -849,7 +849,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t3::e1; try_from: setup, not a use; key: hard-coded (32 bytes, literal at line 29) or parameter (argument 0 of the enclosing function); line: `ed25519_dalek::SigningKey::try_from(b).is_ok()`; code: `ed25519_dalek::SigningKey::try_from`",
+            "additionalContext": "[reachable] [call] in t3::e1; try_from: setup, not a use; key: hard-coded (32 bytes, literal at line 29) or parameter (argument 0 of the enclosing function); owner at src/main.rs:18:3-18:5 within 18:0-20:1; line: `ed25519_dalek::SigningKey::try_from(b).is_ok()`; code: `ed25519_dalek::SigningKey::try_from`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 4,
@@ -906,7 +906,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t3::k1; use: keygen; rng: rng (rand_core::os::OsRng); line: `rsa::RsaPrivateKey::new(&mut OsRng, bits).is_ok()`; code: `rsa::RsaPrivateKey::new`",
+            "additionalContext": "[reachable] [call] in t3::k1; use: keygen; rng: rng (rand_core::os::OsRng); owner at src/main.rs:23:3-23:5 within 23:0-26:1; line: `rsa::RsaPrivateKey::new(&mut OsRng, bits).is_ok()`; code: `rsa::RsaPrivateKey::new`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 4,
@@ -968,42 +968,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t3::x1; from: setup, not a use; key: hard-coded (32 bytes, literal at line 6); line: `let secret = StaticSecret::from([7u8; 32]);`; code: `StaticSecret::from`",
+            "additionalContext": "[reachable] [call] in t3::x1; from: setup, not a use; key: hard-coded (32 bytes, literal at line 6); owner at src/main.rs:5:3-5:5 within 5:0-9:1; line: `let secret = StaticSecret::from([7u8; 32]);`; code: `StaticSecret::from`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in t3::x1; from: setup, not a use; line: `let public = PublicKey::from(&secret);`; code: `PublicKey::from`",
+            "additionalContext": "[reachable] [call] in t3::x1; from: setup, not a use; owner at src/main.rs:5:3-5:5 within 5:0-9:1; line: `let public = PublicKey::from(&secret);`; code: `PublicKey::from`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in t3::x1; use: keyderive; line: `*secret.diffie_hellman(&public).as_bytes()`; code: `diffie_hellman`",
+            "additionalContext": "[reachable] [call] in t3::x1; use: keyderive; owner at src/main.rs:5:3-5:5 within 5:0-9:1; line: `*secret.diffie_hellman(&public).as_bytes()`; code: `diffie_hellman`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "x25519_dalek::x25519::StaticSecret::diffie_hellman"
           },
           {
-            "additionalContext": "[reachable] [call] in t3::x2; use: keygen; rng: rng (rand_core::os::OsRng); line: `let secret = StaticSecret::random_from_rng(OsRng);`; code: `StaticSecret::random_from_rng`",
+            "additionalContext": "[reachable] [call] in t3::x2; use: keygen; rng: rng (rand_core::os::OsRng); owner at src/main.rs:12:3-12:5 within 12:0-15:1; line: `let secret = StaticSecret::random_from_rng(OsRng);`; code: `StaticSecret::random_from_rng`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "x25519_dalek::x25519::StaticSecret::random_from_rng"
           },
           {
-            "additionalContext": "[reachable] [call] in t3::x2; use: keyderive; line: `*secret.diffie_hellman(&PublicKey::from([9u8; 32])).as_bytes()`; code: `diffie_hellman`",
+            "additionalContext": "[reachable] [call] in t3::x2; use: keyderive; owner at src/main.rs:12:3-12:5 within 12:0-15:1; line: `*secret.diffie_hellman(&PublicKey::from([9u8; 32])).as_bytes()`; code: `diffie_hellman`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "x25519_dalek::x25519::StaticSecret::diffie_hellman"
           },
           {
-            "additionalContext": "[reachable] [call] in t3::x2; from: setup, not a use; line: `*secret.diffie_hellman(&PublicKey::from([9u8; 32])).as_bytes()`; code: `PublicKey::from`",
+            "additionalContext": "[reachable] [call] in t3::x2; from: setup, not a use; owner at src/main.rs:12:3-12:5 within 12:0-15:1; line: `*secret.diffie_hellman(&PublicKey::from([9u8; 32])).as_bytes()`; code: `PublicKey::from`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 28,
@@ -1306,7 +1306,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:93cdb38f-df20-8a3d-96ef-6c22f96da117",
+  "serialNumber": "urn:uuid:bdf16b7c-1588-82b8-a8e3-a973f7bd6930",
   "specVersion": "1.7",
   "version": 1
 }

@@ -421,28 +421,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_basic::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let signing_key = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`",
+            "additionalContext": "[reachable] [call] in pilot_sig_basic::main; use: keygen; rng: rng (rand_core::os::OsRng); owner at src/main.rs:4:3-4:7 within 4:0-10:1; line: `let signing_key = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ed25519_dalek::signing::SigningKey::generate"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_basic::main; use: sign; line: `let sig = signing_key.sign(msg);`; code: `sign`",
+            "additionalContext": "[reachable] [call] in pilot_sig_basic::main; use: sign; owner at src/main.rs:4:3-4:7 within 4:0-10:1; line: `let sig = signing_key.sign(msg);`; code: `sign`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "signature::signer::Signer::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_basic::main; verifying_key: setup, not a use; line: `let ok = signing_key.verifying_key().verify(msg, &sig).is_ok();`; code: `verifying_key`",
+            "additionalContext": "[reachable] [call] in pilot_sig_basic::main; verifying_key: setup, not a use; owner at src/main.rs:4:3-4:7 within 4:0-10:1; line: `let ok = signing_key.verifying_key().verify(msg, &sig).is_ok();`; code: `verifying_key`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 25,
             "symbol": "ed25519_dalek::signing::SigningKey::verifying_key"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_basic::main; use: verify; line: `let ok = signing_key.verifying_key().verify(msg, &sig).is_ok();`; code: `verify`",
+            "additionalContext": "[reachable] [call] in pilot_sig_basic::main; use: verify; owner at src/main.rs:4:3-4:7 within 4:0-10:1; line: `let ok = signing_key.verifying_key().verify(msg, &sig).is_ok();`; code: `verify`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 41,
@@ -498,21 +498,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in pilot_sig_basic::main; part of Ed25519; line: `let signing_key = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`",
+            "additionalContext": "[reachable] [component] in pilot_sig_basic::main; part of Ed25519; owner at src/main.rs:4:3-4:7 within 4:0-10:1; line: `let signing_key = SigningKey::generate(&mut OsRng);`; code: `SigningKey::generate`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ed25519_dalek::signing::SigningKey::generate"
           },
           {
-            "additionalContext": "[reachable] [component] in pilot_sig_basic::main; part of Ed25519; line: `let sig = signing_key.sign(msg);`; code: `sign`",
+            "additionalContext": "[reachable] [component] in pilot_sig_basic::main; part of Ed25519; owner at src/main.rs:4:3-4:7 within 4:0-10:1; line: `let sig = signing_key.sign(msg);`; code: `sign`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "signature::signer::Signer::sign"
           },
           {
-            "additionalContext": "[reachable] [component] in pilot_sig_basic::main; part of Ed25519; line: `let ok = signing_key.verifying_key().verify(msg, &sig).is_ok();`; code: `verify`",
+            "additionalContext": "[reachable] [component] in pilot_sig_basic::main; part of Ed25519; owner at src/main.rs:4:3-4:7 within 4:0-10:1; line: `let ok = signing_key.verifying_key().verify(msg, &sig).is_ok();`; code: `verify`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 41,
@@ -713,7 +713,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:06bd80a2-19e2-8dc5-af29-0871f5c4070d",
+  "serialNumber": "urn:uuid:f2e17456-b2aa-8d3f-8e8e-300b52a1530c",
   "specVersion": "1.7",
   "version": 1
 }

@@ -679,7 +679,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in d28::t; use: generate; line: `v.shuffle(&mut rand::thread_rng()); // ChaCha12-RNG`; code: `shuffle`",
+            "additionalContext": "[reachable] [call] in d28::t; use: generate; owner at src/lib.rs:22:7-22:8 within 22:0-26:1; line: `v.shuffle(&mut rand::thread_rng()); // ChaCha12-RNG`; code: `shuffle`",
             "line": 24,
             "location": "src/lib.rs",
             "offset": 6,
@@ -735,35 +735,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in d28::mac::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of d28::mac256) or parameter (argument 0 of the enclosing function); instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `let mut m = <M as Mac>::new_from_slice(k).unwrap();`; code: `<M as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in d28::mac::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of d28::mac256) or parameter (argument 0 of the enclosing function); owner at src/lib.rs:32:7-32:10 within 32:0-36:1; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>` (call, to 39:23 as `mac::<Hmac<Sha256>>` line #87fb21ee, caller at src/lib.rs:38:7-38:13 within 38:0-40:1); line: `let mut m = <M as Mac>::new_from_slice(k).unwrap();`; code: `<M as Mac>::new_from_slice`",
             "line": 33,
             "location": "src/lib.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in d28::mac::<..>; use: tag; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `m.update(d); // HMAC-SHA-256 only: the library's own instance`; code: `update`",
+            "additionalContext": "[reachable] [call] in d28::mac::<..>; use: tag; owner at src/lib.rs:32:7-32:10 within 32:0-36:1; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>` (call, to 39:23 as `mac::<Hmac<Sha256>>` line #87fb21ee, caller at src/lib.rs:38:7-38:13 within 38:0-40:1); line: `m.update(d); // HMAC-SHA-256 only: the library's own instance`; code: `update`",
             "line": 34,
             "location": "src/lib.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in d28::mac::<..>; use: tag; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `m.finalize().into_bytes().to_vec() // HMAC-SHA-256 only`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in d28::mac::<..>; use: tag; owner at src/lib.rs:32:7-32:10 within 32:0-36:1; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>` (call, to 39:23 as `mac::<Hmac<Sha256>>` line #87fb21ee, caller at src/lib.rs:38:7-38:13 within 38:0-40:1); line: `m.finalize().into_bytes().to_vec() // HMAC-SHA-256 only`; code: `finalize`",
             "line": 35,
             "location": "src/lib.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in d28::mac::<..>; into_bytes: setup, not a use; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `m.finalize().into_bytes().to_vec() // HMAC-SHA-256 only`; code: `into_bytes`",
+            "additionalContext": "[reachable] [call] in d28::mac::<..>; into_bytes: setup, not a use; owner at src/lib.rs:32:7-32:10 within 32:0-36:1; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>` (call, to 39:23 as `mac::<Hmac<Sha256>>` line #87fb21ee, caller at src/lib.rs:38:7-38:13 within 38:0-40:1); line: `m.finalize().into_bytes().to_vec() // HMAC-SHA-256 only`; code: `into_bytes`",
             "line": 35,
             "location": "src/lib.rs",
             "offset": 17,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in d28::mac256; chosen as generic argument of d28::mac; line: `mac::<Hmac<Sha256>>(k, d)`; code: `mac::<Hmac<Sha256>>`",
+            "additionalContext": "[reachable] [instantiation] in d28::mac256; chosen as generic argument of d28::mac; owner at src/lib.rs:38:7-38:13 within 38:0-40:1; line: `mac::<Hmac<Sha256>>(k, d)`; code: `mac::<Hmac<Sha256>>`",
             "line": 39,
             "location": "src/lib.rs",
             "offset": 4,
@@ -819,49 +819,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in d28::h; use: digest; line: `Sha256::digest(d).to_vec() // SHA-256: the parameter is the data`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in d28::h; use: digest; owner at src/lib.rs:10:7-10:8 within 10:0-12:1; line: `Sha256::digest(d).to_vec() // SHA-256: the parameter is the data`; code: `Sha256::digest`",
             "line": 11,
             "location": "src/lib.rs",
             "offset": 4,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in d28::c::{closure#0}; use: digest; line: `v.iter().map(|x| Sha256::digest(x).to_vec()).collect() // SHA-256, in a closure`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in d28::c::{closure#0}; use: digest; owner at src/lib.rs:29:17-29:20 as `|x|` line #d9794682 within 29:17-29:47; line: `v.iter().map(|x| Sha256::digest(x).to_vec()).collect() // SHA-256, in a closure`; code: `Sha256::digest`",
             "line": 29,
             "location": "src/lib.rs",
             "offset": 21,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in d28::mac::<..>; part of HMAC-SHA-256; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `let mut m = <M as Mac>::new_from_slice(k).unwrap();`; code: `<M as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [component] in d28::mac::<..>; part of HMAC-SHA-256; owner at src/lib.rs:32:7-32:10 within 32:0-36:1; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>` (call, to 39:23 as `mac::<Hmac<Sha256>>` line #87fb21ee, caller at src/lib.rs:38:7-38:13 within 38:0-40:1); line: `let mut m = <M as Mac>::new_from_slice(k).unwrap();`; code: `<M as Mac>::new_from_slice`",
             "line": 33,
             "location": "src/lib.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in d28::mac::<..>; part of HMAC-SHA-256; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `m.update(d); // HMAC-SHA-256 only: the library's own instance`; code: `update`",
+            "additionalContext": "[reachable] [component] in d28::mac::<..>; part of HMAC-SHA-256; owner at src/lib.rs:32:7-32:10 within 32:0-36:1; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>` (call, to 39:23 as `mac::<Hmac<Sha256>>` line #87fb21ee, caller at src/lib.rs:38:7-38:13 within 38:0-40:1); line: `m.update(d); // HMAC-SHA-256 only: the library's own instance`; code: `update`",
             "line": 34,
             "location": "src/lib.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in d28::mac::<..>; part of HMAC-SHA-256; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `m.finalize().into_bytes().to_vec() // HMAC-SHA-256 only`; code: `finalize`",
+            "additionalContext": "[reachable] [component] in d28::mac::<..>; part of HMAC-SHA-256; owner at src/lib.rs:32:7-32:10 within 32:0-36:1; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>` (call, to 39:23 as `mac::<Hmac<Sha256>>` line #87fb21ee, caller at src/lib.rs:38:7-38:13 within 38:0-40:1); line: `m.finalize().into_bytes().to_vec() // HMAC-SHA-256 only`; code: `finalize`",
             "line": 35,
             "location": "src/lib.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in d28::mac::<..>; part of HMAC-SHA-256; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>`; line: `m.finalize().into_bytes().to_vec() // HMAC-SHA-256 only`; code: `into_bytes`",
+            "additionalContext": "[reachable] [component] in d28::mac::<..>; part of HMAC-SHA-256; owner at src/lib.rs:32:7-32:10 within 32:0-36:1; instantiated by d28::mac256 at src/lib.rs:39:4 as `mac::<Hmac<Sha256>>` (call, to 39:23 as `mac::<Hmac<Sha256>>` line #87fb21ee, caller at src/lib.rs:38:7-38:13 within 38:0-40:1); line: `m.finalize().into_bytes().to_vec() // HMAC-SHA-256 only`; code: `into_bytes`",
             "line": 35,
             "location": "src/lib.rs",
             "offset": 17,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [component] in d28::mac256; part of HMAC-SHA-256; line: `mac::<Hmac<Sha256>>(k, d)`; code: `mac::<Hmac<Sha256>>`",
+            "additionalContext": "[reachable] [component] in d28::mac256; part of HMAC-SHA-256; owner at src/lib.rs:38:7-38:13 within 38:0-40:1; line: `mac::<Hmac<Sha256>>(k, d)`; code: `mac::<Hmac<Sha256>>`",
             "line": 39,
             "location": "src/lib.rs",
             "offset": 4,
@@ -913,14 +913,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in d28::inner::<..>; use: digest; instantiated by d28::sha512 at src/lib.rs:47:4 as `inner::<Sha512>`; line: `D::digest(d).to_vec() // SHA-512 only: no user can choose D`; code: `D::digest`",
+            "additionalContext": "[reachable] [call] in d28::inner::<..>; use: digest; owner at src/lib.rs:42:3-42:8 within 42:0-44:1; instantiated by d28::sha512 at src/lib.rs:47:4 as `inner::<Sha512>` (call, to 47:19 as `inner::<Sha512>` line #4f4b1724, caller at src/lib.rs:46:7-46:13 within 46:0-48:1); line: `D::digest(d).to_vec() // SHA-512 only: no user can choose D`; code: `D::digest`",
             "line": 43,
             "location": "src/lib.rs",
             "offset": 4,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in d28::sha512; chosen as generic argument of d28::inner; line: `inner::<Sha512>(d)`; code: `inner::<Sha512>`",
+            "additionalContext": "[reachable] [instantiation] in d28::sha512; chosen as generic argument of d28::inner; owner at src/lib.rs:46:7-46:13 within 46:0-48:1; line: `inner::<Sha512>(d)`; code: `inner::<Sha512>`",
             "line": 47,
             "location": "src/lib.rs",
             "offset": 4,
@@ -971,7 +971,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in d28::e; use: encrypt; algorithm unresolved: a type parameter (`A`) of the library's generic API: its callers choose the type; nonce: parameter (argument 1 of the enclosing function); line: `a.encrypt(n, m).unwrap_or_default() // an unknown AEAD, the caller's`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in d28::e; use: encrypt; algorithm unresolved: a type parameter (`A`) of the library's generic API: its callers choose the type; nonce: parameter (argument 1 of the enclosing function); owner at src/lib.rs:18:7-18:8 within 18:0-20:1; line: `a.encrypt(n, m).unwrap_or_default() // an unknown AEAD, the caller's`; code: `encrypt`",
             "line": 19,
             "location": "src/lib.rs",
             "offset": 6,
@@ -1030,7 +1030,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in d28::s; use: generate; algorithm unresolved: `rand::seq::SliceRandom::shuffle` of rand 0.8.5 on a type parameter (`R`) of the library's generic API: its callers choose the type; line: `v.shuffle(r); // an unknown generator, the caller's`; code: `shuffle`",
+            "additionalContext": "[reachable] [call] in d28::s; use: generate; algorithm unresolved: `rand::seq::SliceRandom::shuffle` of rand 0.8.5 on a type parameter (`R`) of the library's generic API: its callers choose the type; owner at src/lib.rs:14:7-14:8 within 14:0-16:1; line: `v.shuffle(r); // an unknown generator, the caller's`; code: `shuffle`",
             "line": 15,
             "location": "src/lib.rs",
             "offset": 6,
@@ -1369,7 +1369,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:67c49313-52ec-8804-b9f8-80f56098300f",
+  "serialNumber": "urn:uuid:b1893c1b-4749-8588-b6fe-f8c812b52d96",
   "specVersion": "1.7",
   "version": 1
 }

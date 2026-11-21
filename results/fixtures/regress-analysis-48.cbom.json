@@ -102,56 +102,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in m1::Ctx::via_ref; line: `fn via_ref(&mut self) { let r = &mut self.alg; *r = &SHA1; }`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in m1::Ctx::via_ref; owner at src/main.rs:17:7-17:14 within 17:4-17:64; line: `fn via_ref(&mut self) { let r = &mut self.alg; *r = &SHA1; }`; code: `SHA1`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 57,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::inner; line: `fn inner(slot: &mut &'static Digest) { *slot = &SHA1; }`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in m1::inner; owner at src/main.rs:24:3-24:8 within 24:0-24:55; line: `fn inner(slot: &mut &'static Digest) { *slot = &SHA1; }`; code: `SHA1`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 48,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::swap_in; line: `fn swap_in(slot: &mut &'static Digest) { let old = std::mem::replace(slot, &SHA1); let _ = old; }`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in m1::swap_in; owner at src/main.rs:28:3-28:10 within 28:0-28:97; line: `fn swap_in(slot: &mut &'static Digest) { let old = std::mem::replace(slot, &SHA1); let _ = old; }`; code: `SHA1`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 76,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `m1::inner`; line: `let _ = digest(a7, &d); // SHA-1`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `m1::inner`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a7, &d); // SHA-1`; code: `digest`",
             "line": 62,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `m1::Ctx::via_ref`; line: `let _ = digest(c12.alg, &d); // SHA-1`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `m1::Ctx::via_ref`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(c12.alg, &d); // SHA-1`; code: `digest`",
             "line": 82,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `m1::swap_in`; line: `let _ = digest(a13, &d); // SHA-1`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, reaching the call from another function; member: object, from `m1::swap_in`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a13, &d); // SHA-1`; code: `digest`",
             "line": 86,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut b15: &'static Digest = &SHA1;`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut b15: &'static Digest = &SHA1;`; code: `SHA1`",
             "line": 93,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: object, from `m1::reassigned`; line: `let _ = digest(b15, &d); // SHA-1, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: object, from `m1::reassigned`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(b15, &d); // SHA-1, SHA-512`; code: `digest`",
             "line": 96,
             "location": "src/main.rs",
             "offset": 12,
@@ -207,147 +207,147 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut a1: &'static Digest = &SHA256;`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut a1: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 35,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(a1, &d); // SHA-256, SHA-384`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a1, &d); // SHA-256, SHA-384`; code: `digest`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut c2 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut c2 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<m1::Ctx as m1::Up>::up`; line: `let _ = digest(c2.alg, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<m1::Ctx as m1::Up>::up`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(c2.alg, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 42,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut c4 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut c4 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`",
             "line": 48,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<m1::Ctx as m1::Up>::up`; line: `let _ = digest(c4.alg, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<m1::Ctx as m1::Up>::up`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(c4.alg, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut a6: &'static Digest = &SHA256;`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut a6: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 35,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `m1::rec`; line: `let _ = digest(a6, &d); // SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `m1::rec`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a6, &d); // SHA-512`; code: `digest`",
             "line": 58,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut a7: &'static Digest = &SHA256;`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut a7: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 60,
             "location": "src/main.rs",
             "offset": 35,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut o8 = Outer { inner: Ctx { alg: &SHA256, n: 0 }, tag: 1 };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut o8 = Outer { inner: Ctx { alg: &SHA256, n: 0 }, tag: 1 };`; code: `SHA256`",
             "line": 64,
             "location": "src/main.rs",
             "offset": 44,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut a9: &'static Digest = &SHA256;`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut a9: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 35,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(a9, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a9, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 70,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut a10: &'static Digest = &SHA256;`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut a10: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 72,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `m1::loop_set`; line: `let _ = digest(a10, &d); // SHA-256, SHA-384`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `m1::loop_set`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a10, &d); // SHA-256, SHA-384`; code: `digest`",
             "line": 74,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut c11 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut c11 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`",
             "line": 76,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `m1::Ctx::try_set`; line: `let _ = digest(c11.alg, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `m1::Ctx::try_set`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(c11.alg, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 78,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut c12 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut c12 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut a13: &'static Digest = &SHA256;`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut a13: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 84,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut c14 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut c14 = Ctx { alg: &SHA256, n: 0 };`; code: `SHA256`",
             "line": 88,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut a15: &'static Digest = &SHA256;`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut a15: &'static Digest = &SHA256;`; code: `SHA256`",
             "line": 92,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `m1::reassigned`; line: `let _ = digest(a15, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: object, from `m1::reassigned`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a15, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 95,
             "location": "src/main.rs",
             "offset": 12,
@@ -399,84 +399,84 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in m1::Ctx::chain; line: `fn chain(&mut self) { self.bump(); self.bump(); self.alg = &SHA384; }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in m1::Ctx::chain; owner at src/main.rs:19:7-19:12 within 19:4-19:73; line: `fn chain(&mut self) { self.bump(); self.bump(); self.alg = &SHA384; }`; code: `SHA384`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 64,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::set_nested; line: `fn set_nested(o: &mut Outer) { o.inner.alg = &SHA384; }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in m1::set_nested; owner at src/main.rs:25:3-25:13 within 25:0-25:55; line: `fn set_nested(o: &mut Outer) { o.inner.alg = &SHA384; }`; code: `SHA384`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 46,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::loop_set; line: `fn loop_set(slot: &mut &'static Digest, n: usize) { for _ in 0..n { *slot = &SHA384; } }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in m1::loop_set; owner at src/main.rs:27:3-27:11 within 27:0-27:88; line: `fn loop_set(slot: &mut &'static Digest, n: usize) { for _ in 0..n { *slot = &SHA384; } }`; code: `SHA384`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 77,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main::{closure#0}; instantiated by m1::main at src/main.rs:36:16; line: `let mut f = |b: bool| if b { a1 = &SHA384; };`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in m1::main::{closure#0}; owner at src/main.rs:36:16-36:25 as `|b: bool|` line #626e8d5c within 36:16-36:48; instantiated by m1::main at src/main.rs:36:16 (built, to 36:48 as `|b: bool| if b { a1 = &SHA384` line #626e8d5c, caller at src/main.rs:32:3-32:7 within 32:0-98:1); line: `let mut f = |b: bool| if b { a1 = &SHA384; };`; code: `SHA384`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 39,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; line: `let _ = digest(a1, &d); // SHA-256, SHA-384`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a1, &d); // SHA-256, SHA-384`; code: `digest`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut c3 = Ctx { alg: &SHA384, n: 0 };`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut c3 = Ctx { alg: &SHA384, n: 0 };`; code: `SHA384`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<m1::Ctx as m1::Up>::up`; line: `let _ = digest(c3.alg, &d); // SHA-384, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `<m1::Ctx as m1::Up>::up`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(c3.alg, &d); // SHA-384, SHA-512`; code: `digest`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::main; line: `let mut a5: &'static Digest = &SHA384;`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in m1::main; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let mut a5: &'static Digest = &SHA384;`; code: `SHA384`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 35,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `m1::gen_set`; line: `let _ = digest(a5, &d); // SHA-384, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `m1::gen_set`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a5, &d); // SHA-384, SHA-512`; code: `digest`",
             "line": 54,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `m1::set_nested`; line: `let _ = digest(o8.inner.alg, &d); // SHA-384`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `m1::set_nested`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(o8.inner.alg, &d); // SHA-384`; code: `digest`",
             "line": 66,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `m1::loop_set`; line: `let _ = digest(a10, &d); // SHA-256, SHA-384`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: object, from `m1::loop_set`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a10, &d); // SHA-256, SHA-384`; code: `digest`",
             "line": 74,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `m1::Ctx::chain`; line: `let _ = digest(c14.alg, &d); // SHA-384`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: object, from `m1::Ctx::chain`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(c14.alg, &d); // SHA-384`; code: `digest`",
             "line": 90,
             "location": "src/main.rs",
             "offset": 12,
@@ -528,91 +528,91 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <m1::Ctx as m1::Up>::up; line: `impl Up for Ctx { fn up(&mut self, b: bool) { if b { self.alg = &SHA512; } } }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in <m1::Ctx as m1::Up>::up; owner at src/main.rs:9:21-9:23 within 9:18-9:76; line: `impl Up for Ctx { fn up(&mut self, b: bool) { if b { self.alg = &SHA512; } } }`; code: `SHA512`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 65,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::Ctx::try_set; line: `self.alg = &SHA512;`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in m1::Ctx::try_set; owner at src/main.rs:11:7-11:14 within 11:4-16:5; line: `self.alg = &SHA512;`; code: `SHA512`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::gen_set; `m1::gen_set::<u8>` instantiated by m1::main at src/main.rs:53:4 as `gen_set`; line: `fn gen_set<T: Into<usize>>(slot: &mut &'static Digest, x: T) { if x.into() > 3 { *slot = &SHA512; } }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in m1::gen_set; owner at src/main.rs:21:3-21:10 within 21:0-21:101; owner `m1::gen_set::<u8>` at src/main.rs:21:3-21:10 within 21:0-21:101; `m1::gen_set::<u8>` instantiated by m1::main at src/main.rs:53:4 as `gen_set` (call, to 53:11 as `gen_set` line #d3bd389f, caller at src/main.rs:32:3-32:7 within 32:0-98:1); line: `fn gen_set<T: Into<usize>>(slot: &mut &'static Digest, x: T) { if x.into() > 3 { *slot = &SHA512; } }`; code: `SHA512`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 90,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::rec; line: `fn rec(slot: &mut &'static Digest, n: u32) { if n > 0 { rec(slot, n - 1) } else { *slot = &SHA512 } }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in m1::rec; owner at src/main.rs:22:3-22:6 within 22:0-22:101; line: `fn rec(slot: &mut &'static Digest, n: u32) { if n > 0 { rec(slot, n - 1) } else { *slot = &SHA512 } }`; code: `SHA512`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 91,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::opt_set; line: `fn opt_set(o: Option<&mut &'static Digest>) { if let Some(s) = o { *s = &SHA512; } }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in m1::opt_set; owner at src/main.rs:26:3-26:10 within 26:0-26:84; line: `fn opt_set(o: Option<&mut &'static Digest>) { if let Some(s) = o { *s = &SHA512; } }`; code: `SHA512`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 73,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in m1::reassigned; line: `fn reassigned<'a>(mut slot: &'a mut &'static Digest, other: &'a mut &'static Digest) { if arg(9).is_empty() { slot = other; } *slot = &SHA512; }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in m1::reassigned; owner at src/main.rs:30:3-30:13 within 30:0-30:144; line: `fn reassigned<'a>(mut slot: &'a mut &'static Digest, other: &'a mut &'static Digest) { if arg(9).is_empty() { slot = other; } *slot = &SHA512; }`; code: `SHA512`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 135,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<m1::Ctx as m1::Up>::up`; line: `let _ = digest(c2.alg, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<m1::Ctx as m1::Up>::up`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(c2.alg, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 42,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<m1::Ctx as m1::Up>::up`; line: `let _ = digest(c3.alg, &d); // SHA-384, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<m1::Ctx as m1::Up>::up`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(c3.alg, &d); // SHA-384, SHA-512`; code: `digest`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<m1::Ctx as m1::Up>::up`; line: `let _ = digest(c4.alg, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<m1::Ctx as m1::Up>::up`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(c4.alg, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::gen_set`; line: `let _ = digest(a5, &d); // SHA-384, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::gen_set`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a5, &d); // SHA-384, SHA-512`; code: `digest`",
             "line": 54,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::rec`; line: `let _ = digest(a6, &d); // SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::rec`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a6, &d); // SHA-512`; code: `digest`",
             "line": 58,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::opt_set`; line: `let _ = digest(a9, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::opt_set`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a9, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 70,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::Ctx::try_set`; line: `let _ = digest(c11.alg, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `m1::Ctx::try_set`; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(c11.alg, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 78,
             "location": "src/main.rs",
             "offset": 12,
@@ -663,14 +663,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(a15, &d); // SHA-256, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(a15, &d); // SHA-256, SHA-512`; code: `digest`",
             "line": 95,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `let _ = digest(b15, &d); // SHA-1, SHA-512`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m1::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; owner at src/main.rs:32:3-32:7 within 32:0-98:1; line: `let _ = digest(b15, &d); // SHA-1, SHA-512`; code: `digest`",
             "line": 96,
             "location": "src/main.rs",
             "offset": 12,
@@ -823,7 +823,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:f9596b3e-b28c-85d1-9bdb-bf5b723dd2e5",
+  "serialNumber": "urn:uuid:1f4335da-3893-8314-a7d3-05862dbc8fb4",
   "specVersion": "1.7",
   "version": 1
 }

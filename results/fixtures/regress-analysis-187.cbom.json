@@ -371,7 +371,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in analysis_187::main; use: generate; receiver: one of 2 types the build makes a `dyn RngCore` of, beside others not named; member: dyn, possible (dyn: `rand_core::os::OsRng` is coerced to `dyn rand_core::RngCore` at src/main.rs:46); line: `rng.fill_bytes(&mut salt);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in analysis_187::main; use: generate; receiver: one of 2 types the build makes a `dyn RngCore` of, beside others not named; member: dyn, possible (dyn: `rand_core::os::OsRng` is coerced to `dyn rand_core::RngCore` at src/main.rs:46); owner at src/main.rs:50:3-50:7 within 50:0-64:1; line: `rng.fill_bytes(&mut salt);`; code: `fill_bytes`",
             "line": 61,
             "location": "src/main.rs",
             "offset": 8,
@@ -427,35 +427,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in analysis_187::closures::boxed::{closure#0}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `analysis_187::closures::run`; instantiated by analysis_187::closures::boxed at src/closures.rs:11:13; line: `Box::new(|alg, data| digest::digest(alg, data).as_ref().to_vec())`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in analysis_187::closures::boxed::{closure#0}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `analysis_187::closures::run`; owner at src/closures.rs:11:13-11:24 as `|alg, data|` line #8fb0d562 within 11:13-11:68; instantiated by analysis_187::closures::boxed at src/closures.rs:11:13 (built, to 11:68 as `|alg, data| digest::digest(alg, data).as_ref().to_vec()` line #8fb0d562, caller at src/closures.rs:8:3-8:8 within 8:0-12:1); line: `Box::new(|alg, data| digest::digest(alg, data).as_ref().to_vec())`; code: `digest::digest`",
             "line": 11,
             "location": "src/closures.rs",
             "offset": 25,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in analysis_187::closures::run; line: `let mut out = h(&SHA256, input);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in analysis_187::closures::run; owner at src/closures.rs:18:7-18:10 within 18:0-25:1; line: `let mut out = h(&SHA256, input);`; code: `SHA256`",
             "line": 20,
             "location": "src/closures.rs",
             "offset": 21,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in analysis_187::hasher; new: setup, not a use; line: `_ => Box::new(Sha256::new()),`; code: `Sha256::new`",
+            "additionalContext": "[reachable] [call] in analysis_187::hasher; new: setup, not a use; owner at src/main.rs:9:3-9:9 within 9:0-14:1; line: `_ => Box::new(Sha256::new()),`; code: `Sha256::new`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] in analysis_187::main; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:12); line: `h.update(b\"upload\");`; code: `update`",
+            "additionalContext": "[reachable] [call] in analysis_187::main; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:12); owner at src/main.rs:50:3-50:7 within 50:0-64:1; line: `h.update(b\"upload\");`; code: `update`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in analysis_187::main; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:12); line: `let sum = h.finalize();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in analysis_187::main; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:12); owner at src/main.rs:50:3-50:7 within 50:0-64:1; line: `let sum = h.finalize();`; code: `finalize`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 16,
@@ -507,14 +507,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in analysis_187::closures::boxed::{closure#0}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `analysis_187::closures::run`; instantiated by analysis_187::closures::boxed at src/closures.rs:11:13; line: `Box::new(|alg, data| digest::digest(alg, data).as_ref().to_vec())`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in analysis_187::closures::boxed::{closure#0}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: caller, passed by `analysis_187::closures::run`; owner at src/closures.rs:11:13-11:24 as `|alg, data|` line #8fb0d562 within 11:13-11:68; instantiated by analysis_187::closures::boxed at src/closures.rs:11:13 (built, to 11:68 as `|alg, data| digest::digest(alg, data).as_ref().to_vec()` line #8fb0d562, caller at src/closures.rs:8:3-8:8 within 8:0-12:1); line: `Box::new(|alg, data| digest::digest(alg, data).as_ref().to_vec())`; code: `digest::digest`",
             "line": 11,
             "location": "src/closures.rs",
             "offset": 25,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in analysis_187::closures::run; line: `out.extend(h(&SHA384, input));`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in analysis_187::closures::run; owner at src/closures.rs:18:7-18:10 within 18:0-25:1; line: `out.extend(h(&SHA384, input));`; code: `SHA384`",
             "line": 21,
             "location": "src/closures.rs",
             "offset": 18,
@@ -566,35 +566,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in analysis_187::closures::by_ref; line: `out.extend(f(&SHA512));`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in analysis_187::closures::by_ref; owner at src/closures.rs:14:3-14:9 within 14:0-16:1; line: `out.extend(f(&SHA512));`; code: `SHA512`",
             "line": 15,
             "location": "src/closures.rs",
             "offset": 18,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in analysis_187::closures::run::{closure#0}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: caller, passed by `analysis_187::closures::by_ref`; instantiated by analysis_187::closures::run at src/closures.rs:23:11; line: `by_ref(&|alg| digest::digest(alg, b\"fixed\").as_ref().to_vec(), &mut out);`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in analysis_187::closures::run::{closure#0}; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: caller, passed by `analysis_187::closures::by_ref`; owner at src/closures.rs:23:12-23:17 as `|alg|` line #dadad5b7 within 23:12-23:65; instantiated by analysis_187::closures::run at src/closures.rs:23:11 (object, to 23:65 as `&|alg| digest::digest(alg, b\"fixed\").as_ref().to_vec()` line #97bdecab, caller at src/closures.rs:18:7-18:10 within 18:0-25:1); line: `by_ref(&|alg| digest::digest(alg, b\"fixed\").as_ref().to_vec(), &mut out);`; code: `digest::digest`",
             "line": 23,
             "location": "src/closures.rs",
             "offset": 18,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in analysis_187::hasher; new: setup, not a use; line: `\"sha512\" => Box::new(Sha512::new()),`; code: `Sha512::new`",
+            "additionalContext": "[reachable] [call] in analysis_187::hasher; new: setup, not a use; owner at src/main.rs:9:3-9:9 within 9:0-14:1; line: `\"sha512\" => Box::new(Sha512::new()),`; code: `Sha512::new`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] in analysis_187::main; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:11); line: `h.update(b\"upload\");`; code: `update`",
+            "additionalContext": "[reachable] [call] in analysis_187::main; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:11); owner at src/main.rs:50:3-50:7 within 50:0-64:1; line: `h.update(b\"upload\");`; code: `update`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in analysis_187::main; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:11); line: `let sum = h.finalize();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in analysis_187::main; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:11); owner at src/main.rs:50:3-50:7 within 50:0-64:1; line: `let sum = h.finalize();`; code: `finalize`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 16,
@@ -645,7 +645,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in analysis_187::main; use: generate; algorithm unresolved: a trait object (`dyn RngCore`): of the 2 types the build makes one of, 1 is not a type the knowledge base names; line: `rng.fill_bytes(&mut salt);`; code: `fill_bytes`",
+            "additionalContext": "[reachable] [call] in analysis_187::main; use: generate; algorithm unresolved: a trait object (`dyn RngCore`): of the 2 types the build makes one of, 1 is not a type the knowledge base names; owner at src/main.rs:50:3-50:7 within 50:0-64:1; line: `rng.fill_bytes(&mut salt);`; code: `fill_bytes`",
             "line": 61,
             "location": "src/main.rs",
             "offset": 8,
@@ -700,14 +700,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in analysis_187::closures::boxed::{closure#0}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by analysis_187::closures::boxed at src/closures.rs:11:13; line: `Box::new(|alg, data| digest::digest(alg, data).as_ref().to_vec())`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in analysis_187::closures::boxed::{closure#0}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; owner at src/closures.rs:11:13-11:24 as `|alg, data|` line #8fb0d562 within 11:13-11:68; instantiated by analysis_187::closures::boxed at src/closures.rs:11:13 (built, to 11:68 as `|alg, data| digest::digest(alg, data).as_ref().to_vec()` line #8fb0d562, caller at src/closures.rs:8:3-8:8 within 8:0-12:1); line: `Box::new(|alg, data| digest::digest(alg, data).as_ref().to_vec())`; code: `digest::digest`",
             "line": 11,
             "location": "src/closures.rs",
             "offset": 25,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in analysis_187::closures::run::{closure#0}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by analysis_187::closures::run at src/closures.rs:23:11; line: `by_ref(&|alg| digest::digest(alg, b\"fixed\").as_ref().to_vec(), &mut out);`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in analysis_187::closures::run::{closure#0}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; owner at src/closures.rs:23:12-23:17 as `|alg|` line #dadad5b7 within 23:12-23:65; instantiated by analysis_187::closures::run at src/closures.rs:23:11 (object, to 23:65 as `&|alg| digest::digest(alg, b\"fixed\").as_ref().to_vec()` line #97bdecab, caller at src/closures.rs:18:7-18:10 within 18:0-25:1); line: `by_ref(&|alg| digest::digest(alg, b\"fixed\").as_ref().to_vec(), &mut out);`; code: `digest::digest`",
             "line": 23,
             "location": "src/closures.rs",
             "offset": 18,
@@ -921,7 +921,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:3c1324ae-174b-83fd-bf39-b28c06288680",
+  "serialNumber": "urn:uuid:547a3566-2e11-8694-aacc-45396c950184",
   "specVersion": "1.7",
   "version": 1
 }

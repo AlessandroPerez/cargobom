@@ -102,42 +102,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in p1::my; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `p1::main`; line: `fn my(a: &'static Digest, d: &[u8]) -> Out { digest::digest(a, d) } // SHA-384, SHA-512, SHA-1`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in p1::my; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `p1::main`; owner at src/main.rs:14:3-14:5 within 14:0-14:67; line: `fn my(a: &'static Digest, d: &[u8]) -> Out { digest::digest(a, d) } // SHA-384, SHA-512, SHA-1`; code: `digest::digest`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:12:19; line: `let _ = (*B)(&SHA1, &d); // SHA-1`; code: `(*B)`",
+            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; owner at src/main.rs:18:3-18:7 within 18:0-39:1; called through a function pointer to `ring::digest::digest` named at src/main.rs:12:19; line: `let _ = (*B)(&SHA1, &d); // SHA-1`; code: `(*B)`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `let _ = (*B)(&SHA1, &d); // SHA-1`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `let _ = (*B)(&SHA1, &d); // SHA-1`; code: `SHA1`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:30:65; line: `let _ = b(&SHA1, &d); // SHA-1`; code: `b`",
+            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; owner at src/main.rs:18:3-18:7 within 18:0-39:1; called through a function pointer to `ring::digest::digest` named at src/main.rs:30:65; line: `let _ = b(&SHA1, &d); // SHA-1`; code: `b`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `let _ = b(&SHA1, &d); // SHA-1`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `let _ = b(&SHA1, &d); // SHA-1`; code: `SHA1`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `let _ = my(&SHA1, &d);`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `let _ = my(&SHA1, &d);`; code: `SHA1`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 16,
@@ -193,28 +193,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:8:19; line: `let _ = HF(&SHA256, &d); // SHA-256`; code: `HF`",
+            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; owner at src/main.rs:18:3-18:7 within 18:0-39:1; called through a function pointer to `ring::digest::digest` named at src/main.rs:8:19; line: `let _ = HF(&SHA256, &d); // SHA-256`; code: `HF`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `let _ = HF(&SHA256, &d); // SHA-256`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `let _ = HF(&SHA256, &d); // SHA-256`; code: `SHA256`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:24:16; line: `let _ = mk()(&SHA256, &d); // SHA-256`; code: `mk()`",
+            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; owner at src/main.rs:18:3-18:7 within 18:0-39:1; called through a function pointer to `ring::digest::digest` named at src/main.rs:24:16; line: `let _ = mk()(&SHA256, &d); // SHA-256`; code: `mk()`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `let _ = mk()(&SHA256, &d); // SHA-256`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `let _ = mk()(&SHA256, &d); // SHA-256`; code: `SHA256`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 18,
@@ -266,42 +266,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in p1::my; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `p1::main`; line: `fn my(a: &'static Digest, d: &[u8]) -> Out { digest::digest(a, d) } // SHA-384, SHA-512, SHA-1`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in p1::my; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA384; member: caller, passed by `p1::main`; owner at src/main.rs:14:3-14:5 within 14:0-14:67; line: `fn my(a: &'static Digest, d: &[u8]) -> Out { digest::digest(a, d) } // SHA-384, SHA-512, SHA-1`; code: `digest::digest`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:9:27; called through a function pointer to `ring::digest::digest` named at src/main.rs:9:43; line: `let _ = FNS[arg(1).len() % 2](&SHA384, &d); // SHA-384`; code: `FNS[arg(1).len() % 2]`",
+            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at src/main.rs:18:3-18:7 within 18:0-39:1; called through a function pointer to `ring::digest::digest` named at src/main.rs:9:27; called through a function pointer to `ring::digest::digest` named at src/main.rs:9:43; line: `let _ = FNS[arg(1).len() % 2](&SHA384, &d); // SHA-384`; code: `FNS[arg(1).len() % 2]`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `let _ = FNS[arg(1).len() % 2](&SHA384, &d); // SHA-384`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `let _ = FNS[arg(1).len() % 2](&SHA384, &d); // SHA-384`; code: `SHA384`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 35,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `let _ = MY(&SHA384, &d); // my: SHA-384`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `let _ = MY(&SHA384, &d); // my: SHA-384`; code: `SHA384`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:34:33; line: `if let Some(f) = o { let _ = f(&SHA384, &d); } // SHA-384`; code: `f`",
+            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at src/main.rs:18:3-18:7 within 18:0-39:1; called through a function pointer to `ring::digest::digest` named at src/main.rs:34:33; line: `if let Some(f) = o { let _ = f(&SHA384, &d); } // SHA-384`; code: `f`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 33,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `if let Some(f) = o { let _ = f(&SHA384, &d); } // SHA-384`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `if let Some(f) = o { let _ = f(&SHA384, &d); } // SHA-384`; code: `SHA384`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 36,
@@ -353,35 +353,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in p1::my; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA512_256; member: caller, passed by `p1::twice`; line: `fn my(a: &'static Digest, d: &[u8]) -> Out { digest::digest(a, d) } // SHA-384, SHA-512, SHA-1`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in p1::my; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA512_256; member: caller, passed by `p1::twice`; owner at src/main.rs:14:3-14:5 within 14:0-14:67; line: `fn my(a: &'static Digest, d: &[u8]) -> Out { digest::digest(a, d) } // SHA-384, SHA-512, SHA-1`; code: `digest::digest`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in p1::twice; use: digest; algorithm from ring::digest::SHA512_256 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:36:18; line: `fn twice(f: HashFn, d: &[u8]) -> Out { f(&SHA512_256, d) } // SHA-512/256 (digest::digest), and my's`; code: `f`",
+            "additionalContext": "[reachable] [call] in p1::twice; use: digest; algorithm from ring::digest::SHA512_256 in the arguments; owner at src/main.rs:16:3-16:8 within 16:0-16:58; called through a function pointer to `ring::digest::digest` named at src/main.rs:36:18; line: `fn twice(f: HashFn, d: &[u8]) -> Out { f(&SHA512_256, d) } // SHA-512/256 (digest::digest), and my's`; code: `f`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 39,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::twice; line: `fn twice(f: HashFn, d: &[u8]) -> Out { f(&SHA512_256, d) } // SHA-512/256 (digest::digest), and my's`; code: `SHA512_256`",
+            "additionalContext": "[reachable] [static] in p1::twice; owner at src/main.rs:16:3-16:8 within 16:0-16:58; line: `fn twice(f: HashFn, d: &[u8]) -> Out { f(&SHA512_256, d) } // SHA-512/256 (digest::digest), and my's`; code: `SHA512_256`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 42,
             "symbol": "ring::digest::SHA512_256"
           },
           {
-            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA512_256 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:27:16; line: `let _ = m[&1](&SHA512_256, &d); // SHA-512/256`; code: `m[&1]`",
+            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA512_256 in the arguments; owner at src/main.rs:18:3-18:7 within 18:0-39:1; called through a function pointer to `ring::digest::digest` named at src/main.rs:27:16; line: `let _ = m[&1](&SHA512_256, &d); // SHA-512/256`; code: `m[&1]`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `let _ = m[&1](&SHA512_256, &d); // SHA-512/256`; code: `SHA512_256`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `let _ = m[&1](&SHA512_256, &d); // SHA-512/256`; code: `SHA512_256`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 19,
@@ -433,28 +433,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in p1::my; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA512; member: caller, passed by `p1::main`; line: `fn my(a: &'static Digest, d: &[u8]) -> Out { digest::digest(a, d) } // SHA-384, SHA-512, SHA-1`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in p1::my; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA512; member: caller, passed by `p1::main`; owner at src/main.rs:14:3-14:5 within 14:0-14:67; line: `fn my(a: &'static Digest, d: &[u8]) -> Out { digest::digest(a, d) } // SHA-384, SHA-512, SHA-1`; code: `digest::digest`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; called through a function pointer to `ring::digest::digest` named at src/main.rs:11:34; line: `let _ = (HOLD.f)(&SHA512, &d); // SHA-512`; code: `(HOLD.f)`",
+            "additionalContext": "[reachable] [call] in p1::main; use: digest; algorithm from ring::digest::SHA512 in the arguments; owner at src/main.rs:18:3-18:7 within 18:0-39:1; called through a function pointer to `ring::digest::digest` named at src/main.rs:11:34; line: `let _ = (HOLD.f)(&SHA512, &d); // SHA-512`; code: `(HOLD.f)`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `let _ = (HOLD.f)(&SHA512, &d); // SHA-512`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `let _ = (HOLD.f)(&SHA512, &d); // SHA-512`; code: `SHA512`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in p1::main; line: `let _ = v[0](&SHA512, &d); // my: SHA-512`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in p1::main; owner at src/main.rs:18:3-18:7 within 18:0-39:1; line: `let _ = v[0](&SHA512, &d); // my: SHA-512`; code: `SHA512`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 18,
@@ -603,7 +603,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:0e0aa41d-7901-8ff6-acf4-63ce54796473",
+  "serialNumber": "urn:uuid:d8ddf9c8-c0b0-8686-943e-0d8e1bd916ac",
   "specVersion": "1.7",
   "version": 1
 }

@@ -1201,28 +1201,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 76); line: `let mut key = SealingKey::new(UnboundKey::new(&aead::AES_256_GCM, k).unwrap(), Fixed);`; code: `SealingKey::new`",
+            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 76); owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `let mut key = SealingKey::new(UnboundKey::new(&aead::AES_256_GCM, k).unwrap(), Fixed);`; code: `SealingKey::new`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "ring::aead::BoundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let mut key = SealingKey::new(UnboundKey::new(&aead::AES_256_GCM, k).unwrap(), Fixed);`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::args) or parameter (argument 1 of the enclosing function); owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `let mut key = SealingKey::new(UnboundKey::new(&aead::AES_256_GCM, k).unwrap(), Fixed);`; code: `UnboundKey::new`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 34,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [static] in a24::k6; line: `let mut key = SealingKey::new(UnboundKey::new(&aead::AES_256_GCM, k).unwrap(), Fixed);`; code: `aead::AES_256_GCM`",
+            "additionalContext": "[reachable] [static] in a24::k6; owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `let mut key = SealingKey::new(UnboundKey::new(&aead::AES_256_GCM, k).unwrap(), Fixed);`; code: `aead::AES_256_GCM`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 51,
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k6; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; line: `key.seal_in_place_append_tag(Aad::empty(), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in a24::k6; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `key.seal_in_place_append_tag(Aad::empty(), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 85,
             "location": "src/main.rs",
             "offset": 8,
@@ -1286,14 +1286,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k1; new: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Argon2::new`",
+            "additionalContext": "[reachable] [call] in a24::k1; new: setup, not a use; owner at src/main.rs:22:3-22:5 within 22:0-27:1; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Argon2::new`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "argon2::Argon2::<'key>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k1; default: setup, not a use; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Params::default`",
+            "additionalContext": "[reachable] [call] in a24::k1; default: setup, not a use; owner at src/main.rs:22:3-22:5 within 22:0-27:1; line: `let a = Argon2::new(Algorithm::Argon2i, Version::V0x13, Params::default());`; code: `Params::default`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 60,
@@ -1353,7 +1353,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k2; default: setup, not a use; from: setup, not a use; line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `Params::default`",
+            "additionalContext": "[reachable] [call] in a24::k2; default: setup, not a use; owner at src/main.rs:31:3-31:5 within 31:0-34:1; from: setup, not a use; line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `Params::default`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 25,
@@ -1413,14 +1413,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k1; new: setup, not a use; line: `let params = Params::new(65536, 3, 4, None).unwrap();`; code: `Params::new`",
+            "additionalContext": "[reachable] [call] in a24::k1; new: setup, not a use; owner at src/main.rs:22:3-22:5 within 22:0-27:1; line: `let params = Params::new(65536, 3, 4, None).unwrap();`; code: `Params::new`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "argon2::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k1; use: keyderive; hash_password_customized: its own parameters, not its receiver's; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`",
+            "additionalContext": "[reachable] [call] in a24::k1; use: keyderive; hash_password_customized: its own parameters, not its receiver's; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: rng (salt::SaltString::generate); owner at src/main.rs:22:3-22:5 within 22:0-27:1; line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 6,
@@ -1480,7 +1480,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k2; use: verify; verify_password: its own parameters, not its receiver's; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `verify_password`",
+            "additionalContext": "[reachable] [call] in a24::k2; use: verify; verify_password: its own parameters, not its receiver's; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:31:3-31:5 within 31:0-34:1; line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `verify_password`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 44,
@@ -1540,14 +1540,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a24::k1; part of Argon2id-65536-3-4; line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`",
+            "additionalContext": "[reachable] [component] in a24::k1; part of Argon2id-65536-3-4; owner at src/main.rs:22:3-22:5 within 22:0-27:1; line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "password_hash::traits::PasswordHasher::hash_password_customized"
           },
           {
-            "additionalContext": "[reachable] [component] in a24::k2; part of Argon2; line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `verify_password`",
+            "additionalContext": "[reachable] [component] in a24::k2; part of Argon2; owner at src/main.rs:31:3-31:5 within 31:0-34:1; line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `verify_password`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 44,
@@ -1603,14 +1603,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a24::k1; part of Argon2id-65536-3-4; line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`",
+            "additionalContext": "[reachable] [component] in a24::k1; part of Argon2id-65536-3-4; owner at src/main.rs:22:3-22:5 within 22:0-27:1; line: `a.hash_password_customized(pw, None, None, params, &salt).unwrap().to_string()`; code: `hash_password_customized`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "password_hash::traits::PasswordHasher::hash_password_customized"
           },
           {
-            "additionalContext": "[reachable] [component] in a24::k2; part of Argon2; line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `verify_password`",
+            "additionalContext": "[reachable] [component] in a24::k2; part of Argon2; owner at src/main.rs:31:3-31:5 within 31:0-34:1; line: `let r = Argon2::from(Params::default()).verify_password(pw, h);`; code: `verify_password`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 44,
@@ -1676,49 +1676,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k7; use: verify; algorithm from `Validation.algorithms` (object: from `jsonwebtoken::validation::Validation::new`); the key's family (Ec) allows these; line: `|| jsonwebtoken::decode::<HashMap<String, String>>(token, &ec, &jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::ES256)).is_ok()`; code: `jsonwebtoken::decode::<HashMap<String, String>>`",
+            "additionalContext": "[reachable] [call] in a24::k7; use: verify; algorithm from `Validation.algorithms` (object: from `jsonwebtoken::validation::Validation::new`); the key's family (Ec) allows these; owner at src/main.rs:90:3-90:5 within 90:0-95:1; line: `|| jsonwebtoken::decode::<HashMap<String, String>>(token, &ec, &jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::ES256)).is_ok()`; code: `jsonwebtoken::decode::<HashMap<String, String>>`",
             "line": 94,
             "location": "src/main.rs",
             "offset": 11,
             "symbol": "jsonwebtoken::decoding::decode"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:8:14-8:36 within 8:0-16:1; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`",
             "line": 12,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 29,
             "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:19:14-19:31 within 19:0-25:1; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
             "line": 21,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 29,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let signing_key = signature::EcdsaKeyPair::from_pkcs8(alg, key, &rng)?;`; code: `signature::EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:29:7-29:11 within 29:0-38:1; line: `let signing_key = signature::EcdsaKeyPair::from_pkcs8(alg, key, &rng)?;`; code: `signature::EcdsaKeyPair::from_pkcs8`",
             "line": 35,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 22,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; line: `let out = signing_key.sign(&rng, message)?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:29:7-29:11 within 29:0-38:1; line: `let out = signing_key.sign(&rng, message)?;`; code: `sign`",
             "line": 36,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 26,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -1780,42 +1780,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED,`; code: `signature::ECDSA_P384_SHA384_FIXED`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:8:14-8:36 within 8:0-16:1; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED,`; code: `signature::ECDSA_P384_SHA384_FIXED`",
             "line": 13,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 29,
             "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED_SIGNING,`; code: `signature::ECDSA_P384_SHA384_FIXED_SIGNING`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:19:14-19:31 within 19:0-25:1; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED_SIGNING,`; code: `signature::ECDSA_P384_SHA384_FIXED_SIGNING`",
             "line": 22,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 29,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let signing_key = signature::EcdsaKeyPair::from_pkcs8(alg, key, &rng)?;`; code: `signature::EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; from_pkcs8: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:29:7-29:11 within 29:0-38:1; line: `let signing_key = signature::EcdsaKeyPair::from_pkcs8(alg, key, &rng)?;`; code: `signature::EcdsaKeyPair::from_pkcs8`",
             "line": 35,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 22,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; line: `let out = signing_key.sign(&rng, message)?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::ecdsa::sign; use: sign; algorithm one of 2 that may reach the call from other functions: ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_signing`; owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:29:7-29:11 within 29:0-38:1; line: `let out = signing_key.sign(&rng, message)?;`; code: `sign`",
             "line": 36,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 26,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED; member: object, from `jsonwebtoken::crypto::ecdsa::alg_to_ec_verification`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -1871,14 +1871,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k7; from_ec_pem: setup, not a use; line: `let ec = jsonwebtoken::DecodingKey::from_ec_pem(pem).unwrap();`; code: `jsonwebtoken::DecodingKey::from_ec_pem`",
+            "additionalContext": "[reachable] [call] in a24::k7; from_ec_pem: setup, not a use; owner at src/main.rs:90:3-90:5 within 90:0-95:1; line: `let ec = jsonwebtoken::DecodingKey::from_ec_pem(pem).unwrap();`; code: `jsonwebtoken::DecodingKey::from_ec_pem`",
             "line": 92,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "jsonwebtoken::decoding::DecodingKey::from_ec_pem"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ec_components: setup, not a use; line: `DecodingKey::from_ec_components(&params.x, &params.y)`; code: `DecodingKey::from_ec_components`",
+            "additionalContext": "[present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ec_components: setup, not a use; owner at jsonwebtoken-9.3.1/src/decoding.rs:177:11-177:19 within 177:4-194:5; line: `DecodingKey::from_ec_components(&params.x, &params.y)`; code: `DecodingKey::from_ec_components`",
             "line": 183,
             "location": "jsonwebtoken-9.3.1/src/decoding.rs",
             "offset": 16,
@@ -1940,56 +1940,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::ec::curve25519::ed25519::verification::ED25519 in the arguments; public-key: environment (std::env::args) or parameter (argument 2 of the enclosing function); line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::ec::curve25519::ed25519::verification::ED25519 in the arguments; public-key: environment (std::env::args) or parameter (argument 2 of the enclosing function); owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `UnparsedPublicKey::new`",
             "line": 86,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [static] in a24::k6; line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `ED25519`",
+            "additionalContext": "[reachable] [static] in a24::k6; owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `ED25519`",
             "line": 86,
             "location": "src/main.rs",
             "offset": 28,
             "symbol": "ring::ec::curve25519::ed25519::verification::ED25519"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k6; use: verify; algorithm from ring::ec::curve25519::ed25519::verification::ED25519 in the arguments; line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `verify`",
+            "additionalContext": "[reachable] [call] in a24::k6; use: verify; algorithm from ring::ec::curve25519::ed25519::verification::ED25519 in the arguments; owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `verify`",
             "line": 86,
             "location": "src/main.rs",
             "offset": 41,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::eddsa::alg_to_ec_verification; line: `Algorithm::EdDSA => &signature::ED25519,`; code: `signature::ED25519`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::eddsa::alg_to_ec_verification; owner at jsonwebtoken-9.3.1/src/crypto/eddsa.rs:8:14-8:36 within 8:0-15:1; line: `Algorithm::EdDSA => &signature::ED25519,`; code: `signature::ED25519`",
             "line": 12,
             "location": "jsonwebtoken-9.3.1/src/crypto/eddsa.rs",
             "offset": 29,
             "symbol": "ring::ec::curve25519::ed25519::verification::ED25519"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::eddsa::sign; from_pkcs8_maybe_unchecked: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `let signing_key = signature::Ed25519KeyPair::from_pkcs8_maybe_unchecked(key)?;`; code: `signature::Ed25519KeyPair::from_pkcs8_maybe_unchecked`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::eddsa::sign; from_pkcs8_maybe_unchecked: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at jsonwebtoken-9.3.1/src/crypto/eddsa.rs:19:7-19:11 within 19:0-23:1; line: `let signing_key = signature::Ed25519KeyPair::from_pkcs8_maybe_unchecked(key)?;`; code: `signature::Ed25519KeyPair::from_pkcs8_maybe_unchecked`",
             "line": 20,
             "location": "jsonwebtoken-9.3.1/src/crypto/eddsa.rs",
             "offset": 22,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8_maybe_unchecked"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::eddsa::sign; use: sign; line: `let out = signing_key.sign(message);`; code: `sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::eddsa::sign; use: sign; owner at jsonwebtoken-9.3.1/src/crypto/eddsa.rs:19:7-19:11 within 19:0-23:1; line: `let out = signing_key.sign(message);`; code: `sign`",
             "line": 21,
             "location": "jsonwebtoken-9.3.1/src/crypto/eddsa.rs",
             "offset": 26,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; member: object, from `jsonwebtoken::crypto::eddsa::alg_to_ec_verification`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; member: object, from `jsonwebtoken::crypto::eddsa::alg_to_ec_verification`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; member: object, from `jsonwebtoken::crypto::eddsa::alg_to_ec_verification`; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; member: object, from `jsonwebtoken::crypto::eddsa::alg_to_ec_verification`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
@@ -2045,7 +2045,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ed_components: setup, not a use; line: `AlgorithmParameters::OctetKeyPair(params) => DecodingKey::from_ed_components(&params.x),`; code: `DecodingKey::from_ed_components`",
+            "additionalContext": "[present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_ed_components: setup, not a use; owner at jsonwebtoken-9.3.1/src/decoding.rs:177:11-177:19 within 177:4-194:5; line: `AlgorithmParameters::OctetKeyPair(params) => DecodingKey::from_ed_components(&params.x),`; code: `DecodingKey::from_ed_components`",
             "line": 185,
             "location": "jsonwebtoken-9.3.1/src/decoding.rs",
             "offset": 57,
@@ -2101,7 +2101,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a24::k6; line: `prk.expand(&[b\"info\"], hkdf::HKDF_SHA256).unwrap().fill(&mut out).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[reachable] [static] in a24::k6; owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `prk.expand(&[b\"info\"], hkdf::HKDF_SHA256).unwrap().fill(&mut out).unwrap();`; code: `hkdf::HKDF_SHA256`",
             "line": 82,
             "location": "src/main.rs",
             "offset": 27,
@@ -2153,35 +2153,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; salt: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `hkdf::Salt::new`",
+            "additionalContext": "[reachable] [call] in a24::k6; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; salt: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `hkdf::Salt::new`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "ring::hkdf::Salt::new"
           },
           {
-            "additionalContext": "[reachable] [static] in a24::k6; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `hkdf::HKDF_SHA384`",
+            "additionalContext": "[reachable] [static] in a24::k6; owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `hkdf::HKDF_SHA384`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::hkdf::HKDF_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k6; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; ikm: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `extract`",
+            "additionalContext": "[reachable] [call] in a24::k6; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; ikm: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `extract`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 54,
             "symbol": "ring::hkdf::Salt::extract"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k6; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; line: `prk.expand(&[b\"info\"], hkdf::HKDF_SHA256).unwrap().fill(&mut out).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [call] in a24::k6; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `prk.expand(&[b\"info\"], hkdf::HKDF_SHA256).unwrap().fill(&mut out).unwrap();`; code: `expand`",
             "line": 82,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "ring::hkdf::Prk::expand"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k6; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; line: `prk.expand(&[b\"info\"], hkdf::HKDF_SHA256).unwrap().fill(&mut out).unwrap();`; code: `fill`",
+            "additionalContext": "[reachable] [call] in a24::k6; use: keyderive; algorithm from ring::hkdf::HKDF_SHA384 in the arguments; owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `prk.expand(&[b\"info\"], hkdf::HKDF_SHA256).unwrap().fill(&mut out).unwrap();`; code: `fill`",
             "line": 82,
             "location": "src/main.rs",
             "offset": 55,
@@ -2241,28 +2241,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a24::k6; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `prk.expand(&[b\"info\"], hkdf::HKDF_SHA256).unwrap().fill(&mut out).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[reachable] [component] in a24::k6; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `prk.expand(&[b\"info\"], hkdf::HKDF_SHA256).unwrap().fill(&mut out).unwrap();`; code: `hkdf::HKDF_SHA256`",
             "line": 82,
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "ring::hkdf::HKDF_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA256; member: caller, passed by `jsonwebtoken::crypto::sign`; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA256; member: caller, passed by `jsonwebtoken::crypto::sign`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:16:14-16:23 within 16:0-19:1; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`",
             "line": 17,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 17,
             "symbol": "ring::hmac::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA256; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA256; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:16:14-16:23 within 16:0-19:1; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
             "line": 17,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 29,
             "symbol": "ring::hmac::Key::new"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::sign; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:25:7-25:11 within 25:0-44:1; line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`",
             "line": 27,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 41,
@@ -2318,28 +2318,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a24::k6; part of HKDF-SHA-384 (ring::hkdf::HKDF_SHA384 -> ring::hmac::HMAC_SHA384); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `hkdf::HKDF_SHA384`",
+            "additionalContext": "[reachable] [component] in a24::k6; part of HKDF-SHA-384 (ring::hkdf::HKDF_SHA384 -> ring::hmac::HMAC_SHA384); owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `hkdf::HKDF_SHA384`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::hkdf::HKDF_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA384; member: caller, passed by `jsonwebtoken::crypto::sign`; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA384; member: caller, passed by `jsonwebtoken::crypto::sign`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:16:14-16:23 within 16:0-19:1; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`",
             "line": 17,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 17,
             "symbol": "ring::hmac::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA384; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA384; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:16:14-16:23 within 16:0-19:1; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
             "line": 17,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 29,
             "symbol": "ring::hmac::Key::new"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::sign; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:25:7-25:11 within 25:0-44:1; line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`",
             "line": 28,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 41,
@@ -2395,21 +2395,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; member: caller, passed by `jsonwebtoken::crypto::sign`; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; use: tag; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; member: caller, passed by `jsonwebtoken::crypto::sign`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:16:14-16:23 within 16:0-19:1; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::sign`",
             "line": 17,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 17,
             "symbol": "ring::hmac::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::sign_hmac; new: setup, not a use; algorithm one of 3 that may reach the call from other functions: ring::hmac::HMAC_SHA512; member: caller, passed by `jsonwebtoken::crypto::sign`; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:16:14-16:23 within 16:0-19:1; line: `let digest = hmac::sign(&hmac::Key::new(alg, key), message);`; code: `hmac::Key::new`",
             "line": 17,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 29,
             "symbol": "ring::hmac::Key::new"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::sign; line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::sign; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:25:7-25:11 within 25:0-44:1; line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`",
             "line": 29,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 41,
@@ -2461,7 +2461,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of the enclosing function) or unknown (too deep); line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify; from_secret: setup, not a use; key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of the enclosing function) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:68:7-68:13 within 68:0-107:1; line: `let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;`; code: `EncodingKey::from_secret`",
             "line": 77,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 40,
@@ -2524,7 +2524,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k1; use: generate; line: `let salt = SaltString::generate(&mut OsRng);`; code: `SaltString::generate`",
+            "additionalContext": "[reachable] [call] in a24::k1; use: generate; owner at src/main.rs:22:3-22:5 within 22:0-27:1; line: `let salt = SaltString::generate(&mut OsRng);`; code: `SaltString::generate`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 15,
@@ -2580,14 +2580,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k4; new: setup, not a use; line: `let ek = rsa::oaep::EncryptingKey::<Sha256>::new(key.to_public_key());`; code: `rsa::oaep::EncryptingKey::<Sha256>::new`",
+            "additionalContext": "[reachable] [call] in a24::k4; new: setup, not a use; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let ek = rsa::oaep::EncryptingKey::<Sha256>::new(key.to_public_key());`; code: `rsa::oaep::EncryptingKey::<Sha256>::new`",
             "line": 53,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "rsa::oaep::encrypting_key::EncryptingKey::<D, MGD>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k4; use: encrypt; rng: hard-coded (literal at line 54); line: `let c = ek.encrypt_with_rng(&mut rng2, msg).unwrap();`; code: `encrypt_with_rng`",
+            "additionalContext": "[reachable] [call] in a24::k4; use: encrypt; rng: hard-coded (literal at line 54); owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let c = ek.encrypt_with_rng(&mut rng2, msg).unwrap();`; code: `encrypt_with_rng`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 15,
@@ -2647,14 +2647,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k4; new: setup, not a use; line: `let std_key = rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new(key.clone());`; code: `rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new`",
+            "additionalContext": "[reachable] [call] in a24::k4; new: setup, not a use; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let std_key = rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new(key.clone());`; code: `rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "rsa::pkcs1v15::signing_key::SigningKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k4; use: sign; rng: rng (rand_core::os::OsRng); line: `let a = std_key.sign_with_rng(&mut OsRng, msg);`; code: `sign_with_rng`",
+            "additionalContext": "[reachable] [call] in a24::k4; use: sign; rng: rng (rand_core::os::OsRng); owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let a = std_key.sign_with_rng(&mut OsRng, msg);`; code: `sign_with_rng`",
             "line": 57,
             "location": "src/main.rs",
             "offset": 20,
@@ -2711,49 +2711,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k7; use: verify; algorithm from `Validation.algorithms` (object: from `jsonwebtoken::validation::Validation::new`); the key's family (Rsa) allows these; line: `jsonwebtoken::decode::<HashMap<String, String>>(token, &key, &jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::RS256)).is_ok()`; code: `jsonwebtoken::decode::<HashMap<String, String>>`",
+            "additionalContext": "[reachable] [call] in a24::k7; use: verify; algorithm from `Validation.algorithms` (object: from `jsonwebtoken::validation::Validation::new`); the key's family (Rsa) allows these; owner at src/main.rs:90:3-90:5 within 90:0-95:1; line: `jsonwebtoken::decode::<HashMap<String, String>>(token, &key, &jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::RS256)).is_ok()`; code: `jsonwebtoken::decode::<HashMap<String, String>>`",
             "line": 93,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "jsonwebtoken::decoding::decode"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::RS256 => &signature::RSA_PKCS1_2048_8192_SHA256,`; code: `signature::RSA_PKCS1_2048_8192_SHA256`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::RS256 => &signature::RSA_PKCS1_2048_8192_SHA256,`; code: `signature::RSA_PKCS1_2048_8192_SHA256`",
             "line": 10,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 23,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:36:14-36:18 within 36:0-49:1; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
             "line": 46,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 13,
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:52:14-52:36 within 52:0-62:1; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -2810,42 +2810,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::RS384 => &signature::RSA_PKCS1_2048_8192_SHA384,`; code: `signature::RSA_PKCS1_2048_8192_SHA384`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::RS384 => &signature::RSA_PKCS1_2048_8192_SHA384,`; code: `signature::RSA_PKCS1_2048_8192_SHA384`",
             "line": 11,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`",
             "line": 24,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:36:14-36:18 within 36:0-49:1; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
             "line": 46,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 13,
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:52:14-52:36 within 52:0-62:1; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -2902,42 +2902,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`",
             "line": 12,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`",
             "line": 25,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:36:14-36:18 within 36:0-49:1; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
             "line": 46,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 13,
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:52:14-52:36 within 52:0-62:1; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -2993,14 +2993,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k4; new_unprefixed: setup, not a use; line: `let raw_key = rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new_unprefixed(key);`; code: `rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new_unprefixed`",
+            "additionalContext": "[reachable] [call] in a24::k4; new_unprefixed: setup, not a use; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let raw_key = rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new_unprefixed(key);`; code: `rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new_unprefixed`",
             "line": 58,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "rsa::pkcs1v15::signing_key::SigningKey::<D>::new_unprefixed"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k4; use: sign; rng: rng (rand_core::os::OsRng); line: `let b = raw_key.sign_with_rng(&mut OsRng, msg);`; code: `sign_with_rng`",
+            "additionalContext": "[reachable] [call] in a24::k4; use: sign; rng: rng (rand_core::os::OsRng); owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let b = raw_key.sign_with_rng(&mut OsRng, msg);`; code: `sign_with_rng`",
             "line": 59,
             "location": "src/main.rs",
             "offset": 20,
@@ -3061,56 +3061,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k4; use: sign; rng: hard-coded (literal at line 51); line: `let s = key.sign_with_rng(&mut rng, Pss::new::<Sha256>(), &h).unwrap();`; code: `sign_with_rng`",
+            "additionalContext": "[reachable] [call] in a24::k4; use: sign; rng: hard-coded (literal at line 51); owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let s = key.sign_with_rng(&mut rng, Pss::new::<Sha256>(), &h).unwrap();`; code: `sign_with_rng`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "rsa::key::RsaPrivateKey::sign_with_rng"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k4; new: setup, not a use; line: `let s = key.sign_with_rng(&mut rng, Pss::new::<Sha256>(), &h).unwrap();`; code: `Pss::new::<Sha256>`",
+            "additionalContext": "[reachable] [call] in a24::k4; new: setup, not a use; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let s = key.sign_with_rng(&mut rng, Pss::new::<Sha256>(), &h).unwrap();`; code: `Pss::new::<Sha256>`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 40,
             "symbol": "rsa::pss::Pss::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`",
             "line": 13,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`",
             "line": 26,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pss::RSA_PSS_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pss::RSA_PSS_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:36:14-36:18 within 36:0-49:1; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
             "line": 46,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 13,
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA256; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:52:14-52:36 within 52:0-62:1; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -3183,42 +3183,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`",
             "line": 14,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`",
             "line": 27,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pss::RSA_PSS_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pss::RSA_PSS_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:36:14-36:18 within 36:0-49:1; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
             "line": 46,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 13,
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA384; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:52:14-52:36 within 52:0-62:1; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -3283,42 +3283,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; new: setup, not a use; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; public-key: environment (std::env::args) or parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 3 of the enclosing function) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let public_key = signature::UnparsedPublicKey::new(alg, key);`; code: `signature::UnparsedPublicKey::new`",
             "line": 54,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 21,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::verify_ring; use: verify; algorithm one of 9 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`",
             "line": 15,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA512"
           },
           {
-            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`",
+            "additionalContext": "[reachable] [static] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`",
             "line": 28,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::padding::pss::RSA_PSS_SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pss::RSA_PSS_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; use: sign; algorithm one of 6 that may reach the call from other functions: ring::rsa::padding::pss::RSA_PSS_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_signing`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:36:14-36:18 within 36:0-49:1; line: `key_pair.sign(alg, &rng, message, &mut signature).map_err(|_| ErrorKind::RsaFailedSigning)?;`; code: `sign`",
             "line": 46,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 13,
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::verify_from_components; use: verify; algorithm one of 6 that may reach the call from other functions: ring::rsa::verification::RSA_PSS_2048_8192_SHA512; member: object, from `jsonwebtoken::crypto::rsa::alg_to_rsa_parameters`; owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:52:14-52:36 within 52:0-62:1; line: `let res = pubkey.verify(alg, message, &signature_bytes);`; code: `verify`",
             "line": 60,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 21,
@@ -3378,28 +3378,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k4; from_p_q: setup, not a use; key: computed (biguint::BigUint::from_bytes_be); line: `let key = RsaPrivateKey::from_p_q(BigUint::from_bytes_be(p), BigUint::from_bytes_be(q), BigUint::from(65537u32)).unwrap();`; code: `RsaPrivateKey::from_p_q`",
+            "additionalContext": "[reachable] [call] in a24::k4; from_p_q: setup, not a use; key: computed (biguint::BigUint::from_bytes_be); owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let key = RsaPrivateKey::from_p_q(BigUint::from_bytes_be(p), BigUint::from_bytes_be(q), BigUint::from(65537u32)).unwrap();`; code: `RsaPrivateKey::from_p_q`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "rsa::key::RsaPrivateKey::from_p_q"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k5; use: keygen; rng: rng (rngs::thread::thread_rng); line: `let k = RsaPrivateKey::new(&mut rand::thread_rng(), bits).unwrap();`; code: `RsaPrivateKey::new`",
+            "additionalContext": "[reachable] [call] in a24::k5; use: keygen; rng: rng (rngs::thread::thread_rng); owner at src/main.rs:64:3-64:5 within 64:0-68:1; line: `let k = RsaPrivateKey::new(&mut rand::thread_rng(), bits).unwrap();`; code: `RsaPrivateKey::new`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "rsa::key::RsaPrivateKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k5; from_pkcs8: setup, not a use; key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `let p = RsaKeyPair::from_pkcs8(der).unwrap();`; code: `RsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in a24::k5; from_pkcs8: setup, not a use; key: environment (std::env::args) or parameter (argument 1 of the enclosing function); owner at src/main.rs:64:3-64:5 within 64:0-68:1; line: `let p = RsaKeyPair::from_pkcs8(der).unwrap();`; code: `RsaKeyPair::from_pkcs8`",
             "line": 66,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::rsa::keypair::KeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; from_der: setup, not a use; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); line: `let key_pair = signature::RsaKeyPair::from_der(key)`; code: `signature::RsaKeyPair::from_der`",
+            "additionalContext": "[reachable] [call] in jsonwebtoken::crypto::rsa::sign; from_der: setup, not a use; key: parameter (argument 1 of a24::k7) or parameter (argument 1 of decoding::decode::) or parameter (argument 1 of jsonwebtoken::crypto::sign) or parameter (argument 1 of jsonwebtoken::decoding::decode) or parameter (argument 1 of jsonwebtoken::decoding::verify_signature) or parameter (argument 1 of the enclosing function) or parameter (argument 2 of jsonwebtoken::crypto::verify) or parameter (argument 2 of jsonwebtoken::encoding::encode) or unknown (too deep); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:36:14-36:18 within 36:0-49:1; line: `let key_pair = signature::RsaKeyPair::from_der(key)`; code: `signature::RsaKeyPair::from_der`",
             "line": 41,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 19,
@@ -3459,14 +3459,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k7; from_rsa_pem: setup, not a use; line: `let key = jsonwebtoken::DecodingKey::from_rsa_pem(pem).unwrap();`; code: `jsonwebtoken::DecodingKey::from_rsa_pem`",
+            "additionalContext": "[reachable] [call] in a24::k7; from_rsa_pem: setup, not a use; owner at src/main.rs:90:3-90:5 within 90:0-95:1; line: `let key = jsonwebtoken::DecodingKey::from_rsa_pem(pem).unwrap();`; code: `jsonwebtoken::DecodingKey::from_rsa_pem`",
             "line": 91,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "jsonwebtoken::decoding::DecodingKey::from_rsa_pem"
           },
           {
-            "additionalContext": "[present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_rsa_components: setup, not a use; line: `DecodingKey::from_rsa_components(&params.n, &params.e)`; code: `DecodingKey::from_rsa_components`",
+            "additionalContext": "[present] [call] in jsonwebtoken::decoding::DecodingKey::from_jwk; from_rsa_components: setup, not a use; owner at jsonwebtoken-9.3.1/src/decoding.rs:177:11-177:19 within 177:4-194:5; line: `DecodingKey::from_rsa_components(&params.n, &params.e)`; code: `DecodingKey::from_rsa_components`",
             "line": 180,
             "location": "jsonwebtoken-9.3.1/src/decoding.rs",
             "offset": 16,
@@ -3526,28 +3526,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-PKCS1-1.5-SHA-1; line: `let std_key = rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new(key.clone());`; code: `rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new`",
+            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-PKCS1-1.5-SHA-1; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let std_key = rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new(key.clone());`; code: `rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "rsa::pkcs1v15::signing_key::SigningKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-PKCS1-1.5-SHA-1; line: `let a = std_key.sign_with_rng(&mut OsRng, msg);`; code: `sign_with_rng`",
+            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-PKCS1-1.5-SHA-1; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let a = std_key.sign_with_rng(&mut OsRng, msg);`; code: `sign_with_rng`",
             "line": 57,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "signature::signer::RandomizedSigner::sign_with_rng"
           },
           {
-            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-PKCS1-1.5; line: `let raw_key = rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new_unprefixed(key);`; code: `rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new_unprefixed`",
+            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-PKCS1-1.5; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let raw_key = rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new_unprefixed(key);`; code: `rsa::pkcs1v15::SigningKey::<sha1::Sha1>::new_unprefixed`",
             "line": 58,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "rsa::pkcs1v15::signing_key::SigningKey::<D>::new_unprefixed"
           },
           {
-            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-PKCS1-1.5; line: `let b = raw_key.sign_with_rng(&mut OsRng, msg);`; code: `sign_with_rng`",
+            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-PKCS1-1.5; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let b = raw_key.sign_with_rng(&mut OsRng, msg);`; code: `sign_with_rng`",
             "line": 59,
             "location": "src/main.rs",
             "offset": 20,
@@ -3607,84 +3607,84 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k4; use: digest; line: `let h = Sha256::digest(msg);`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in a24::k4; use: digest; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let h = Sha256::digest(msg);`; code: `Sha256::digest`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-PSS-SHA-256; line: `let s = key.sign_with_rng(&mut rng, Pss::new::<Sha256>(), &h).unwrap();`; code: `Pss::new::<Sha256>`",
+            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-PSS-SHA-256; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let s = key.sign_with_rng(&mut rng, Pss::new::<Sha256>(), &h).unwrap();`; code: `Pss::new::<Sha256>`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 40,
             "symbol": "rsa::pss::Pss::new"
           },
           {
-            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-OAEP-SHA-256; line: `let ek = rsa::oaep::EncryptingKey::<Sha256>::new(key.to_public_key());`; code: `rsa::oaep::EncryptingKey::<Sha256>::new`",
+            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-OAEP-SHA-256; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let ek = rsa::oaep::EncryptingKey::<Sha256>::new(key.to_public_key());`; code: `rsa::oaep::EncryptingKey::<Sha256>::new`",
             "line": 53,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "rsa::oaep::encrypting_key::EncryptingKey::<D, MGD>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-OAEP-SHA-256; line: `let c = ek.encrypt_with_rng(&mut rng2, msg).unwrap();`; code: `encrypt_with_rng`",
+            "additionalContext": "[reachable] [component] in a24::k4; part of RSA-OAEP-SHA-256; owner at src/main.rs:48:3-48:5 within 48:0-61:1; line: `let c = ek.encrypt_with_rng(&mut rng2, msg).unwrap();`; code: `encrypt_with_rng`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "rsa::traits::encryption::RandomizedEncryptor::encrypt_with_rng"
           },
           {
-            "additionalContext": "[reachable] [component] in a24::k6; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `prk.expand(&[b\"info\"], hkdf::HKDF_SHA256).unwrap().fill(&mut out).unwrap();`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[reachable] [component] in a24::k6; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `prk.expand(&[b\"info\"], hkdf::HKDF_SHA256).unwrap().fill(&mut out).unwrap();`; code: `hkdf::HKDF_SHA256`",
             "line": 82,
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "ring::hkdf::HKDF_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED -> ring::digest::SHA256); line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED -> ring::digest::SHA256); owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:8:14-8:36 within 8:0-16:1; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED,`; code: `signature::ECDSA_P256_SHA256_FIXED`",
             "line": 12,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 29,
             "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> ring::digest::SHA256); line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> ring::digest::SHA256); owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:19:14-19:31 within 19:0-25:1; line: `Algorithm::ES256 => &signature::ECDSA_P256_SHA256_FIXED_SIGNING,`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
             "line": 21,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 29,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:25:7-25:11 within 25:0-44:1; line: `Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),`; code: `hmac::HMAC_SHA256`",
             "line": 27,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 41,
             "symbol": "ring::hmac::HMAC_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 -> ring::digest::SHA256); line: `Algorithm::RS256 => &signature::RSA_PKCS1_2048_8192_SHA256,`; code: `signature::RSA_PKCS1_2048_8192_SHA256`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 -> ring::digest::SHA256); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::RS256 => &signature::RSA_PKCS1_2048_8192_SHA256,`; code: `signature::RSA_PKCS1_2048_8192_SHA256`",
             "line": 10,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-256 (ring::rsa::verification::RSA_PSS_2048_8192_SHA256 -> ring::digest::SHA256); line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-256 (ring::rsa::verification::RSA_PSS_2048_8192_SHA256 -> ring::digest::SHA256); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::PS256 => &signature::RSA_PSS_2048_8192_SHA256,`; code: `signature::RSA_PSS_2048_8192_SHA256`",
             "line": 13,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::RS256 => &signature::RSA_PKCS1_SHA256,`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 23,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-256 (ring::rsa::padding::pss::RSA_PSS_SHA256 -> ring::digest::SHA256); line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-256 (ring::rsa::padding::pss::RSA_PSS_SHA256 -> ring::digest::SHA256); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::PS256 => &signature::RSA_PSS_SHA256,`; code: `signature::RSA_PSS_SHA256`",
             "line": 26,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
@@ -3736,56 +3736,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a24::k6; part of HKDF-SHA-384 (ring::hkdf::HKDF_SHA384 -> ring::digest::SHA384); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `hkdf::HKDF_SHA384`",
+            "additionalContext": "[reachable] [component] in a24::k6; part of HKDF-SHA-384 (ring::hkdf::HKDF_SHA384 -> ring::digest::SHA384); owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA384, ikm).extract(ikm);`; code: `hkdf::HKDF_SHA384`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::hkdf::HKDF_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED -> ring::digest::SHA384); line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED,`; code: `signature::ECDSA_P384_SHA384_FIXED`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_verification; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED -> ring::digest::SHA384); owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:8:14-8:36 within 8:0-16:1; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED,`; code: `signature::ECDSA_P384_SHA384_FIXED`",
             "line": 13,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 29,
             "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_FIXED"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING -> ring::digest::SHA384); line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED_SIGNING,`; code: `signature::ECDSA_P384_SHA384_FIXED_SIGNING`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::ecdsa::alg_to_ec_signing; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING -> ring::digest::SHA384); owner at jsonwebtoken-9.3.1/src/crypto/ecdsa.rs:19:14-19:31 within 19:0-25:1; line: `Algorithm::ES384 => &signature::ECDSA_P384_SHA384_FIXED_SIGNING,`; code: `signature::ECDSA_P384_SHA384_FIXED_SIGNING`",
             "line": 22,
             "location": "jsonwebtoken-9.3.1/src/crypto/ecdsa.rs",
             "offset": 29,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P384_SHA384_FIXED_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-384 (ring::hmac::HMAC_SHA384 -> ring::digest::SHA384); line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-384 (ring::hmac::HMAC_SHA384 -> ring::digest::SHA384); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:25:7-25:11 within 25:0-44:1; line: `Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),`; code: `hmac::HMAC_SHA384`",
             "line": 28,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 41,
             "symbol": "ring::hmac::HMAC_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 -> ring::digest::SHA384); line: `Algorithm::RS384 => &signature::RSA_PKCS1_2048_8192_SHA384,`; code: `signature::RSA_PKCS1_2048_8192_SHA384`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384 -> ring::digest::SHA384); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::RS384 => &signature::RSA_PKCS1_2048_8192_SHA384,`; code: `signature::RSA_PKCS1_2048_8192_SHA384`",
             "line": 11,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-384 (ring::rsa::verification::RSA_PSS_2048_8192_SHA384 -> ring::digest::SHA384); line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-384 (ring::rsa::verification::RSA_PSS_2048_8192_SHA384 -> ring::digest::SHA384); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::PS384 => &signature::RSA_PSS_2048_8192_SHA384,`; code: `signature::RSA_PSS_2048_8192_SHA384`",
             "line": 14,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-384 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384 -> ring::digest::SHA384); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::RS384 => &signature::RSA_PKCS1_SHA384,`; code: `signature::RSA_PKCS1_SHA384`",
             "line": 24,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA384"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-384 (ring::rsa::padding::pss::RSA_PSS_SHA384 -> ring::digest::SHA384); line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-384 (ring::rsa::padding::pss::RSA_PSS_SHA384 -> ring::digest::SHA384); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::PS384 => &signature::RSA_PSS_SHA384,`; code: `signature::RSA_PSS_SHA384`",
             "line": 27,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
@@ -3841,56 +3841,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a24::k6; part of Ed25519; line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `verify`",
+            "additionalContext": "[reachable] [component] in a24::k6; part of Ed25519; owner at src/main.rs:79:3-79:5 within 79:0-87:1; line: `UnparsedPublicKey::new(&ED25519, pk).verify(&buf, sig).is_ok()`; code: `verify`",
             "line": 86,
             "location": "src/main.rs",
             "offset": 41,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::eddsa::sign; part of Ed25519; line: `let out = signing_key.sign(message);`; code: `sign`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::eddsa::sign; part of Ed25519; owner at jsonwebtoken-9.3.1/src/crypto/eddsa.rs:19:7-19:11 within 19:0-23:1; line: `let out = signing_key.sign(message);`; code: `sign`",
             "line": 21,
             "location": "jsonwebtoken-9.3.1/src/crypto/eddsa.rs",
             "offset": 26,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::sign; part of HMAC-SHA-512 (ring::hmac::HMAC_SHA512 -> ring::digest::SHA512); owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:25:7-25:11 within 25:0-44:1; line: `Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),`; code: `hmac::HMAC_SHA512`",
             "line": 29,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 41,
             "symbol": "ring::hmac::HMAC_SHA512"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::verify_ring; part of Ed25519; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::verify_ring; part of Ed25519; owner at jsonwebtoken-9.3.1/src/crypto/mod.rs:47:3-47:14 within 47:0-58:1; line: `let res = public_key.verify(message, &signature_bytes);`; code: `verify`",
             "line": 55,
             "location": "jsonwebtoken-9.3.1/src/crypto/mod.rs",
             "offset": 25,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512 -> ring::digest::SHA512); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::RS512 => &signature::RSA_PKCS1_2048_8192_SHA512,`; code: `signature::RSA_PKCS1_2048_8192_SHA512`",
             "line": 12,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA512"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-512 (ring::rsa::verification::RSA_PSS_2048_8192_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_parameters; part of RSA-PSS-SHA-512 (ring::rsa::verification::RSA_PSS_2048_8192_SHA512 -> ring::digest::SHA512); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:8:14-8:35 within 8:0-18:1; line: `Algorithm::PS512 => &signature::RSA_PSS_2048_8192_SHA512,`; code: `signature::RSA_PSS_2048_8192_SHA512`",
             "line": 15,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::verification::RSA_PSS_2048_8192_SHA512"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PKCS1-1.5-SHA-512 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512 -> ring::digest::SHA512); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::RS512 => &signature::RSA_PKCS1_SHA512,`; code: `signature::RSA_PKCS1_SHA512`",
             "line": 25,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA512"
           },
           {
-            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-512 (ring::rsa::padding::pss::RSA_PSS_SHA512 -> ring::digest::SHA512); line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`",
+            "additionalContext": "[reachable] [component] in jsonwebtoken::crypto::rsa::alg_to_rsa_signing; part of RSA-PSS-SHA-512 (ring::rsa::padding::pss::RSA_PSS_SHA512 -> ring::digest::SHA512); owner at jsonwebtoken-9.3.1/src/crypto/rsa.rs:21:14-21:32 within 21:0-31:1; line: `Algorithm::PS512 => &signature::RSA_PSS_SHA512,`; code: `signature::RSA_PSS_SHA512`",
             "line": 28,
             "location": "jsonwebtoken-9.3.1/src/crypto/rsa.rs",
             "offset": 29,
@@ -3947,42 +3947,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a24::k3; from_aead: setup, not a use; nonce: hard-coded (all zero, 19 bytes, literal at line 39); line: `let enc = EncryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `EncryptorBE32::from_aead`",
+            "additionalContext": "[reachable] [call] in a24::k3; from_aead: setup, not a use; nonce: hard-coded (all zero, 19 bytes, literal at line 39); owner at src/main.rs:38:3-38:5 within 38:0-43:1; line: `let enc = EncryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `EncryptorBE32::from_aead`",
             "line": 39,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "aead::stream::Encryptor::<A, S>::from_aead"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k3; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let enc = EncryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `XChaCha20Poly1305::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a24::k3; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:38:3-38:5 within 38:0-43:1; line: `let enc = EncryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `XChaCha20Poly1305::new_from_slice`",
             "line": 39,
             "location": "src/main.rs",
             "offset": 39,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k3; use: encrypt; line: `let c = enc.encrypt_last(msg).unwrap();`; code: `encrypt_last`",
+            "additionalContext": "[reachable] [call] in a24::k3; use: encrypt; owner at src/main.rs:38:3-38:5 within 38:0-43:1; line: `let c = enc.encrypt_last(msg).unwrap();`; code: `encrypt_last`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "aead::stream::Encryptor::<A, S>::encrypt_last"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k3; from_aead: setup, not a use; nonce: hard-coded (all zero, 19 bytes, literal at line 41); line: `let dec = DecryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `DecryptorBE32::from_aead`",
+            "additionalContext": "[reachable] [call] in a24::k3; from_aead: setup, not a use; nonce: hard-coded (all zero, 19 bytes, literal at line 41); owner at src/main.rs:38:3-38:5 within 38:0-43:1; line: `let dec = DecryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `DecryptorBE32::from_aead`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "aead::stream::Decryptor::<A, S>::from_aead"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k3; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let dec = DecryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `XChaCha20Poly1305::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a24::k3; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:38:3-38:5 within 38:0-43:1; line: `let dec = DecryptorBE32::from_aead(XChaCha20Poly1305::new_from_slice(key).unwrap(), (&[0u8; 19]).into());`; code: `XChaCha20Poly1305::new_from_slice`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 39,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a24::k3; use: decrypt; line: `dec.decrypt_last(&c[..]).unwrap()`; code: `decrypt_last`",
+            "additionalContext": "[reachable] [call] in a24::k3; use: decrypt; owner at src/main.rs:38:3-38:5 within 38:0-43:1; line: `dec.decrypt_last(&c[..]).unwrap()`; code: `decrypt_last`",
             "line": 42,
             "location": "src/main.rs",
             "offset": 8,
@@ -4584,7 +4584,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:eb8f897e-ce50-8e44-b368-841e78c3b20c",
+  "serialNumber": "urn:uuid:37c05cb1-7296-85ae-84dd-617edc9313bf",
   "specVersion": "1.7",
   "version": 1
 }

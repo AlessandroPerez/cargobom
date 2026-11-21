@@ -104,28 +104,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t13::sign_ecdsa; line: `let alg = &signature::ECDSA_P256_SHA256_ASN1_SIGNING;`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in t13::sign_ecdsa; owner at src/main.rs:30:3-30:13 within 30:0-36:1; line: `let alg = &signature::ECDSA_P256_SHA256_ASN1_SIGNING;`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [call] in t13::sign_ecdsa; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING in the arguments; line: `let pkcs8 = EcdsaKeyPair::generate_pkcs8(alg, &rng).unwrap();`; code: `EcdsaKeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [call] in t13::sign_ecdsa; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING in the arguments; owner at src/main.rs:30:3-30:13 within 30:0-36:1; line: `let pkcs8 = EcdsaKeyPair::generate_pkcs8(alg, &rng).unwrap();`; code: `EcdsaKeyPair::generate_pkcs8`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in t13::sign_ecdsa; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING in the arguments; key: rng (rand::SystemRandom::new); line: `let kp = EcdsaKeyPair::from_pkcs8(alg, pkcs8.as_ref(), &rng).unwrap();`; code: `EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in t13::sign_ecdsa; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING in the arguments; key: rng (rand::SystemRandom::new); owner at src/main.rs:30:3-30:13 within 30:0-36:1; line: `let kp = EcdsaKeyPair::from_pkcs8(alg, pkcs8.as_ref(), &rng).unwrap();`; code: `EcdsaKeyPair::from_pkcs8`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in t13::sign_ecdsa; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING in the arguments; line: `kp.sign(&rng, msg).unwrap().as_ref().to_vec()`; code: `sign`",
+            "additionalContext": "[reachable] [call] in t13::sign_ecdsa; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING in the arguments; owner at src/main.rs:30:3-30:13 within 30:0-36:1; line: `kp.sign(&rng, msg).unwrap().as_ref().to_vec()`; code: `sign`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 7,
@@ -182,14 +182,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t13::ACCEPTED; line: `static ACCEPTED: [&signature::EcdsaVerificationAlgorithm; 1] = [&signature::ECDSA_P384_SHA384_ASN1];`; code: `signature::ECDSA_P384_SHA384_ASN1`",
+            "additionalContext": "[reachable] [static] in t13::ACCEPTED; owner at src/main.rs:40:7-40:15 within 40:0-40:100; line: `static ACCEPTED: [&signature::EcdsaVerificationAlgorithm; 1] = [&signature::ECDSA_P384_SHA384_ASN1];`; code: `signature::ECDSA_P384_SHA384_ASN1`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 65,
             "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t13::main; t13::ACCEPTED -> ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1; line: `println!(\"{} {} {}\", a.len(), b.len(), ACCEPTED.len());`; code: `ACCEPTED`",
+            "additionalContext": "[reachable] [via-static] in t13::main; t13::ACCEPTED -> ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1; owner at src/main.rs:42:3-42:7 within 42:0-46:1; line: `println!(\"{} {} {}\", a.len(), b.len(), ACCEPTED.len());`; code: `ACCEPTED`",
             "line": 45,
             "location": "src/main.rs",
             "offset": 43,
@@ -243,49 +243,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t13::ED; line: `tag: &signature::ED25519,`; code: `signature::ED25519`",
+            "additionalContext": "[reachable] [static] in t13::ED; owner at src/main.rs:14:7-14:9 within 14:0-16:2; line: `tag: &signature::ED25519,`; code: `signature::ED25519`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 10,
             "symbol": "ring::ec::curve25519::ed25519::verification::ED25519"
           },
           {
-            "additionalContext": "[reachable] [call] in t13::sign_tagged; use: keygen; line: `let pkcs8 = Ed25519KeyPair::generate_pkcs8(&rng).unwrap();`; code: `Ed25519KeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [call] in t13::sign_tagged; use: keygen; owner at src/main.rs:18:3-18:14 within 18:0-27:1; line: `let pkcs8 = Ed25519KeyPair::generate_pkcs8(&rng).unwrap();`; code: `Ed25519KeyPair::generate_pkcs8`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in t13::sign_tagged; from_pkcs8: setup, not a use; key: rng (rand::SystemRandom::new); line: `let kp = Ed25519KeyPair::from_pkcs8(pkcs8.as_ref()).unwrap();`; code: `Ed25519KeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in t13::sign_tagged; from_pkcs8: setup, not a use; key: rng (rand::SystemRandom::new); owner at src/main.rs:18:3-18:14 within 18:0-27:1; line: `let kp = Ed25519KeyPair::from_pkcs8(pkcs8.as_ref()).unwrap();`; code: `Ed25519KeyPair::from_pkcs8`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [static] in t13::sign_tagged; line: `if std::ptr::eq(scheme.tag, &signature::ED25519) {`; code: `signature::ED25519`",
+            "additionalContext": "[reachable] [static] in t13::sign_tagged; owner at src/main.rs:18:3-18:14 within 18:0-27:1; line: `if std::ptr::eq(scheme.tag, &signature::ED25519) {`; code: `signature::ED25519`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 33,
             "symbol": "ring::ec::curve25519::ed25519::verification::ED25519"
           },
           {
-            "additionalContext": "[reachable] [call] in t13::sign_tagged; use: sign; line: `kp.sign(msg).as_ref().to_vec()`; code: `sign`",
+            "additionalContext": "[reachable] [call] in t13::sign_tagged; use: sign; owner at src/main.rs:18:3-18:14 within 18:0-27:1; line: `kp.sign(msg).as_ref().to_vec()`; code: `sign`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 11,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in t13::sign_tagged; public_key: setup, not a use; line: `kp.public_key().as_ref().to_vec()`; code: `public_key`",
+            "additionalContext": "[reachable] [call] in t13::sign_tagged; public_key: setup, not a use; owner at src/main.rs:18:3-18:14 within 18:0-27:1; line: `kp.public_key().as_ref().to_vec()`; code: `public_key`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 11,
             "symbol": "ring::signature::KeyPair::public_key"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t13::main; t13::ED -> ring::ec::curve25519::ed25519::verification::ED25519; line: `let a = sign_tagged(&ED, b\"m\");`; code: `ED`",
+            "additionalContext": "[reachable] [via-static] in t13::main; t13::ED -> ring::ec::curve25519::ed25519::verification::ED25519; owner at src/main.rs:42:3-42:7 within 42:0-46:1; line: `let a = sign_tagged(&ED, b\"m\");`; code: `ED`",
             "line": 43,
             "location": "src/main.rs",
             "offset": 25,
@@ -341,7 +341,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in t13::sign_ecdsa; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `let alg = &signature::ECDSA_P256_SHA256_ASN1_SIGNING;`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [component] in t13::sign_ecdsa; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/main.rs:30:3-30:13 within 30:0-36:1; line: `let alg = &signature::ECDSA_P256_SHA256_ASN1_SIGNING;`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 15,
@@ -397,14 +397,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in t13::ACCEPTED; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); line: `static ACCEPTED: [&signature::EcdsaVerificationAlgorithm; 1] = [&signature::ECDSA_P384_SHA384_ASN1];`; code: `signature::ECDSA_P384_SHA384_ASN1`",
+            "additionalContext": "[reachable] [component] in t13::ACCEPTED; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); owner at src/main.rs:40:7-40:15 within 40:0-40:100; line: `static ACCEPTED: [&signature::EcdsaVerificationAlgorithm; 1] = [&signature::ECDSA_P384_SHA384_ASN1];`; code: `signature::ECDSA_P384_SHA384_ASN1`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 65,
             "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1"
           },
           {
-            "additionalContext": "[reachable] [component] in t13::main; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); line: `println!(\"{} {} {}\", a.len(), b.len(), ACCEPTED.len());`; code: `ACCEPTED`",
+            "additionalContext": "[reachable] [component] in t13::main; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); owner at src/main.rs:42:3-42:7 within 42:0-46:1; line: `println!(\"{} {} {}\", a.len(), b.len(), ACCEPTED.len());`; code: `ACCEPTED`",
             "line": 45,
             "location": "src/main.rs",
             "offset": 43,
@@ -460,14 +460,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in t13::sign_tagged; part of Ed25519; line: `let pkcs8 = Ed25519KeyPair::generate_pkcs8(&rng).unwrap();`; code: `Ed25519KeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [component] in t13::sign_tagged; part of Ed25519; owner at src/main.rs:18:3-18:14 within 18:0-27:1; line: `let pkcs8 = Ed25519KeyPair::generate_pkcs8(&rng).unwrap();`; code: `Ed25519KeyPair::generate_pkcs8`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::ec::curve25519::ed25519::signing::Ed25519KeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [component] in t13::sign_tagged; part of Ed25519; line: `kp.sign(msg).as_ref().to_vec()`; code: `sign`",
+            "additionalContext": "[reachable] [component] in t13::sign_tagged; part of Ed25519; owner at src/main.rs:18:3-18:14 within 18:0-27:1; line: `kp.sign(msg).as_ref().to_vec()`; code: `sign`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 11,
@@ -630,7 +630,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c5120c5e-7a86-8373-a709-bb92654d2ea3",
+  "serialNumber": "urn:uuid:dfd30063-3813-871f-b0e1-849486c5d8dd",
   "specVersion": "1.7",
   "version": 1
 }

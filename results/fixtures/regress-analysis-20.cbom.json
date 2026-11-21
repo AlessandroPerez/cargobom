@@ -102,35 +102,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <a20::Suite as a20::Hasher>::hash; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: type-join, possible (a value `static a20::SHA256_SUITE` stores in the field); line: `digest::digest(self.alg, data).as_ref().to_vec()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in <a20::Suite as a20::Hasher>::hash; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: type-join, possible (a value `static a20::SHA256_SUITE` stores in the field); owner at src/main.rs:17:7-17:11 within 17:4-19:5; line: `digest::digest(self.alg, data).as_ref().to_vec()`; code: `digest::digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a20::SHA256_SUITE; line: `static SHA256_SUITE: Suite = Suite { alg: &digest::SHA256 };`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in a20::SHA256_SUITE; owner at src/main.rs:22:7-22:19 within 22:0-22:60; line: `static SHA256_SUITE: Suite = Suite { alg: &digest::SHA256 };`; code: `digest::SHA256`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 43,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a20::DEFAULT; a20::SHA256_SUITE -> ring::digest::SHA256; line: `pub static DEFAULT: &[&dyn Hasher] = &[&SHA256_SUITE];`; code: `SHA256_SUITE`",
+            "additionalContext": "[reachable] [via-static] in a20::DEFAULT; a20::SHA256_SUITE -> ring::digest::SHA256; owner at src/main.rs:25:11-25:18 within 25:0-25:54; line: `pub static DEFAULT: &[&dyn Hasher] = &[&SHA256_SUITE];`; code: `SHA256_SUITE`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 40,
             "symbol": "a20::SHA256_SUITE"
           },
           {
-            "additionalContext": "[present] [via-static] in a20::ALL; a20::SHA256_SUITE -> ring::digest::SHA256; line: `pub static ALL: &[&dyn Hasher] = &[&SHA256_SUITE, &SHA512_SUITE];`; code: `SHA256_SUITE`",
+            "additionalContext": "[present] [via-static] in a20::ALL; a20::SHA256_SUITE -> ring::digest::SHA256; owner at src/main.rs:26:11-26:14 within 26:0-26:65; line: `pub static ALL: &[&dyn Hasher] = &[&SHA256_SUITE, &SHA512_SUITE];`; code: `SHA256_SUITE`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "a20::SHA256_SUITE"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a20::main; a20::DEFAULT -> ring::digest::SHA256; line: `for h in DEFAULT {`; code: `DEFAULT`",
+            "additionalContext": "[reachable] [via-static] in a20::main; a20::DEFAULT -> ring::digest::SHA256; owner at src/main.rs:28:3-28:7 within 28:0-32:1; line: `for h in DEFAULT {`; code: `DEFAULT`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 13,
@@ -182,21 +182,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in <a20::Suite as a20::Hasher>::hash; use: digest; algorithm ring::digest::SHA512 only through code or data no entry point reaches (stored by static `a20::SHA512_SUITE`); line: `digest::digest(self.alg, data).as_ref().to_vec()`; code: `digest::digest`",
+            "additionalContext": "[present] [call] in <a20::Suite as a20::Hasher>::hash; use: digest; algorithm ring::digest::SHA512 only through code or data no entry point reaches (stored by static `a20::SHA512_SUITE`); owner at src/main.rs:17:7-17:11 within 17:4-19:5; line: `digest::digest(self.alg, data).as_ref().to_vec()`; code: `digest::digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] in a20::SHA512_SUITE; line: `static SHA512_SUITE: Suite = Suite { alg: &digest::SHA512 };`; code: `digest::SHA512`",
+            "additionalContext": "[present] [static] in a20::SHA512_SUITE; owner at src/main.rs:23:7-23:19 within 23:0-23:60; line: `static SHA512_SUITE: Suite = Suite { alg: &digest::SHA512 };`; code: `digest::SHA512`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 43,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[present] [via-static] in a20::ALL; a20::SHA512_SUITE -> ring::digest::SHA512; line: `pub static ALL: &[&dyn Hasher] = &[&SHA256_SUITE, &SHA512_SUITE];`; code: `SHA512_SUITE`",
+            "additionalContext": "[present] [via-static] in a20::ALL; a20::SHA512_SUITE -> ring::digest::SHA512; owner at src/main.rs:26:11-26:14 within 26:0-26:65; line: `pub static ALL: &[&dyn Hasher] = &[&SHA256_SUITE, &SHA512_SUITE];`; code: `SHA512_SUITE`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 51,
@@ -330,7 +330,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:90275f18-7794-8ca7-8190-2aeae381d7a5",
+  "serialNumber": "urn:uuid:430f2f9a-fde2-86a7-ab74-10a09f73129f",
   "specVersion": "1.7",
   "version": 1
 }

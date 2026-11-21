@@ -532,14 +532,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a18::main; new_from_slice: setup, not a use; key: environment (std::env::args); line: `let c = Aes256Gcm::new_from_slice(&k[..32]).unwrap();`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a18::main; new_from_slice: setup, not a use; key: environment (std::env::args); owner at src/main.rs:9:3-9:7 within 9:0-19:1; line: `let c = Aes256Gcm::new_from_slice(&k[..32]).unwrap();`; code: `Aes256Gcm::new_from_slice`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a18::main; use: encrypt; nonce: environment (std::env::args); line: `let ct = c.encrypt(Nonce::from_slice(&k[32..44]), b\"m\".as_ref()).unwrap();`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a18::main; use: encrypt; nonce: environment (std::env::args); owner at src/main.rs:9:3-9:7 within 9:0-19:1; line: `let ct = c.encrypt(Nonce::from_slice(&k[32..44]), b\"m\".as_ref()).unwrap();`; code: `encrypt`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 15,
@@ -834,7 +834,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:9c0dd6c9-e982-8022-aa20-b210f7a09b70",
+  "serialNumber": "urn:uuid:abc069b2-dfca-89dc-a7c8-76e1f71b02c4",
   "specVersion": "1.7",
   "version": 1
 }

@@ -102,42 +102,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in unresolved::by_map; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: container, possible (a value `std::collections::hash::map::HashMap::insert` puts in it); line: `digest(m[\"h\"], d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] in unresolved::by_map; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: container, possible (a value `std::collections::hash::map::HashMap::insert` puts in it); owner at src/main.rs:32:3-32:9 within 32:0-34:1; line: `digest(m[\"h\"], d).as_ref().len()`; code: `digest`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <unresolved::P as unresolved::Pick>::alg; line: `&SHA256`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in <unresolved::P as unresolved::Pick>::alg; owner at src/main.rs:42:7-42:10 within 42:4-44:5; line: `&SHA256`; code: `SHA256`",
             "line": 43,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in unresolved::by_param::<unresolved::P>; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<unresolved::P as unresolved::Pick>::alg`; instantiated by unresolved::main at src/main.rs:64:12 as `by_param::<P>`; line: `digest(T::alg(), d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] in unresolved::by_param::<unresolved::P>; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: object, from `<unresolved::P as unresolved::Pick>::alg`; owner at src/main.rs:54:3-54:11 within 54:0-56:1; instantiated by unresolved::main at src/main.rs:64:12 as `by_param::<P>` (call, to 64:25 as `by_param::<P>` line #c2225859, caller at src/main.rs:58:3-58:7 within 58:0-66:1); line: `digest(T::alg(), d).as_ref().len()`; code: `digest`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in unresolved::main; line: `m.insert(\"h\", &SHA256);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in unresolved::main; owner at src/main.rs:58:3-58:7 within 58:0-66:1; line: `m.insert(\"h\", &SHA256);`; code: `SHA256`",
             "line": 62,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in unresolved::main; line: `let n: usize = [&SHA256].iter().map(|a| digest(a, &d).as_ref().len()).sum();`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in unresolved::main; owner at src/main.rs:58:3-58:7 within 58:0-66:1; line: `let n: usize = [&SHA256].iter().map(|a| digest(a, &d).as_ref().len()).sum();`; code: `SHA256`",
             "line": 63,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in unresolved::main::{closure#0}; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `unresolved::main`; instantiated by unresolved::main at src/main.rs:63:40; line: `let n: usize = [&SHA256].iter().map(|a| digest(a, &d).as_ref().len()).sum();`; code: `digest`",
+            "additionalContext": "[reachable] [call] in unresolved::main::{closure#0}; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `unresolved::main`; owner at src/main.rs:63:40-63:43 as `|a|` line #764caa6d within 63:40-63:72; instantiated by unresolved::main at src/main.rs:63:40 (built, to 63:72 as `|a| digest(a, &d).as_ref().len()` line #764caa6d, caller at src/main.rs:58:3-58:7 within 58:0-66:1); line: `let n: usize = [&SHA256].iter().map(|a| digest(a, &d).as_ref().len()).sum();`; code: `digest`",
             "line": 63,
             "location": "src/main.rs",
             "offset": 44,
@@ -189,14 +189,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <unresolved::S384 as unresolved::Scheme>::alg; line: `&SHA384`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in <unresolved::S384 as unresolved::Scheme>::alg; owner at src/main.rs:16:7-16:10 within 16:4-18:5; line: `&SHA384`; code: `SHA384`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in unresolved::by_dyn; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `unresolved::S384` is coerced to `dyn unresolved::Scheme` at src/main.rs:60); line: `digest(s.alg(), d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] in unresolved::by_dyn; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `unresolved::S384` is coerced to `dyn unresolved::Scheme` at src/main.rs:60); owner at src/main.rs:27:3-27:9 within 27:0-29:1; line: `digest(s.alg(), d).as_ref().len()`; code: `digest`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 4,
@@ -248,28 +248,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <unresolved::S512 as unresolved::Scheme>::alg; line: `&SHA512`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in <unresolved::S512 as unresolved::Scheme>::alg; owner at src/main.rs:21:7-21:10 within 21:4-23:5; line: `&SHA512`; code: `SHA512`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in unresolved::by_dyn; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `unresolved::S512` is coerced to `dyn unresolved::Scheme` at src/main.rs:60); line: `digest(s.alg(), d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] in unresolved::by_dyn; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `unresolved::S512` is coerced to `dyn unresolved::Scheme` at src/main.rs:60); owner at src/main.rs:27:3-27:9 within 27:0-29:1; line: `digest(s.alg(), d).as_ref().len()`; code: `digest`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <unresolved::Q as unresolved::Pick>::alg; line: `CHOSEN.get().copied().unwrap_or(&SHA512)`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in <unresolved::Q as unresolved::Pick>::alg; owner at src/main.rs:48:7-48:10 within 48:4-50:5; line: `CHOSEN.get().copied().unwrap_or(&SHA512)`; code: `SHA512`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 41,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in unresolved::by_param::<unresolved::Q>; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<unresolved::Q as unresolved::Pick>::alg`; instantiated by unresolved::main at src/main.rs:64:32 as `by_param::<Q>`; line: `digest(T::alg(), d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] in unresolved::by_param::<unresolved::Q>; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: object, from `<unresolved::Q as unresolved::Pick>::alg`; owner at src/main.rs:54:3-54:11 within 54:0-56:1; instantiated by unresolved::main at src/main.rs:64:32 as `by_param::<Q>` (call, to 64:45 as `by_param::<Q>` line #4aa3e45b, caller at src/main.rs:58:3-58:7 within 58:0-66:1); line: `digest(T::alg(), d).as_ref().len()`; code: `digest`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 4,
@@ -320,7 +320,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in unresolved::by_map; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; line: `digest(m[\"h\"], d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] in unresolved::by_map; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; owner at src/main.rs:32:3-32:9 within 32:0-34:1; line: `digest(m[\"h\"], d).as_ref().len()`; code: `digest`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 4,
@@ -468,7 +468,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:fcbf1a26-a523-8f21-a35d-97c11a05c995",
+  "serialNumber": "urn:uuid:c26c2a9d-75b4-89f0-b146-80faada3607e",
   "specVersion": "1.7",
   "version": 1
 }

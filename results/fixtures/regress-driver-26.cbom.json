@@ -102,14 +102,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in <d26::M1 as d26::Mac>::run; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `impl Mac for M1 { fn run(&self, d: &[u8]) { let _ = digest(&SHA1, d); } } // present: never called`; code: `digest`",
+            "additionalContext": "[present] [call] in <d26::M1 as d26::Mac>::run; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; owner at src/main.rs:11:21-11:24 within 11:18-11:71; line: `impl Mac for M1 { fn run(&self, d: &[u8]) { let _ = digest(&SHA1, d); } } // present: never called`; code: `digest`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 52,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] in <d26::M1 as d26::Mac>::run; line: `impl Mac for M1 { fn run(&self, d: &[u8]) { let _ = digest(&SHA1, d); } } // present: never called`; code: `SHA1`",
+            "additionalContext": "[present] [static] in <d26::M1 as d26::Mac>::run; owner at src/main.rs:11:21-11:24 within 11:18-11:71; line: `impl Mac for M1 { fn run(&self, d: &[u8]) { let _ = digest(&SHA1, d); } } // present: never called`; code: `SHA1`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 60,
@@ -165,14 +165,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <d26::H1 as d26::Hash>::run; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `impl Hash for H1 { fn run(&self, d: &[u8]) { let _ = digest(&SHA256, d); } } // reachable`; code: `digest`",
+            "additionalContext": "[reachable] [call] in <d26::H1 as d26::Hash>::run; use: digest; algorithm from ring::digest::SHA256 in the arguments; owner at src/main.rs:10:22-10:25 within 10:19-10:74; line: `impl Hash for H1 { fn run(&self, d: &[u8]) { let _ = digest(&SHA256, d); } } // reachable`; code: `digest`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 53,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <d26::H1 as d26::Hash>::run; line: `impl Hash for H1 { fn run(&self, d: &[u8]) { let _ = digest(&SHA256, d); } } // reachable`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in <d26::H1 as d26::Hash>::run; owner at src/main.rs:10:22-10:25 within 10:19-10:74; line: `impl Hash for H1 { fn run(&self, d: &[u8]) { let _ = digest(&SHA256, d); } } // reachable`; code: `SHA256`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 61,
@@ -224,14 +224,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in d26::main::{closure#0}; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `let _held = Hold { cb: Box::new(|x: &[u8], _n: u8| { let _ = digest(&SHA384, x); }) };`; code: `digest`",
+            "additionalContext": "[present] [call] in d26::main::{closure#0}; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at src/main.rs:19:36-19:54 as `|x: &[u8], _n: u8|` line #1915f9bd within 19:36-19:86; line: `let _held = Hold { cb: Box::new(|x: &[u8], _n: u8| { let _ = digest(&SHA384, x); }) };`; code: `digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 65,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] in d26::main::{closure#0}; line: `let _held = Hold { cb: Box::new(|x: &[u8], _n: u8| { let _ = digest(&SHA384, x); }) };`; code: `SHA384`",
+            "additionalContext": "[present] [static] in d26::main::{closure#0}; owner at src/main.rs:19:36-19:54 as `|x: &[u8], _n: u8|` line #1915f9bd within 19:36-19:86; line: `let _held = Hold { cb: Box::new(|x: &[u8], _n: u8| { let _ = digest(&SHA384, x); }) };`; code: `SHA384`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 73,
@@ -283,14 +283,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in d26::main::{closure#1}; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by d26::main at src/main.rs:21:46; line: `let called: Box<dyn Fn(&[u8])> = Box::new(|x: &[u8]| { let _ = digest(&SHA512, x); });`; code: `digest`",
+            "additionalContext": "[reachable] [call] in d26::main::{closure#1}; use: digest; algorithm from ring::digest::SHA512 in the arguments; owner at src/main.rs:21:46-21:56 as `|x: &[u8]|` line #1c942eab within 21:46-21:88; instantiated by d26::main at src/main.rs:21:46 (built, to 21:88 as `|x: &[u8]| { let _ = digest(&SHA512, x)` line #1c942eab, caller at src/main.rs:13:3-13:7 within 13:0-23:1); line: `let called: Box<dyn Fn(&[u8])> = Box::new(|x: &[u8]| { let _ = digest(&SHA512, x); });`; code: `digest`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 67,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in d26::main::{closure#1}; instantiated by d26::main at src/main.rs:21:46; line: `let called: Box<dyn Fn(&[u8])> = Box::new(|x: &[u8]| { let _ = digest(&SHA512, x); });`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in d26::main::{closure#1}; owner at src/main.rs:21:46-21:56 as `|x: &[u8]|` line #1c942eab within 21:46-21:88; instantiated by d26::main at src/main.rs:21:46 (built, to 21:88 as `|x: &[u8]| { let _ = digest(&SHA512, x)` line #1c942eab, caller at src/main.rs:13:3-13:7 within 13:0-23:1); line: `let called: Box<dyn Fn(&[u8])> = Box::new(|x: &[u8]| { let _ = digest(&SHA512, x); });`; code: `SHA512`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 75,
@@ -434,7 +434,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:c8d97b2c-2a32-8f15-a501-a19a359820bf",
+  "serialNumber": "urn:uuid:1fbad1a8-659f-8220-9287-44a80857e2c1",
   "specVersion": "1.7",
   "version": 1
 }

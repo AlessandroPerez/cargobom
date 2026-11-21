@@ -105,49 +105,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in pilot_sig_interproc::signing_alg; line: `&signature::ECDSA_P256_SHA256_FIXED_SIGNING`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
+            "additionalContext": "[reachable] [static] in pilot_sig_interproc::signing_alg; owner at src/main.rs:4:3-4:14 within 4:0-6:1; line: `&signature::ECDSA_P256_SHA256_FIXED_SIGNING`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 5,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_interproc::new_key; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; line: `let pkcs8 = EcdsaKeyPair::generate_pkcs8(alg, rng).unwrap();`; code: `EcdsaKeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::new_key; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; owner at src/main.rs:8:3-8:10 within 8:0-11:1; line: `let pkcs8 = EcdsaKeyPair::generate_pkcs8(alg, rng).unwrap();`; code: `EcdsaKeyPair::generate_pkcs8`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_interproc::new_key; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; key: computed (pilot_sig_interproc::signing_alg) or parameter (argument 0 of pilot_sig_interproc::issue) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or rng (rand::SystemRandom::new); line: `EcdsaKeyPair::from_pkcs8(alg, pkcs8.as_ref(), rng).unwrap()`; code: `EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::new_key; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; key: computed (pilot_sig_interproc::signing_alg) or parameter (argument 0 of pilot_sig_interproc::issue) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of the enclosing function) or rng (rand::SystemRandom::new); owner at src/main.rs:8:3-8:10 within 8:0-11:1; line: `EcdsaKeyPair::from_pkcs8(alg, pkcs8.as_ref(), rng).unwrap()`; code: `EcdsaKeyPair::from_pkcs8`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_interproc::issue; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; line: `let sig = kp.sign(&rng, msg).unwrap();`; code: `sign`",
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::issue; use: sign; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING, reaching the call from another function; member: object, from `pilot_sig_interproc::signing_alg`; owner at src/main.rs:13:3-13:8 within 13:0-18:1; line: `let sig = kp.sign(&rng, msg).unwrap();`; code: `sign`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_interproc::main; new: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED in the arguments; public-key: computed (pilot_sig_interproc::issue); line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::main; new: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED in the arguments; public-key: computed (pilot_sig_interproc::issue); owner at src/main.rs:20:3-20:7 within 20:0-25:1; line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `UnparsedPublicKey::new`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [static] in pilot_sig_interproc::main; line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `signature::ECDSA_P256_SHA256_FIXED`",
+            "additionalContext": "[reachable] [static] in pilot_sig_interproc::main; owner at src/main.rs:20:3-20:7 within 20:0-25:1; line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `signature::ECDSA_P256_SHA256_FIXED`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 37,
             "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_interproc::main; use: verify; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED in the arguments; line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in pilot_sig_interproc::main; use: verify; algorithm from ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED in the arguments; owner at src/main.rs:20:3-20:7 within 20:0-25:1; line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `verify`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 78,
@@ -207,14 +207,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in pilot_sig_interproc::signing_alg; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> ring::digest::SHA256); line: `&signature::ECDSA_P256_SHA256_FIXED_SIGNING`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
+            "additionalContext": "[reachable] [component] in pilot_sig_interproc::signing_alg; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING -> ring::digest::SHA256); owner at src/main.rs:4:3-4:14 within 4:0-6:1; line: `&signature::ECDSA_P256_SHA256_FIXED_SIGNING`; code: `signature::ECDSA_P256_SHA256_FIXED_SIGNING`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 5,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_FIXED_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [component] in pilot_sig_interproc::main; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED -> ring::digest::SHA256); line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `signature::ECDSA_P256_SHA256_FIXED`",
+            "additionalContext": "[reachable] [component] in pilot_sig_interproc::main; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_FIXED -> ring::digest::SHA256); owner at src/main.rs:20:3-20:7 within 20:0-25:1; line: `let ok = UnparsedPublicKey::new(&signature::ECDSA_P256_SHA256_FIXED, &pk).verify(msg, &sig);`; code: `signature::ECDSA_P256_SHA256_FIXED`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 37,
@@ -354,7 +354,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:775562d1-33a4-8ce2-bb40-3725c4e17fb6",
+  "serialNumber": "urn:uuid:d7bd3c55-2e3b-8c66-9a3d-164f64ffd54e",
   "specVersion": "1.7",
   "version": 1
 }

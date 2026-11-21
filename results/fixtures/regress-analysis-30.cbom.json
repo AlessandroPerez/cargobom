@@ -1102,28 +1102,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe30::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 17); line: `let mut m = <blake2::Blake2bMac512 as Mac>::new_from_slice(b\"key\").unwrap();`; code: `<blake2::Blake2bMac512 as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in probe30::main; new_from_slice: setup, not a use; key: hard-coded (3 bytes, literal at line 17); owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let mut m = <blake2::Blake2bMac512 as Mac>::new_from_slice(b\"key\").unwrap();`; code: `<blake2::Blake2bMac512 as Mac>::new_from_slice`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in probe30::main; use: tag; line: `Mac::update(&mut m, b\"abc\");`; code: `Mac::update`",
+            "additionalContext": "[reachable] [call] in probe30::main; use: tag; owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `Mac::update(&mut m, b\"abc\");`; code: `Mac::update`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in probe30::main; use: tag; line: `let t = m.finalize().into_bytes();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in probe30::main; use: tag; owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let t = m.finalize().into_bytes();`; code: `finalize`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in probe30::main; into_bytes: setup, not a use; line: `let t = m.finalize().into_bytes();`; code: `into_bytes`",
+            "additionalContext": "[reachable] [call] in probe30::main; into_bytes: setup, not a use; owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let t = m.finalize().into_bytes();`; code: `into_bytes`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 25,
@@ -1187,7 +1187,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe30::main; use: digest; line: `let b = blake2::Blake2b512::digest(b\"abc\");`; code: `blake2::Blake2b512::digest`",
+            "additionalContext": "[reachable] [call] in probe30::main; use: digest; owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let b = blake2::Blake2b512::digest(b\"abc\");`; code: `blake2::Blake2b512::digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
@@ -1240,21 +1240,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe30::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let e = p256::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p256::ecdh::EphemeralSecret::random`",
+            "additionalContext": "[reachable] [call] in probe30::main; use: keygen; rng: rng (rand_core::os::OsRng); owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let e = p256::ecdh::EphemeralSecret::random(&mut OsRng);`; code: `p256::ecdh::EphemeralSecret::random`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::random"
           },
           {
-            "additionalContext": "[reachable] [call] in probe30::main; from: setup, not a use; line: `let pk = p256::PublicKey::from(&e);`; code: `p256::PublicKey::from`",
+            "additionalContext": "[reachable] [call] in probe30::main; from: setup, not a use; owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let pk = p256::PublicKey::from(&e);`; code: `p256::PublicKey::from`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in probe30::main; use: keyderive; line: `let shared = e.diffie_hellman(&pk);`; code: `diffie_hellman`",
+            "additionalContext": "[reachable] [call] in probe30::main; use: keyderive; owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let shared = e.diffie_hellman(&pk);`; code: `diffie_hellman`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 19,
@@ -1311,14 +1311,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe30::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let sk = p256::ecdsa::SigningKey::random(&mut OsRng);`; code: `p256::ecdsa::SigningKey::random`",
+            "additionalContext": "[reachable] [call] in probe30::main; use: keygen; rng: rng (rand_core::os::OsRng); owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let sk = p256::ecdsa::SigningKey::random(&mut OsRng);`; code: `p256::ecdsa::SigningKey::random`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "ecdsa::signing::SigningKey::<C>::random"
           },
           {
-            "additionalContext": "[reachable] [call] in probe30::main; use: sign; line: `let sig: p256::ecdsa::Signature = sk.sign(b\"msg\");`; code: `sign`",
+            "additionalContext": "[reachable] [call] in probe30::main; use: sign; owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let sig: p256::ecdsa::Signature = sk.sign(b\"msg\");`; code: `sign`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 41,
@@ -1374,7 +1374,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe30::main; use: digest; called through a function pointer to `digest::digest::Digest::digest` named at src/main.rs:13:12; line: `let a = f(b\"abc\");`; code: `f`",
+            "additionalContext": "[reachable] [call] in probe30::main; use: digest; owner at src/main.rs:11:3-11:7 within 11:0-36:1; called through a function pointer to `digest::digest::Digest::digest` named at src/main.rs:13:12; line: `let a = f(b\"abc\");`; code: `f`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 12,
@@ -1425,7 +1425,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe30::main; use: encrypt; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; line: `bf.encrypt_block(&mut blk);`; code: `encrypt_block`",
+            "additionalContext": "[reachable] [call] in probe30::main; use: encrypt; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `bf.encrypt_block(&mut blk);`; code: `encrypt_block`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 7,
@@ -1481,7 +1481,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe30::main; use: encrypt or decrypt; algorithm unresolved: the type `salsa20::SalsaCore` of salsa20 0.10.2, a crypto package the knowledge base does not model; line: `s.apply_keystream(&mut buf);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in probe30::main; use: encrypt or decrypt; algorithm unresolved: the type `salsa20::SalsaCore` of salsa20 0.10.2, a crypto package the knowledge base does not model; owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `s.apply_keystream(&mut buf);`; code: `apply_keystream`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 6,
@@ -1534,7 +1534,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe30::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; key: hard-coded (16 bytes, literal at line 21); line: `let bf = blowfish::Blowfish::<byteorder::BE>::new_from_slice(b\"0123456789abcdef\").unwrap();`; code: `blowfish::Blowfish::<byteorder::BE>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in probe30::main; new_from_slice: setup, not a use; algorithm unresolved: the type `blowfish::Blowfish` of blowfish 0.9.1, a crypto package the knowledge base does not model; key: hard-coded (16 bytes, literal at line 21); owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let bf = blowfish::Blowfish::<byteorder::BE>::new_from_slice(b\"0123456789abcdef\").unwrap();`; code: `blowfish::Blowfish::<byteorder::BE>::new_from_slice`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 13,
@@ -1595,7 +1595,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in probe30::main; new: setup, not a use; algorithm unresolved: the type `salsa20::SalsaCore` of salsa20 0.10.2, a crypto package the knowledge base does not model; key: hard-coded (32 bytes, literal at line 25); iv: hard-coded (8 bytes, literal at line 25); line: `let mut s = salsa20::Salsa20::new(&[1u8; 32].into(), &[2u8; 8].into());`; code: `salsa20::Salsa20::new`",
+            "additionalContext": "[reachable] [call] in probe30::main; new: setup, not a use; algorithm unresolved: the type `salsa20::SalsaCore` of salsa20 0.10.2, a crypto package the knowledge base does not model; key: hard-coded (32 bytes, literal at line 25); iv: hard-coded (8 bytes, literal at line 25); owner at src/main.rs:11:3-11:7 within 11:0-36:1; line: `let mut s = salsa20::Salsa20::new(&[1u8; 32].into(), &[2u8; 8].into());`; code: `salsa20::Salsa20::new`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 16,
@@ -2004,7 +2004,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:6876ce2f-1a60-8db6-96c5-89dd2870a436",
+  "serialNumber": "urn:uuid:a9f98fba-736f-84fe-87e9-4a4dcf65b5e9",
   "specVersion": "1.7",
   "version": 1
 }

@@ -279,49 +279,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [via-static] in verify_53::main; verify_53::suites::SUITE_AES_256 -> ring::aead::algorithm::AES_256_GCM; line: `&suites::SUITE_AES_256`; code: `suites::SUITE_AES_256`",
+            "additionalContext": "[reachable] [via-static] in verify_53::main; verify_53::suites::SUITE_AES_256 -> ring::aead::algorithm::AES_256_GCM; owner at src/main.rs:5:3-5:7 within 5:0-19:1; line: `&suites::SUITE_AES_256`; code: `suites::SUITE_AES_256`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "verify_53::suites::SUITE_AES_256"
           },
           {
-            "additionalContext": "[reachable] [static] in verify_53::suites::SUITE_AES_256; line: `aead_algorithm: &aead::AES_256_GCM,`; code: `aead::AES_256_GCM`",
+            "additionalContext": "[reachable] [static] in verify_53::suites::SUITE_AES_256; owner at src/suites.rs:27:11-27:24 within 27:0-31:7; line: `aead_algorithm: &aead::AES_256_GCM,`; code: `aead::AES_256_GCM`",
             "line": 29,
             "location": "src/suites.rs",
             "offset": 25,
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in <verify_53::suites::AesGcm as verify_53::suites::AeadAlg>::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static verify_53::suites::SUITE_AES_256` stores in the field); nonce: hard-coded (all zero, 12 bytes, literal at line 56); line: `key.seal_in_place_append_tag(nonce, aead::Aad::empty(), data).unwrap();`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in <verify_53::suites::AesGcm as verify_53::suites::AeadAlg>::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static verify_53::suites::SUITE_AES_256` stores in the field); nonce: hard-coded (all zero, 12 bytes, literal at line 56); owner at src/suites.rs:55:7-55:11 within 55:4-58:5; line: `key.seal_in_place_append_tag(nonce, aead::Aad::empty(), data).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 57,
             "location": "src/suites.rs",
             "offset": 12,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in <verify_53::suites::ChaCha as verify_53::suites::AeadAlg>::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static verify_53::suites::SUITE_AES_256` stores in the field); nonce: hard-coded (12 bytes, literal at line 67); line: `key.seal_in_place_append_tag(nonce, aead::Aad::empty(), data).unwrap();`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in <verify_53::suites::ChaCha as verify_53::suites::AeadAlg>::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static verify_53::suites::SUITE_AES_256` stores in the field); nonce: hard-coded (12 bytes, literal at line 67); owner at src/suites.rs:66:7-66:11 within 66:4-69:5; line: `key.seal_in_place_append_tag(nonce, aead::Aad::empty(), data).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 68,
             "location": "src/suites.rs",
             "offset": 12,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in <verify_53::suites::GcmDecrypter as verify_53::suites::Decrypter>::decrypt; use: decrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static verify_53::suites::SUITE_AES_256` stores in the field); nonce: parameter (argument 1 of the enclosing function); line: `.open_in_place(aead::Nonce::assume_unique_for_key(nonce), aead::Aad::empty(), data)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] in <verify_53::suites::GcmDecrypter as verify_53::suites::Decrypter>::decrypt; use: decrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static verify_53::suites::SUITE_AES_256` stores in the field); nonce: parameter (argument 1 of the enclosing function); owner at src/suites.rs:73:7-73:14 within 73:4-77:5; line: `.open_in_place(aead::Nonce::assume_unique_for_key(nonce), aead::Aad::empty(), data)`; code: `open_in_place`",
             "line": 75,
             "location": "src/suites.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::open_in_place"
           },
           {
-            "additionalContext": "[reachable] [call] in <verify_53::suites::ChaChaDecrypter as verify_53::suites::Decrypter>::decrypt; use: decrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static verify_53::suites::SUITE_AES_256` stores in the field); nonce: parameter (argument 1 of the enclosing function); line: `.open_in_place(aead::Nonce::assume_unique_for_key(nonce), aead::Aad::empty(), data)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] in <verify_53::suites::ChaChaDecrypter as verify_53::suites::Decrypter>::decrypt; use: decrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static verify_53::suites::SUITE_AES_256` stores in the field); nonce: parameter (argument 1 of the enclosing function); owner at src/suites.rs:81:7-81:14 within 81:4-85:5; line: `.open_in_place(aead::Nonce::assume_unique_for_key(nonce), aead::Aad::empty(), data)`; code: `open_in_place`",
             "line": 83,
             "location": "src/suites.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::open_in_place"
           },
           {
-            "additionalContext": "[reachable] [call] in verify_53::suites::open; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static verify_53::suites::SUITE_AES_256` stores in the field); key: hard-coded (32 bytes, literal at src/main.rs:14) or parameter (argument 1 of the enclosing function); line: `let key = aead::LessSafeKey::new(aead::UnboundKey::new(suite.aead_algorithm, key).unwrap());`; code: `aead::UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in verify_53::suites::open; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: type-join, possible (a value `static verify_53::suites::SUITE_AES_256` stores in the field); key: hard-coded (32 bytes, literal at src/main.rs:14) or parameter (argument 1 of the enclosing function); owner at src/suites.rs:88:7-88:11 within 88:0-93:1; line: `let key = aead::LessSafeKey::new(aead::UnboundKey::new(suite.aead_algorithm, key).unwrap());`; code: `aead::UnboundKey::new`",
             "line": 90,
             "location": "src/suites.rs",
             "offset": 37,
@@ -390,49 +390,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [via-static] in verify_53::main; verify_53::suites::SUITE_CHACHA -> ring::aead::algorithm::CHACHA20_POLY1305; line: `&suites::SUITE_CHACHA`; code: `suites::SUITE_CHACHA`",
+            "additionalContext": "[reachable] [via-static] in verify_53::main; verify_53::suites::SUITE_CHACHA -> ring::aead::algorithm::CHACHA20_POLY1305; owner at src/main.rs:5:3-5:7 within 5:0-19:1; line: `&suites::SUITE_CHACHA`; code: `suites::SUITE_CHACHA`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "verify_53::suites::SUITE_CHACHA"
           },
           {
-            "additionalContext": "[reachable] [static] in verify_53::suites::SUITE_CHACHA; line: `aead_algorithm: &aead::CHACHA20_POLY1305,`; code: `aead::CHACHA20_POLY1305`",
+            "additionalContext": "[reachable] [static] in verify_53::suites::SUITE_CHACHA; owner at src/suites.rs:33:11-33:23 within 33:0-37:7; line: `aead_algorithm: &aead::CHACHA20_POLY1305,`; code: `aead::CHACHA20_POLY1305`",
             "line": 35,
             "location": "src/suites.rs",
             "offset": 25,
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in <verify_53::suites::AesGcm as verify_53::suites::AeadAlg>::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static verify_53::suites::SUITE_CHACHA` stores in the field); nonce: hard-coded (all zero, 12 bytes, literal at line 56); line: `key.seal_in_place_append_tag(nonce, aead::Aad::empty(), data).unwrap();`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in <verify_53::suites::AesGcm as verify_53::suites::AeadAlg>::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static verify_53::suites::SUITE_CHACHA` stores in the field); nonce: hard-coded (all zero, 12 bytes, literal at line 56); owner at src/suites.rs:55:7-55:11 within 55:4-58:5; line: `key.seal_in_place_append_tag(nonce, aead::Aad::empty(), data).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 57,
             "location": "src/suites.rs",
             "offset": 12,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in <verify_53::suites::ChaCha as verify_53::suites::AeadAlg>::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static verify_53::suites::SUITE_CHACHA` stores in the field); nonce: hard-coded (12 bytes, literal at line 67); line: `key.seal_in_place_append_tag(nonce, aead::Aad::empty(), data).unwrap();`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in <verify_53::suites::ChaCha as verify_53::suites::AeadAlg>::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static verify_53::suites::SUITE_CHACHA` stores in the field); nonce: hard-coded (12 bytes, literal at line 67); owner at src/suites.rs:66:7-66:11 within 66:4-69:5; line: `key.seal_in_place_append_tag(nonce, aead::Aad::empty(), data).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 68,
             "location": "src/suites.rs",
             "offset": 12,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in <verify_53::suites::GcmDecrypter as verify_53::suites::Decrypter>::decrypt; use: decrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static verify_53::suites::SUITE_CHACHA` stores in the field); nonce: parameter (argument 1 of the enclosing function); line: `.open_in_place(aead::Nonce::assume_unique_for_key(nonce), aead::Aad::empty(), data)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] in <verify_53::suites::GcmDecrypter as verify_53::suites::Decrypter>::decrypt; use: decrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static verify_53::suites::SUITE_CHACHA` stores in the field); nonce: parameter (argument 1 of the enclosing function); owner at src/suites.rs:73:7-73:14 within 73:4-77:5; line: `.open_in_place(aead::Nonce::assume_unique_for_key(nonce), aead::Aad::empty(), data)`; code: `open_in_place`",
             "line": 75,
             "location": "src/suites.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::open_in_place"
           },
           {
-            "additionalContext": "[reachable] [call] in <verify_53::suites::ChaChaDecrypter as verify_53::suites::Decrypter>::decrypt; use: decrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static verify_53::suites::SUITE_CHACHA` stores in the field); nonce: parameter (argument 1 of the enclosing function); line: `.open_in_place(aead::Nonce::assume_unique_for_key(nonce), aead::Aad::empty(), data)`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] in <verify_53::suites::ChaChaDecrypter as verify_53::suites::Decrypter>::decrypt; use: decrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static verify_53::suites::SUITE_CHACHA` stores in the field); nonce: parameter (argument 1 of the enclosing function); owner at src/suites.rs:81:7-81:14 within 81:4-85:5; line: `.open_in_place(aead::Nonce::assume_unique_for_key(nonce), aead::Aad::empty(), data)`; code: `open_in_place`",
             "line": 83,
             "location": "src/suites.rs",
             "offset": 13,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::open_in_place"
           },
           {
-            "additionalContext": "[reachable] [call] in verify_53::suites::open; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static verify_53::suites::SUITE_CHACHA` stores in the field); key: hard-coded (32 bytes, literal at src/main.rs:14) or parameter (argument 1 of the enclosing function); line: `let key = aead::LessSafeKey::new(aead::UnboundKey::new(suite.aead_algorithm, key).unwrap());`; code: `aead::UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in verify_53::suites::open; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: type-join, possible (a value `static verify_53::suites::SUITE_CHACHA` stores in the field); key: hard-coded (32 bytes, literal at src/main.rs:14) or parameter (argument 1 of the enclosing function); owner at src/suites.rs:88:7-88:11 within 88:0-93:1; line: `let key = aead::LessSafeKey::new(aead::UnboundKey::new(suite.aead_algorithm, key).unwrap());`; code: `aead::UnboundKey::new`",
             "line": 90,
             "location": "src/suites.rs",
             "offset": 37,
@@ -500,28 +500,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in verify_53::boxed::Padding::new::<..>; new: setup, not a use; instantiated by verify_53::main at src/main.rs:15:12 as `boxed::Padding::new::<sha2::Sha256>`; line: `digest: Box::new(T::new()),`; code: `T::new`",
+            "additionalContext": "[reachable] [call] in verify_53::boxed::Padding::new::<..>; new: setup, not a use; owner at src/boxed.rs:11:11-11:14 within 11:4-15:5; instantiated by verify_53::main at src/main.rs:15:12 as `boxed::Padding::new::<sha2::Sha256>` (call, to 15:47 as `boxed::Padding::new::<sha2::Sha256>` line #09598ad6, caller at src/main.rs:5:3-5:7 within 5:0-19:1); line: `digest: Box::new(T::new()),`; code: `T::new`",
             "line": 13,
             "location": "src/boxed.rs",
             "offset": 29,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] in verify_53::boxed::Padding::label; use: digest; receiver: the type the build makes a `dyn DynDigest` of; member: dyn (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>`, the only type coerced to `dyn digest::digest::DynDigest` at src/boxed.rs:13); line: `self.digest.update(label);`; code: `update`",
+            "additionalContext": "[reachable] [call] in verify_53::boxed::Padding::label; use: digest; receiver: the type the build makes a `dyn DynDigest` of; member: dyn (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>`, the only type coerced to `dyn digest::digest::DynDigest` at src/boxed.rs:13); owner at src/boxed.rs:17:11-17:16 within 17:4-20:5; line: `self.digest.update(label);`; code: `update`",
             "line": 18,
             "location": "src/boxed.rs",
             "offset": 20,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in verify_53::boxed::Padding::label; use: digest; receiver: the type the build makes a `dyn DynDigest` of; member: dyn (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>`, the only type coerced to `dyn digest::digest::DynDigest` at src/boxed.rs:13); line: `self.digest.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] in verify_53::boxed::Padding::label; use: digest; receiver: the type the build makes a `dyn DynDigest` of; member: dyn (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>`, the only type coerced to `dyn digest::digest::DynDigest` at src/boxed.rs:13); owner at src/boxed.rs:17:11-17:16 within 17:4-20:5; line: `self.digest.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 19,
             "location": "src/boxed.rs",
             "offset": 20,
             "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in verify_53::main; chosen as generic argument of verify_53::boxed::Padding::new; line: `let b = boxed::Padding::new::<sha2::Sha256>().label(&input);`; code: `boxed::Padding::new::<sha2::Sha256>`",
+            "additionalContext": "[reachable] [instantiation] in verify_53::main; chosen as generic argument of verify_53::boxed::Padding::new; owner at src/main.rs:5:3-5:7 within 5:0-19:1; line: `let b = boxed::Padding::new::<sha2::Sha256>().label(&input);`; code: `boxed::Padding::new::<sha2::Sha256>`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
@@ -573,14 +573,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from; use: unknown; algorithm unresolved: `sha1_smol::Sha1::new` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; instantiated by <fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from} as core::ops::function::FnMut<(&alloc::vec::Vec<u8>,)>>::call_mut at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:166:4; instantiated by core::iter::adapters::map::map_try_fold::<..>::{closure#0}; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, alloc::vec::Vec<u8>>, fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from}> as core::iter::traits::iterator::Iterator>::try_fold::<..> at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/iter/adapters/map.rs:95:4; instantiated by <core::iter::adapters::GenericShunt<'_, core::iter::adapters::map::Map<core::slice::iter::Iter<'_, alloc::vec::Vec<u8>>, fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from}>, core::result::Result<!, ()>> as core::iter::traits::iterator::Iterator>::try_fold::<..>; line: `let mut h = sha1_smol::Sha1::new();`; code: `sha1_smol::Sha1::new`",
+            "additionalContext": "[reachable] [call] in <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from; use: unknown; algorithm unresolved: `sha1_smol::Sha1::new` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; owner at src/mapped.rs:10:7-10:15 within 10:4-17:5; instantiated by <fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from} as core::ops::function::FnMut<(&alloc::vec::Vec<u8>,)>>::call_mut at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:166:4 (call, to 166:74 as `extern \"rust-call\" fn call_mut(&mut self, args: Args) -> Sel` line #4c8ba9b5, caller at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:166:26-166:34 within 166:4-166:74); instantiated by core::iter::adapters::map::map_try_fold::<..>::{closure#0}; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, alloc::vec::Vec<u8>>, fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from}> as core::iter::traits::iterator::Iterator>::try_fold::<..> at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/iter/adapters/map.rs:95:4 (built, to 95:34 as `move |acc, elt| g(acc, f(elt))` line #6cd2c7cd, caller at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/iter/adapters/map.rs:115:7-115:15 within 115:4-122:5); instantiated by <core::iter::adapters::GenericShunt<'_, core::iter::adapters::map::Map<core::slice::iter::Iter<'_, alloc::vec::Vec<u8>>, fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from}>, core::result::Result<!, ()>> as core::iter::traits::iterator::Iterator>::try_fold::<..>; line: `let mut h = sha1_smol::Sha1::new();`; code: `sha1_smol::Sha1::new`",
             "line": 11,
             "location": "src/mapped.rs",
             "offset": 20,
             "symbol": "sha1_smol::Sha1::new"
           },
           {
-            "additionalContext": "[reachable] [call] in <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from; use: digest; algorithm unresolved: `sha1_smol::Sha1::digest` of sha1_smol 1.0.1, a crypto package the knowledge base does not model; instantiated by <fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from} as core::ops::function::FnMut<(&alloc::vec::Vec<u8>,)>>::call_mut at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:166:4; instantiated by core::iter::adapters::map::map_try_fold::<..>::{closure#0}; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, alloc::vec::Vec<u8>>, fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from}> as core::iter::traits::iterator::Iterator>::try_fold::<..> at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/iter/adapters/map.rs:95:4; instantiated by <core::iter::adapters::GenericShunt<'_, core::iter::adapters::map::Map<core::slice::iter::Iter<'_, alloc::vec::Vec<u8>>, fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from}>, core::result::Result<!, ()>> as core::iter::traits::iterator::Iterator>::try_fold::<..>; line: `Ok(Signer(h.digest().to_string()))`; code: `digest`",
+            "additionalContext": "[reachable] [call] in <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from; use: digest; algorithm unresolved: `sha1_smol::Sha1::digest` of sha1_smol 1.0.1, a crypto package the knowledge base does not model; owner at src/mapped.rs:10:7-10:15 within 10:4-17:5; instantiated by <fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from} as core::ops::function::FnMut<(&alloc::vec::Vec<u8>,)>>::call_mut at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:166:4 (call, to 166:74 as `extern \"rust-call\" fn call_mut(&mut self, args: Args) -> Sel` line #4c8ba9b5, caller at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:166:26-166:34 within 166:4-166:74); instantiated by core::iter::adapters::map::map_try_fold::<..>::{closure#0}; instantiated by <core::iter::adapters::map::Map<core::slice::iter::Iter<'_, alloc::vec::Vec<u8>>, fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from}> as core::iter::traits::iterator::Iterator>::try_fold::<..> at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/iter/adapters/map.rs:95:4 (built, to 95:34 as `move |acc, elt| g(acc, f(elt))` line #6cd2c7cd, caller at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/iter/adapters/map.rs:115:7-115:15 within 115:4-122:5); instantiated by <core::iter::adapters::GenericShunt<'_, core::iter::adapters::map::Map<core::slice::iter::Iter<'_, alloc::vec::Vec<u8>>, fn(&alloc::vec::Vec<u8>) -> core::result::Result<verify_53::mapped::Signer, <verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::Error> {<verify_53::mapped::Signer as core::convert::TryFrom<&alloc::vec::Vec<u8>>>::try_from}>, core::result::Result<!, ()>> as core::iter::traits::iterator::Iterator>::try_fold::<..>; line: `Ok(Signer(h.digest().to_string()))`; code: `digest`",
             "line": 16,
             "location": "src/mapped.rs",
             "offset": 20,
@@ -759,7 +759,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:74206aed-e8a6-8db6-adf7-ec3a1e62a231",
+  "serialNumber": "urn:uuid:61bc15f3-23c2-861b-958c-4e32ada73334",
   "specVersion": "1.7",
   "version": 1
 }

@@ -102,14 +102,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a115::P::alg; `<a115::T0 as a115::P>::alg` instantiated by a115::pass::<a115::T0> at src/main.rs:6:31 as `T::alg`; instantiated by a115::main at src/main.rs:14:4; `<a115::T1 as a115::P>::alg` instantiated by a115::pass::<a115::T1> at src/main.rs:6:31 as `T::alg`; instantiated by a115::main at src/main.rs:14:4; `<a115::T2 as a115::P>::alg` instantiated by a115::pass::<a115::T2> at src/main.rs:6:31 as `T::alg`; instantiated by a115::main at src/main.rs:14:4; line: `trait P { fn alg() -> &'static Algorithm { &SHA256 } }`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a115::P::alg; owner at src/main.rs:4:13-4:16 within 4:10-4:52; owner `<a115::T0 as a115::P>::alg` at src/main.rs:4:13-4:16 within 4:10-4:52; `<a115::T0 as a115::P>::alg` instantiated by a115::pass::<a115::T0> at src/main.rs:6:31 as `T::alg` (call, to 6:37 as `T::alg` line #214a040d, caller at src/main.rs:6:3-6:7 within 6:0-6:45); instantiated by a115::main at src/main.rs:14:4 (call, to 14:24 as `calls!` line #0dc681d7, from src/main.rs:10:52-10:62 as `pass::<$t>` line #1e02fc6a (by macro calls! at src/main.rs:14:4-14:24 line #0dc681d7 defined src/main.rs:10-10), caller at src/main.rs:12:3-12:7 within 12:0-16:1); owner `<a115::T1 as a115::P>::alg` at src/main.rs:4:13-4:16 within 4:10-4:52; `<a115::T1 as a115::P>::alg` instantiated by a115::pass::<a115::T1> at src/main.rs:6:31 as `T::alg` (call, to 6:37 as `T::alg` line #214a040d, caller at src/main.rs:6:3-6:7 within 6:0-6:45); instantiated by a115::main at src/main.rs:14:4 (call, to 14:24 as `calls!` line #0dc681d7, from src/main.rs:10:52-10:62 as `pass::<$t>` line #1e02fc6a (by macro calls! at src/main.rs:14:4-14:24 line #0dc681d7 defined src/main.rs:10-10), caller at src/main.rs:12:3-12:7 within 12:0-16:1); owner `<a115::T2 as a115::P>::alg` at src/main.rs:4:13-4:16 within 4:10-4:52; `<a115::T2 as a115::P>::alg` instantiated by a115::pass::<a115::T2> at src/main.rs:6:31 as `T::alg` (call, to 6:37 as `T::alg` line #214a040d, caller at src/main.rs:6:3-6:7 within 6:0-6:45); instantiated by a115::main at src/main.rs:14:4 (call, to 14:24 as `calls!` line #0dc681d7, from src/main.rs:10:52-10:62 as `pass::<$t>` line #1e02fc6a (by macro calls! at src/main.rs:14:4-14:24 line #0dc681d7 defined src/main.rs:10-10), caller at src/main.rs:12:3-12:7 within 12:0-16:1); line: `trait P { fn alg() -> &'static Algorithm { &SHA256 } }`; code: `SHA256`",
             "line": 4,
             "location": "src/main.rs",
             "offset": 44,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a115::sink; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<a115::T0 as a115::P>::alg`; line: `fn sink(a: &'static Algorithm, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a115::sink; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: object, from `<a115::T0 as a115::P>::alg`; owner at src/main.rs:5:3-5:7 within 5:0-5:66; line: `fn sink(a: &'static Algorithm, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 51,
@@ -161,14 +161,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a115::sink; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<a115::Last as a115::P>::alg`; line: `fn sink(a: &'static Algorithm, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a115::sink; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: object, from `<a115::Last as a115::P>::alg`; owner at src/main.rs:5:3-5:7 within 5:0-5:66; line: `fn sink(a: &'static Algorithm, d: &[u8]) { let _ = digest(a, d); }`; code: `digest`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 51,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <a115::Last as a115::P>::alg; line: `impl P for Last { fn alg() -> &'static Algorithm { &SHA512 } }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in <a115::Last as a115::P>::alg; owner at src/main.rs:8:21-8:24 within 8:18-8:60; line: `impl P for Last { fn alg() -> &'static Algorithm { &SHA512 } }`; code: `SHA512`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 52,
@@ -302,7 +302,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d804ae56-83b6-8a88-ae29-37cd51342a08",
+  "serialNumber": "urn:uuid:5e54c7c4-92e2-88c7-9192-89526b98b9d9",
   "specVersion": "1.7",
   "version": 1
 }

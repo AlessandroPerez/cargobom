@@ -430,21 +430,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_basic::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 5); line: `let cipher = Aes256Gcm::new(key);`; code: `Aes256Gcm::new`",
+            "additionalContext": "[reachable] [call] in pilot_aead_basic::main; new: setup, not a use; key: hard-coded (32 bytes, literal at line 5); owner at src/main.rs:4:3-4:7 within 4:0-11:1; line: `let cipher = Aes256Gcm::new(key);`; code: `Aes256Gcm::new`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_basic::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 7); line: `let ct = cipher.encrypt(nonce, b\"attack at dawn\".as_ref()).unwrap();`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in pilot_aead_basic::main; use: encrypt; nonce: hard-coded (12 bytes, literal at line 7); owner at src/main.rs:4:3-4:7 within 4:0-11:1; line: `let ct = cipher.encrypt(nonce, b\"attack at dawn\".as_ref()).unwrap();`; code: `encrypt`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_basic::main; use: decrypt; nonce: hard-coded (12 bytes, literal at line 7); line: `let pt = cipher.decrypt(nonce, ct.as_ref()).unwrap();`; code: `decrypt`",
+            "additionalContext": "[reachable] [call] in pilot_aead_basic::main; use: decrypt; nonce: hard-coded (12 bytes, literal at line 7); owner at src/main.rs:4:3-4:7 within 4:0-11:1; line: `let pt = cipher.decrypt(nonce, ct.as_ref()).unwrap();`; code: `decrypt`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 20,
@@ -670,7 +670,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:3d248452-f339-8124-9401-455da03b17b6",
+  "serialNumber": "urn:uuid:4b6e30cb-26e2-825d-8cca-7399e58ac28a",
   "specVersion": "1.7",
   "version": 1
 }

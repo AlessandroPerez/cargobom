@@ -293,14 +293,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_basic::main; use: keyderive; salt: hard-coded (12 bytes, literal at line 8); ikm: derived (pbkdf2::pbkdf2_hmac); line: `let hk = Hkdf::<Sha256>::new(Some(&b\"context-salt\"[..]), &master);`; code: `Hkdf::<Sha256>::new`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_basic::main; use: keyderive; salt: hard-coded (12 bytes, literal at line 8); ikm: derived (pbkdf2::pbkdf2_hmac); owner at src/main.rs:5:3-5:7 within 5:0-12:1; line: `let hk = Hkdf::<Sha256>::new(Some(&b\"context-salt\"[..]), &master);`; code: `Hkdf::<Sha256>::new`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "hkdf::Hkdf::<H, I>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_basic::main; use: keyderive; line: `hk.expand(b\"session\", &mut okm).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_basic::main; use: keyderive; owner at src/main.rs:5:3-5:7 within 5:0-12:1; line: `hk.expand(b\"session\", &mut okm).unwrap();`; code: `expand`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 7,
@@ -364,14 +364,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in pilot_kdf_basic::main; part of HKDF-SHA-256; line: `let hk = Hkdf::<Sha256>::new(Some(&b\"context-salt\"[..]), &master);`; code: `Hkdf::<Sha256>::new`",
+            "additionalContext": "[reachable] [component] in pilot_kdf_basic::main; part of HKDF-SHA-256; owner at src/main.rs:5:3-5:7 within 5:0-12:1; line: `let hk = Hkdf::<Sha256>::new(Some(&b\"context-salt\"[..]), &master);`; code: `Hkdf::<Sha256>::new`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "hkdf::Hkdf::<H, I>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in pilot_kdf_basic::main; part of HKDF-SHA-256; line: `hk.expand(b\"session\", &mut okm).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [component] in pilot_kdf_basic::main; part of HKDF-SHA-256; owner at src/main.rs:5:3-5:7 within 5:0-12:1; line: `hk.expand(b\"session\", &mut okm).unwrap();`; code: `expand`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 7,
@@ -427,7 +427,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in pilot_kdf_basic::main; use: keyderive; password: hard-coded (13 bytes, literal at line 7); salt: hard-coded (11 bytes, literal at line 7); line: `pbkdf2_hmac::<Sha256>(b\"correct horse\", b\"pepper-salt\", 600_000, &mut master);`; code: `pbkdf2_hmac::<Sha256>`",
+            "additionalContext": "[reachable] [call] in pilot_kdf_basic::main; use: keyderive; password: hard-coded (13 bytes, literal at line 7); salt: hard-coded (11 bytes, literal at line 7); owner at src/main.rs:5:3-5:7 within 5:0-12:1; line: `pbkdf2_hmac::<Sha256>(b\"correct horse\", b\"pepper-salt\", 600_000, &mut master);`; code: `pbkdf2_hmac::<Sha256>`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 4,
@@ -495,21 +495,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in pilot_kdf_basic::main; part of PBKDF2-SHA-256-600000-32; line: `pbkdf2_hmac::<Sha256>(b\"correct horse\", b\"pepper-salt\", 600_000, &mut master);`; code: `pbkdf2_hmac::<Sha256>`",
+            "additionalContext": "[reachable] [component] in pilot_kdf_basic::main; part of PBKDF2-SHA-256-600000-32; owner at src/main.rs:5:3-5:7 within 5:0-12:1; line: `pbkdf2_hmac::<Sha256>(b\"correct horse\", b\"pepper-salt\", 600_000, &mut master);`; code: `pbkdf2_hmac::<Sha256>`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "pbkdf2::pbkdf2_hmac"
           },
           {
-            "additionalContext": "[reachable] [component] in pilot_kdf_basic::main; part of HKDF-SHA-256; line: `let hk = Hkdf::<Sha256>::new(Some(&b\"context-salt\"[..]), &master);`; code: `Hkdf::<Sha256>::new`",
+            "additionalContext": "[reachable] [component] in pilot_kdf_basic::main; part of HKDF-SHA-256; owner at src/main.rs:5:3-5:7 within 5:0-12:1; line: `let hk = Hkdf::<Sha256>::new(Some(&b\"context-salt\"[..]), &master);`; code: `Hkdf::<Sha256>::new`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "hkdf::Hkdf::<H, I>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in pilot_kdf_basic::main; part of HKDF-SHA-256; line: `hk.expand(b\"session\", &mut okm).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [component] in pilot_kdf_basic::main; part of HKDF-SHA-256; owner at src/main.rs:5:3-5:7 within 5:0-12:1; line: `hk.expand(b\"session\", &mut okm).unwrap();`; code: `expand`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 7,
@@ -707,7 +707,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:295caaf7-730d-824c-97bc-e5c7bac3cc6d",
+  "serialNumber": "urn:uuid:f3ad8775-7814-8505-9291-83597fb78501",
   "specVersion": "1.7",
   "version": 1
 }

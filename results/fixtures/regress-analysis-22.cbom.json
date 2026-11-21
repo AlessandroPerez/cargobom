@@ -158,14 +158,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a22::main; line: `let p = ParsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, &a).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1`",
+            "additionalContext": "[reachable] [static] in a22::main; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let p = ParsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, &a).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 34,
             "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
           },
           {
-            "additionalContext": "[reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; line: `let _ = p.verify_sig(b\"msg\", &a);`; code: `verify_sig`",
+            "additionalContext": "[reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 in the arguments; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let _ = p.verify_sig(b\"msg\", &a);`; code: `verify_sig`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 14,
@@ -218,14 +218,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a22::main; line: `let _ = signature::ED25519.verify_sig(&a, b\"msg\", &a);`; code: `signature::ED25519`",
+            "additionalContext": "[reachable] [static] in a22::main; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let _ = signature::ED25519.verify_sig(&a, b\"msg\", &a);`; code: `signature::ED25519`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "aws_lc_rs::signature::ED25519"
           },
           {
-            "additionalContext": "[reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::ED25519 in the arguments; line: `let _ = signature::ED25519.verify_sig(&a, b\"msg\", &a);`; code: `verify_sig`",
+            "additionalContext": "[reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::ED25519 in the arguments; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let _ = signature::ED25519.verify_sig(&a, b\"msg\", &a);`; code: `verify_sig`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 31,
@@ -279,21 +279,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a22::main; use: keygen; algorithm from aws_lc_rs::signature::ML_DSA_44_SIGNING in the arguments; line: `let kp = signature::PqdsaKeyPair::generate(&aws_lc_rs::unstable::signature::MLDSA_44_SIGNING)`; code: `signature::PqdsaKeyPair::generate`",
+            "additionalContext": "[reachable] [call] in a22::main; use: keygen; algorithm from aws_lc_rs::signature::ML_DSA_44_SIGNING in the arguments; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let kp = signature::PqdsaKeyPair::generate(&aws_lc_rs::unstable::signature::MLDSA_44_SIGNING)`; code: `signature::PqdsaKeyPair::generate`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "aws_lc_rs::pqdsa::key_pair::PqdsaKeyPair::generate"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a22::main; aws_lc_rs::unstable::signature::MLDSA_44_SIGNING -> aws_lc_rs::signature::ML_DSA_44_SIGNING; aws_lc_rs::unstable::signature::MLDSA_44_SIGNING -> aws_lc_rs::signature::ML_DSA_44; line: `let kp = signature::PqdsaKeyPair::generate(&aws_lc_rs::unstable::signature::MLDSA_44_SIGNING)`; code: `aws_lc_rs::unstable::signature::MLDSA_44_SIGNING`",
+            "additionalContext": "[reachable] [via-static] in a22::main; aws_lc_rs::unstable::signature::MLDSA_44_SIGNING -> aws_lc_rs::signature::ML_DSA_44_SIGNING; owner at src/main.rs:7:3-7:7 within 7:0-26:1; aws_lc_rs::unstable::signature::MLDSA_44_SIGNING -> aws_lc_rs::signature::ML_DSA_44; line: `let kp = signature::PqdsaKeyPair::generate(&aws_lc_rs::unstable::signature::MLDSA_44_SIGNING)`; code: `aws_lc_rs::unstable::signature::MLDSA_44_SIGNING`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 48,
             "symbol": "aws_lc_rs::unstable::signature::MLDSA_44_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [call] in a22::main; use: sign; algorithm from aws_lc_rs::signature::ML_DSA_44_SIGNING in the arguments; line: `let _ = kp.sign(b\"msg\", &mut sig);`; code: `sign`",
+            "additionalContext": "[reachable] [call] in a22::main; use: sign; algorithm from aws_lc_rs::signature::ML_DSA_44_SIGNING in the arguments; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let _ = kp.sign(b\"msg\", &mut sig);`; code: `sign`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 15,
@@ -345,21 +345,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a22::main; new: setup, not a use; algorithm from aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 in the arguments; public-key: environment (std::env::args); line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in a22::main; new: setup, not a use; algorithm from aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 in the arguments; public-key: environment (std::env::args); owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `UnparsedPublicKey::new`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [static] in a22::main; line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `signature::RSA_PSS_2048_8192_SHA256`",
+            "additionalContext": "[reachable] [static] in a22::main; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `signature::RSA_PSS_2048_8192_SHA256`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 in the arguments; line: `let _ = u.verify(b\"msg\", &a);`; code: `verify`",
+            "additionalContext": "[reachable] [call] in a22::main; use: verify; algorithm from aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 in the arguments; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let _ = u.verify(b\"msg\", &a);`; code: `verify`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 14,
@@ -423,14 +423,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a22::main; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `let p = ParsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, &a).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1`",
+            "additionalContext": "[reachable] [component] in a22::main; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let p = ParsedPublicKey::new(&signature::ECDSA_P256_SHA256_ASN1, &a).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 34,
             "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
           },
           {
-            "additionalContext": "[reachable] [component] in a22::main; part of RSA-PSS-SHA-256 (aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `signature::RSA_PSS_2048_8192_SHA256`",
+            "additionalContext": "[reachable] [component] in a22::main; part of RSA-PSS-SHA-256 (aws_lc_rs::signature::RSA_PSS_2048_8192_SHA256 -> aws_lc_rs::digest::sha::SHA256); owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let u = UnparsedPublicKey::new(&signature::RSA_PSS_2048_8192_SHA256, &a);`; code: `signature::RSA_PSS_2048_8192_SHA256`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 36,
@@ -486,14 +486,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a22::main; line: `let ctx = digest::Context::new(&digest::SHA384);`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in a22::main; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let ctx = digest::Context::new(&digest::SHA384);`; code: `digest::SHA384`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "aws_lc_rs::digest::sha::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a22::main; use: digest; algorithm from aws_lc_rs::digest::sha::SHA384 in the arguments; line: `let d = ctx.finish();`; code: `finish`",
+            "additionalContext": "[reachable] [call] in a22::main; use: digest; algorithm from aws_lc_rs::digest::sha::SHA384 in the arguments; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let d = ctx.finish();`; code: `finish`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 16,
@@ -545,7 +545,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a22::main; part of Ed25519; line: `let _ = signature::ED25519.verify_sig(&a, b\"msg\", &a);`; code: `verify_sig`",
+            "additionalContext": "[reachable] [component] in a22::main; part of Ed25519; owner at src/main.rs:7:3-7:7 within 7:0-26:1; line: `let _ = signature::ED25519.verify_sig(&a, b\"msg\", &a);`; code: `verify_sig`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 31,
@@ -718,7 +718,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:6f92d689-f257-8eb2-8456-70e604a4256c",
+  "serialNumber": "urn:uuid:ba60db20-7a48-8ebb-98d5-c909f9a1586d",
   "specVersion": "1.7",
   "version": 1
 }

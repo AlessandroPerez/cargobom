@@ -392,21 +392,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a162::main; from_bytes: setup, not a use; key: hard-coded (32 bytes, literal at line 11); line: `let k = SigningKey::from_bytes(&[7u8; 32]);`; code: `SigningKey::from_bytes`",
+            "additionalContext": "[reachable] [call] in a162::main; from_bytes: setup, not a use; key: hard-coded (32 bytes, literal at line 11); owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let k = SigningKey::from_bytes(&[7u8; 32]);`; code: `SigningKey::from_bytes`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ed25519_dalek::signing::SigningKey::from_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in a162::main; use: sign; line: `let s = k.sign(&d); // Ed25519`; code: `sign`",
+            "additionalContext": "[reachable] [call] in a162::main; use: sign; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let s = k.sign(&d); // Ed25519`; code: `sign`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "signature::signer::Signer::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in a162::main; use: verify; line: `let _ = k.verify(&d, &s); // Ed25519`; code: `verify`",
+            "additionalContext": "[reachable] [call] in a162::main; use: verify; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let _ = k.verify(&d, &s); // Ed25519`; code: `verify`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 14,
@@ -466,21 +466,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a162::main; new: setup, not a use; line: `let mut c = md5::Context::new();`; code: `md5::Context::new`",
+            "additionalContext": "[reachable] [call] in a162::main; new: setup, not a use; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let mut c = md5::Context::new();`; code: `md5::Context::new`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "md5::Context::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a162::main; use: digest; line: `c.consume(&d);`; code: `consume`",
+            "additionalContext": "[reachable] [call] in a162::main; use: digest; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `c.consume(&d);`; code: `consume`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "md5::Context::consume"
           },
           {
-            "additionalContext": "[reachable] [call] in a162::main; use: digest; line: `let _ = c.finalize(); // MD5`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a162::main; use: digest; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let _ = c.finalize(); // MD5`; code: `finalize`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 14,
@@ -536,14 +536,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a162::main; part of Ed25519; line: `let s = k.sign(&d); // Ed25519`; code: `sign`",
+            "additionalContext": "[reachable] [component] in a162::main; part of Ed25519; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let s = k.sign(&d); // Ed25519`; code: `sign`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "signature::signer::Signer::sign"
           },
           {
-            "additionalContext": "[reachable] [component] in a162::main; part of Ed25519; line: `let _ = k.verify(&d, &s); // Ed25519`; code: `verify`",
+            "additionalContext": "[reachable] [component] in a162::main; part of Ed25519; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let _ = k.verify(&d, &s); // Ed25519`; code: `verify`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 14,
@@ -744,7 +744,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d4fe423c-0692-8b58-aae1-5ebd81fcdd78",
+  "serialNumber": "urn:uuid:df3bbd5e-6b0a-84f7-92d1-f6012e415f4e",
   "specVersion": "1.7",
   "version": 1
 }

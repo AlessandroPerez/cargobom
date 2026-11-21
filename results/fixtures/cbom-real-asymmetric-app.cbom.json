@@ -866,14 +866,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in cbom_real_asymmetric_app::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::var) or hard-coded (literal at line 9); line: `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in cbom_real_asymmetric_app::main; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: environment (std::env::var) or hard-coded (literal at line 9); owner at src/main.rs:7:3-7:7 within 7:0-19:1; line: `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);`; code: `UnboundKey::new`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [static] in cbom_real_asymmetric_app::main; line: `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);`; code: `AES_256_GCM`",
+            "additionalContext": "[reachable] [static] in cbom_real_asymmetric_app::main; owner at src/main.rs:7:3-7:7 within 7:0-19:1; line: `let _ = UnboundKey::new(&AES_256_GCM, &signing_secret.as_bytes()[..32]);`; code: `AES_256_GCM`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 29,
@@ -934,7 +934,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in cbom_real_asymmetric_app::main; from_bytes: setup, not a use; key: hard-coded (32 bytes, literal at line 16); line: `let _ = SigningKey::from_bytes(&[42u8; 32]);`; code: `SigningKey::from_bytes`",
+            "additionalContext": "[reachable] [call] in cbom_real_asymmetric_app::main; from_bytes: setup, not a use; key: hard-coded (32 bytes, literal at line 16); owner at src/main.rs:7:3-7:7 within 7:0-19:1; line: `let _ = SigningKey::from_bytes(&[42u8; 32]);`; code: `SigningKey::from_bytes`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
@@ -991,7 +991,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in cbom_real_asymmetric_app::main; use: keygen; rng: rng (rngs::thread::thread_rng); line: `let _ = RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `RsaPrivateKey::new`",
+            "additionalContext": "[reachable] [call] in cbom_real_asymmetric_app::main; use: keygen; rng: rng (rngs::thread::thread_rng); owner at src/main.rs:7:3-7:7 within 7:0-19:1; line: `let _ = RsaPrivateKey::new(&mut rng, 2048).unwrap();`; code: `RsaPrivateKey::new`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
@@ -1051,14 +1051,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in cbom_real_asymmetric_app::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `digest`",
+            "additionalContext": "[reachable] [call] in cbom_real_asymmetric_app::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; owner at src/main.rs:7:3-7:7 within 7:0-19:1; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `digest`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in cbom_real_asymmetric_app::main; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in cbom_real_asymmetric_app::main; owner at src/main.rs:7:3-7:7 within 7:0-19:1; line: `let _ = digest(&SHA256, signing_secret.as_bytes());`; code: `SHA256`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 20,
@@ -1352,7 +1352,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:844c11ea-bb80-8702-b68c-2d4fd8043fea",
+  "serialNumber": "urn:uuid:a525a78e-79b5-8529-8719-f19844eb6748",
   "specVersion": "1.7",
   "version": 1
 }

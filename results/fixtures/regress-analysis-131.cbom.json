@@ -102,35 +102,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a131::LIVE; line: `static LIVE: Mutex<C> = Mutex::new(C { h: &SHA256 });`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a131::LIVE; owner at src/main.rs:6:7-6:11 within 6:0-6:53; line: `static LIVE: Mutex<C> = Mutex::new(C { h: &SHA256 });`; code: `SHA256`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 43,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a131::main; a131::LIVE -> ring::digest::SHA256; line: `if arg(1).is_empty() { set(&LIVE); }`; code: `LIVE`",
+            "additionalContext": "[reachable] [via-static] in a131::main; a131::LIVE -> ring::digest::SHA256; owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `if arg(1).is_empty() { set(&LIVE); }`; code: `LIVE`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 32,
             "symbol": "a131::LIVE"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a131::LIVE` starts with, which the program may replace); line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a131::LIVE` starts with, which the program may replace); owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a131::main; a131::LIVE -> ring::digest::SHA256; line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `LIVE`",
+            "additionalContext": "[reachable] [via-static] in a131::main; a131::LIVE -> ring::digest::SHA256; owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `LIVE`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "a131::LIVE"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: type-join, possible (a value `static a131::LIVE` stores in the field); line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: type-join, possible (a value `static a131::LIVE` stores in the field); owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
@@ -182,35 +182,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a131::DEAD; line: `static DEAD: Mutex<C> = Mutex::new(C { h: &SHA384 });`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a131::DEAD; owner at src/main.rs:7:7-7:11 within 7:0-7:53; line: `static DEAD: Mutex<C> = Mutex::new(C { h: &SHA384 });`; code: `SHA384`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 43,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[present] [via-static] in a131::never; a131::DEAD -> ring::digest::SHA384; line: `fn never() { set(&DEAD); }`; code: `DEAD`",
+            "additionalContext": "[present] [via-static] in a131::never; a131::DEAD -> ring::digest::SHA384; owner at src/main.rs:10:3-10:8 within 10:0-10:26; line: `fn never() { set(&DEAD); }`; code: `DEAD`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "a131::DEAD"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: type-join, possible (a value `static a131::DEAD` stores in the field); line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: type-join, possible (a value `static a131::DEAD` stores in the field); owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (the value `static a131::DEAD` starts with, which the program may replace); line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (the value `static a131::DEAD` starts with, which the program may replace); owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a131::main; a131::DEAD -> ring::digest::SHA384; line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `DEAD`",
+            "additionalContext": "[reachable] [via-static] in a131::main; a131::DEAD -> ring::digest::SHA384; owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `DEAD`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 19,
@@ -262,21 +262,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a131::set; line: `fn set(m: &Mutex<C>) { m.lock().unwrap().h = &SHA512; }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in a131::set; owner at src/main.rs:8:3-8:6 within 8:0-8:55; line: `fn set(m: &Mutex<C>) { m.lock().unwrap().h = &SHA512; }`; code: `SHA512`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 46,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `a131::set` puts in `static a131::LIVE`); line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `a131::set` puts in `static a131::LIVE`); owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `a131::set` puts in `static a131::DEAD`); line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm one of 3 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `a131::set` puts in `static a131::DEAD`); owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
@@ -327,14 +327,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `let _ = digest(LIVE.lock().unwrap().h, &d);`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a131::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written through `std::sync::Mutex::<T>::lock` is not followed; owner at src/main.rs:12:3-12:7 within 12:0-17:1; line: `let _ = digest(DEAD.lock().unwrap().h, &d);`; code: `digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 12,
@@ -482,7 +482,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:7defce3e-39c1-8d17-82f2-ea5d7b4927a9",
+  "serialNumber": "urn:uuid:6926aba0-5256-87ec-a2d4-d77eb12b1c86",
   "specVersion": "1.7",
   "version": 1
 }

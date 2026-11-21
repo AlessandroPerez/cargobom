@@ -102,21 +102,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in v40::hash_with::{closure#0}; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `v40::main`; instantiated by v40::run::{closure#0} at src/main.rs:14:42; instantiated by v40::run at src/main.rs:13:44; line: `digest(alg, &d).as_ref().len()`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v40::hash_with::{closure#0}; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `v40::main`; owner at src/main.rs:9:65-11:1 as `{` line #96bd7ef6 within 9:65-11:1; instantiated by v40::run::{closure#0} at src/main.rs:14:42 (call of `core::future::future::Future::poll`, to 14:47 as `await` line #2437ad37, from src/main.rs:14:42-14:47 as `await` line #2437ad37 (by rewrite await at src/main.rs:14:42-14:47 line #2437ad37), caller at src/main.rs:13:44-19:1 as `{` line #ed5be8e6 within 13:44-19:1); instantiated by v40::run at src/main.rs:13:44 (built, to 19:1 as `{` line #ed5be8e6, caller at src/main.rs:13:9-13:12 within 13:0-19:1); line: `digest(alg, &d).as_ref().len()`; code: `digest`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in v40::run::{closure#0}::{closure#1}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `v40::main`; instantiated by v40::run::{closure#0} at src/main.rs:17:12 as `async move { digest(alg, &d).as_ref().len() }`; instantiated by v40::run at src/main.rs:13:44; line: `let m = async move { digest(alg, &d).as_ref().len() };`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v40::run::{closure#0}::{closure#1}; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: caller, passed by `v40::main`; owner at src/main.rs:17:12-17:22 as `async move` line #985e3592 within 17:12-17:57; instantiated by v40::run::{closure#0} at src/main.rs:17:12 as `async move { digest(alg, &d).as_ref().len() }` (built, to 17:57 as `async move { digest(alg, &d).as_ref().len() }` line #985e3592, caller at src/main.rs:13:44-19:1 as `{` line #ed5be8e6 within 13:44-19:1); instantiated by v40::run at src/main.rs:13:44 (built, to 19:1 as `{` line #ed5be8e6, caller at src/main.rs:13:9-13:12 within 13:0-19:1); line: `let m = async move { digest(alg, &d).as_ref().len() };`; code: `digest`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 25,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in v40::main; line: `let job = Job { alg: &SHA256 };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in v40::main; owner at src/main.rs:21:3-21:7 within 21:0-25:1; line: `let job = Job { alg: &SHA256 };`; code: `SHA256`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 26,
@@ -168,14 +168,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in v40::run::{closure#0}; instantiated by v40::run at src/main.rs:13:44; line: `let alg = if n > 40 { &SHA384 } else { job.alg };`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in v40::run::{closure#0}; owner at src/main.rs:13:44-19:1 as `{` line #ed5be8e6 within 13:44-19:1; instantiated by v40::run at src/main.rs:13:44 (built, to 19:1 as `{` line #ed5be8e6, caller at src/main.rs:13:9-13:12 within 13:0-19:1); line: `let alg = if n > 40 { &SHA384 } else { job.alg };`; code: `SHA384`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in v40::run::{closure#0}::{closure#1}; use: digest; algorithm one of 2 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; instantiated by v40::run::{closure#0} at src/main.rs:17:12 as `async move { digest(alg, &d).as_ref().len() }`; instantiated by v40::run at src/main.rs:13:44; line: `let m = async move { digest(alg, &d).as_ref().len() };`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v40::run::{closure#0}::{closure#1}; use: digest; algorithm one of 2 that may reach the call, beside others not followed: ring::digest::SHA384 in the arguments; owner at src/main.rs:17:12-17:22 as `async move` line #985e3592 within 17:12-17:57; instantiated by v40::run::{closure#0} at src/main.rs:17:12 as `async move { digest(alg, &d).as_ref().len() }` (built, to 17:57 as `async move { digest(alg, &d).as_ref().len() }` line #985e3592, caller at src/main.rs:13:44-19:1 as `{` line #ed5be8e6 within 13:44-19:1); instantiated by v40::run at src/main.rs:13:44 (built, to 19:1 as `{` line #ed5be8e6, caller at src/main.rs:13:9-13:12 within 13:0-19:1); line: `let m = async move { digest(alg, &d).as_ref().len() };`; code: `digest`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 25,
@@ -227,14 +227,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in v40::run::{closure#0}::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by v40::run::{closure#0} at src/main.rs:15:16 as `async { digest(&SHA512, &d).as_ref().len() }`; instantiated by v40::run at src/main.rs:13:44; line: `let extra = async { digest(&SHA512, &d).as_ref().len() }.await;`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v40::run::{closure#0}::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; owner at src/main.rs:15:16-15:21 as `async` line #0a68371a within 15:16-15:60; instantiated by v40::run::{closure#0} at src/main.rs:15:16 as `async { digest(&SHA512, &d).as_ref().len() }` (built, to 15:60 as `async { digest(&SHA512, &d).as_ref().len() }` line #0a68371a, caller at src/main.rs:13:44-19:1 as `{` line #ed5be8e6 within 13:44-19:1); instantiated by v40::run at src/main.rs:13:44 (built, to 19:1 as `{` line #ed5be8e6, caller at src/main.rs:13:9-13:12 within 13:0-19:1); line: `let extra = async { digest(&SHA512, &d).as_ref().len() }.await;`; code: `digest`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 24,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in v40::run::{closure#0}::{closure#0}; instantiated by v40::run::{closure#0} at src/main.rs:15:16 as `async { digest(&SHA512, &d).as_ref().len() }`; instantiated by v40::run at src/main.rs:13:44; line: `let extra = async { digest(&SHA512, &d).as_ref().len() }.await;`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in v40::run::{closure#0}::{closure#0}; owner at src/main.rs:15:16-15:21 as `async` line #0a68371a within 15:16-15:60; instantiated by v40::run::{closure#0} at src/main.rs:15:16 as `async { digest(&SHA512, &d).as_ref().len() }` (built, to 15:60 as `async { digest(&SHA512, &d).as_ref().len() }` line #0a68371a, caller at src/main.rs:13:44-19:1 as `{` line #ed5be8e6 within 13:44-19:1); instantiated by v40::run at src/main.rs:13:44 (built, to 19:1 as `{` line #ed5be8e6, caller at src/main.rs:13:9-13:12 within 13:0-19:1); line: `let extra = async { digest(&SHA512, &d).as_ref().len() }.await;`; code: `SHA512`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 32,
@@ -285,7 +285,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in v40::run::{closure#0}::{closure#1}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; instantiated by v40::run::{closure#0} at src/main.rs:17:12 as `async move { digest(alg, &d).as_ref().len() }`; instantiated by v40::run at src/main.rs:13:44; line: `let m = async move { digest(alg, &d).as_ref().len() };`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v40::run::{closure#0}::{closure#1}; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value of unknown origin is not followed; owner at src/main.rs:17:12-17:22 as `async move` line #985e3592 within 17:12-17:57; instantiated by v40::run::{closure#0} at src/main.rs:17:12 as `async move { digest(alg, &d).as_ref().len() }` (built, to 17:57 as `async move { digest(alg, &d).as_ref().len() }` line #985e3592, caller at src/main.rs:13:44-19:1 as `{` line #ed5be8e6 within 13:44-19:1); instantiated by v40::run at src/main.rs:13:44 (built, to 19:1 as `{` line #ed5be8e6, caller at src/main.rs:13:9-13:12 within 13:0-19:1); line: `let m = async move { digest(alg, &d).as_ref().len() };`; code: `digest`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 25,
@@ -433,7 +433,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:8c9b2579-73d3-8034-9be8-15654d7818d7",
+  "serialNumber": "urn:uuid:a203fb85-eb8f-8efb-a859-49c3551acbd6",
   "specVersion": "1.7",
   "version": 1
 }

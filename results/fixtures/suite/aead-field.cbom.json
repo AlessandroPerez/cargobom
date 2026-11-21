@@ -105,7 +105,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in pilot_aead_field::main; line: `let mut s = Settings { label: \"v1\", cipher: &aead::AES_128_GCM };`; code: `aead::AES_128_GCM`",
+            "additionalContext": "[reachable] [static] in pilot_aead_field::main; owner at src/main.rs:29:3-29:7 within 29:0-34:1; line: `let mut s = Settings { label: \"v1\", cipher: &aead::AES_128_GCM };`; code: `aead::AES_128_GCM`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 49,
@@ -160,28 +160,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in pilot_aead_field::upgrade; line: `s.cipher = &aead::AES_256_GCM;`; code: `aead::AES_256_GCM`",
+            "additionalContext": "[reachable] [static] in pilot_aead_field::upgrade; owner at src/main.rs:8:3-8:10 within 8:0-10:1; line: `s.cipher = &aead::AES_256_GCM;`; code: `aead::AES_256_GCM`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_field::key_for; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `pilot_aead_field::upgrade`; key: hard-coded (literal at line 13); line: `LessSafeKey::new(UnboundKey::new(s.cipher, &bytes).unwrap())`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in pilot_aead_field::key_for; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `pilot_aead_field::upgrade`; key: hard-coded (literal at line 13); owner at src/main.rs:12:3-12:10 within 12:0-15:1; line: `LessSafeKey::new(UnboundKey::new(s.cipher, &bytes).unwrap())`; code: `UnboundKey::new`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_field::encrypt; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `pilot_aead_field::upgrade`; nonce: hard-coded (all zero, 12 bytes, literal at line 19); line: `key_for(s).seal_in_place_append_tag(nonce, Aad::from(s.label), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in pilot_aead_field::encrypt; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `pilot_aead_field::upgrade`; nonce: hard-coded (all zero, 12 bytes, literal at line 19); owner at src/main.rs:17:3-17:10 within 17:0-22:1; line: `key_for(s).seal_in_place_append_tag(nonce, Aad::from(s.label), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_field::decrypt; use: decrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `pilot_aead_field::upgrade`; nonce: hard-coded (all zero, 12 bytes, literal at line 25); line: `key_for(s).open_in_place(nonce, Aad::from(s.label), &mut ct).unwrap().len()`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] in pilot_aead_field::decrypt; use: decrypt; algorithm from ring::aead::algorithm::AES_256_GCM, reaching the call from another function; member: object, from `pilot_aead_field::upgrade`; nonce: hard-coded (all zero, 12 bytes, literal at line 25); owner at src/main.rs:24:3-24:10 within 24:0-27:1; line: `key_for(s).open_in_place(nonce, Aad::from(s.label), &mut ct).unwrap().len()`; code: `open_in_place`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 15,
@@ -331,7 +331,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:a28a524b-cbf0-8f57-926a-8f655884d23e",
+  "serialNumber": "urn:uuid:85083c97-9d62-881c-be47-d18ed89cd971",
   "specVersion": "1.7",
   "version": 1
 }

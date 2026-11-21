@@ -102,35 +102,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <v16::Fast as v16::Pick>::alg; line: `impl Pick for Fast { fn alg(&self) -> &'static Algorithm { &SHA256 } }`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in <v16::Fast as v16::Pick>::alg; owner at src/main.rs:9:24-9:27 within 9:21-9:68; line: `impl Pick for Fast { fn alg(&self) -> &'static Algorithm { &SHA256 } }`; code: `SHA256`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 60,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [static] in v16::T1; line: `static T1: [&Algorithm; 2] = [&SHA256, &SHA384];`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in v16::T1; owner at src/main.rs:15:7-15:9 within 15:0-15:48; line: `static T1: [&Algorithm; 2] = [&SHA256, &SHA384];`; code: `SHA256`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: dyn, possible (dyn: `v16::Fast` is coerced to `dyn v16::Pick` at src/main.rs:22); line: `let _ = digest(p.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: dyn, possible (dyn: `v16::Fast` is coerced to `dyn v16::Pick` at src/main.rs:22); owner at src/main.rs:18:3-18:7 within 18:0-31:1; line: `let _ = digest(p.alg(), &d);`; code: `digest`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of the 2 in `v16::T1`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let _ = digest(T1[i], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of the 2 in `v16::T1`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; owner at src/main.rs:18:3-18:7 within 18:0-31:1; line: `let _ = digest(T1[i], &d);`; code: `digest`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in v16::main; v16::T1 -> ring::digest::SHA256; line: `let _ = digest(T1[i], &d);`; code: `T1`",
+            "additionalContext": "[reachable] [via-static] in v16::main; v16::T1 -> ring::digest::SHA256; owner at src/main.rs:18:3-18:7 within 18:0-31:1; line: `let _ = digest(T1[i], &d);`; code: `T1`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 19,
@@ -182,56 +182,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <v16::Slow as v16::Pick>::alg; line: `impl Pick for Slow { fn alg(&self) -> &'static Algorithm { &SHA384 } }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in <v16::Slow as v16::Pick>::alg; owner at src/main.rs:10:24-10:27 within 10:21-10:68; line: `impl Pick for Slow { fn alg(&self) -> &'static Algorithm { &SHA384 } }`; code: `SHA384`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 60,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in v16::T1; line: `static T1: [&Algorithm; 2] = [&SHA256, &SHA384];`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in v16::T1; owner at src/main.rs:15:7-15:9 within 15:0-15:48; line: `static T1: [&Algorithm; 2] = [&SHA256, &SHA384];`; code: `SHA384`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 40,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [static] in v16::T2; line: `static T2: [&Algorithm; 2] = [&SHA384, &SHA512];`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in v16::T2; owner at src/main.rs:16:7-16:9 within 16:0-16:48; line: `static T2: [&Algorithm; 2] = [&SHA384, &SHA512];`; code: `SHA384`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `v16::Slow` is coerced to `dyn v16::Pick` at src/main.rs:22); line: `let _ = digest(p.alg(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `v16::Slow` is coerced to `dyn v16::Pick` at src/main.rs:22); owner at src/main.rs:18:3-18:7 within 18:0-31:1; line: `let _ = digest(p.alg(), &d);`; code: `digest`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of the 2 in `v16::T1`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `let _ = digest(T1[i], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of the 2 in `v16::T1`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; owner at src/main.rs:18:3-18:7 within 18:0-31:1; line: `let _ = digest(T1[i], &d);`; code: `digest`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in v16::main; v16::T1 -> ring::digest::SHA384; line: `let _ = digest(T1[i], &d);`; code: `T1`",
+            "additionalContext": "[reachable] [via-static] in v16::main; v16::T1 -> ring::digest::SHA384; owner at src/main.rs:18:3-18:7 within 18:0-31:1; line: `let _ = digest(T1[i], &d);`; code: `T1`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "v16::T1"
           },
           {
-            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of the 2 in `v16::T2`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; line: `let _ = digest(T2[i], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of the 2 in `v16::T2`, the element read by an index or a field the analysis does not follow: ring::digest::SHA384; owner at src/main.rs:18:3-18:7 within 18:0-31:1; line: `let _ = digest(T2[i], &d);`; code: `digest`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in v16::main; v16::T2 -> ring::digest::SHA384; line: `let _ = digest(T2[i], &d);`; code: `T2`",
+            "additionalContext": "[reachable] [via-static] in v16::main; v16::T2 -> ring::digest::SHA384; owner at src/main.rs:18:3-18:7 within 18:0-31:1; line: `let _ = digest(T2[i], &d);`; code: `T2`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 19,
@@ -283,21 +283,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in v16::T2; line: `static T2: [&Algorithm; 2] = [&SHA384, &SHA512];`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in v16::T2; owner at src/main.rs:16:7-16:9 within 16:0-16:48; line: `static T2: [&Algorithm; 2] = [&SHA384, &SHA512];`; code: `SHA512`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 40,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of the 2 in `v16::T2`, the element read by an index or a field the analysis does not follow: ring::digest::SHA512; line: `let _ = digest(T2[i], &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in v16::main; use: digest; algorithm one of the 2 in `v16::T2`, the element read by an index or a field the analysis does not follow: ring::digest::SHA512; owner at src/main.rs:18:3-18:7 within 18:0-31:1; line: `let _ = digest(T2[i], &d);`; code: `digest`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in v16::main; v16::T2 -> ring::digest::SHA512; line: `let _ = digest(T2[i], &d);`; code: `T2`",
+            "additionalContext": "[reachable] [via-static] in v16::main; v16::T2 -> ring::digest::SHA512; owner at src/main.rs:18:3-18:7 within 18:0-31:1; line: `let _ = digest(T2[i], &d);`; code: `T2`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 19,
@@ -436,7 +436,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:6e3250f2-3d70-8b2e-82e3-11baf5e5f8e4",
+  "serialNumber": "urn:uuid:34f9efaa-145a-87d2-9405-8698d800cd62",
   "specVersion": "1.7",
   "version": 1
 }

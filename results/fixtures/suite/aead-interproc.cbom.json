@@ -400,42 +400,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_interproc::make_cipher; new: setup, not a use; key: hard-coded (32 bytes, literal at line 5); line: `XChaCha20Poly1305::new(&[8u8; 32].into())`; code: `XChaCha20Poly1305::new`",
+            "additionalContext": "[reachable] [call] in pilot_aead_interproc::make_cipher; new: setup, not a use; key: hard-coded (32 bytes, literal at line 5); owner at src/main.rs:4:3-4:14 within 4:0-6:1; line: `XChaCha20Poly1305::new(&[8u8; 32].into())`; code: `XChaCha20Poly1305::new`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "crypto_common::KeyInit::new"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in pilot_aead_interproc::protect::<..>; chosen as generic argument of pilot_aead_interproc::seal; instantiated by pilot_aead_interproc::main at src/main.rs:23:13 as `protect`; line: `seal(cipher, &nonce, msg)`; code: `seal`",
+            "additionalContext": "[reachable] [instantiation] in pilot_aead_interproc::protect::<..>; chosen as generic argument of pilot_aead_interproc::seal; owner at src/main.rs:8:3-8:10 within 8:0-11:1; instantiated by pilot_aead_interproc::main at src/main.rs:23:13 as `protect` (call, to 23:20 as `protect` line #1b2c6d75, caller at src/main.rs:21:3-21:7 within 21:0-26:1); line: `seal(cipher, &nonce, msg)`; code: `seal`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "pilot_aead_interproc::seal"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_interproc::seal::<..>; use: encrypt; nonce: hard-coded (default value) or parameter (argument 1 of the enclosing function); instantiated by pilot_aead_interproc::protect::<..> at src/main.rs:10:4 as `seal`; instantiated by pilot_aead_interproc::main at src/main.rs:23:13 as `protect`; line: `cipher.encrypt(nonce, msg).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in pilot_aead_interproc::seal::<..>; use: encrypt; nonce: hard-coded (default value) or parameter (argument 1 of the enclosing function); owner at src/main.rs:13:3-13:7 within 13:0-15:1; instantiated by pilot_aead_interproc::protect::<..> at src/main.rs:10:4 as `seal` (call, to 10:8 as `seal` line #93d2cbf0, caller at src/main.rs:8:3-8:10 within 8:0-11:1); instantiated by pilot_aead_interproc::main at src/main.rs:23:13 as `protect` (call, to 23:20 as `protect` line #1b2c6d75, caller at src/main.rs:21:3-21:7 within 21:0-26:1); line: `cipher.encrypt(nonce, msg).unwrap()`; code: `encrypt`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 11,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_interproc::unprotect::<..>; use: decrypt; nonce: hard-coded (default value); instantiated by pilot_aead_interproc::main at src/main.rs:24:13 as `unprotect`; line: `cipher.decrypt(&Nonce::<C>::default(), ct).unwrap()`; code: `decrypt`",
+            "additionalContext": "[reachable] [call] in pilot_aead_interproc::unprotect::<..>; use: decrypt; nonce: hard-coded (default value); owner at src/main.rs:17:3-17:12 within 17:0-19:1; instantiated by pilot_aead_interproc::main at src/main.rs:24:13 as `unprotect` (call, to 24:22 as `unprotect` line #deadc3d1, caller at src/main.rs:21:3-21:7 within 21:0-26:1); line: `cipher.decrypt(&Nonce::<C>::default(), ct).unwrap()`; code: `decrypt`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 11,
             "symbol": "aead::Aead::decrypt"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in pilot_aead_interproc::main; chosen as generic argument of pilot_aead_interproc::protect; line: `let ct = protect(&cipher, b\"interprocedural\");`; code: `protect`",
+            "additionalContext": "[reachable] [instantiation] in pilot_aead_interproc::main; chosen as generic argument of pilot_aead_interproc::protect; owner at src/main.rs:21:3-21:7 within 21:0-26:1; line: `let ct = protect(&cipher, b\"interprocedural\");`; code: `protect`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "pilot_aead_interproc::protect"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in pilot_aead_interproc::main; chosen as generic argument of pilot_aead_interproc::unprotect; line: `let pt = unprotect(&cipher, &ct);`; code: `unprotect`",
+            "additionalContext": "[reachable] [instantiation] in pilot_aead_interproc::main; chosen as generic argument of pilot_aead_interproc::unprotect; owner at src/main.rs:21:3-21:7 within 21:0-26:1; line: `let pt = unprotect(&cipher, &ct);`; code: `unprotect`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 13,
@@ -648,7 +648,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:917ed124-8e8a-861d-a2fc-00d219accd50",
+  "serialNumber": "urn:uuid:2a02733a-244e-80df-97c1-8becc2bee45b",
   "specVersion": "1.7",
   "version": 1
 }

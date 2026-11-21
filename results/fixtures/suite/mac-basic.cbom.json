@@ -223,49 +223,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ext_mac_basic::main; new_from_slice: setup, not a use; key: hard-coded (13 bytes, literal at line 7); line: `let mut mac = HmacSha256::new_from_slice(b\"shared secret\").unwrap();`; code: `HmacSha256::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ext_mac_basic::main; new_from_slice: setup, not a use; key: hard-coded (13 bytes, literal at line 7); owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let mut mac = HmacSha256::new_from_slice(b\"shared secret\").unwrap();`; code: `HmacSha256::new_from_slice`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_basic::main; use: tag; line: `mac.update(b\"order=42\");`; code: `update`",
+            "additionalContext": "[reachable] [call] in ext_mac_basic::main; use: tag; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `mac.update(b\"order=42\");`; code: `update`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_basic::main; use: tag; line: `let tag = mac.finalize().into_bytes();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in ext_mac_basic::main; use: tag; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let tag = mac.finalize().into_bytes();`; code: `finalize`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_basic::main; into_bytes: setup, not a use; line: `let tag = mac.finalize().into_bytes();`; code: `into_bytes`",
+            "additionalContext": "[reachable] [call] in ext_mac_basic::main; into_bytes: setup, not a use; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let tag = mac.finalize().into_bytes();`; code: `into_bytes`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_basic::main; new_from_slice: setup, not a use; key: hard-coded (13 bytes, literal at line 11); line: `let mut check = HmacSha256::new_from_slice(b\"shared secret\").unwrap();`; code: `HmacSha256::new_from_slice`",
+            "additionalContext": "[reachable] [call] in ext_mac_basic::main; new_from_slice: setup, not a use; key: hard-coded (13 bytes, literal at line 11); owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let mut check = HmacSha256::new_from_slice(b\"shared secret\").unwrap();`; code: `HmacSha256::new_from_slice`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_basic::main; use: tag; line: `check.update(b\"order=42\");`; code: `update`",
+            "additionalContext": "[reachable] [call] in ext_mac_basic::main; use: tag; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `check.update(b\"order=42\");`; code: `update`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 10,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_basic::main; use: verify; line: `println!(\"{}\", check.verify_slice(&tag).is_ok());`; code: `verify_slice`",
+            "additionalContext": "[reachable] [call] in ext_mac_basic::main; use: verify; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `println!(\"{}\", check.verify_slice(&tag).is_ok());`; code: `verify_slice`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 25,
@@ -325,49 +325,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; line: `let mut mac = HmacSha256::new_from_slice(b\"shared secret\").unwrap();`; code: `HmacSha256::new_from_slice`",
+            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let mut mac = HmacSha256::new_from_slice(b\"shared secret\").unwrap();`; code: `HmacSha256::new_from_slice`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; line: `mac.update(b\"order=42\");`; code: `update`",
+            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `mac.update(b\"order=42\");`; code: `update`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; line: `let tag = mac.finalize().into_bytes();`; code: `finalize`",
+            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let tag = mac.finalize().into_bytes();`; code: `finalize`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; line: `let tag = mac.finalize().into_bytes();`; code: `into_bytes`",
+            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let tag = mac.finalize().into_bytes();`; code: `into_bytes`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; line: `let mut check = HmacSha256::new_from_slice(b\"shared secret\").unwrap();`; code: `HmacSha256::new_from_slice`",
+            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `let mut check = HmacSha256::new_from_slice(b\"shared secret\").unwrap();`; code: `HmacSha256::new_from_slice`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; line: `check.update(b\"order=42\");`; code: `update`",
+            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `check.update(b\"order=42\");`; code: `update`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 10,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; line: `println!(\"{}\", check.verify_slice(&tag).is_ok());`; code: `verify_slice`",
+            "additionalContext": "[reachable] [component] in ext_mac_basic::main; part of HMAC-SHA-256; owner at src/main.rs:6:3-6:7 within 6:0-14:1; line: `println!(\"{}\", check.verify_slice(&tag).is_ok());`; code: `verify_slice`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 25,
@@ -532,7 +532,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:72b69de4-b070-864b-8a5f-f92a90e97375",
+  "serialNumber": "urn:uuid:083e4d04-2e69-8311-bf80-5304bc2582e1",
   "specVersion": "1.7",
   "version": 1
 }

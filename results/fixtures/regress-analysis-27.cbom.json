@@ -1064,28 +1064,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in unmodelled::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let alice = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`",
+            "additionalContext": "[reachable] [call] in unmodelled::main; use: keygen; rng: rng (rand_core::os::OsRng); owner at src/main.rs:23:3-23:7 within 23:0-34:1; line: `let alice = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::random"
           },
           {
-            "additionalContext": "[reachable] [call] in unmodelled::main; use: keygen; rng: rng (rand_core::os::OsRng); line: `let bob = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`",
+            "additionalContext": "[reachable] [call] in unmodelled::main; use: keygen; rng: rng (rand_core::os::OsRng); owner at src/main.rs:23:3-23:7 within 23:0-34:1; line: `let bob = EphemeralSecret::random(&mut OsRng);`; code: `EphemeralSecret::random`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::random"
           },
           {
-            "additionalContext": "[reachable] [call] in unmodelled::main; use: keyderive; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `diffie_hellman`",
+            "additionalContext": "[reachable] [call] in unmodelled::main; use: keyderive; owner at src/main.rs:23:3-23:7 within 23:0-34:1; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `diffie_hellman`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 23,
             "symbol": "elliptic_curve::ecdh::EphemeralSecret::<C>::diffie_hellman"
           },
           {
-            "additionalContext": "[reachable] [call] in unmodelled::main; public_key: setup, not a use; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `public_key`",
+            "additionalContext": "[reachable] [call] in unmodelled::main; public_key: setup, not a use; owner at src/main.rs:23:3-23:7 within 23:0-34:1; line: `let shared = alice.diffie_hellman(&bob.public_key());`; code: `public_key`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 43,
@@ -1141,28 +1141,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; line: `\"md5\" => Box::new(Md5::new()),`; code: `Md5::new`",
+            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; owner at src/main.rs:14:3-14:15 within 14:0-21:1; line: `\"md5\" => Box::new(Md5::new()),`; code: `Md5::new`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<md5::Md5Core>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:16); line: `h.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<md5::Md5Core>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:16); owner at src/main.rs:14:3-14:15 within 14:0-21:1; line: `h.update(data);`; code: `update`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<md5::Md5Core>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:16); line: `h.finalize().to_vec()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<md5::Md5Core>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:16); owner at src/main.rs:14:3-14:15 within 14:0-21:1; line: `h.finalize().to_vec()`; code: `finalize`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in unmodelled::main; use: digest; line: `let a = Md5::digest(&d);`; code: `Md5::digest`",
+            "additionalContext": "[reachable] [call] in unmodelled::main; use: digest; owner at src/main.rs:23:3-23:7 within 23:0-34:1; line: `let a = Md5::digest(&d);`; code: `Md5::digest`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 12,
@@ -1218,21 +1218,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; line: `_ => Box::new(sha2::Sha256::new()),`; code: `sha2::Sha256::new`",
+            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; new: setup, not a use; owner at src/main.rs:14:3-14:15 within 14:0-21:1; line: `_ => Box::new(sha2::Sha256::new()),`; code: `sha2::Sha256::new`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:17); line: `h.update(data);`; code: `update`",
+            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:17); owner at src/main.rs:14:3-14:15 within 14:0-21:1; line: `h.update(data);`; code: `update`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:17); line: `h.finalize().to_vec()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in unmodelled::hash_by_name; use: digest; receiver: one of 2 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at src/main.rs:17); owner at src/main.rs:14:3-14:15 within 14:0-21:1; line: `h.finalize().to_vec()`; code: `finalize`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 6,
@@ -1284,7 +1284,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in unmodelled::main; use: digest; line: `let b = Sha3_256::digest(&d);`; code: `Sha3_256::digest`",
+            "additionalContext": "[reachable] [call] in unmodelled::main; use: digest; owner at src/main.rs:23:3-23:7 within 23:0-34:1; line: `let b = Sha3_256::digest(&d);`; code: `Sha3_256::digest`",
             "line": 26,
             "location": "src/main.rs",
             "offset": 12,
@@ -1634,7 +1634,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:46e48dc6-4463-8a48-b027-de4a5797740e",
+  "serialNumber": "urn:uuid:cdd646a8-2485-8e1f-ab94-30af2bb1ce1a",
   "specVersion": "1.7",
   "version": 1
 }

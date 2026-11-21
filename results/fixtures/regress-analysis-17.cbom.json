@@ -160,35 +160,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a17::scatter; new: setup, not a use; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&aead::AES_128_GCM, key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in a17::scatter; new: setup, not a use; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:12:3-12:10 within 12:0-21:1; line: `let k = LessSafeKey::new(UnboundKey::new(&aead::AES_128_GCM, key).unwrap());`; code: `UnboundKey::new`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "aws_lc_rs::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [static] in a17::scatter; line: `let k = LessSafeKey::new(UnboundKey::new(&aead::AES_128_GCM, key).unwrap());`; code: `aead::AES_128_GCM`",
+            "additionalContext": "[reachable] [static] in a17::scatter; owner at src/main.rs:12:3-12:10 within 12:0-21:1; line: `let k = LessSafeKey::new(UnboundKey::new(&aead::AES_128_GCM, key).unwrap());`; code: `aead::AES_128_GCM`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 46,
             "symbol": "aws_lc_rs::aead::aes_gcm::AES_128_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::scatter; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 16); line: `let _ = k.seal_out_of_place_scatter(Nonce::assume_unique_for_key([1u8; 12]), Aad::empty(), data, &mut ct, &[], &mut tag[..16]);`; code: `seal_out_of_place_scatter`",
+            "additionalContext": "[reachable] [call] in a17::scatter; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 16); owner at src/main.rs:12:3-12:10 within 12:0-21:1; line: `let _ = k.seal_out_of_place_scatter(Nonce::assume_unique_for_key([1u8; 12]), Aad::empty(), data, &mut ct, &[], &mut tag[..16]);`; code: `seal_out_of_place_scatter`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "aws_lc_rs::aead::LessSafeKey::seal_out_of_place_scatter"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::scatter; use: decrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 18); line: `let r = k.open_separate_gather(Nonce::assume_unique_for_key([2u8; 12]), Aad::empty(), &ct, &tag[..16], &mut pt);`; code: `open_separate_gather`",
+            "additionalContext": "[reachable] [call] in a17::scatter; use: decrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 18); owner at src/main.rs:12:3-12:10 within 12:0-21:1; line: `let r = k.open_separate_gather(Nonce::assume_unique_for_key([2u8; 12]), Aad::empty(), &ct, &tag[..16], &mut pt);`; code: `open_separate_gather`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "aws_lc_rs::aead::LessSafeKey::open_separate_gather"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::scatter; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 19); line: `let _ = k.seal_in_place_scatter(Nonce::assume_unique_for_key([3u8; 12]), Aad::empty(), data, &[], &mut tag[..16]);`; code: `seal_in_place_scatter`",
+            "additionalContext": "[reachable] [call] in a17::scatter; use: encrypt; algorithm from aws_lc_rs::aead::aes_gcm::AES_128_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 19); owner at src/main.rs:12:3-12:10 within 12:0-21:1; line: `let _ = k.seal_in_place_scatter(Nonce::assume_unique_for_key([3u8; 12]), Aad::empty(), data, &[], &mut tag[..16]);`; code: `seal_in_place_scatter`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 14,
@@ -253,21 +253,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a17::ctr_iv; new: setup, not a use; algorithm from aws_lc_rs::cipher::AES_128 in the arguments; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let uk = cipher::UnboundCipherKey::new(&cipher::AES_128, key).unwrap();`; code: `cipher::UnboundCipherKey::new`",
+            "additionalContext": "[reachable] [call] in a17::ctr_iv; new: setup, not a use; algorithm from aws_lc_rs::cipher::AES_128 in the arguments; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:24:3-24:9 within 24:0-29:1; line: `let uk = cipher::UnboundCipherKey::new(&cipher::AES_128, key).unwrap();`; code: `cipher::UnboundCipherKey::new`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "aws_lc_rs::cipher::UnboundCipherKey::new"
           },
           {
-            "additionalContext": "[reachable] [static] in a17::ctr_iv; line: `let uk = cipher::UnboundCipherKey::new(&cipher::AES_128, key).unwrap();`; code: `cipher::AES_128`",
+            "additionalContext": "[reachable] [static] in a17::ctr_iv; owner at src/main.rs:24:3-24:9 within 24:0-29:1; line: `let uk = cipher::UnboundCipherKey::new(&cipher::AES_128, key).unwrap();`; code: `cipher::AES_128`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 44,
             "symbol": "aws_lc_rs::cipher::AES_128"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::ctr_iv; use: encrypt; algorithm from aws_lc_rs::cipher::AES_128 in the arguments; iv: hard-coded (all zero, 16 bytes, literal at line 27); line: `ek.less_safe_encrypt(data, ctx).is_ok()`; code: `less_safe_encrypt`",
+            "additionalContext": "[reachable] [call] in a17::ctr_iv; use: encrypt; algorithm from aws_lc_rs::cipher::AES_128 in the arguments; iv: hard-coded (all zero, 16 bytes, literal at line 27); owner at src/main.rs:24:3-24:9 within 24:0-29:1; line: `ek.less_safe_encrypt(data, ctx).is_ok()`; code: `less_safe_encrypt`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 7,
@@ -332,28 +332,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a17::P256; line: `alg: &signature::ECDSA_P256_SHA256_ASN1,`; code: `signature::ECDSA_P256_SHA256_ASN1`",
+            "additionalContext": "[reachable] [static] in a17::P256; owner at src/main.rs:64:7-64:11 within 64:0-66:2; line: `alg: &signature::ECDSA_P256_SHA256_ASN1,`; code: `signature::ECDSA_P256_SHA256_ASN1`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 10,
             "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; member: type-join, possible (a value `static a17::P256` stores in the field); public-key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; member: type-join, possible (a value `static a17::P256` stores in the field); public-key: environment (std::env::args) or parameter (argument 1 of the enclosing function); owner at src/main.rs:69:7-69:13 within 69:4-73:5; line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`",
             "line": 70,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::Verifier::verify; use: verify; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; member: type-join, possible (a value `static a17::P256` stores in the field); line: `.verify(msg, sig)`; code: `verify`",
+            "additionalContext": "[reachable] [call] in a17::Verifier::verify; use: verify; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; member: type-join, possible (a value `static a17::P256` stores in the field); owner at src/main.rs:69:7-69:13 within 69:4-73:5; line: `.verify(msg, sig)`; code: `verify`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a17::main; a17::P256 -> aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; line: `println!(\"{} {}\", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `P256`",
+            "additionalContext": "[reachable] [via-static] in a17::main; a17::P256 -> aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1; owner at src/main.rs:76:3-76:7 within 76:0-86:1; line: `println!(\"{} {}\", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `P256`",
             "line": 85,
             "location": "src/main.rs",
             "offset": 42,
@@ -411,42 +411,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a17::ed_seed; from_seed_unchecked: setup, not a use; key: hard-coded (32 bytes, literal at line 50); line: `let kp = signature::Ed25519KeyPair::from_seed_unchecked(&[4u8; 32]).unwrap();`; code: `signature::Ed25519KeyPair::from_seed_unchecked`",
+            "additionalContext": "[reachable] [call] in a17::ed_seed; from_seed_unchecked: setup, not a use; key: hard-coded (32 bytes, literal at line 50); owner at src/main.rs:49:3-49:10 within 49:0-52:1; line: `let kp = signature::Ed25519KeyPair::from_seed_unchecked(&[4u8; 32]).unwrap();`; code: `signature::Ed25519KeyPair::from_seed_unchecked`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "aws_lc_rs::ed25519::Ed25519KeyPair::from_seed_unchecked"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::ed_seed; use: sign; line: `kp.sign(msg).as_ref().len()`; code: `sign`",
+            "additionalContext": "[reachable] [call] in a17::ed_seed; use: sign; owner at src/main.rs:49:3-49:10 within 49:0-52:1; line: `kp.sign(msg).as_ref().len()`; code: `sign`",
             "line": 51,
             "location": "src/main.rs",
             "offset": 7,
             "symbol": "aws_lc_rs::ed25519::Ed25519KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [static] in a17::ED; line: `alg: &signature::ED25519,`; code: `signature::ED25519`",
+            "additionalContext": "[reachable] [static] in a17::ED; owner at src/main.rs:61:7-61:9 within 61:0-63:2; line: `alg: &signature::ED25519,`; code: `signature::ED25519`",
             "line": 62,
             "location": "src/main.rs",
             "offset": 10,
             "symbol": "aws_lc_rs::signature::ED25519"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; member: type-join, possible (a value `static a17::ED` stores in the field); public-key: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`",
+            "additionalContext": "[reachable] [call] in a17::Verifier::verify; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; member: type-join, possible (a value `static a17::ED` stores in the field); public-key: environment (std::env::args) or parameter (argument 1 of the enclosing function); owner at src/main.rs:69:7-69:13 within 69:4-73:5; line: `signature::UnparsedPublicKey::new(self.alg, pk)`; code: `signature::UnparsedPublicKey::new`",
             "line": 70,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::Verifier::verify; use: verify; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; member: type-join, possible (a value `static a17::ED` stores in the field); line: `.verify(msg, sig)`; code: `verify`",
+            "additionalContext": "[reachable] [call] in a17::Verifier::verify; use: verify; algorithm one of 2 that may reach the call from other functions: aws_lc_rs::signature::ED25519; member: type-join, possible (a value `static a17::ED` stores in the field); owner at src/main.rs:69:7-69:13 within 69:4-73:5; line: `.verify(msg, sig)`; code: `verify`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "aws_lc_rs::signature::UnparsedPublicKey::<B>::verify"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a17::main; a17::ED -> aws_lc_rs::signature::ED25519; line: `println!(\"{} {}\", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `ED`",
+            "additionalContext": "[reachable] [via-static] in a17::main; a17::ED -> aws_lc_rs::signature::ED25519; owner at src/main.rs:76:3-76:7 within 76:0-86:1; line: `println!(\"{} {}\", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `ED`",
             "line": 85,
             "location": "src/main.rs",
             "offset": 22,
@@ -510,7 +510,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a17::mac_kdf; part of PBKDF2-SHA-256 (aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 -> aws_lc_rs::hmac::HMAC_SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b\"fixed-salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "additionalContext": "[reachable] [component] in a17::mac_kdf; part of PBKDF2-SHA-256 (aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 -> aws_lc_rs::hmac::HMAC_SHA256); owner at src/main.rs:32:3-32:10 within 32:0-38:1; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b\"fixed-salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 19,
@@ -566,21 +566,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a17::mac_kdf; new: setup, not a use; algorithm from aws_lc_rs::hmac::HMAC_SHA512 in the arguments; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in a17::mac_kdf; new: setup, not a use; algorithm from aws_lc_rs::hmac::HMAC_SHA512 in the arguments; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:32:3-32:10 within 32:0-38:1; line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::Key::new`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "aws_lc_rs::hmac::Key::new"
           },
           {
-            "additionalContext": "[reachable] [static] in a17::mac_kdf; line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::HMAC_SHA512`",
+            "additionalContext": "[reachable] [static] in a17::mac_kdf; owner at src/main.rs:32:3-32:10 within 32:0-38:1; line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::HMAC_SHA512`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "aws_lc_rs::hmac::HMAC_SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::mac_kdf; use: tag; algorithm from aws_lc_rs::hmac::HMAC_SHA512 in the arguments; line: `let t = hmac::sign(&k, b\"data\");`; code: `hmac::sign`",
+            "additionalContext": "[reachable] [call] in a17::mac_kdf; use: tag; algorithm from aws_lc_rs::hmac::HMAC_SHA512 in the arguments; owner at src/main.rs:32:3-32:10 within 32:0-38:1; line: `let t = hmac::sign(&k, b\"data\");`; code: `hmac::sign`",
             "line": 34,
             "location": "src/main.rs",
             "offset": 12,
@@ -639,28 +639,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a17::kem1024; use: keygen; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; line: `let dk = kem::DecapsulationKey::generate(&kem::ML_KEM_1024).unwrap();`; code: `kem::DecapsulationKey::generate`",
+            "additionalContext": "[reachable] [call] in a17::kem1024; use: keygen; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; owner at src/main.rs:41:3-41:10 within 41:0-46:1; line: `let dk = kem::DecapsulationKey::generate(&kem::ML_KEM_1024).unwrap();`; code: `kem::DecapsulationKey::generate`",
             "line": 42,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "aws_lc_rs::kem::DecapsulationKey::<Id>::generate"
           },
           {
-            "additionalContext": "[reachable] [static] in a17::kem1024; line: `let dk = kem::DecapsulationKey::generate(&kem::ML_KEM_1024).unwrap();`; code: `kem::ML_KEM_1024`",
+            "additionalContext": "[reachable] [static] in a17::kem1024; owner at src/main.rs:41:3-41:10 within 41:0-46:1; line: `let dk = kem::DecapsulationKey::generate(&kem::ML_KEM_1024).unwrap();`; code: `kem::ML_KEM_1024`",
             "line": 42,
             "location": "src/main.rs",
             "offset": 46,
             "symbol": "aws_lc_rs::kem::ML_KEM_1024"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::kem1024; use: encapsulate; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; line: `let (ct, _ss) = ek.encapsulate().unwrap();`; code: `encapsulate`",
+            "additionalContext": "[reachable] [call] in a17::kem1024; use: encapsulate; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; owner at src/main.rs:41:3-41:10 within 41:0-46:1; line: `let (ct, _ss) = ek.encapsulate().unwrap();`; code: `encapsulate`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 23,
             "symbol": "aws_lc_rs::kem::EncapsulationKey::<Id>::encapsulate"
           },
           {
-            "additionalContext": "[reachable] [call] in a17::kem1024; use: decapsulate; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; line: `dk.decapsulate(ct).is_ok()`; code: `decapsulate`",
+            "additionalContext": "[reachable] [call] in a17::kem1024; use: decapsulate; algorithm from aws_lc_rs::kem::ML_KEM_1024 in the arguments; owner at src/main.rs:41:3-41:10 within 41:0-46:1; line: `dk.decapsulate(ct).is_ok()`; code: `decapsulate`",
             "line": 45,
             "location": "src/main.rs",
             "offset": 7,
@@ -712,7 +712,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a17::mac_kdf; use: keyderive; algorithm from aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (10 bytes, literal at line 36); password: environment (std::env::args) or parameter (argument 1 of the enclosing function); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b\"fixed-salt\", pw, &mut out);`; code: `pbkdf2::derive`",
+            "additionalContext": "[reachable] [call] in a17::mac_kdf; use: keyderive; algorithm from aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 in the arguments; salt: hard-coded (10 bytes, literal at line 36); password: environment (std::env::args) or parameter (argument 1 of the enclosing function); owner at src/main.rs:32:3-32:10 within 32:0-38:1; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b\"fixed-salt\", pw, &mut out);`; code: `pbkdf2::derive`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 4,
@@ -776,21 +776,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a17::mac_kdf; part of PBKDF2-SHA-256 (aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 -> aws_lc_rs::digest::sha::SHA256); line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b\"fixed-salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
+            "additionalContext": "[reachable] [component] in a17::mac_kdf; part of PBKDF2-SHA-256 (aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256 -> aws_lc_rs::digest::sha::SHA256); owner at src/main.rs:32:3-32:10 within 32:0-38:1; line: `pbkdf2::derive(pbkdf2::PBKDF2_HMAC_SHA256, NonZeroU32::new(600_000).unwrap(), b\"fixed-salt\", pw, &mut out);`; code: `pbkdf2::PBKDF2_HMAC_SHA256`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "aws_lc_rs::pbkdf2::PBKDF2_HMAC_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in a17::P256; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `alg: &signature::ECDSA_P256_SHA256_ASN1,`; code: `signature::ECDSA_P256_SHA256_ASN1`",
+            "additionalContext": "[reachable] [component] in a17::P256; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); owner at src/main.rs:64:7-64:11 within 64:0-66:2; line: `alg: &signature::ECDSA_P256_SHA256_ASN1,`; code: `signature::ECDSA_P256_SHA256_ASN1`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 10,
             "symbol": "aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1"
           },
           {
-            "additionalContext": "[reachable] [component] in a17::main; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); line: `println!(\"{} {}\", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `P256`",
+            "additionalContext": "[reachable] [component] in a17::main; part of ECDSA-P-256-SHA-256 (aws_lc_rs::signature::ECDSA_P256_SHA256_ASN1 -> aws_lc_rs::digest::sha::SHA256); owner at src/main.rs:76:3-76:7 within 76:0-86:1; line: `println!(\"{} {}\", ED.verify(k, k, k), P256.verify(k, k, k));`; code: `P256`",
             "line": 85,
             "location": "src/main.rs",
             "offset": 42,
@@ -846,14 +846,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a17::mac_kdf; use: digest; algorithm from aws_lc_rs::digest::sha::SHA512_256 in the arguments; line: `t.as_ref().len() + digest::digest(&digest::SHA512_256, pw).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in a17::mac_kdf; use: digest; algorithm from aws_lc_rs::digest::sha::SHA512_256 in the arguments; owner at src/main.rs:32:3-32:10 within 32:0-38:1; line: `t.as_ref().len() + digest::digest(&digest::SHA512_256, pw).as_ref().len()`; code: `digest::digest`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 23,
             "symbol": "aws_lc_rs::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a17::mac_kdf; line: `t.as_ref().len() + digest::digest(&digest::SHA512_256, pw).as_ref().len()`; code: `digest::SHA512_256`",
+            "additionalContext": "[reachable] [static] in a17::mac_kdf; owner at src/main.rs:32:3-32:10 within 32:0-38:1; line: `t.as_ref().len() + digest::digest(&digest::SHA512_256, pw).as_ref().len()`; code: `digest::SHA512_256`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 39,
@@ -905,21 +905,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a17::mac_kdf; part of HMAC-SHA-512 (aws_lc_rs::hmac::HMAC_SHA512 -> aws_lc_rs::digest::sha::SHA512); line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::HMAC_SHA512`",
+            "additionalContext": "[reachable] [component] in a17::mac_kdf; part of HMAC-SHA-512 (aws_lc_rs::hmac::HMAC_SHA512 -> aws_lc_rs::digest::sha::SHA512); owner at src/main.rs:32:3-32:10 within 32:0-38:1; line: `let k = hmac::Key::new(hmac::HMAC_SHA512, key);`; code: `hmac::HMAC_SHA512`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 27,
             "symbol": "aws_lc_rs::hmac::HMAC_SHA512"
           },
           {
-            "additionalContext": "[reachable] [component] in a17::ed_seed; part of Ed25519; line: `kp.sign(msg).as_ref().len()`; code: `sign`",
+            "additionalContext": "[reachable] [component] in a17::ed_seed; part of Ed25519; owner at src/main.rs:49:3-49:10 within 49:0-52:1; line: `kp.sign(msg).as_ref().len()`; code: `sign`",
             "line": 51,
             "location": "src/main.rs",
             "offset": 7,
             "symbol": "aws_lc_rs::ed25519::Ed25519KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [component] in a17::Verifier::verify; part of Ed25519; line: `.verify(msg, sig)`; code: `verify`",
+            "additionalContext": "[reachable] [component] in a17::Verifier::verify; part of Ed25519; owner at src/main.rs:69:7-69:13 within 69:4-73:5; line: `.verify(msg, sig)`; code: `verify`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 13,
@@ -1118,7 +1118,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:077d2b15-0894-86e7-8e4a-0a909b78054e",
+  "serialNumber": "urn:uuid:d1a6b995-66fd-82c2-b3bf-8de4f9009fe9",
   "specVersion": "1.7",
   "version": 1
 }

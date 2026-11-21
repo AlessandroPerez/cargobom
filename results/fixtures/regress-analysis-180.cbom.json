@@ -1190,14 +1190,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a180::main; use: keygen; rng: rng (rngs::thread::rng); line: `let a = EphemeralSecret::generate_from_rng(&mut rng);`; code: `EphemeralSecret::generate_from_rng`",
+            "additionalContext": "[reachable] [call] in a180::main; use: keygen; rng: rng (rngs::thread::rng); owner at src/main.rs:10:3-10:7 within 10:0-23:1; line: `let a = EphemeralSecret::generate_from_rng(&mut rng);`; code: `EphemeralSecret::generate_from_rng`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "crypto_common::generate::Generate::generate_from_rng"
           },
           {
-            "additionalContext": "[reachable] [call] in a180::main; use: keyderive; line: `let shared = a.diffie_hellman(&b.public_key());`; code: `diffie_hellman`",
+            "additionalContext": "[reachable] [call] in a180::main; use: keyderive; owner at src/main.rs:10:3-10:7 within 10:0-23:1; line: `let shared = a.diffie_hellman(&b.public_key());`; code: `diffie_hellman`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 19,
@@ -1255,28 +1255,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a180::main; use: keygen; rng: rng (rngs::thread::rng); line: `let sk = SigningKey::generate_from_rng(&mut rng);`; code: `SigningKey::generate_from_rng`",
+            "additionalContext": "[reachable] [call] in a180::main; use: keygen; rng: rng (rngs::thread::rng); owner at src/main.rs:10:3-10:7 within 10:0-23:1; line: `let sk = SigningKey::generate_from_rng(&mut rng);`; code: `SigningKey::generate_from_rng`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "crypto_common::generate::Generate::generate_from_rng"
           },
           {
-            "additionalContext": "[reachable] [call] in a180::main; use: sign; line: `let sig: Signature = sk.sign(msg.as_bytes());`; code: `sign`",
+            "additionalContext": "[reachable] [call] in a180::main; use: sign; owner at src/main.rs:10:3-10:7 within 10:0-23:1; line: `let sig: Signature = sk.sign(msg.as_bytes());`; code: `sign`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 28,
             "symbol": "signature::signer::Signer::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in a180::main; from: setup, not a use; line: `let vk = VerifyingKey::from(&sk);`; code: `VerifyingKey::from`",
+            "additionalContext": "[reachable] [call] in a180::main; from: setup, not a use; owner at src/main.rs:10:3-10:7 within 10:0-23:1; line: `let vk = VerifyingKey::from(&sk);`; code: `VerifyingKey::from`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in a180::main; use: verify; line: `let ok = vk.verify(msg.as_bytes(), &sig).is_ok();`; code: `verify`",
+            "additionalContext": "[reachable] [call] in a180::main; use: verify; owner at src/main.rs:10:3-10:7 within 10:0-23:1; line: `let ok = vk.verify(msg.as_bytes(), &sig).is_ok();`; code: `verify`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 16,
@@ -1333,14 +1333,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a180::main; use: keygen; rng: rng (rngs::thread::rng); line: `let k384 = p384::ecdsa::SigningKey::generate_from_rng(&mut rng);`; code: `p384::ecdsa::SigningKey::generate_from_rng`",
+            "additionalContext": "[reachable] [call] in a180::main; use: keygen; rng: rng (rngs::thread::rng); owner at src/main.rs:10:3-10:7 within 10:0-23:1; line: `let k384 = p384::ecdsa::SigningKey::generate_from_rng(&mut rng);`; code: `p384::ecdsa::SigningKey::generate_from_rng`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "crypto_common::generate::Generate::generate_from_rng"
           },
           {
-            "additionalContext": "[reachable] [call] in a180::main; use: sign; line: `let s384: p384::ecdsa::Signature = k384.sign(msg.as_bytes());`; code: `sign`",
+            "additionalContext": "[reachable] [call] in a180::main; use: sign; owner at src/main.rs:10:3-10:7 within 10:0-23:1; line: `let s384: p384::ecdsa::Signature = k384.sign(msg.as_bytes());`; code: `sign`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 44,
@@ -1395,7 +1395,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a180::main; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.14.3, which the knowledge base does not name; rng: rng (rngs::thread::rng); line: `let b = p256::SecretKey::generate_from_rng(&mut rng);`; code: `p256::SecretKey::generate_from_rng`",
+            "additionalContext": "[reachable] [call] in a180::main; use: keygen; algorithm unresolved: the type `elliptic_curve::secret_key::SecretKey` of elliptic-curve 0.14.3, which the knowledge base does not name; rng: rng (rngs::thread::rng); owner at src/main.rs:10:3-10:7 within 10:0-23:1; line: `let b = p256::SecretKey::generate_from_rng(&mut rng);`; code: `p256::SecretKey::generate_from_rng`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 12,
@@ -1802,7 +1802,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:2c5ffd3e-291e-8eb6-929d-11b3f94cf82e",
+  "serialNumber": "urn:uuid:a00740da-7514-86f2-b49f-6a5b6eb370bc",
   "specVersion": "1.7",
   "version": 1
 }

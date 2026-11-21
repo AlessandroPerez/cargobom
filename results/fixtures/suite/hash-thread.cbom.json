@@ -102,14 +102,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in ext_hash_thread::main; line: `let alg = &digest::SHA384;`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in ext_hash_thread::main; owner at src/main.rs:4:3-4:7 within 4:0-10:1; line: `let alg = &digest::SHA384;`; code: `digest::SHA384`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_hash_thread::main::{closure#0}; use: digest; algorithm from ring::digest::SHA384 in the arguments; instantiated by ext_hash_thread::main at src/main.rs:7:31; line: `let worker = thread::spawn(move || digest::digest(alg, &payload));`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in ext_hash_thread::main::{closure#0}; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at src/main.rs:7:31-7:38 as `move ||` line #96b70062 within 7:31-7:68; instantiated by ext_hash_thread::main at src/main.rs:7:31 (built, to 7:68 as `move || digest::digest(alg, &payload)` line #96b70062, caller at src/main.rs:4:3-4:7 within 4:0-10:1); line: `let worker = thread::spawn(move || digest::digest(alg, &payload));`; code: `digest::digest`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 39,
@@ -238,7 +238,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:3291ec5b-b91c-8e19-bb54-d8ac36ebb6cc",
+  "serialNumber": "urn:uuid:0565aba5-9d09-85b7-a0ed-186ae915b073",
   "specVersion": "1.7",
   "version": 1
 }

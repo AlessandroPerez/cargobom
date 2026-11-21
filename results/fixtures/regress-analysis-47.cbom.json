@@ -102,28 +102,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in c1::from_map; line: `m.insert(\"b\", &digest::SHA1_FOR_LEGACY_USE_ONLY);`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
+            "additionalContext": "[reachable] [static] in c1::from_map; owner at src/main.rs:13:3-13:11 within 13:0-18:1; line: `m.insert(\"b\", &digest::SHA1_FOR_LEGACY_USE_ONLY);`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in c1::from_map; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; member: container, possible (an element of the container the call reads); line: `digest::digest(m.get(k).unwrap(), d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in c1::from_map; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; member: container, possible (an element of the container the call reads); owner at src/main.rs:13:3-13:11 within 13:0-18:1; line: `digest::digest(m.get(k).unwrap(), d).as_ref().len()`; code: `digest::digest`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in c1::generic; use: digest; algorithm possibly from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, the only one found reaching the call from another function; member: type-join, possible (a value `c1::main` stores in the field); line: `digest::digest(s.alg(), d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in c1::generic; use: digest; algorithm possibly from ring::digest::SHA1_FOR_LEGACY_USE_ONLY, the only one found reaching the call from another function; member: type-join, possible (a value `c1::main` stores in the field); owner at src/main.rs:64:3-64:10 within 64:0-66:1; line: `digest::digest(s.alg(), d).as_ref().len()`; code: `digest::digest`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in c1::main; line: `let h: Box<dyn Source> = Box::new(Holder { alg: &digest::SHA1_FOR_LEGACY_USE_ONLY, _t: 1u8 });`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
+            "additionalContext": "[reachable] [static] in c1::main; owner at src/main.rs:83:3-83:7 within 83:0-102:1; line: `let h: Box<dyn Source> = Box::new(Holder { alg: &digest::SHA1_FOR_LEGACY_USE_ONLY, _t: 1u8 });`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
             "line": 89,
             "location": "src/main.rs",
             "offset": 53,
@@ -179,42 +179,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in c1::from_vec; line: `v.push(&digest::SHA256);`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in c1::from_vec; owner at src/main.rs:5:3-5:11 within 5:0-10:1; line: `v.push(&digest::SHA256);`; code: `digest::SHA256`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in c1::from_vec; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); line: `digest::digest(v[i], d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in c1::from_vec; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA256 in the arguments; member: container, possible (an element of the container the call reads); owner at src/main.rs:5:3-5:11 within 5:0-10:1; line: `digest::digest(v[i], d).as_ref().len()`; code: `digest::digest`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <c1::Custom as c1::Hasher>::alg; line: `fn alg(&self) -> &'static digest::Algorithm { &digest::SHA256 }`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in <c1::Custom as c1::Hasher>::alg; owner at src/main.rs:47:7-47:10 within 47:4-47:67; line: `fn alg(&self) -> &'static digest::Algorithm { &digest::SHA256 }`; code: `digest::SHA256`",
             "line": 47,
             "location": "src/main.rs",
             "offset": 51,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in c1::defaulted; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: dyn, possible (dyn: `c1::Custom` is coerced to `dyn c1::Hasher` at src/main.rs:88); line: `digest::digest(h.alg(), d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in c1::defaulted; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: dyn, possible (dyn: `c1::Custom` is coerced to `dyn c1::Hasher` at src/main.rs:88); owner at src/main.rs:49:3-49:12 within 49:0-51:1; line: `digest::digest(h.alg(), d).as_ref().len()`; code: `digest::digest`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <c1::Fixed as c1::Pick>::alg; line: `fn alg(&self) -> &'static digest::Algorithm { &digest::SHA256 }`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in <c1::Fixed as c1::Pick>::alg; owner at src/main.rs:74:7-74:10 within 74:4-74:67; line: `fn alg(&self) -> &'static digest::Algorithm { &digest::SHA256 }`; code: `digest::SHA256`",
             "line": 74,
             "location": "src/main.rs",
             "offset": 51,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in c1::partial; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: dyn, possible (dyn: `c1::Fixed` is coerced to `dyn c1::Pick` at src/main.rs:90); line: `digest::digest(p.alg(), d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in c1::partial; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA256; member: dyn, possible (dyn: `c1::Fixed` is coerced to `dyn c1::Pick` at src/main.rs:90); owner at src/main.rs:79:3-79:10 within 79:0-81:1; line: `digest::digest(p.alg(), d).as_ref().len()`; code: `digest::digest`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 4,
@@ -266,28 +266,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in c1::from_vec; line: `v.push(&digest::SHA384);`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in c1::from_vec; owner at src/main.rs:5:3-5:11 within 5:0-10:1; line: `v.push(&digest::SHA384);`; code: `digest::SHA384`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in c1::from_vec; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); line: `digest::digest(v[i], d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in c1::from_vec; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA384 in the arguments; member: container, possible (an element of the container the call reads); owner at src/main.rs:5:3-5:11 within 5:0-10:1; line: `digest::digest(v[i], d).as_ref().len()`; code: `digest::digest`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in c1::Hasher::alg; `<c1::Plain as c1::Hasher>::alg` instantiated by c1::main at src/main.rs:87:33; line: `fn alg(&self) -> &'static digest::Algorithm { &digest::SHA384 }`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in c1::Hasher::alg; owner at src/main.rs:41:7-41:10 within 41:4-41:67; owner `<c1::Plain as c1::Hasher>::alg` at src/main.rs:41:7-41:10 within 41:4-41:67; `<c1::Plain as c1::Hasher>::alg` instantiated by c1::main at src/main.rs:87:33 (object, to 87:48 as `Box::new(Plain)` line #1b3bff03, caller at src/main.rs:83:3-83:7 within 83:0-102:1); line: `fn alg(&self) -> &'static digest::Algorithm { &digest::SHA384 }`; code: `digest::SHA384`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 51,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in c1::defaulted; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `c1::Plain` is coerced to `dyn c1::Hasher` at src/main.rs:87); line: `digest::digest(h.alg(), d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in c1::defaulted; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA384; member: dyn, possible (dyn: `c1::Plain` is coerced to `dyn c1::Hasher` at src/main.rs:87); owner at src/main.rs:49:3-49:12 within 49:0-51:1; line: `digest::digest(h.alg(), d).as_ref().len()`; code: `digest::digest`",
             "line": 50,
             "location": "src/main.rs",
             "offset": 4,
@@ -339,14 +339,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <c1::P1 as c1::Named>::alg; line: `fn alg(&self) -> &'static digest::Algorithm { &digest::SHA512_256 }`; code: `digest::SHA512_256`",
+            "additionalContext": "[reachable] [static] in <c1::P1 as c1::Named>::alg; owner at src/main.rs:29:7-29:10 within 29:4-29:71; line: `fn alg(&self) -> &'static digest::Algorithm { &digest::SHA512_256 }`; code: `digest::SHA512_256`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 51,
             "symbol": "ring::digest::SHA512_256"
           },
           {
-            "additionalContext": "[reachable] [call] in c1::upcast; use: digest; algorithm from ring::digest::SHA512_256, reaching the call from another function; member: dyn (dyn: `c1::P1`, the only type coerced to `dyn c1::Named` at src/main.rs:86); line: `digest::digest(n.alg(), d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in c1::upcast; use: digest; algorithm from ring::digest::SHA512_256, reaching the call from another function; member: dyn (dyn: `c1::P1`, the only type coerced to `dyn c1::Named` at src/main.rs:86); owner at src/main.rs:34:3-34:9 within 34:0-37:1; line: `digest::digest(n.alg(), d).as_ref().len()`; code: `digest::digest`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 4,
@@ -398,28 +398,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in c1::from_map; line: `m.insert(\"a\", &digest::SHA512);`; code: `digest::SHA512`",
+            "additionalContext": "[reachable] [static] in c1::from_map; owner at src/main.rs:13:3-13:11 within 13:0-18:1; line: `m.insert(\"a\", &digest::SHA512);`; code: `digest::SHA512`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in c1::from_map; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); line: `digest::digest(m.get(k).unwrap(), d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in c1::from_map; use: digest; algorithm one of 2 that may reach the call: ring::digest::SHA512 in the arguments; member: container, possible (an element of the container the call reads); owner at src/main.rs:13:3-13:11 within 13:0-18:1; line: `digest::digest(m.get(k).unwrap(), d).as_ref().len()`; code: `digest::digest`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <u8 as c1::Pick>::alg; line: `fn alg(&self) -> &'static digest::Algorithm { &digest::SHA512 }`; code: `digest::SHA512`",
+            "additionalContext": "[reachable] [static] in <u8 as c1::Pick>::alg; owner at src/main.rs:77:7-77:10 within 77:4-77:67; line: `fn alg(&self) -> &'static digest::Algorithm { &digest::SHA512 }`; code: `digest::SHA512`",
             "line": 77,
             "location": "src/main.rs",
             "offset": 51,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in c1::partial; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `u8` is coerced to `dyn c1::Pick` at src/main.rs:91); line: `digest::digest(p.alg(), d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in c1::partial; use: digest; algorithm one of 2 that may reach the call from other functions: ring::digest::SHA512; member: dyn, possible (dyn: `u8` is coerced to `dyn c1::Pick` at src/main.rs:91); owner at src/main.rs:79:3-79:10 within 79:0-81:1; line: `digest::digest(p.alg(), d).as_ref().len()`; code: `digest::digest`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 4,
@@ -568,7 +568,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:69ebfb93-c414-866a-86f3-b2867aedda9f",
+  "serialNumber": "urn:uuid:0bbf4b3b-d5e3-8f41-a789-6e8fe0e64b5b",
   "specVersion": "1.7",
   "version": 1
 }

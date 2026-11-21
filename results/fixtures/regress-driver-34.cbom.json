@@ -83,28 +83,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u128; use: generate; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`",
+            "additionalContext": "[reachable] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u128; use: generate; owner at uuid-1.29.2/src/rng.rs:54:11-54:15 within 54:8-63:9; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`",
             "line": 57,
             "location": "uuid-1.29.2/src/rng.rs",
             "offset": 12,
             "symbol": "getrandom::fill"
           },
           {
-            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u64; use: generate; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`",
+            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u64; use: generate; owner at uuid-1.29.2/src/rng.rs:65:11-65:14 within 65:8-74:9; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`",
             "line": 68,
             "location": "uuid-1.29.2/src/rng.rs",
             "offset": 12,
             "symbol": "getrandom::fill"
           },
           {
-            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u16; use: generate; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`",
+            "additionalContext": "[present] [call] in <uuid::rng::imp::RngImp as uuid::rng::Rng>::u16; use: generate; owner at uuid-1.29.2/src/rng.rs:76:11-76:14 within 76:8-85:9; line: `getrandom::fill(&mut bytes).unwrap_or_else(|err| {`; code: `getrandom::fill`",
             "line": 79,
             "location": "uuid-1.29.2/src/rng.rs",
             "offset": 12,
             "symbol": "getrandom::fill"
           },
           {
-            "additionalContext": "[reachable] [call] in d34::token; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `getrandom::fill` of getrandom 0.4.3; line: `Uuid::new_v4()`; code: `Uuid::new_v4`",
+            "additionalContext": "[reachable] [call] in d34::token; use: generate; run for this call by `uuid::v4::<impl uuid::Uuid>::new_v4`: `getrandom::fill` of getrandom 0.4.3; owner at src/main.rs:10:3-10:8 within 10:0-12:1; line: `Uuid::new_v4()`; code: `Uuid::new_v4`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 4,
@@ -160,28 +160,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in uuid::sha1::hash; use: unknown; algorithm unresolved: `sha1_smol::Sha1::new` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; line: `let mut hasher = Sha1::new();`; code: `Sha1::new`",
+            "additionalContext": "[reachable] [call] in uuid::sha1::hash; use: unknown; algorithm unresolved: `sha1_smol::Sha1::new` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; owner at uuid-1.29.2/src/sha1.rs:2:14-2:18 within 2:0-14:1; line: `let mut hasher = Sha1::new();`; code: `Sha1::new`",
             "line": 5,
             "location": "uuid-1.29.2/src/sha1.rs",
             "offset": 21,
             "symbol": "sha1_smol::Sha1::new"
           },
           {
-            "additionalContext": "[reachable] [call] in uuid::sha1::hash; use: digest; algorithm unresolved: `sha1_smol::Sha1::digest` of sha1_smol 1.0.1, a crypto package the knowledge base does not model; line: `bytes.copy_from_slice(&hasher.digest().bytes()[..16]);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in uuid::sha1::hash; use: digest; algorithm unresolved: `sha1_smol::Sha1::digest` of sha1_smol 1.0.1, a crypto package the knowledge base does not model; owner at uuid-1.29.2/src/sha1.rs:2:14-2:18 within 2:0-14:1; line: `bytes.copy_from_slice(&hasher.digest().bytes()[..16]);`; code: `digest`",
             "line": 11,
             "location": "uuid-1.29.2/src/sha1.rs",
             "offset": 34,
             "symbol": "sha1_smol::Sha1::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in uuid::sha1::hash; use: unknown; algorithm unresolved: `sha1_smol::Digest::bytes` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; line: `bytes.copy_from_slice(&hasher.digest().bytes()[..16]);`; code: `bytes`",
+            "additionalContext": "[reachable] [call] in uuid::sha1::hash; use: unknown; algorithm unresolved: `sha1_smol::Digest::bytes` of sha1_smol 1.0.1, a crypto package the knowledge base does not model: what the call does is not known; owner at uuid-1.29.2/src/sha1.rs:2:14-2:18 within 2:0-14:1; line: `bytes.copy_from_slice(&hasher.digest().bytes()[..16]);`; code: `bytes`",
             "line": 11,
             "location": "uuid-1.29.2/src/sha1.rs",
             "offset": 43,
             "symbol": "sha1_smol::Digest::bytes"
           },
           {
-            "additionalContext": "[reachable] [call] in d34::main; use: unknown; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Digest::bytes` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Sha1::digest` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Sha1::new` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `let b = Uuid::new_v5(&Uuid::NAMESPACE_DNS, name.as_bytes());`; code: `Uuid::new_v5`",
+            "additionalContext": "[reachable] [call] in d34::main; use: unknown; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Digest::bytes` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; owner at src/main.rs:14:3-14:7 within 14:0-20:1; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Sha1::digest` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; algorithm unresolved: the boundary check: `uuid::v5::<impl uuid::Uuid>::new_v5` runs `sha1_smol::Sha1::new` of sha1_smol 1.0.1 here, a call nothing else in the CBOM accounts for: what it does is not known; line: `let b = Uuid::new_v5(&Uuid::NAMESPACE_DNS, name.as_bytes());`; code: `Uuid::new_v5`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 12,
@@ -320,7 +320,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:536b0e3a-139f-8d47-8cff-16ea3a537093",
+  "serialNumber": "urn:uuid:b1539cfb-8932-8311-981d-d542d2d1332e",
   "specVersion": "1.7",
   "version": 1
 }

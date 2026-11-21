@@ -104,28 +104,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a21::Holder::ec; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; member: caller, passed by `a21::main`; line: `let doc = EcdsaKeyPair::generate_pkcs8(alg, &rng).ext()?;`; code: `EcdsaKeyPair::generate_pkcs8`",
+            "additionalContext": "[reachable] [call] in a21::Holder::ec; use: keygen; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; member: caller, passed by `a21::main`; owner at src/main.rs:30:7-30:9 within 30:4-35:5; line: `let doc = EcdsaKeyPair::generate_pkcs8(alg, &rng).ext()?;`; code: `EcdsaKeyPair::generate_pkcs8`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::generate_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in a21::Holder::ec; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; member: caller, passed by `a21::main`; key: computed (a21::Ext::ext); line: `let kp = EcdsaKeyPair::from_pkcs8(alg, doc.as_ref(), &rng).ext()?;`; code: `EcdsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in a21::Holder::ec; from_pkcs8: setup, not a use; algorithm from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, reaching the call from another function; member: caller, passed by `a21::main`; key: computed (a21::Ext::ext); owner at src/main.rs:30:7-30:9 within 30:4-35:5; line: `let kp = EcdsaKeyPair::from_pkcs8(alg, doc.as_ref(), &rng).ext()?;`; code: `EcdsaKeyPair::from_pkcs8`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::from_pkcs8"
           },
           {
-            "additionalContext": "[reachable] [call] in a21::Holder::run; use: sign; algorithm possibly from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, the only one found reaching the call from another function; member: type-join, possible (a value `a21::Holder::ec` stores in the field); line: `Kind::Ec(kp) => kp.sign(&SystemRandom::new(), msg).unwrap().as_ref().to_vec(),`; code: `sign`",
+            "additionalContext": "[reachable] [call] in a21::Holder::run; use: sign; algorithm possibly from ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING, the only one found reaching the call from another function; member: type-join, possible (a value `a21::Holder::ec` stores in the field); owner at src/main.rs:43:7-43:10 within 43:4-50:5; line: `Kind::Ec(kp) => kp.sign(&SystemRandom::new(), msg).unwrap().as_ref().to_vec(),`; code: `sign`",
             "line": 46,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "ring::ec::suite_b::ecdsa::signing::EcdsaKeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [static] in a21::main; line: `let h = Holder::ec(&signature::ECDSA_P256_SHA256_ASN1_SIGNING).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [static] in a21::main; owner at src/main.rs:73:3-73:7 within 73:0-79:1; line: `let h = Holder::ec(&signature::ECDSA_P256_SHA256_ASN1_SIGNING).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 75,
             "location": "src/main.rs",
             "offset": 24,
@@ -181,14 +181,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a21::sign_rsa; use: sign; algorithm from ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 in the arguments; line: `kp.sign(&signature::RSA_PKCS1_SHA256, &SystemRandom::new(), msg, &mut sig)`; code: `sign`",
+            "additionalContext": "[reachable] [call] in a21::sign_rsa; use: sign; algorithm from ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 in the arguments; owner at src/main.rs:65:3-65:11 within 65:0-71:1; line: `kp.sign(&signature::RSA_PKCS1_SHA256, &SystemRandom::new(), msg, &mut sig)`; code: `sign`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 7,
             "symbol": "ring::rsa::keypair::KeyPair::sign"
           },
           {
-            "additionalContext": "[reachable] [static] in a21::sign_rsa; line: `kp.sign(&signature::RSA_PKCS1_SHA256, &SystemRandom::new(), msg, &mut sig)`; code: `signature::RSA_PKCS1_SHA256`",
+            "additionalContext": "[reachable] [static] in a21::sign_rsa; owner at src/main.rs:65:3-65:11 within 65:0-71:1; line: `kp.sign(&signature::RSA_PKCS1_SHA256, &SystemRandom::new(), msg, &mut sig)`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 13,
@@ -236,7 +236,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a21::sign_rsa; from_pkcs8: setup, not a use; key: hard-coded (static a21::RSA_PKCS8); line: `let kp = signature::RsaKeyPair::from_pkcs8(RSA_PKCS8).unwrap();`; code: `signature::RsaKeyPair::from_pkcs8`",
+            "additionalContext": "[reachable] [call] in a21::sign_rsa; from_pkcs8: setup, not a use; key: hard-coded (static a21::RSA_PKCS8); owner at src/main.rs:65:3-65:11 within 65:0-71:1; line: `let kp = signature::RsaKeyPair::from_pkcs8(RSA_PKCS8).unwrap();`; code: `signature::RsaKeyPair::from_pkcs8`",
             "line": 66,
             "location": "src/main.rs",
             "offset": 13,
@@ -300,28 +300,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a21::pick; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `a21::main`; line: `Some(a) => digest::digest(a, m).as_ref().to_vec(),`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in a21::pick; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `a21::main`; owner at src/main.rs:54:3-54:7 within 54:0-59:1; line: `Some(a) => digest::digest(a, m).as_ref().to_vec(),`; code: `digest::digest`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in a21::sign_rsa; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); line: `kp.sign(&signature::RSA_PKCS1_SHA256, &SystemRandom::new(), msg, &mut sig)`; code: `signature::RSA_PKCS1_SHA256`",
+            "additionalContext": "[reachable] [component] in a21::sign_rsa; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256 -> ring::digest::SHA256); owner at src/main.rs:65:3-65:11 within 65:0-71:1; line: `kp.sign(&signature::RSA_PKCS1_SHA256, &SystemRandom::new(), msg, &mut sig)`; code: `signature::RSA_PKCS1_SHA256`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "ring::rsa::padding::pkcs1::RSA_PKCS1_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in a21::main; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); line: `let h = Holder::ec(&signature::ECDSA_P256_SHA256_ASN1_SIGNING).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
+            "additionalContext": "[reachable] [component] in a21::main; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING -> ring::digest::SHA256); owner at src/main.rs:73:3-73:7 within 73:0-79:1; line: `let h = Holder::ec(&signature::ECDSA_P256_SHA256_ASN1_SIGNING).unwrap();`; code: `signature::ECDSA_P256_SHA256_ASN1_SIGNING`",
             "line": 75,
             "location": "src/main.rs",
             "offset": 24,
             "symbol": "ring::ec::suite_b::ecdsa::signing::ECDSA_P256_SHA256_ASN1_SIGNING"
           },
           {
-            "additionalContext": "[reachable] [static] in a21::main; line: `println!(\"{}\", pick(Some(&digest::SHA256), b\"m\").len());`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in a21::main; owner at src/main.rs:73:3-73:7 within 73:0-79:1; line: `println!(\"{}\", pick(Some(&digest::SHA256), b\"m\").len());`; code: `digest::SHA256`",
             "line": 78,
             "location": "src/main.rs",
             "offset": 30,
@@ -373,14 +373,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a21::Holder::hash; line: `kind: Kind::Hash(&digest::SHA384, 0),`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in a21::Holder::hash; owner at src/main.rs:37:7-37:11 within 37:4-41:5; line: `kind: Kind::Hash(&digest::SHA384, 0),`; code: `digest::SHA384`",
             "line": 39,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a21::Holder::run; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: type-join, possible (a value `a21::Holder::hash` stores in the field); line: `Kind::Hash(alg, _) => digest::digest(alg, msg).as_ref().to_vec(),`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in a21::Holder::run; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: type-join, possible (a value `a21::Holder::hash` stores in the field); owner at src/main.rs:43:7-43:10 within 43:4-50:5; line: `Kind::Hash(alg, _) => digest::digest(alg, msg).as_ref().to_vec(),`; code: `digest::digest`",
             "line": 48,
             "location": "src/main.rs",
             "offset": 34,
@@ -533,7 +533,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:8b9ddc64-e79c-80fa-a005-6d5d8fe7ac37",
+  "serialNumber": "urn:uuid:5f2873f0-beea-8eb5-a934-68fba401f8e2",
   "specVersion": "1.7",
   "version": 1
 }

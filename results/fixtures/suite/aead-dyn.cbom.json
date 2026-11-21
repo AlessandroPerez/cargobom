@@ -105,7 +105,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [static] in <pilot_aead_dyn::Server as pilot_aead_dyn::Profile>::cipher; line: `&aead::AES_256_GCM`; code: `aead::AES_256_GCM`",
+            "additionalContext": "[present] [static] in <pilot_aead_dyn::Server as pilot_aead_dyn::Profile>::cipher; owner at src/main.rs:17:7-17:13 within 17:4-19:5; line: `&aead::AES_256_GCM`; code: `aead::AES_256_GCM`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 9,
@@ -157,21 +157,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <pilot_aead_dyn::Mobile as pilot_aead_dyn::Profile>::cipher; line: `&aead::CHACHA20_POLY1305`; code: `aead::CHACHA20_POLY1305`",
+            "additionalContext": "[reachable] [static] in <pilot_aead_dyn::Mobile as pilot_aead_dyn::Profile>::cipher; owner at src/main.rs:11:7-11:13 within 11:4-13:5; line: `&aead::CHACHA20_POLY1305`; code: `aead::CHACHA20_POLY1305`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_dyn::seal; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: dyn (dyn: `pilot_aead_dyn::Mobile`, the only type coerced to `dyn pilot_aead_dyn::Profile` at src/main.rs:32); key: hard-coded (literal at line 24); line: `let key = LessSafeKey::new(UnboundKey::new(alg, &vec![5u8; alg.key_len()]).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in pilot_aead_dyn::seal; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: dyn (dyn: `pilot_aead_dyn::Mobile`, the only type coerced to `dyn pilot_aead_dyn::Profile` at src/main.rs:32); key: hard-coded (literal at line 24); owner at src/main.rs:22:3-22:7 within 22:0-29:1; line: `let key = LessSafeKey::new(UnboundKey::new(alg, &vec![5u8; alg.key_len()]).unwrap());`; code: `UnboundKey::new`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_dyn::seal; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: dyn (dyn: `pilot_aead_dyn::Mobile`, the only type coerced to `dyn pilot_aead_dyn::Profile` at src/main.rs:32); nonce: hard-coded (all zero, 12 bytes, literal at line 26); line: `key.seal_in_place_append_tag(nonce, Aad::from(b\"hdr\"), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in pilot_aead_dyn::seal; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: dyn (dyn: `pilot_aead_dyn::Mobile`, the only type coerced to `dyn pilot_aead_dyn::Profile` at src/main.rs:32); nonce: hard-coded (all zero, 12 bytes, literal at line 26); owner at src/main.rs:22:3-22:7 within 22:0-29:1; line: `key.seal_in_place_append_tag(nonce, Aad::from(b\"hdr\"), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 27,
             "location": "src/main.rs",
             "offset": 8,
@@ -321,7 +321,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:945ce5e8-06df-8d2e-b45d-492b4f48b34c",
+  "serialNumber": "urn:uuid:479054f8-4576-8ca2-ab89-e5179a36893e",
   "specVersion": "1.7",
   "version": 1
 }

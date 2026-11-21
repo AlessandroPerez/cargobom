@@ -799,7 +799,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a183::main; use: keygen; rng: rng (rngs::thread::rng); line: `let key = PrivateKey::new(&mut rng, 2048).unwrap();`; code: `PrivateKey::new`",
+            "additionalContext": "[reachable] [call] in a183::main; use: keygen; rng: rng (rngs::thread::rng); owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let key = PrivateKey::new(&mut rng, 2048).unwrap();`; code: `PrivateKey::new`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 14,
@@ -860,28 +860,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a183::main; use: encrypt; rng: rng (rngs::thread::rng); line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a183::main; use: encrypt; rng: rng (rngs::thread::rng); owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `encrypt`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "rsa::public_key::PublicKey::encrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; new: setup, not a use; line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `Oaep::<Sha256>::new`",
+            "additionalContext": "[reachable] [call] in a183::main; new: setup, not a use; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `Oaep::<Sha256>::new`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 38,
             "symbol": "rsa::oaep::Oaep::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; use: decrypt; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `decrypt`",
+            "additionalContext": "[reachable] [call] in a183::main; use: decrypt; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `decrypt`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "rsa::private_key::PrivateKey::decrypt"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; new: setup, not a use; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `Oaep::<Sha256>::new`",
+            "additionalContext": "[reachable] [call] in a183::main; new: setup, not a use; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `Oaep::<Sha256>::new`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 25,
@@ -938,28 +938,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a183::main; new: setup, not a use; line: `let signer = SigningKey::<Sha256>::new(key.clone());`; code: `SigningKey::<Sha256>::new`",
+            "additionalContext": "[reachable] [call] in a183::main; new: setup, not a use; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let signer = SigningKey::<Sha256>::new(key.clone());`; code: `SigningKey::<Sha256>::new`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "rsa::pkcs1v15::signing_key::SigningKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; use: sign; rng: rng (rngs::thread::rng); line: `let sig = signer.sign_with_rng(&mut rng, msg);`; code: `sign_with_rng`",
+            "additionalContext": "[reachable] [call] in a183::main; use: sign; rng: rng (rngs::thread::rng); owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let sig = signer.sign_with_rng(&mut rng, msg);`; code: `sign_with_rng`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "signature::signer::RandomizedSigner::sign_with_rng"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; new: setup, not a use; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `VerifyingKey::<Sha256>::new`",
+            "additionalContext": "[reachable] [call] in a183::main; new: setup, not a use; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `VerifyingKey::<Sha256>::new`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "rsa::pkcs1v15::verifying_key::VerifyingKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; use: verify; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `verify`",
+            "additionalContext": "[reachable] [call] in a183::main; use: verify; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `verify`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 58,
@@ -1016,28 +1016,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a183::main; use: sign; rng: rng (rngs::thread::rng); line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `sign_with_rng`",
+            "additionalContext": "[reachable] [call] in a183::main; use: sign; rng: rng (rngs::thread::rng); owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `sign_with_rng`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "rsa::private_key::PrivateKey::sign_with_rng"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; new_with_salt: setup, not a use; line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `Pss::<Sha256>::new_with_salt`",
+            "additionalContext": "[reachable] [call] in a183::main; new_with_salt: setup, not a use; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `Pss::<Sha256>::new_with_salt`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 41,
             "symbol": "rsa::pss::Pss::<D>::new_with_salt"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; use: verify; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `verify`",
+            "additionalContext": "[reachable] [call] in a183::main; use: verify; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `verify`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "rsa::public_key::PublicKey::verify"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; new: setup, not a use; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `Pss::<Sha256>::new`",
+            "additionalContext": "[reachable] [call] in a183::main; new: setup, not a use; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `Pss::<Sha256>::new`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 28,
@@ -1098,14 +1098,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a183::main; use: sign; rng: rng (rngs::thread::rng); line: `let s3 = key.pss_sign_with_rng::<Sha384, _>(&mut rng, msg).unwrap();`; code: `pss_sign_with_rng`",
+            "additionalContext": "[reachable] [call] in a183::main; use: sign; rng: rng (rngs::thread::rng); owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let s3 = key.pss_sign_with_rng::<Sha384, _>(&mut rng, msg).unwrap();`; code: `pss_sign_with_rng`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "rsa::pss::<impl rsa::private_key::PrivateKey>::pss_sign_with_rng"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; use: verify; line: `let ok3 = public.pss_verify::<Sha384>(msg, &s3).is_ok();`; code: `pss_verify`",
+            "additionalContext": "[reachable] [call] in a183::main; use: verify; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ok3 = public.pss_verify::<Sha384>(msg, &s3).is_ok();`; code: `pss_verify`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 21,
@@ -1161,91 +1161,91 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; line: `let signer = SigningKey::<Sha256>::new(key.clone());`; code: `SigningKey::<Sha256>::new`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let signer = SigningKey::<Sha256>::new(key.clone());`; code: `SigningKey::<Sha256>::new`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "rsa::pkcs1v15::signing_key::SigningKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; line: `let sig = signer.sign_with_rng(&mut rng, msg);`; code: `sign_with_rng`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let sig = signer.sign_with_rng(&mut rng, msg);`; code: `sign_with_rng`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "signature::signer::RandomizedSigner::sign_with_rng"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `VerifyingKey::<Sha256>::new`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `VerifyingKey::<Sha256>::new`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "rsa::pkcs1v15::verifying_key::VerifyingKey::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `verify`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PKCS1-1.5-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ok1 = VerifyingKey::<Sha256>::new(public.clone()).verify(msg, &sig).is_ok();`; code: `verify`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 58,
             "symbol": "signature::verifier::Verifier::verify"
           },
           {
-            "additionalContext": "[reachable] [call] in a183::main; use: digest; line: `let digest = Sha256::digest(msg);`; code: `Sha256::digest`",
+            "additionalContext": "[reachable] [call] in a183::main; use: digest; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let digest = Sha256::digest(msg);`; code: `Sha256::digest`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-256; line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `sign_with_rng`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `sign_with_rng`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "rsa::private_key::PrivateKey::sign_with_rng"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-256; line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `Pss::<Sha256>::new_with_salt`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let s2 = key.sign_with_rng(&mut rng, Pss::<Sha256>::new_with_salt(20), &digest).unwrap();`; code: `Pss::<Sha256>::new_with_salt`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 41,
             "symbol": "rsa::pss::Pss::<D>::new_with_salt"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-256; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `verify`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `verify`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "rsa::public_key::PublicKey::verify"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-256; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `Pss::<Sha256>::new`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ok2 = public.verify(Pss::<Sha256>::new(), &digest, &s2).is_ok();`; code: `Pss::<Sha256>::new`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 28,
             "symbol": "rsa::pss::Pss::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `encrypt`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `encrypt`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "rsa::public_key::PublicKey::encrypt"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `Oaep::<Sha256>::new`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ct = public.encrypt(&mut rng, Oaep::<Sha256>::new(), msg).unwrap();`; code: `Oaep::<Sha256>::new`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 38,
             "symbol": "rsa::oaep::Oaep::<D>::new"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `decrypt`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `decrypt`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "rsa::private_key::PrivateKey::decrypt"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `Oaep::<Sha256>::new`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-OAEP-SHA-256; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let pt = key.decrypt(Oaep::<Sha256>::new(), &ct).unwrap();`; code: `Oaep::<Sha256>::new`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 25,
@@ -1297,14 +1297,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-384; line: `let s3 = key.pss_sign_with_rng::<Sha384, _>(&mut rng, msg).unwrap();`; code: `pss_sign_with_rng`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-384; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let s3 = key.pss_sign_with_rng::<Sha384, _>(&mut rng, msg).unwrap();`; code: `pss_sign_with_rng`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "rsa::pss::<impl rsa::private_key::PrivateKey>::pss_sign_with_rng"
           },
           {
-            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-384; line: `let ok3 = public.pss_verify::<Sha384>(msg, &s3).is_ok();`; code: `pss_verify`",
+            "additionalContext": "[reachable] [component] in a183::main; part of RSA-PSS-SHA-384; owner at src/main.rs:10:3-10:7 within 10:0-27:1; line: `let ok3 = public.pss_verify::<Sha384>(msg, &s3).is_ok();`; code: `pss_verify`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 21,
@@ -1624,7 +1624,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:5d9889b8-795b-80a1-8879-d662be98d7d8",
+  "serialNumber": "urn:uuid:53da5c20-61b4-8960-a6eb-7e5b00e3b782",
   "specVersion": "1.7",
   "version": 1
 }

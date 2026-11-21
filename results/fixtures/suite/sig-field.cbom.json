@@ -699,21 +699,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_field::load; new: setup, not a use; line: `Signer { key, scheme: Pkcs1v15Sign::new::<Sha384>() }`; code: `Pkcs1v15Sign::new::<Sha384>`",
+            "additionalContext": "[reachable] [call] in pilot_sig_field::load; new: setup, not a use; owner at src/main.rs:10:3-10:7 within 10:0-13:1; line: `Signer { key, scheme: Pkcs1v15Sign::new::<Sha384>() }`; code: `Pkcs1v15Sign::new::<Sha384>`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "rsa::pkcs1v15::Pkcs1v15Sign::new"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_field::sign; use: sign; line: `s.key.sign(s.scheme.clone(), &hashed).unwrap()`; code: `sign`",
+            "additionalContext": "[reachable] [call] in pilot_sig_field::sign; use: sign; owner at src/main.rs:15:3-15:7 within 15:0-18:1; line: `s.key.sign(s.scheme.clone(), &hashed).unwrap()`; code: `sign`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 10,
             "symbol": "rsa::key::RsaPrivateKey::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_field::check; use: verify; line: `public.verify(s.scheme.clone(), &expected, sig).is_ok()`; code: `verify`",
+            "additionalContext": "[reachable] [call] in pilot_sig_field::check; use: verify; owner at src/main.rs:20:3-20:8 within 20:0-24:1; line: `public.verify(s.scheme.clone(), &expected, sig).is_ok()`; code: `verify`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 11,
@@ -765,21 +765,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in pilot_sig_field::load; part of RSA-PKCS1-1.5-SHA-384; line: `Signer { key, scheme: Pkcs1v15Sign::new::<Sha384>() }`; code: `Pkcs1v15Sign::new::<Sha384>`",
+            "additionalContext": "[reachable] [component] in pilot_sig_field::load; part of RSA-PKCS1-1.5-SHA-384; owner at src/main.rs:10:3-10:7 within 10:0-13:1; line: `Signer { key, scheme: Pkcs1v15Sign::new::<Sha384>() }`; code: `Pkcs1v15Sign::new::<Sha384>`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 26,
             "symbol": "rsa::pkcs1v15::Pkcs1v15Sign::new"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_field::sign; use: digest; line: `let hashed = Sha384::digest(msg);`; code: `Sha384::digest`",
+            "additionalContext": "[reachable] [call] in pilot_sig_field::sign; use: digest; owner at src/main.rs:15:3-15:7 within 15:0-18:1; line: `let hashed = Sha384::digest(msg);`; code: `Sha384::digest`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_sig_field::check; use: digest; line: `let expected = Sha384::digest(msg);`; code: `Sha384::digest`",
+            "additionalContext": "[reachable] [call] in pilot_sig_field::check; use: digest; owner at src/main.rs:20:3-20:8 within 20:0-24:1; line: `let expected = Sha384::digest(msg);`; code: `Sha384::digest`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 19,
@@ -1031,7 +1031,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:65979d9b-163c-8299-8347-b2d696cb2802",
+  "serialNumber": "urn:uuid:8d0a8c4f-eaf9-8762-8b83-fc568a3885a4",
   "specVersion": "1.7",
   "version": 1
 }

@@ -1,0 +1,16 @@
+# What the compiler records of code that macros write, in the shapes the fifth batch's packages
+# gave it (tough's `#[async_trait]`, sspi's `#[instrument]`, picky-asn1's derive under a
+# `macro_rules!`, libp2p-tls's static named in a dependency's closure): the verifier holds each
+# to the record, not to rules of its own. Each case is commented where it is.
+[package]
+name = "verify-54"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["pm", "inner"]
+
+[dependencies]
+pm = { path = "pm" }
+inner = { path = "inner" }
+sha2 = "0.10"

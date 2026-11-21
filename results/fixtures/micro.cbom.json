@@ -803,49 +803,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of ::seal) or parameter (argument 0 of the enclosing function); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `let cipher = A::new_from_slice(key).expect(\"key length\");`; code: `A::new_from_slice`",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of ::seal) or parameter (argument 0 of the enclosing function); owner at src/main.rs:11:3-11:7 within 11:0-15:1; instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>` (call, to 25:25 as `seal::<Aes256Gcm>` line #f9758515, caller at src/main.rs:24:7-24:11 within 24:4-26:5); line: `let cipher = A::new_from_slice(key).expect(\"key length\");`; code: `A::new_from_slice`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; rng: rng (rand_core::os::OsRng); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; rng: rng (rand_core::os::OsRng); owner at src/main.rs:11:3-11:7 within 11:0-15:1; instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>` (call, to 25:25 as `seal::<Aes256Gcm>` line #f9758515, caller at src/main.rs:24:7-24:11 within 24:4-26:5); line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "aead::AeadCore::generate_nonce"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aead::AeadCore::generate_nonce); instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>`; line: `cipher.encrypt(&nonce, msg).expect(\"encrypt\")`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aead::AeadCore::generate_nonce); owner at src/main.rs:11:3-11:7 within 11:0-15:1; instantiated by <micro::AesSealer as micro::Sealer>::seal at src/main.rs:25:8 as `seal::<Aes256Gcm>` (call, to 25:25 as `seal::<Aes256Gcm>` line #f9758515, caller at src/main.rs:24:7-24:11 within 24:4-26:5); line: `cipher.encrypt(&nonce, msg).expect(\"encrypt\")`; code: `encrypt`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 11,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in <micro::AesSealer as micro::Sealer>::seal; chosen as generic argument of micro::seal; line: `seal::<Aes256Gcm>(&self.0, msg)`; code: `seal::<Aes256Gcm>`",
+            "additionalContext": "[reachable] [instantiation] in <micro::AesSealer as micro::Sealer>::seal; chosen as generic argument of micro::seal; owner at src/main.rs:24:7-24:11 within 24:4-26:5; line: `seal::<Aes256Gcm>(&self.0, msg)`; code: `seal::<Aes256Gcm>`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "micro::seal"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::ring_seal; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (32 bytes, literal at line 88) or parameter (argument 0 of the enclosing function); line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in micro::ring_seal; new: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (32 bytes, literal at line 88) or parameter (argument 0 of the enclosing function); owner at src/main.rs:38:3-38:12 within 38:0-43:1; line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `UnboundKey::new`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [static] in micro::ring_seal; line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `AES_256_GCM`",
+            "additionalContext": "[reachable] [static] in micro::ring_seal; owner at src/main.rs:38:3-38:12 within 38:0-43:1; line: `let k = LessSafeKey::new(UnboundKey::new(&AES_256_GCM, key).unwrap());`; code: `AES_256_GCM`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 46,
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::ring_seal; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 41); line: `k.seal_in_place_append_tag(nonce, Aad::empty(), msg).unwrap();`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in micro::ring_seal; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 41); owner at src/main.rs:38:3-38:12 within 38:0-43:1; line: `k.seal_in_place_append_tag(nonce, Aad::empty(), msg).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 42,
             "location": "src/main.rs",
             "offset": 6,
@@ -925,28 +925,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of ::seal) or parameter (argument 0 of the enclosing function); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `let cipher = A::new_from_slice(key).expect(\"key length\");`; code: `A::new_from_slice`",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; new_from_slice: setup, not a use; key: parameter (argument 0 of ::seal) or parameter (argument 0 of the enclosing function); owner at src/main.rs:11:3-11:7 within 11:0-15:1; instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>` (call, to 30:32 as `seal::<ChaCha20Poly1305>` line #ef70950f, caller at src/main.rs:29:7-29:11 within 29:4-31:5); line: `let cipher = A::new_from_slice(key).expect(\"key length\");`; code: `A::new_from_slice`",
             "line": 12,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; rng: rng (rand_core::os::OsRng); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; generate_nonce: setup, not a use; rng: rng (rand_core::os::OsRng); owner at src/main.rs:11:3-11:7 within 11:0-15:1; instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>` (call, to 30:32 as `seal::<ChaCha20Poly1305>` line #ef70950f, caller at src/main.rs:29:7-29:11 within 29:4-31:5); line: `let nonce = A::generate_nonce(&mut OsRng);`; code: `A::generate_nonce`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "aead::AeadCore::generate_nonce"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aead::AeadCore::generate_nonce); instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>`; line: `cipher.encrypt(&nonce, msg).expect(\"encrypt\")`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in micro::seal::<..>; use: encrypt; nonce: rng (aead::AeadCore::generate_nonce); owner at src/main.rs:11:3-11:7 within 11:0-15:1; instantiated by <micro::ChaChaSealer as micro::Sealer>::seal at src/main.rs:30:8 as `seal::<ChaCha20Poly1305>` (call, to 30:32 as `seal::<ChaCha20Poly1305>` line #ef70950f, caller at src/main.rs:29:7-29:11 within 29:4-31:5); line: `cipher.encrypt(&nonce, msg).expect(\"encrypt\")`; code: `encrypt`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 11,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [instantiation] in <micro::ChaChaSealer as micro::Sealer>::seal; chosen as generic argument of micro::seal; line: `seal::<ChaCha20Poly1305>(&self.0, msg)`; code: `seal::<ChaCha20Poly1305>`",
+            "additionalContext": "[reachable] [instantiation] in <micro::ChaChaSealer as micro::Sealer>::seal; chosen as generic argument of micro::seal; owner at src/main.rs:29:7-29:11 within 29:4-31:5; line: `seal::<ChaCha20Poly1305>(&self.0, msg)`; code: `seal::<ChaCha20Poly1305>`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 8,
@@ -1014,28 +1014,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in micro::mac; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 89) or parameter (argument 0 of the enclosing function); line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key) // trailing comment`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [call] in micro::mac; new_from_slice: setup, not a use; key: hard-coded (1 bytes, literal at line 89) or parameter (argument 0 of the enclosing function); owner at src/main.rs:46:3-46:6 within 46:0-58:1; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key) // trailing comment`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::mac; use: tag; line: `m.update(msg);`; code: `update`",
+            "additionalContext": "[reachable] [call] in micro::mac; use: tag; owner at src/main.rs:46:3-46:6 within 46:0-58:1; line: `m.update(msg);`; code: `update`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::mac; use: tag; line: `.finalize()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in micro::mac; use: tag; owner at src/main.rs:46:3-46:6 within 46:0-58:1; line: `.finalize()`; code: `finalize`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::mac; into_bytes: setup, not a use; line: `.into_bytes()`; code: `into_bytes`",
+            "additionalContext": "[reachable] [call] in micro::mac; into_bytes: setup, not a use; owner at src/main.rs:46:3-46:6 within 46:0-58:1; line: `.into_bytes()`; code: `into_bytes`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 9,
@@ -1095,49 +1095,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key) // trailing comment`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
+            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; owner at src/main.rs:46:3-46:6 within 46:0-58:1; line: `let mut m = <Hmac<Sha256> as Mac>::new_from_slice(key) // trailing comment`; code: `<Hmac<Sha256> as Mac>::new_from_slice`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "digest::mac::Mac::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `m.update(msg);`; code: `update`",
+            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; owner at src/main.rs:46:3-46:6 within 46:0-58:1; line: `m.update(msg);`; code: `update`",
             "line": 52,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `.finalize()`; code: `finalize`",
+            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; owner at src/main.rs:46:3-46:6 within 46:0-58:1; line: `.finalize()`; code: `finalize`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; line: `.into_bytes()`; code: `into_bytes`",
+            "additionalContext": "[reachable] [component] in micro::mac; part of HMAC-SHA-256; owner at src/main.rs:46:3-46:6 within 46:0-58:1; line: `.into_bytes()`; code: `into_bytes`",
             "line": 56,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "digest::mac::CtOutput::<T>::into_bytes"
           },
           {
-            "additionalContext": "[reachable] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `RING_SHA256`",
+            "additionalContext": "[reachable] [static] in micro::DIGESTS; owner at src/main.rs:68:7-68:14 within 68:0-68:86; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `RING_SHA256`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 50,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::digests; use: digest; algorithm one of the 2 in `micro::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `ring_digest`",
+            "additionalContext": "[reachable] [call] in micro::digests; use: digest; algorithm one of the 2 in `micro::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA256; owner at src/main.rs:70:3-70:10 within 70:0-74:1; line: `let a = ring_digest(DIGESTS[0], data);`; code: `ring_digest`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA256; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
+            "additionalContext": "[reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA256; owner at src/main.rs:70:3-70:10 within 70:0-74:1; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 24,
@@ -1189,14 +1189,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [macro hash_all!] in micro::digests; use: digest; algorithm from ring::digest::SHA384 in the arguments; expanded from src/main.rs:63; line: `let b = hash_all!(data, b\"x\");`",
+            "additionalContext": "[reachable] [call] [macro hash_all!] in micro::digests; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at src/main.rs:70:3-70:10 within 70:0-74:1; expanded from src/main.rs:63:15-63:35 as `ring::digest::digest` line #94532251 (by macro hash_all! at src/main.rs:72:12-72:33 line #68aa9dc8 defined src/main.rs:61-65); line: `let b = hash_all!(data, b\"x\");`",
             "line": 72,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] [macro hash_all!] in micro::digests; expanded from src/main.rs:63; line: `let b = hash_all!(data, b\"x\");`",
+            "additionalContext": "[reachable] [static] [macro hash_all!] in micro::digests; owner at src/main.rs:70:3-70:10 within 70:0-74:1; expanded from src/main.rs:63:37-63:57 as `ring::digest::SHA384` line #fd20ef31 (by macro hash_all! at src/main.rs:72:12-72:33 line #68aa9dc8 defined src/main.rs:61-65); line: `let b = hash_all!(data, b\"x\");`",
             "line": 72,
             "location": "src/main.rs",
             "offset": 12,
@@ -1248,28 +1248,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in micro::DIGESTS; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `ring::digest::SHA512`",
+            "additionalContext": "[reachable] [static] in micro::DIGESTS; owner at src/main.rs:68:7-68:14 within 68:0-68:86; line: `static DIGESTS: [&ring::digest::Algorithm; 2] = [&RING_SHA256, &ring::digest::SHA512];`; code: `ring::digest::SHA512`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 64,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in micro::digests; use: digest; algorithm one of the 2 in `micro::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `ring_digest`",
+            "additionalContext": "[reachable] [call] in micro::digests; use: digest; algorithm one of the 2 in `micro::DIGESTS`, the element read by an index or a field the analysis does not follow: ring::digest::SHA512; owner at src/main.rs:70:3-70:10 within 70:0-74:1; line: `let a = ring_digest(DIGESTS[0], data);`; code: `ring_digest`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA512; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
+            "additionalContext": "[reachable] [via-static] in micro::digests; micro::DIGESTS -> ring::digest::SHA512; owner at src/main.rs:70:3-70:10 within 70:0-74:1; line: `let a = ring_digest(DIGESTS[0], data);`; code: `DIGESTS`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 24,
             "symbol": "micro::DIGESTS"
           },
           {
-            "additionalContext": "[present] [call] in micro::unused_sha512; use: digest; line: `Sha512::digest(data).to_vec()`; code: `Sha512::digest`",
+            "additionalContext": "[present] [call] in micro::unused_sha512; use: digest; owner at src/main.rs:78:3-78:16 within 78:0-81:1; line: `Sha512::digest(data).to_vec()`; code: `Sha512::digest`",
             "line": 80,
             "location": "src/main.rs",
             "offset": 4,
@@ -1636,7 +1636,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:3e880ecd-2b8a-868c-bf8f-b31392a82e0e",
+  "serialNumber": "urn:uuid:0312b70b-62de-8a19-8c23-5d491128677b",
   "specVersion": "1.7",
   "version": 1
 }

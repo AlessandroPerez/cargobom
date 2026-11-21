@@ -103,28 +103,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ext_mac_container::main; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: hard-coded (18 bytes, literal at line 6); line: `keys.insert(\"v1\", hmac::Key::new(hmac::HMAC_SHA256, b\"old webhook secret\"));`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: hard-coded (18 bytes, literal at line 6); owner at src/main.rs:4:3-4:7 within 4:0-12:1; line: `keys.insert(\"v1\", hmac::Key::new(hmac::HMAC_SHA256, b\"old webhook secret\"));`; code: `hmac::Key::new`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ring::hmac::Key::new"
           },
           {
-            "additionalContext": "[reachable] [static] in ext_mac_container::main; line: `keys.insert(\"v1\", hmac::Key::new(hmac::HMAC_SHA256, b\"old webhook secret\"));`; code: `hmac::HMAC_SHA256`",
+            "additionalContext": "[reachable] [static] in ext_mac_container::main; owner at src/main.rs:4:3-4:7 within 4:0-12:1; line: `keys.insert(\"v1\", hmac::Key::new(hmac::HMAC_SHA256, b\"old webhook secret\"));`; code: `hmac::HMAC_SHA256`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 37,
             "symbol": "ring::hmac::HMAC_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: tag; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA256 in the arguments; line: `let tag = hmac::sign(&keys[\"v2\"], body);`; code: `hmac::sign`",
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: tag; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA256 in the arguments; owner at src/main.rs:4:3-4:7 within 4:0-12:1; line: `let tag = hmac::sign(&keys[\"v2\"], body);`; code: `hmac::sign`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "ring::hmac::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: verify; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA256 in the arguments; line: `let ok = hmac::verify(&keys[\"v2\"], body, tag.as_ref()).is_ok();`; code: `hmac::verify`",
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: verify; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA256 in the arguments; owner at src/main.rs:4:3-4:7 within 4:0-12:1; line: `let ok = hmac::verify(&keys[\"v2\"], body, tag.as_ref()).is_ok();`; code: `hmac::verify`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 13,
@@ -185,28 +185,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in ext_mac_container::main; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA384 in the arguments; key: hard-coded (18 bytes, literal at line 7); line: `keys.insert(\"v2\", hmac::Key::new(hmac::HMAC_SHA384, b\"new webhook secret\"));`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA384 in the arguments; key: hard-coded (18 bytes, literal at line 7); owner at src/main.rs:4:3-4:7 within 4:0-12:1; line: `keys.insert(\"v2\", hmac::Key::new(hmac::HMAC_SHA384, b\"new webhook secret\"));`; code: `hmac::Key::new`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ring::hmac::Key::new"
           },
           {
-            "additionalContext": "[reachable] [static] in ext_mac_container::main; line: `keys.insert(\"v2\", hmac::Key::new(hmac::HMAC_SHA384, b\"new webhook secret\"));`; code: `hmac::HMAC_SHA384`",
+            "additionalContext": "[reachable] [static] in ext_mac_container::main; owner at src/main.rs:4:3-4:7 within 4:0-12:1; line: `keys.insert(\"v2\", hmac::Key::new(hmac::HMAC_SHA384, b\"new webhook secret\"));`; code: `hmac::HMAC_SHA384`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 37,
             "symbol": "ring::hmac::HMAC_SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: tag; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA384 in the arguments; line: `let tag = hmac::sign(&keys[\"v2\"], body);`; code: `hmac::sign`",
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: tag; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA384 in the arguments; owner at src/main.rs:4:3-4:7 within 4:0-12:1; line: `let tag = hmac::sign(&keys[\"v2\"], body);`; code: `hmac::sign`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "ring::hmac::sign"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: verify; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA384 in the arguments; line: `let ok = hmac::verify(&keys[\"v2\"], body, tag.as_ref()).is_ok();`; code: `hmac::verify`",
+            "additionalContext": "[reachable] [call] in ext_mac_container::main; use: verify; algorithm one of 2 that may reach the call: ring::hmac::HMAC_SHA384 in the arguments; owner at src/main.rs:4:3-4:7 within 4:0-12:1; line: `let ok = hmac::verify(&keys[\"v2\"], body, tag.as_ref()).is_ok();`; code: `hmac::verify`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 13,
@@ -266,7 +266,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in ext_mac_container::main; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `keys.insert(\"v1\", hmac::Key::new(hmac::HMAC_SHA256, b\"old webhook secret\"));`; code: `hmac::HMAC_SHA256`",
+            "additionalContext": "[reachable] [component] in ext_mac_container::main; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); owner at src/main.rs:4:3-4:7 within 4:0-12:1; line: `keys.insert(\"v1\", hmac::Key::new(hmac::HMAC_SHA256, b\"old webhook secret\"));`; code: `hmac::HMAC_SHA256`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 37,
@@ -322,7 +322,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in ext_mac_container::main; part of HMAC-SHA-384 (ring::hmac::HMAC_SHA384 -> ring::digest::SHA384); line: `keys.insert(\"v2\", hmac::Key::new(hmac::HMAC_SHA384, b\"new webhook secret\"));`; code: `hmac::HMAC_SHA384`",
+            "additionalContext": "[reachable] [component] in ext_mac_container::main; part of HMAC-SHA-384 (ring::hmac::HMAC_SHA384 -> ring::digest::SHA384); owner at src/main.rs:4:3-4:7 within 4:0-12:1; line: `keys.insert(\"v2\", hmac::Key::new(hmac::HMAC_SHA384, b\"new webhook secret\"));`; code: `hmac::HMAC_SHA384`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 37,
@@ -474,7 +474,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:2110f00b-9c96-8ad0-ab0d-3b972b394fb8",
+  "serialNumber": "urn:uuid:59530b11-5610-8bac-a2b6-447474495ef4",
   "specVersion": "1.7",
   "version": 1
 }

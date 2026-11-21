@@ -102,14 +102,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [static] in a95::dead; line: `fn dead() { set_alg(&SHA1); }`; code: `SHA1`",
+            "additionalContext": "[present] [static] in a95::dead; owner at src/main.rs:8:3-8:7 within 8:0-8:29; line: `fn dead() { set_alg(&SHA1); }`; code: `SHA1`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[present] [call] in a95::main; use: digest; algorithm ring::digest::SHA1_FOR_LEGACY_USE_ONLY only through code or data no entry point reaches; line: `let _ = digest(*ALG.read().unwrap(), &d);`; code: `digest`",
+            "additionalContext": "[present] [call] in a95::main; use: digest; algorithm ring::digest::SHA1_FOR_LEGACY_USE_ONLY only through code or data no entry point reaches; owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `let _ = digest(*ALG.read().unwrap(), &d);`; code: `digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 12,
@@ -165,56 +165,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a95::ALG; line: `static ALG: RwLock<&'static Digest> = RwLock::new(&SHA256);`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a95::ALG; owner at src/main.rs:5:7-5:10 within 5:0-5:59; line: `static ALG: RwLock<&'static Digest> = RwLock::new(&SHA256);`; code: `SHA256`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 51,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a95::set_alg; a95::ALG -> ring::digest::SHA256; line: `fn set_alg(a: &'static Digest) { *ALG.write().unwrap() = a; }`; code: `ALG`",
+            "additionalContext": "[reachable] [via-static] in a95::set_alg; a95::ALG -> ring::digest::SHA256; owner at src/main.rs:6:3-6:10 within 6:0-6:61; line: `fn set_alg(a: &'static Digest) { *ALG.write().unwrap() = a; }`; code: `ALG`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 34,
             "symbol": "a95::ALG"
           },
           {
-            "additionalContext": "[reachable] [static] in a95::CFG; line: `static CFG: Mutex<Cfg> = Mutex::new(Cfg { h: &SHA256 });`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a95::CFG; owner at src/main.rs:10:7-10:10 within 10:0-10:56; line: `static CFG: Mutex<Cfg> = Mutex::new(Cfg { h: &SHA256 });`; code: `SHA256`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 46,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a95::set_h; a95::CFG -> ring::digest::SHA256; line: `fn set_h(a: &'static Digest) { CFG.lock().unwrap().h = a; }`; code: `CFG`",
+            "additionalContext": "[reachable] [via-static] in a95::set_h; a95::CFG -> ring::digest::SHA256; owner at src/main.rs:11:3-11:8 within 11:0-11:59; line: `fn set_h(a: &'static Digest) { CFG.lock().unwrap().h = a; }`; code: `CFG`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "a95::CFG"
           },
           {
-            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a95::ALG` starts with, which the program may replace); line: `let _ = digest(*ALG.read().unwrap(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a95::ALG` starts with, which the program may replace); owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `let _ = digest(*ALG.read().unwrap(), &d);`; code: `digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a95::main; a95::ALG -> ring::digest::SHA256; line: `let _ = digest(*ALG.read().unwrap(), &d);`; code: `ALG`",
+            "additionalContext": "[reachable] [via-static] in a95::main; a95::ALG -> ring::digest::SHA256; owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `let _ = digest(*ALG.read().unwrap(), &d);`; code: `ALG`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "a95::ALG"
           },
           {
-            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a95::CFG` starts with, which the program may replace); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a95::CFG` starts with, which the program may replace); owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a95::main; a95::CFG -> ring::digest::SHA256; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `CFG`",
+            "additionalContext": "[reachable] [via-static] in a95::main; a95::CFG -> ring::digest::SHA256; owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `CFG`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 19,
@@ -266,28 +266,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a95::main; line: `set_alg(&SHA384);`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a95::main; owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `set_alg(&SHA384);`; code: `SHA384`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (a value `a95::set_alg` puts in `static a95::ALG`); line: `let _ = digest(*ALG.read().unwrap(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (a value `a95::set_alg` puts in `static a95::ALG`); owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `let _ = digest(*ALG.read().unwrap(), &d);`; code: `digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in a95::main; line: `set_h(&SHA384);`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in a95::main; owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `set_h(&SHA384);`; code: `SHA384`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 11,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (a value `a95::set_h` puts in `static a95::CFG`); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA384; member: static, possible (a value `a95::set_h` puts in `static a95::CFG`); owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
@@ -339,14 +339,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [static] in a95::dead2; line: `fn dead2() { set_h(&SHA512); }`; code: `SHA512`",
+            "additionalContext": "[present] [static] in a95::dead2; owner at src/main.rs:13:3-13:8 within 13:0-13:30; line: `fn dead2() { set_h(&SHA512); }`; code: `SHA512`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[present] [call] in a95::main; use: digest; algorithm ring::digest::SHA512 only through code or data no entry point reaches; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[present] [call] in a95::main; use: digest; algorithm ring::digest::SHA512 only through code or data no entry point reaches; owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
@@ -397,14 +397,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(*ALG.read().unwrap(), &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `let _ = digest(*ALG.read().unwrap(), &d);`; code: `digest`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a95::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; owner at src/main.rs:15:3-15:7 within 15:0-21:1; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 12,
@@ -557,7 +557,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:8e6e2f23-9e6c-8bf9-a615-2ee30563c99c",
+  "serialNumber": "urn:uuid:fa125da6-551a-8cc4-983b-9c7f11026f94",
   "specVersion": "1.7",
   "version": 1
 }

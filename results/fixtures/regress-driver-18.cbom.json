@@ -1029,28 +1029,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t18::MAC_ALG; line: `static MAC_ALG: &hmac::Algorithm = &hmac::HMAC_SHA256;`; code: `hmac::HMAC_SHA256`",
+            "additionalContext": "[reachable] [static] in t18::MAC_ALG; owner at src/main.rs:104:7-104:14 within 104:0-104:54; line: `static MAC_ALG: &hmac::Algorithm = &hmac::HMAC_SHA256;`; code: `hmac::HMAC_SHA256`",
             "line": 104,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "ring::hmac::HMAC_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::mac; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: hard-coded (19 bytes, literal at line 106); line: `let key = hmac::Key::new(*MAC_ALG, b\"hard-coded hmac key\");`; code: `hmac::Key::new`",
+            "additionalContext": "[reachable] [call] in t18::mac; new: setup, not a use; algorithm from ring::hmac::HMAC_SHA256 in the arguments; key: hard-coded (19 bytes, literal at line 106); owner at src/main.rs:105:3-105:6 within 105:0-108:1; line: `let key = hmac::Key::new(*MAC_ALG, b\"hard-coded hmac key\");`; code: `hmac::Key::new`",
             "line": 106,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "ring::hmac::Key::new"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t18::mac; t18::MAC_ALG -> ring::hmac::HMAC_SHA256; line: `let key = hmac::Key::new(*MAC_ALG, b\"hard-coded hmac key\");`; code: `MAC_ALG`",
+            "additionalContext": "[reachable] [via-static] in t18::mac; t18::MAC_ALG -> ring::hmac::HMAC_SHA256; owner at src/main.rs:105:3-105:6 within 105:0-108:1; line: `let key = hmac::Key::new(*MAC_ALG, b\"hard-coded hmac key\");`; code: `MAC_ALG`",
             "line": 106,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "t18::MAC_ALG"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::mac; use: tag; algorithm from ring::hmac::HMAC_SHA256 in the arguments; line: `hmac::sign(&key, b\"m\").as_ref().len()`; code: `hmac::sign`",
+            "additionalContext": "[reachable] [call] in t18::mac; use: tag; algorithm from ring::hmac::HMAC_SHA256 in the arguments; owner at src/main.rs:105:3-105:6 within 105:0-108:1; line: `hmac::sign(&key, b\"m\").as_ref().len()`; code: `hmac::sign`",
             "line": 107,
             "location": "src/main.rs",
             "offset": 4,
@@ -1110,42 +1110,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t18::picks; line: `Pick::B(&digest::SHA1_FOR_LEGACY_USE_ONLY)`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
+            "additionalContext": "[reachable] [static] in t18::picks; owner at src/main.rs:16:3-16:8 within 16:0-26:1; line: `Pick::B(&digest::SHA1_FOR_LEGACY_USE_ONLY)`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::picks; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; line: `Pick::B(y) => digest::digest(y, b\"b\").as_ref().len(),`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::picks; use: digest; algorithm from ring::digest::SHA1_FOR_LEGACY_USE_ONLY in the arguments; owner at src/main.rs:16:3-16:8 within 16:0-26:1; line: `Pick::B(y) => digest::digest(y, b\"b\").as_ref().len(),`; code: `digest::digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t18::statics; line: `*ALG.write().unwrap() = &digest::SHA1_FOR_LEGACY_USE_ONLY;`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
+            "additionalContext": "[reachable] [static] in t18::statics; owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `*ALG.write().unwrap() = &digest::SHA1_FOR_LEGACY_USE_ONLY;`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 29,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (a value `t18::statics` puts in `static t18::ALG`); line: `let a = digest::digest(*ALG.read().unwrap(), b\"x\").as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (a value `t18::statics` puts in `static t18::ALG`); owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let a = digest::digest(*ALG.read().unwrap(), b\"x\").as_ref().len();`; code: `digest::digest`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t18::statics; line: `unsafe { ALG2 = &digest::SHA1_FOR_LEGACY_USE_ONLY };`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
+            "additionalContext": "[reachable] [static] in t18::statics; owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `unsafe { ALG2 = &digest::SHA1_FOR_LEGACY_USE_ONLY };`; code: `digest::SHA1_FOR_LEGACY_USE_ONLY`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "ring::digest::SHA1_FOR_LEGACY_USE_ONLY"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (a value `t18::statics` puts in `static t18::ALG2`); line: `let b = digest::digest(unsafe { ALG2 }, b\"y\").as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: static, possible (a value `t18::statics` puts in `static t18::ALG2`); owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let b = digest::digest(unsafe { ALG2 }, b\"y\").as_ref().len();`; code: `digest::digest`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 12,
@@ -1201,77 +1201,77 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t18::ALG; line: `static ALG: RwLock<&'static digest::Algorithm> = RwLock::new(&digest::SHA256);`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in t18::ALG; owner at src/main.rs:29:7-29:10 within 29:0-29:78; line: `static ALG: RwLock<&'static digest::Algorithm> = RwLock::new(&digest::SHA256);`; code: `digest::SHA256`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 62,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t18::statics; t18::ALG -> ring::digest::SHA256; line: `*ALG.write().unwrap() = &digest::SHA1_FOR_LEGACY_USE_ONLY;`; code: `ALG`",
+            "additionalContext": "[reachable] [via-static] in t18::statics; t18::ALG -> ring::digest::SHA256; owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `*ALG.write().unwrap() = &digest::SHA1_FOR_LEGACY_USE_ONLY;`; code: `ALG`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 5,
             "symbol": "t18::ALG"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static t18::ALG` starts with, which the program may replace); line: `let a = digest::digest(*ALG.read().unwrap(), b\"x\").as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static t18::ALG` starts with, which the program may replace); owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let a = digest::digest(*ALG.read().unwrap(), b\"x\").as_ref().len();`; code: `digest::digest`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t18::statics; t18::ALG -> ring::digest::SHA256; line: `let a = digest::digest(*ALG.read().unwrap(), b\"x\").as_ref().len();`; code: `ALG`",
+            "additionalContext": "[reachable] [via-static] in t18::statics; t18::ALG -> ring::digest::SHA256; owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let a = digest::digest(*ALG.read().unwrap(), b\"x\").as_ref().len();`; code: `ALG`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 28,
             "symbol": "t18::ALG"
           },
           {
-            "additionalContext": "[present] [static] in t18::Scheme::ALG; line: `const ALG: &'static digest::Algorithm = &digest::SHA256;`; code: `digest::SHA256`",
+            "additionalContext": "[present] [static] in t18::Scheme::ALG; owner at src/main.rs:51:10-51:13 within 51:4-51:60; line: `const ALG: &'static digest::Algorithm = &digest::SHA256;`; code: `digest::SHA256`",
             "line": 51,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::run; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: type-join, possible (a value `t18::main` stores in the field); line: `Mode::Hash(a) => digest::digest(a, d).as_ref().len(),`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::run; use: digest; algorithm possibly from ring::digest::SHA256, the only one found reaching the call from another function; member: type-join, possible (a value `t18::main` stores in the field); owner at src/main.rs:77:3-77:6 within 77:0-82:1; line: `Mode::Hash(a) => digest::digest(a, d).as_ref().len(),`; code: `digest::digest`",
             "line": 79,
             "location": "src/main.rs",
             "offset": 25,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::hash_with; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `t18::live`; line: `digest::digest(alg, d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::hash_with; use: digest; algorithm from ring::digest::SHA256, reaching the call from another function; member: caller, passed by `t18::live`; owner at src/main.rs:91:3-91:12 within 91:0-93:1; line: `digest::digest(alg, d).as_ref().len()`; code: `digest::digest`",
             "line": 92,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t18::live; line: `hash_with(&digest::SHA256, d)`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in t18::live; owner at src/main.rs:94:3-94:7 within 94:0-96:1; line: `hash_with(&digest::SHA256, d)`; code: `digest::SHA256`",
             "line": 95,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in t18::MAC_ALG; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `static MAC_ALG: &hmac::Algorithm = &hmac::HMAC_SHA256;`; code: `hmac::HMAC_SHA256`",
+            "additionalContext": "[reachable] [component] in t18::MAC_ALG; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); owner at src/main.rs:104:7-104:14 within 104:0-104:54; line: `static MAC_ALG: &hmac::Algorithm = &hmac::HMAC_SHA256;`; code: `hmac::HMAC_SHA256`",
             "line": 104,
             "location": "src/main.rs",
             "offset": 36,
             "symbol": "ring::hmac::HMAC_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in t18::mac; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); line: `let key = hmac::Key::new(*MAC_ALG, b\"hard-coded hmac key\");`; code: `MAC_ALG`",
+            "additionalContext": "[reachable] [component] in t18::mac; part of HMAC-SHA-256 (ring::hmac::HMAC_SHA256 -> ring::digest::SHA256); owner at src/main.rs:105:3-105:6 within 105:0-108:1; line: `let key = hmac::Key::new(*MAC_ALG, b\"hard-coded hmac key\");`; code: `MAC_ALG`",
             "line": 106,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "t18::MAC_ALG"
           },
           {
-            "additionalContext": "[reachable] [static] in t18::main; line: `n += run(Mode::Hash(&digest::SHA256), b\"r\") + run(Mode::Skip, b\"s\");`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in t18::main; owner at src/main.rs:110:3-110:7 within 110:0-120:1; line: `n += run(Mode::Hash(&digest::SHA256), b\"r\") + run(Mode::Skip, b\"s\");`; code: `digest::SHA256`",
             "line": 112,
             "location": "src/main.rs",
             "offset": 25,
@@ -1323,49 +1323,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t18::picks; line: `Pick::A(&digest::SHA384)`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in t18::picks; owner at src/main.rs:16:3-16:8 within 16:0-26:1; line: `Pick::A(&digest::SHA384)`; code: `digest::SHA384`",
             "line": 18,
             "location": "src/main.rs",
             "offset": 17,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::picks; use: digest; algorithm from ring::digest::SHA384 in the arguments; line: `Pick::A(x) => digest::digest(x, b\"a\").as_ref().len(),`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::picks; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at src/main.rs:16:3-16:8 within 16:0-26:1; line: `Pick::A(x) => digest::digest(x, b\"a\").as_ref().len(),`; code: `digest::digest`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t18::LAZY::{closure#0}; instantiated by <{closure@t18::LAZY::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `static LAZY: LazyLock<&'static digest::Algorithm> = LazyLock::new(|| &digest::SHA384);`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in t18::LAZY::{closure#0}; owner at src/main.rs:32:66-32:68 as `||` line #c0bf1719 within 32:66-32:84; instantiated by <{closure@t18::LAZY::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4 (call of `core::ops::function::FnMut::call_mut`, to 250:70 as `extern \"rust-call\" fn call_once(self, args: Args) -> Self::O` line #3f47b1c8, caller at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:26-250:35 within 250:4-250:70); line: `static LAZY: LazyLock<&'static digest::Algorithm> = LazyLock::new(|| &digest::SHA384);`; code: `digest::SHA384`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 70,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: static, possible (the value `static t18::LAZY` holds); line: `let d = digest::digest(*LAZY, b\"l\").as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm possibly from ring::digest::SHA384, the only one found reaching the call from another function; member: static, possible (the value `static t18::LAZY` holds); owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let d = digest::digest(*LAZY, b\"l\").as_ref().len();`; code: `digest::digest`",
             "line": 44,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <t18::S384 as t18::Scheme>::ALG; line: `const ALG: &'static digest::Algorithm = &digest::SHA384;`; code: `digest::SHA384`",
+            "additionalContext": "[reachable] [static] in <t18::S384 as t18::Scheme>::ALG; owner at src/main.rs:55:10-55:13 within 55:4-55:60; line: `const ALG: &'static digest::Algorithm = &digest::SHA384;`; code: `digest::SHA384`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::hash::<t18::S384>; use: digest; algorithm from ring::digest::SHA384 in the arguments; instantiated by t18::main at src/main.rs:111:38 as `hash::<S384>`; line: `digest::digest(T::ALG, d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::hash::<t18::S384>; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at src/main.rs:64:3-64:7 within 64:0-66:1; instantiated by t18::main at src/main.rs:111:38 as `hash::<S384>` (call, to 111:50 as `hash::<S384>` line #b8916a28, caller at src/main.rs:110:3-110:7 within 110:0-120:1); line: `digest::digest(T::ALG, d).as_ref().len()`; code: `digest::digest`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t18::hash::<t18::S384>; <t18::S384 as t18::Scheme>::ALG -> ring::digest::SHA384; instantiated by t18::main at src/main.rs:111:38 as `hash::<S384>`; line: `digest::digest(T::ALG, d).as_ref().len()`; code: `T::ALG`",
+            "additionalContext": "[reachable] [via-static] in t18::hash::<t18::S384>; <t18::S384 as t18::Scheme>::ALG -> ring::digest::SHA384; owner at src/main.rs:64:3-64:7 within 64:0-66:1; instantiated by t18::main at src/main.rs:111:38 as `hash::<S384>` (call, to 111:50 as `hash::<S384>` line #b8916a28, caller at src/main.rs:110:3-110:7 within 110:0-120:1); line: `digest::digest(T::ALG, d).as_ref().len()`; code: `T::ALG`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 19,
@@ -1417,7 +1417,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[present] [call] in t18::flagged; use: digest; line: `Sha512_224::digest(b\"helper\").len()`; code: `Sha512_224::digest`",
+            "additionalContext": "[present] [call] in t18::flagged; use: digest; owner at src/main.rs:86:3-86:10 within 86:0-88:1; line: `Sha512_224::digest(b\"helper\").len()`; code: `Sha512_224::digest`",
             "line": 87,
             "location": "src/main.rs",
             "offset": 4,
@@ -1469,28 +1469,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t18::ALG2; line: `static mut ALG2: &'static digest::Algorithm = &digest::SHA512_256;`; code: `digest::SHA512_256`",
+            "additionalContext": "[reachable] [static] in t18::ALG2; owner at src/main.rs:30:11-30:15 within 30:0-30:66; line: `static mut ALG2: &'static digest::Algorithm = &digest::SHA512_256;`; code: `digest::SHA512_256`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 47,
             "symbol": "ring::digest::SHA512_256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t18::statics; t18::ALG2 -> ring::digest::SHA512_256; line: `unsafe { ALG2 = &digest::SHA1_FOR_LEGACY_USE_ONLY };`; code: `ALG2`",
+            "additionalContext": "[reachable] [via-static] in t18::statics; t18::ALG2 -> ring::digest::SHA512_256; owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `unsafe { ALG2 = &digest::SHA1_FOR_LEGACY_USE_ONLY };`; code: `ALG2`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 13,
             "symbol": "t18::ALG2"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512_256; member: static, possible (the value `static t18::ALG2` starts with, which the program may replace); line: `let b = digest::digest(unsafe { ALG2 }, b\"y\").as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512_256; member: static, possible (the value `static t18::ALG2` starts with, which the program may replace); owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let b = digest::digest(unsafe { ALG2 }, b\"y\").as_ref().len();`; code: `digest::digest`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t18::statics; t18::ALG2 -> ring::digest::SHA512_256; line: `let b = digest::digest(unsafe { ALG2 }, b\"y\").as_ref().len();`; code: `ALG2`",
+            "additionalContext": "[reachable] [via-static] in t18::statics; t18::ALG2 -> ring::digest::SHA512_256; owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let b = digest::digest(unsafe { ALG2 }, b\"y\").as_ref().len();`; code: `ALG2`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 36,
@@ -1542,63 +1542,63 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in t18::statics; line: `let _ = ONCE.set(&digest::SHA512);`; code: `digest::SHA512`",
+            "additionalContext": "[reachable] [static] in t18::statics; owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let _ = ONCE.set(&digest::SHA512);`; code: `digest::SHA512`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 22,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `t18::statics` puts in `static t18::ONCE`); line: `let c = digest::digest(ONCE.get().unwrap(), b\"o\").as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm one of 1 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: static, possible (a value `t18::statics` puts in `static t18::ONCE`); owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let c = digest::digest(ONCE.get().unwrap(), b\"o\").as_ref().len();`; code: `digest::digest`",
             "line": 43,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in <t18::P512 as t18::Plain>::ALG; line: `const ALG: &'static digest::Algorithm = &digest::SHA512;`; code: `digest::SHA512`",
+            "additionalContext": "[reachable] [static] in <t18::P512 as t18::Plain>::ALG; owner at src/main.rs:62:10-62:13 within 62:4-62:60; line: `const ALG: &'static digest::Algorithm = &digest::SHA512;`; code: `digest::SHA512`",
             "line": 62,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [via-static] in t18::each::<t18::P512>; <t18::P512 as t18::Plain>::ALG -> ring::digest::SHA512; instantiated by t18::main at src/main.rs:111:59 as `each::<P512>`; line: `let alg = T::ALG;`; code: `T::ALG`",
+            "additionalContext": "[reachable] [via-static] in t18::each::<t18::P512>; <t18::P512 as t18::Plain>::ALG -> ring::digest::SHA512; owner at src/main.rs:67:3-67:7 within 67:0-70:1; instantiated by t18::main at src/main.rs:111:59 as `each::<P512>` (call, to 111:71 as `each::<P512>` line #483f5fd0, caller at src/main.rs:110:3-110:7 within 110:0-120:1); line: `let alg = T::ALG;`; code: `T::ALG`",
             "line": 68,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "<t18::P512 as t18::Plain>::ALG"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::each::<t18::P512>::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; instantiated by t18::each::<t18::P512> at src/main.rs:69:21; instantiated by t18::main at src/main.rs:111:59 as `each::<P512>`; line: `items.iter().map(move |d| digest::digest(alg, d).as_ref().len()).sum()`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::each::<t18::P512>::{closure#0}; use: digest; algorithm from ring::digest::SHA512 in the arguments; owner at src/main.rs:69:21-69:29 as `move |d|` line #7f38a002 within 69:21-69:67; instantiated by t18::each::<t18::P512> at src/main.rs:69:21 (built, to 69:67 as `move |d| digest::digest(alg, d).as_ref().len()` line #7f38a002, caller at src/main.rs:67:3-67:7 within 67:0-70:1); instantiated by t18::main at src/main.rs:111:59 as `each::<P512>` (call, to 111:71 as `each::<P512>` line #483f5fd0, caller at src/main.rs:110:3-110:7 within 110:0-120:1); line: `items.iter().map(move |d| digest::digest(alg, d).as_ref().len()).sum()`; code: `digest::digest`",
             "line": 69,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [call] in t18::hash_with; use: digest; algorithm ring::digest::SHA512 only through code or data no entry point reaches; line: `digest::digest(alg, d).as_ref().len()`; code: `digest::digest`",
+            "additionalContext": "[present] [call] in t18::hash_with; use: digest; algorithm ring::digest::SHA512 only through code or data no entry point reaches; owner at src/main.rs:91:3-91:12 within 91:0-93:1; line: `digest::digest(alg, d).as_ref().len()`; code: `digest::digest`",
             "line": 92,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[present] [static] in t18::dead; line: `hash_with(&digest::SHA512, d)`; code: `digest::SHA512`",
+            "additionalContext": "[present] [static] in t18::dead; owner at src/main.rs:98:3-98:7 within 98:0-100:1; line: `hash_with(&digest::SHA512, d)`; code: `digest::SHA512`",
             "line": 99,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::main::{closure#0}; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: caller, passed by `t18::main`; instantiated by t18::main at src/main.rs:113:12; line: `let f = |a: &'static digest::Algorithm, d: &[u8]| digest::digest(a, d).as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::main::{closure#0}; use: digest; algorithm from ring::digest::SHA512, reaching the call from another function; member: caller, passed by `t18::main`; owner at src/main.rs:113:12-113:53 as `|a: &'static digest::Algorithm, d: &[u8]|` line #f7ce9e3b within 113:12-113:89; instantiated by t18::main at src/main.rs:113:12 (built, to 113:89 as `|a: &'static digest::Algorithm, d: &[u8]| digest::digest` line #f7ce9e3b, caller at src/main.rs:110:3-110:7 within 110:0-120:1); line: `let f = |a: &'static digest::Algorithm, d: &[u8]| digest::digest(a, d).as_ref().len();`; code: `digest::digest`",
             "line": 113,
             "location": "src/main.rs",
             "offset": 54,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in t18::main; line: `n += f(&digest::SHA512, b\"c\");`; code: `digest::SHA512`",
+            "additionalContext": "[reachable] [static] in t18::main; owner at src/main.rs:110:3-110:7 within 110:0-120:1; line: `n += f(&digest::SHA512, b\"c\");`; code: `digest::SHA512`",
             "line": 114,
             "location": "src/main.rs",
             "offset": 12,
@@ -1649,21 +1649,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let a = digest::digest(*ALG.read().unwrap(), b\"x\").as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let a = digest::digest(*ALG.read().unwrap(), b\"x\").as_ref().len();`; code: `digest::digest`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let b = digest::digest(unsafe { ALG2 }, b\"y\").as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let b = digest::digest(unsafe { ALG2 }, b\"y\").as_ref().len();`; code: `digest::digest`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let c = digest::digest(ONCE.get().unwrap(), b\"o\").as_ref().len();`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in t18::statics; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; owner at src/main.rs:34:3-34:10 within 34:0-46:1; line: `let c = digest::digest(ONCE.get().unwrap(), b\"o\").as_ref().len();`; code: `digest::digest`",
             "line": 43,
             "location": "src/main.rs",
             "offset": 12,
@@ -2343,7 +2343,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:02efe76b-9ab2-82fc-86d9-2c5d81affeb0",
+  "serialNumber": "urn:uuid:31df4c6c-2ebb-83e2-b98b-f090848e85ba",
   "specVersion": "1.7",
   "version": 1
 }

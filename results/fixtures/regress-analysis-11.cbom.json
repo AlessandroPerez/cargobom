@@ -1358,14 +1358,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m5; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let enc = cbc::Encryptor::<aes::Aes128>::new_from_slices(&key[..16], &key[..16]).unwrap();`; code: `cbc::Encryptor::<aes::Aes128>::new_from_slices`",
+            "additionalContext": "[reachable] [call] in a11::m5; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:70:3-70:5 within 70:0-77:1; line: `let enc = cbc::Encryptor::<aes::Aes128>::new_from_slices(&key[..16], &key[..16]).unwrap();`; code: `cbc::Encryptor::<aes::Aes128>::new_from_slices`",
             "line": 71,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m5; use: encrypt; line: `let ct = enc.encrypt_padded_vec_mut::<Pkcs7>(b\"msg\");`; code: `encrypt_padded_vec_mut`",
+            "additionalContext": "[reachable] [call] in a11::m5; use: encrypt; owner at src/main.rs:70:3-70:5 within 70:0-77:1; line: `let ct = enc.encrypt_padded_vec_mut::<Pkcs7>(b\"msg\");`; code: `encrypt_padded_vec_mut`",
             "line": 72,
             "location": "src/main.rs",
             "offset": 17,
@@ -1428,14 +1428,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m5; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `let mut c = ctr::Ctr128BE::<aes::Aes256>::new_from_slices(&key[..32], &key[..16]).unwrap();`; code: `ctr::Ctr128BE::<aes::Aes256>::new_from_slices`",
+            "additionalContext": "[reachable] [call] in a11::m5; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); iv: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:70:3-70:5 within 70:0-77:1; line: `let mut c = ctr::Ctr128BE::<aes::Aes256>::new_from_slices(&key[..32], &key[..16]).unwrap();`; code: `ctr::Ctr128BE::<aes::Aes256>::new_from_slices`",
             "line": 73,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "crypto_common::KeyIvInit::new_from_slices"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m5; use: encrypt or decrypt; line: `c.apply_keystream(&mut buf);`; code: `apply_keystream`",
+            "additionalContext": "[reachable] [call] in a11::m5; use: encrypt or decrypt; owner at src/main.rs:70:3-70:5 within 70:0-77:1; line: `c.apply_keystream(&mut buf);`; code: `apply_keystream`",
             "line": 75,
             "location": "src/main.rs",
             "offset": 6,
@@ -1497,49 +1497,49 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function) or partly hard-coded (literal at line 14); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function) or partly hard-coded (literal at line 14); owner at src/main.rs:13:3-13:5 within 13:0-17:1; line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a11::p1; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/main.rs:13:3-13:5 within 13:0-17:1; line: `Aes256Gcm::new_from_slice(&a).is_ok() && Aes256Gcm::new_from_slice(&b).is_ok()`; code: `Aes256Gcm::new_from_slice`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 45,
             "symbol": "crypto_common::KeyInit::new_from_slice"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::p2; use: encrypt; nonce: computed (written into an element by a11::p2) or environment (std::env::args) or parameter (argument 1 of the enclosing function) or partly hard-coded (all zero, literal at line 22); line: `c.encrypt(Nonce::from_slice(&nb), m).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a11::p2; use: encrypt; nonce: computed (written into an element by a11::p2) or environment (std::env::args) or parameter (argument 1 of the enclosing function) or partly hard-coded (all zero, literal at line 22); owner at src/main.rs:20:3-20:5 within 20:0-25:1; line: `c.encrypt(Nonce::from_slice(&nb), m).unwrap()`; code: `encrypt`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "aead::Aead::encrypt"
           },
           {
-            "additionalContext": "[reachable] [static] in a11::m1; line: `let okm = prk.expand(&[b\"info\"], &AES_256_GCM).unwrap();`; code: `AES_256_GCM`",
+            "additionalContext": "[reachable] [static] in a11::m1; owner at src/main.rs:35:3-35:5 within 35:0-43:1; line: `let okm = prk.expand(&[b\"info\"], &AES_256_GCM).unwrap();`; code: `AES_256_GCM`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 38,
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m1; from: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Prk::expand); line: `let key = LessSafeKey::new(UnboundKey::from(okm));`; code: `UnboundKey::from`",
+            "additionalContext": "[reachable] [call] in a11::m1; from: setup, not a use; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; key: derived (hkdf::Prk::expand); owner at src/main.rs:35:3-35:5 within 35:0-43:1; line: `let key = LessSafeKey::new(UnboundKey::from(okm));`; code: `UnboundKey::from`",
             "line": 38,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "core::convert::From::from"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m1; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 117) or parameter (argument 2 of the enclosing function); line: `key.seal_in_place_append_tag(ring::aead::Nonce::assume_unique_for_key(n), Aad::empty(), &mut buf)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in a11::m1; use: encrypt; algorithm from ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (all zero, 12 bytes, literal at line 117) or parameter (argument 2 of the enclosing function); owner at src/main.rs:35:3-35:5 within 35:0-43:1; line: `key.seal_in_place_append_tag(ring::aead::Nonce::assume_unique_for_key(n), Aad::empty(), &mut buf)`; code: `seal_in_place_append_tag`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::main; new_from_slice: setup, not a use; key: environment (std::env::args); line: `let c = Aes256Gcm::new_from_slice(args[0].as_bytes()).unwrap();`; code: `Aes256Gcm::new_from_slice`",
+            "additionalContext": "[reachable] [call] in a11::main; new_from_slice: setup, not a use; key: environment (std::env::args); owner at src/main.rs:110:3-110:7 within 110:0-126:1; line: `let c = Aes256Gcm::new_from_slice(args[0].as_bytes()).unwrap();`; code: `Aes256Gcm::new_from_slice`",
             "line": 112,
             "location": "src/main.rs",
             "offset": 12,
@@ -1611,7 +1611,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m2; use: keyderive; ikm: hard-coded (3 bytes, literal at line 118) or parameter (argument 0 of the enclosing function); line: `h.update(&blake3::derive_key(\"a11 2026-10-08 context\", ikm));`; code: `blake3::derive_key`",
+            "additionalContext": "[reachable] [call] in a11::m2; use: keyderive; ikm: hard-coded (3 bytes, literal at line 118) or parameter (argument 0 of the enclosing function); owner at src/main.rs:46:3-46:5 within 46:0-50:1; line: `h.update(&blake3::derive_key(\"a11 2026-10-08 context\", ikm));`; code: `blake3::derive_key`",
             "line": 48,
             "location": "src/main.rs",
             "offset": 14,
@@ -1679,42 +1679,42 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m2; new: setup, not a use; line: `let mut h = blake3::Hasher::new();`; code: `blake3::Hasher::new`",
+            "additionalContext": "[reachable] [call] in a11::m2; new: setup, not a use; owner at src/main.rs:46:3-46:5 within 46:0-50:1; line: `let mut h = blake3::Hasher::new();`; code: `blake3::Hasher::new`",
             "line": 47,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "blake3::Hasher::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m2; use: digest; line: `h.update(&blake3::derive_key(\"a11 2026-10-08 context\", ikm));`; code: `update`",
+            "additionalContext": "[reachable] [call] in a11::m2; use: digest; owner at src/main.rs:46:3-46:5 within 46:0-50:1; line: `h.update(&blake3::derive_key(\"a11 2026-10-08 context\", ikm));`; code: `update`",
             "line": 48,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "blake3::Hasher::update"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m2; use: digest; line: `*h.finalize().as_bytes()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a11::m2; use: digest; owner at src/main.rs:46:3-46:5 within 46:0-50:1; line: `*h.finalize().as_bytes()`; code: `finalize`",
             "line": 49,
             "location": "src/main.rs",
             "offset": 7,
             "symbol": "blake3::Hasher::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::pick; new: setup, not a use; line: `blake3::Hasher::new()`; code: `blake3::Hasher::new`",
+            "additionalContext": "[reachable] [call] in a11::pick; new: setup, not a use; owner at src/main.rs:54:3-54:7 within 54:0-56:1; line: `blake3::Hasher::new()`; code: `blake3::Hasher::new`",
             "line": 55,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "blake3::Hasher::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m3; use: digest; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] in a11::m3; use: digest; owner at src/main.rs:57:3-57:5 within 57:0-61:1; line: `h.update(d);`; code: `update`",
             "line": 59,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "blake3::Hasher::update"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m3; use: digest; line: `*h.finalize().as_bytes()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in a11::m3; use: digest; owner at src/main.rs:57:3-57:5 within 57:0-61:1; line: `*h.finalize().as_bytes()`; code: `finalize`",
             "line": 60,
             "location": "src/main.rs",
             "offset": 7,
@@ -1770,7 +1770,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m3; new_keyed: setup, not a use; key: hard-coded (32 bytes, literal at line 119) or parameter (argument 0 of the enclosing function); line: `let mut h = pick(blake3::Hasher::new_keyed(key));`; code: `blake3::Hasher::new_keyed`",
+            "additionalContext": "[reachable] [call] in a11::m3; new_keyed: setup, not a use; key: hard-coded (32 bytes, literal at line 119) or parameter (argument 0 of the enclosing function); owner at src/main.rs:57:3-57:5 within 57:0-61:1; line: `let mut h = pick(blake3::Hasher::new_keyed(key));`; code: `blake3::Hasher::new_keyed`",
             "line": 58,
             "location": "src/main.rs",
             "offset": 21,
@@ -1838,28 +1838,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m1; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: hard-coded (4 bytes, literal at line 36); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::Salt::new`",
+            "additionalContext": "[reachable] [call] in a11::m1; new: setup, not a use; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; salt: hard-coded (4 bytes, literal at line 36); owner at src/main.rs:35:3-35:5 within 35:0-43:1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::Salt::new`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 14,
             "symbol": "ring::hkdf::Salt::new"
           },
           {
-            "additionalContext": "[reachable] [static] in a11::m1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[reachable] [static] in a11::m1; owner at src/main.rs:35:3-35:5 within 35:0-43:1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::hkdf::HKDF_SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m1; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: hard-coded (3 bytes, literal at line 117) or parameter (argument 0 of the enclosing function); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `extract`",
+            "additionalContext": "[reachable] [call] in a11::m1; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; ikm: hard-coded (3 bytes, literal at line 117) or parameter (argument 0 of the enclosing function); owner at src/main.rs:35:3-35:5 within 35:0-43:1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `extract`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 58,
             "symbol": "ring::hkdf::Salt::extract"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m1; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; line: `let okm = prk.expand(&[b\"info\"], &AES_256_GCM).unwrap();`; code: `expand`",
+            "additionalContext": "[reachable] [call] in a11::m1; use: keyderive; algorithm from ring::hkdf::HKDF_SHA256 in the arguments; owner at src/main.rs:35:3-35:5 within 35:0-43:1; line: `let okm = prk.expand(&[b\"info\"], &AES_256_GCM).unwrap();`; code: `expand`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 18,
@@ -1927,7 +1927,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a11::m1; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[reachable] [component] in a11::m1; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::hmac::HMAC_SHA256); owner at src/main.rs:35:3-35:5 within 35:0-43:1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 30,
@@ -1983,7 +1983,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m6; use: keyderive; password: hard-coded (2 bytes, literal at line 122) or parameter (argument 0 of the enclosing function); salt: hard-coded (4 bytes, literal at line 83); line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b\"salt\", rounds, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
+            "additionalContext": "[reachable] [call] in a11::m6; use: keyderive; password: hard-coded (2 bytes, literal at line 122) or parameter (argument 0 of the enclosing function); salt: hard-coded (4 bytes, literal at line 83); owner at src/main.rs:81:3-81:5 within 81:0-85:1; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b\"salt\", rounds, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 4,
@@ -2052,14 +2052,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::p3; use: keygen; rng: hard-coded (literal at line 29); line: `RsaPrivateKey::new(&mut rng, 2048).is_ok()`; code: `RsaPrivateKey::new`",
+            "additionalContext": "[reachable] [call] in a11::p3; use: keygen; rng: hard-coded (literal at line 29); owner at src/main.rs:28:3-28:5 within 28:0-31:1; line: `RsaPrivateKey::new(&mut rng, 2048).is_ok()`; code: `RsaPrivateKey::new`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "rsa::key::RsaPrivateKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::main; use: keygen; rng: rng (rngs::thread::thread_rng); line: `let k = RsaPrivateKey::new(&mut rand::thread_rng(), 2048).unwrap();`; code: `RsaPrivateKey::new`",
+            "additionalContext": "[reachable] [call] in a11::main; use: keygen; rng: rng (rngs::thread::thread_rng); owner at src/main.rs:110:3-110:7 within 110:0-126:1; line: `let k = RsaPrivateKey::new(&mut rand::thread_rng(), 2048).unwrap();`; code: `RsaPrivateKey::new`",
             "line": 114,
             "location": "src/main.rs",
             "offset": 12,
@@ -2123,14 +2123,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m4; new: setup, not a use; line: `let padding = Oaep::new::<Sha256>();`; code: `Oaep::new::<Sha256>`",
+            "additionalContext": "[reachable] [call] in a11::m4; new: setup, not a use; owner at src/main.rs:64:3-64:5 within 64:0-67:1; line: `let padding = Oaep::new::<Sha256>();`; code: `Oaep::new::<Sha256>`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "rsa::oaep::Oaep::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m4; use: encrypt; rng: rng (rngs::thread::thread_rng); line: `k.encrypt(&mut rand::thread_rng(), padding, m).unwrap()`; code: `encrypt`",
+            "additionalContext": "[reachable] [call] in a11::m4; use: encrypt; rng: rng (rngs::thread::thread_rng); owner at src/main.rs:64:3-64:5 within 64:0-67:1; line: `k.encrypt(&mut rand::thread_rng(), padding, m).unwrap()`; code: `encrypt`",
             "line": 66,
             "location": "src/main.rs",
             "offset": 6,
@@ -2190,21 +2190,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [component] in a11::m1; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
+            "additionalContext": "[reachable] [component] in a11::m1; part of HKDF-SHA-256 (ring::hkdf::HKDF_SHA256 -> ring::digest::SHA256); owner at src/main.rs:35:3-35:5 within 35:0-43:1; line: `let prk = hkdf::Salt::new(hkdf::HKDF_SHA256, b\"salt\").extract(ikm);`; code: `hkdf::HKDF_SHA256`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::hkdf::HKDF_SHA256"
           },
           {
-            "additionalContext": "[reachable] [component] in a11::m4; part of RSA-OAEP-SHA-256; line: `let padding = Oaep::new::<Sha256>();`; code: `Oaep::new::<Sha256>`",
+            "additionalContext": "[reachable] [component] in a11::m4; part of RSA-OAEP-SHA-256; owner at src/main.rs:64:3-64:5 within 64:0-67:1; line: `let padding = Oaep::new::<Sha256>();`; code: `Oaep::new::<Sha256>`",
             "line": 65,
             "location": "src/main.rs",
             "offset": 18,
             "symbol": "rsa::oaep::Oaep::new"
           },
           {
-            "additionalContext": "[reachable] [component] in a11::m6; part of PBKDF2-SHA-256; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b\"salt\", rounds, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
+            "additionalContext": "[reachable] [component] in a11::m6; part of PBKDF2-SHA-256; owner at src/main.rs:81:3-81:5 within 81:0-85:1; line: `pbkdf2::pbkdf2_hmac::<Sha256>(pw, b\"salt\", rounds, &mut out);`; code: `pbkdf2::pbkdf2_hmac::<Sha256>`",
             "line": 83,
             "location": "src/main.rs",
             "offset": 4,
@@ -2260,14 +2260,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m7; new: setup, not a use; line: `let p = scrypt::Params::new(15, 8, 1, 32).ok()?;`; code: `scrypt::Params::new`",
+            "additionalContext": "[reachable] [call] in a11::m7; new: setup, not a use; owner at src/main.rs:90:3-90:5 within 90:0-95:1; line: `let p = scrypt::Params::new(15, 8, 1, 32).ok()?;`; code: `scrypt::Params::new`",
             "line": 91,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "scrypt::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m7; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: hard-coded (7 bytes, literal at line 93); line: `scrypt::scrypt(pw, b\"m7-salt\", &p, &mut out).ok()?;`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in a11::m7; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of the enclosing function); salt: hard-coded (7 bytes, literal at line 93); owner at src/main.rs:90:3-90:5 within 90:0-95:1; line: `scrypt::scrypt(pw, b\"m7-salt\", &p, &mut out).ok()?;`; code: `scrypt::scrypt`",
             "line": 93,
             "location": "src/main.rs",
             "offset": 4,
@@ -2331,14 +2331,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a11::m8_params; new: setup, not a use; line: `scrypt::Params::new(log_n, 8, 1, 32).unwrap()`; code: `scrypt::Params::new`",
+            "additionalContext": "[reachable] [call] in a11::m8_params; new: setup, not a use; owner at src/main.rs:100:3-100:12 within 100:0-102:1; line: `scrypt::Params::new(log_n, 8, 1, 32).unwrap()`; code: `scrypt::Params::new`",
             "line": 101,
             "location": "src/main.rs",
             "offset": 4,
             "symbol": "scrypt::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a11::m8; use: keyderive; password: hard-coded (2 bytes, literal at line 124) or parameter (argument 0 of the enclosing function); salt: hard-coded (7 bytes, literal at line 106); line: `scrypt::scrypt(pw, b\"m8-salt\", &m8_params(log_n), &mut out).unwrap();`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in a11::m8; use: keyderive; password: hard-coded (2 bytes, literal at line 124) or parameter (argument 0 of the enclosing function); salt: hard-coded (7 bytes, literal at line 106); owner at src/main.rs:104:3-104:5 within 104:0-108:1; line: `scrypt::scrypt(pw, b\"m8-salt\", &m8_params(log_n), &mut out).unwrap();`; code: `scrypt::scrypt`",
             "line": 106,
             "location": "src/main.rs",
             "offset": 4,
@@ -2836,7 +2836,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:fbf5f1c9-af42-81f4-aa13-30b26898f686",
+  "serialNumber": "urn:uuid:a3ecac0e-d341-81e8-af93-0ba37bc34ec4",
   "specVersion": "1.7",
   "version": 1
 }

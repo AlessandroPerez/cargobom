@@ -381,7 +381,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a167::generate; use: generate; line: `getrandom::getrandom(&mut kdf_salt).unwrap();`; code: `getrandom::getrandom`",
+            "additionalContext": "[reachable] [call] in a167::generate; use: generate; owner at src/main.rs:26:3-26:11 within 26:0-34:1; line: `getrandom::getrandom(&mut kdf_salt).unwrap();`; code: `getrandom::getrandom`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 4,
@@ -437,14 +437,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a167::SecretKey::encrypt; new: setup, not a use; line: `let params = scrypt::Params::new(10, 8, 1, 32).unwrap();`; code: `scrypt::Params::new`",
+            "additionalContext": "[reachable] [call] in a167::SecretKey::encrypt; new: setup, not a use; owner at src/main.rs:18:7-18:14 within 18:4-23:5; line: `let params = scrypt::Params::new(10, 8, 1, 32).unwrap();`; code: `scrypt::Params::new`",
             "line": 19,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "scrypt::params::Params::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a167::SecretKey::encrypt; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of a167::generate) or parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of the enclosing function) or rng (getrandom::getrandom); line: `scrypt::scrypt(password.as_bytes(), &self.kdf_salt, &params, &mut out).unwrap();`; code: `scrypt::scrypt`",
+            "additionalContext": "[reachable] [call] in a167::SecretKey::encrypt; use: keyderive; password: environment (std::env::args) or parameter (argument 0 of a167::generate) or parameter (argument 1 of the enclosing function); salt: parameter (argument 0 of the enclosing function) or rng (getrandom::getrandom); owner at src/main.rs:18:7-18:14 within 18:4-23:5; line: `scrypt::scrypt(password.as_bytes(), &self.kdf_salt, &params, &mut out).unwrap();`; code: `scrypt::scrypt`",
             "line": 21,
             "location": "src/main.rs",
             "offset": 8,
@@ -642,7 +642,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:60477b47-1f6d-853c-9e9a-e0b592659e5d",
+  "serialNumber": "urn:uuid:91f428bd-d0ce-8216-8847-5dc4860ace11",
   "specVersion": "1.7",
   "version": 1
 }

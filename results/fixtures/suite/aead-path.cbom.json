@@ -105,28 +105,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in pilot_aead_path::main; line: `&aead::AES_256_GCM`; code: `aead::AES_256_GCM`",
+            "additionalContext": "[reachable] [static] in pilot_aead_path::main; owner at src/main.rs:5:3-5:7 within 5:0-18:1; line: `&aead::AES_256_GCM`; code: `aead::AES_256_GCM`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_path::main; new: setup, not a use; algorithm one of 2 that may reach the call: ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (literal at line 13); line: `let key = LessSafeKey::new(UnboundKey::new(alg, &vec![4u8; alg.key_len()]).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in pilot_aead_path::main; new: setup, not a use; algorithm one of 2 that may reach the call: ring::aead::algorithm::AES_256_GCM in the arguments; key: hard-coded (literal at line 13); owner at src/main.rs:5:3-5:7 within 5:0-18:1; line: `let key = LessSafeKey::new(UnboundKey::new(alg, &vec![4u8; alg.key_len()]).unwrap());`; code: `UnboundKey::new`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_path::main; use: encrypt; algorithm one of 2 that may reach the call: ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 15); line: `key.seal_in_place_append_tag(Nonce::assume_unique_for_key([9u8; 12]), Aad::empty(), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in pilot_aead_path::main; use: encrypt; algorithm one of 2 that may reach the call: ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 15); owner at src/main.rs:5:3-5:7 within 5:0-18:1; line: `key.seal_in_place_append_tag(Nonce::assume_unique_for_key([9u8; 12]), Aad::empty(), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_path::main; use: decrypt; algorithm one of 2 that may reach the call: ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 16); line: `let pt = key.open_in_place(Nonce::assume_unique_for_key([9u8; 12]), Aad::empty(), &mut buf).unwrap();`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] in pilot_aead_path::main; use: decrypt; algorithm one of 2 that may reach the call: ring::aead::algorithm::AES_256_GCM in the arguments; nonce: hard-coded (12 bytes, literal at line 16); owner at src/main.rs:5:3-5:7 within 5:0-18:1; line: `let pt = key.open_in_place(Nonce::assume_unique_for_key([9u8; 12]), Aad::empty(), &mut buf).unwrap();`; code: `open_in_place`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 17,
@@ -195,28 +195,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in pilot_aead_path::main; line: `&aead::CHACHA20_POLY1305`; code: `aead::CHACHA20_POLY1305`",
+            "additionalContext": "[reachable] [static] in pilot_aead_path::main; owner at src/main.rs:5:3-5:7 within 5:0-18:1; line: `&aead::CHACHA20_POLY1305`; code: `aead::CHACHA20_POLY1305`",
             "line": 11,
             "location": "src/main.rs",
             "offset": 9,
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_path::main; new: setup, not a use; algorithm one of 2 that may reach the call: ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; key: hard-coded (literal at line 13); line: `let key = LessSafeKey::new(UnboundKey::new(alg, &vec![4u8; alg.key_len()]).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in pilot_aead_path::main; new: setup, not a use; algorithm one of 2 that may reach the call: ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; key: hard-coded (literal at line 13); owner at src/main.rs:5:3-5:7 within 5:0-18:1; line: `let key = LessSafeKey::new(UnboundKey::new(alg, &vec![4u8; alg.key_len()]).unwrap());`; code: `UnboundKey::new`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_path::main; use: encrypt; algorithm one of 2 that may reach the call: ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; nonce: hard-coded (12 bytes, literal at line 15); line: `key.seal_in_place_append_tag(Nonce::assume_unique_for_key([9u8; 12]), Aad::empty(), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in pilot_aead_path::main; use: encrypt; algorithm one of 2 that may reach the call: ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; nonce: hard-coded (12 bytes, literal at line 15); owner at src/main.rs:5:3-5:7 within 5:0-18:1; line: `key.seal_in_place_append_tag(Nonce::assume_unique_for_key([9u8; 12]), Aad::empty(), &mut buf).unwrap();`; code: `seal_in_place_append_tag`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in pilot_aead_path::main; use: decrypt; algorithm one of 2 that may reach the call: ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; nonce: hard-coded (12 bytes, literal at line 16); line: `let pt = key.open_in_place(Nonce::assume_unique_for_key([9u8; 12]), Aad::empty(), &mut buf).unwrap();`; code: `open_in_place`",
+            "additionalContext": "[reachable] [call] in pilot_aead_path::main; use: decrypt; algorithm one of 2 that may reach the call: ring::aead::algorithm::CHACHA20_POLY1305 in the arguments; nonce: hard-coded (12 bytes, literal at line 16); owner at src/main.rs:5:3-5:7 within 5:0-18:1; line: `let pt = key.open_in_place(Nonce::assume_unique_for_key([9u8; 12]), Aad::empty(), &mut buf).unwrap();`; code: `open_in_place`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 17,
@@ -366,7 +366,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:e022b622-2095-823a-a677-390d6e5db6c8",
+  "serialNumber": "urn:uuid:0b7d4a9a-c37e-8373-86b7-dd6a40f464f0",
   "specVersion": "1.7",
   "version": 1
 }

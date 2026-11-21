@@ -102,28 +102,28 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a132::CFG; line: `static CFG: Mutex<C> = Mutex::new(C { h: &SHA256 });`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in a132::CFG; owner at src/main.rs:6:7-6:10 within 6:0-6:52; line: `static CFG: Mutex<C> = Mutex::new(C { h: &SHA256 });`; code: `SHA256`",
             "line": 6,
             "location": "src/main.rs",
             "offset": 42,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a132::main; a132::CFG -> ring::digest::SHA256; line: `if arg(1).is_empty() { set(&CFG); }`; code: `CFG`",
+            "additionalContext": "[reachable] [via-static] in a132::main; a132::CFG -> ring::digest::SHA256; owner at src/main.rs:9:3-9:7 within 9:0-15:1; line: `if arg(1).is_empty() { set(&CFG); }`; code: `CFG`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 32,
             "symbol": "a132::CFG"
           },
           {
-            "additionalContext": "[reachable] [call] in a132::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a132::CFG` holds); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a132::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA256; member: static, possible (the value `static a132::CFG` holds); owner at src/main.rs:9:3-9:7 within 9:0-15:1; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in a132::main; a132::CFG -> ring::digest::SHA256; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `CFG`",
+            "additionalContext": "[reachable] [via-static] in a132::main; a132::CFG -> ring::digest::SHA256; owner at src/main.rs:9:3-9:7 within 9:0-15:1; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `CFG`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 19,
@@ -175,14 +175,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in a132::set; line: `fn set(m: &Mutex<C>) { m.lock().unwrap().h = &SHA512; }`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in a132::set; owner at src/main.rs:7:3-7:6 within 7:0-7:55; line: `fn set(m: &Mutex<C>) { m.lock().unwrap().h = &SHA512; }`; code: `SHA512`",
             "line": 7,
             "location": "src/main.rs",
             "offset": 46,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in a132::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: type-join, possible (a value `a132::set` stores in the field); line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a132::main; use: digest; algorithm one of 2 that may reach the call from other functions, beside others not followed: ring::digest::SHA512; member: type-join, possible (a value `a132::set` stores in the field); owner at src/main.rs:9:3-9:7 within 9:0-15:1; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 12,
@@ -233,7 +233,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a132::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
+            "additionalContext": "[reachable] [call] in a132::main; use: digest; algorithm unresolved: other algorithms than these may reach the call: a value written into a static with interior mutability through a borrow of it is not followed; owner at src/main.rs:9:3-9:7 within 9:0-15:1; line: `let _ = digest(CFG.lock().unwrap().h, &d);`; code: `digest`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 12,
@@ -376,7 +376,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:5af20a45-5589-8ae6-9be0-9447f269b821",
+  "serialNumber": "urn:uuid:0c1d5488-4129-8acf-8ff4-3fc2e7cdb806",
   "specVersion": "1.7",
   "version": 1
 }

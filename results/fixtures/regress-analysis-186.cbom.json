@@ -186,7 +186,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a186::main; use: digest; line: `let digest = Sha1::digest(b\"message\");`; code: `Sha1::digest`",
+            "additionalContext": "[reachable] [call] in a186::main; use: digest; owner at src/main.rs:20:3-20:7 within 20:0-32:1; line: `let digest = Sha1::digest(b\"message\");`; code: `Sha1::digest`",
             "line": 30,
             "location": "src/main.rs",
             "offset": 17,
@@ -242,35 +242,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a186::table_hash; new_with_keys: setup, not a use; line: `let mut hasher = SipHasher13::new_with_keys(0, key);`; code: `SipHasher13::new_with_keys`",
+            "additionalContext": "[reachable] [call] in a186::table_hash; new_with_keys: setup, not a use; owner at src/main.rs:13:3-13:13 within 13:0-18:1; line: `let mut hasher = SipHasher13::new_with_keys(0, key);`; code: `SipHasher13::new_with_keys`",
             "line": 14,
             "location": "src/main.rs",
             "offset": 21,
             "symbol": "siphasher::sip128::SipHasher13::new_with_keys"
           },
           {
-            "additionalContext": "[reachable] [call] in a186::table_hash; use: tag; line: `let h = hasher.finish128();`; code: `finish128`",
+            "additionalContext": "[reachable] [call] in a186::table_hash; use: tag; owner at src/main.rs:13:3-13:13 within 13:0-18:1; line: `let h = hasher.finish128();`; code: `finish128`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "siphasher::sip128::Hasher128::finish128"
           },
           {
-            "additionalContext": "[reachable] [call] in a186::table_hash; use: tag; run for this call by the standard library's `core::hash::Hash::hash`: `<siphasher::sip128::SipHasher13 as core::hash::Hasher>::write` of siphasher 1.0.4, a function of `siphasher::sip128::SipHasher13`; run for this call by the standard library's `core::hash::Hash::hash`: `<siphasher::sip128::SipHasher13 as core::hash::Hasher>::write_u8` of siphasher 1.0.4, a function of `siphasher::sip128::SipHasher13`; line: `x.hash(&mut hasher);`; code: `hash`",
+            "additionalContext": "[reachable] [call] in a186::table_hash; use: tag; run for this call by the standard library's `core::hash::Hash::hash`: `<siphasher::sip128::SipHasher13 as core::hash::Hasher>::write` of siphasher 1.0.4, a function of `siphasher::sip128::SipHasher13`; owner at src/main.rs:13:3-13:13 within 13:0-18:1; run for this call by the standard library's `core::hash::Hash::hash`: `<siphasher::sip128::SipHasher13 as core::hash::Hasher>::write_u8` of siphasher 1.0.4, a function of `siphasher::sip128::SipHasher13`; line: `x.hash(&mut hasher);`; code: `hash`",
             "line": 15,
             "location": "src/main.rs",
             "offset": 6,
             "symbol": "core::hash::Hash::hash"
           },
           {
-            "additionalContext": "[reachable] [call] in a186::main; use: tag; default: setup, not a use; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::default::Default>::default` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::finish` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write_u8` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; line: `map.insert(\"a\", 1);`; code: `insert`",
+            "additionalContext": "[reachable] [call] in a186::main; use: tag; default: setup, not a use; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::default::Default>::default` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; owner at src/main.rs:20:3-20:7 within 20:0-32:1; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::finish` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::insert`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write_u8` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; line: `map.insert(\"a\", 1);`; code: `insert`",
             "line": 28,
             "location": "src/main.rs",
             "offset": 8,
             "symbol": "std::collections::hash::map::HashMap::<K, V, S, A>::insert"
           },
           {
-            "additionalContext": "[reachable] [call] in a186::main; use: tag; default: setup, not a use; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::default::Default>::default` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::finish` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write_u8` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; line: `let found = map.get(\"a\").copied();`; code: `get`",
+            "additionalContext": "[reachable] [call] in a186::main; use: tag; default: setup, not a use; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::default::Default>::default` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; owner at src/main.rs:20:3-20:7 within 20:0-32:1; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::finish` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; run for this call by the standard library's `std::collections::hash::map::HashMap::<K, V, S, A>::get`: `<siphasher::sip::SipHasher13 as core::hash::Hasher>::write_u8` of siphasher 1.0.4, a function of `siphasher::sip::SipHasher13`; line: `let found = map.get(\"a\").copied();`; code: `get`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 20,
@@ -322,35 +322,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in a186::main; new_with_key: setup, not a use; line: `let one_shot = SipHasher24::new_with_key(&[1u8; 16]).hash(b\"message\");`; code: `SipHasher24::new_with_key`",
+            "additionalContext": "[reachable] [call] in a186::main; new_with_key: setup, not a use; owner at src/main.rs:20:3-20:7 within 20:0-32:1; line: `let one_shot = SipHasher24::new_with_key(&[1u8; 16]).hash(b\"message\");`; code: `SipHasher24::new_with_key`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 19,
             "symbol": "siphasher::sip::SipHasher24::new_with_key"
           },
           {
-            "additionalContext": "[reachable] [call] in a186::main; use: tag; line: `let one_shot = SipHasher24::new_with_key(&[1u8; 16]).hash(b\"message\");`; code: `hash`",
+            "additionalContext": "[reachable] [call] in a186::main; use: tag; owner at src/main.rs:20:3-20:7 within 20:0-32:1; line: `let one_shot = SipHasher24::new_with_key(&[1u8; 16]).hash(b\"message\");`; code: `hash`",
             "line": 22,
             "location": "src/main.rs",
             "offset": 57,
             "symbol": "siphasher::sip::SipHasher24::hash"
           },
           {
-            "additionalContext": "[reachable] [call] in a186::main; new: setup, not a use; line: `let mut plain = SipHasher::new();`; code: `SipHasher::new`",
+            "additionalContext": "[reachable] [call] in a186::main; new: setup, not a use; owner at src/main.rs:20:3-20:7 within 20:0-32:1; line: `let mut plain = SipHasher::new();`; code: `SipHasher::new`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 20,
             "symbol": "siphasher::sip::SipHasher::new"
           },
           {
-            "additionalContext": "[reachable] [call] in a186::main; use: tag; line: `plain.write(b\"message\");`; code: `write`",
+            "additionalContext": "[reachable] [call] in a186::main; use: tag; owner at src/main.rs:20:3-20:7 within 20:0-32:1; line: `plain.write(b\"message\");`; code: `write`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 10,
             "symbol": "core::hash::Hasher::write"
           },
           {
-            "additionalContext": "[reachable] [call] in a186::main; use: tag; line: `let default_rounds = plain.finish();`; code: `finish`",
+            "additionalContext": "[reachable] [call] in a186::main; use: tag; owner at src/main.rs:20:3-20:7 within 20:0-32:1; line: `let default_rounds = plain.finish();`; code: `finish`",
             "line": 25,
             "location": "src/main.rs",
             "offset": 31,
@@ -507,7 +507,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:20bb8e1f-f737-80aa-8fda-517571c7d154",
+  "serialNumber": "urn:uuid:39e08705-9959-8354-8379-4f675b909cc2",
   "specVersion": "1.7",
   "version": 1
 }

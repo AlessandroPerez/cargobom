@@ -1,6 +1,6 @@
-  occ SHA-256 | crypto:algorithm:SHA-256 | app/src/main.rs:6:12 | digest::digest::Digest::digest | [reachable] [call] in app::main; use: digest; line: `let d = Sha256::digest(input.as_bytes());`; code: `Sha256::digest`
-  occ SHA-512 | crypto:algorithm:SHA-512 | shared/src/lib.rs:4:4 | digest::digest::Digest::digest | [reachable] [call] in shared::fingerprint; use: digest; line: `Sha512::digest(data).to_vec()`; code: `Sha512::digest`
-  occ SHA3-256 | crypto:algorithm:SHA3-256 | shared/src/lib.rs:11:4 | digest::digest::Digest::digest | [present] [call] in shared::unused; use: digest; line: `Sha3_256::digest(data).to_vec()`; code: `Sha3_256::digest`
+  occ SHA-256 | crypto:algorithm:SHA-256 | app/src/main.rs:6:12 | digest::digest::Digest::digest | [reachable] [call] in app::main; use: digest; owner at app/src/main.rs:3:3-3:7 within 3:0-10:1; line: `let d = Sha256::digest(input.as_bytes());`; code: `Sha256::digest`
+  occ SHA-512 | crypto:algorithm:SHA-512 | shared/src/lib.rs:4:4 | digest::digest::Digest::digest | [reachable] [call] in shared::fingerprint; use: digest; owner at shared/src/lib.rs:3:7-3:18 within 3:0-5:1; line: `Sha512::digest(data).to_vec()`; code: `Sha512::digest`
+  occ SHA3-256 | crypto:algorithm:SHA3-256 | shared/src/lib.rs:11:4 | digest::digest::Digest::digest | [present] [call] in shared::unused; use: digest; owner at shared/src/lib.rs:9:7-9:13 within 9:0-12:1; line: `Sha3_256::digest(data).to_vec()`; code: `Sha3_256::digest`
   occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:14:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via app -> sha2 -> digest -> block-buffer
   occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:38:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via app -> sha2 -> digest -> crypto-common
   occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:48:0 | digest | [manifest] locked digest 0.10.7; reached via app -> sha2 -> digest

@@ -1,4 +1,4 @@
-  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:6:36 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t10::main; new_from_slice: setup, not a use; key: environment (std::env::args); line: `let c = parking_lot::Mutex::new(Aes256Gcm::new_from_slice(&k).unwrap());`; code: `Aes256Gcm::new_from_slice`
+  occ AES-256-GCM | crypto:algorithm:AES-256-GCM | src/main.rs:6:36 | crypto_common::KeyInit::new_from_slice | [reachable] [call] in t10::main; new_from_slice: setup, not a use; key: environment (std::env::args); owner at src/main.rs:4:3-4:7 within 4:0-9:1; line: `let c = parking_lot::Mutex::new(Aes256Gcm::new_from_slice(&k).unwrap());`; code: `Aes256Gcm::new_from_slice`
   occ aead | pkg:cargo/aead@0.5.2 | Cargo.lock:6:0 | aead | [manifest] locked aead 0.5.2; reached via t10 -> aes-gcm -> aead
   occ aes | pkg:cargo/aes@0.8.4 | Cargo.lock:16:0 | aes | [manifest] locked aes 0.8.4; reached via t10 -> aes-gcm -> aes
   occ aes-gcm | pkg:cargo/aes-gcm@0.10.3 | Cargo.lock:27:0 | aes-gcm | [manifest] locked aes-gcm 0.10.3; reached via t10 -> aes-gcm

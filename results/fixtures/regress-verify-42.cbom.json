@@ -405,7 +405,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in v42::signature::<impl core::convert::From<&v42::signature::Seed> for ed25519_dalek::signing::SigningKey>::from; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); line: `ed25519_dalek::SigningKey::from_bytes(&s.0) // Ed25519`; code: `ed25519_dalek::SigningKey::from_bytes`",
+            "additionalContext": "[reachable] [call] in v42::signature::<impl core::convert::From<&v42::signature::Seed> for ed25519_dalek::signing::SigningKey>::from; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at src/signature.rs:13:7-13:11 within 13:4-15:5; line: `ed25519_dalek::SigningKey::from_bytes(&s.0) // Ed25519`; code: `ed25519_dalek::SigningKey::from_bytes`",
             "line": 14,
             "location": "src/signature.rs",
             "offset": 8,
@@ -461,21 +461,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>> as v42::macs::Tag>::tag; use: tag; line: `h.update(m);`; code: `update`",
+            "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>> as v42::macs::Tag>::tag; use: tag; owner at src/macs.rs:26:7-26:10 within 26:4-30:5; line: `h.update(m);`; code: `update`",
             "line": 28,
             "location": "src/macs.rs",
             "offset": 10,
             "symbol": "digest::mac::Mac::update"
           },
           {
-            "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>> as v42::macs::Tag>::tag; use: tag; line: `h.finalize().into_bytes().to_vec() // HMAC of the caller's hash`; code: `finalize`",
+            "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>> as v42::macs::Tag>::tag; use: tag; owner at src/macs.rs:26:7-26:10 within 26:4-30:5; line: `h.finalize().into_bytes().to_vec() // HMAC of the caller's hash`; code: `finalize`",
             "line": 29,
             "location": "src/macs.rs",
             "offset": 10,
             "symbol": "digest::mac::Mac::finalize"
           },
           {
-            "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>> as v42::macs::Tag>::tag; into_bytes: setup, not a use; line: `h.finalize().into_bytes().to_vec() // HMAC of the caller's hash`; code: `into_bytes`",
+            "additionalContext": "[reachable] [call] in <digest::core_api::wrapper::CoreWrapper<hmac::optim::HmacCore<D>> as v42::macs::Tag>::tag; into_bytes: setup, not a use; owner at src/macs.rs:26:7-26:10 within 26:4-30:5; line: `h.finalize().into_bytes().to_vec() // HMAC of the caller's hash`; code: `into_bytes`",
             "line": 29,
             "location": "src/macs.rs",
             "offset": 21,
@@ -527,14 +527,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [macro keyed!] in v42::K256::digest; use: digest; expanded from src/lib.rs:19; line: `keyed!(K256, sha2::Sha256); // SHA-256`",
+            "additionalContext": "[reachable] [call] [macro keyed!] in v42::K256::digest; use: digest; owner at src/lib.rs:18:19-18:25 as `digest` line #1d843a7e (by macro keyed! at src/lib.rs:24:0-24:26 line #57483731 defined src/lib.rs:14-23); expanded from src/lib.rs:19:16-19:46 as `<$alg as sha2::Digest>::digest` line #c13d3920 (by macro keyed! at src/lib.rs:24:0-24:26 line #57483731 defined src/lib.rs:14-23); line: `keyed!(K256, sha2::Sha256); // SHA-256`",
             "line": 24,
             "location": "src/lib.rs",
             "offset": 0,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] in v42::signature::<impl v42::Check for v42::public::sk::SkKey>::check; use: digest; line: `sha2::Sha256::digest(m).len() // SHA-256`; code: `sha2::Sha256::digest`",
+            "additionalContext": "[reachable] [call] in v42::signature::<impl v42::Check for v42::public::sk::SkKey>::check; use: digest; owner at src/signature.rs:5:7-5:12 within 5:4-7:5; line: `sha2::Sha256::digest(m).len() // SHA-256`; code: `sha2::Sha256::digest`",
             "line": 6,
             "location": "src/signature.rs",
             "offset": 8,
@@ -586,7 +586,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [macro keyed!] in v42::K512::digest; use: digest; expanded from src/lib.rs:19; line: `keyed!(K512, sha2::Sha512); // SHA-512`",
+            "additionalContext": "[reachable] [call] [macro keyed!] in v42::K512::digest; use: digest; owner at src/lib.rs:18:19-18:25 as `digest` line #1d843a7e (by macro keyed! at src/lib.rs:25:0-25:26 line #19efb740 defined src/lib.rs:14-23); expanded from src/lib.rs:19:16-19:46 as `<$alg as sha2::Digest>::digest` line #c13d3920 (by macro keyed! at src/lib.rs:25:0-25:26 line #19efb740 defined src/lib.rs:14-23); line: `keyed!(K512, sha2::Sha512); // SHA-512`",
             "line": 25,
             "location": "src/lib.rs",
             "offset": 0,
@@ -791,7 +791,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:cd3f9714-0bce-809a-adaf-7dc4f26111b0",
+  "serialNumber": "urn:uuid:1e00e939-0225-80ba-b85e-3575247793a9",
   "specVersion": "1.7",
   "version": 1
 }

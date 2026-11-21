@@ -102,21 +102,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in ext_hash_static::PRIMARY; line: `static PRIMARY: &digest::Algorithm = &digest::SHA256;`; code: `digest::SHA256`",
+            "additionalContext": "[reachable] [static] in ext_hash_static::PRIMARY; owner at src/main.rs:4:7-4:14 within 4:0-4:53; line: `static PRIMARY: &digest::Algorithm = &digest::SHA256;`; code: `digest::SHA256`",
             "line": 4,
             "location": "src/main.rs",
             "offset": 38,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_hash_static::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; line: `let a = digest::digest(PRIMARY, b\"static\");`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in ext_hash_static::main; use: digest; algorithm from ring::digest::SHA256 in the arguments; owner at src/main.rs:7:3-7:7 within 7:0-11:1; line: `let a = digest::digest(PRIMARY, b\"static\");`; code: `digest::digest`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [via-static] in ext_hash_static::main; ext_hash_static::PRIMARY -> ring::digest::SHA256; line: `let a = digest::digest(PRIMARY, b\"static\");`; code: `PRIMARY`",
+            "additionalContext": "[reachable] [via-static] in ext_hash_static::main; ext_hash_static::PRIMARY -> ring::digest::SHA256; owner at src/main.rs:7:3-7:7 within 7:0-11:1; line: `let a = digest::digest(PRIMARY, b\"static\");`; code: `PRIMARY`",
             "line": 8,
             "location": "src/main.rs",
             "offset": 27,
@@ -168,14 +168,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in ext_hash_static::ARCHIVE::{closure#0}; instantiated by <{closure@ext_hash_static::ARCHIVE::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4; line: `static ARCHIVE: LazyLock<&'static digest::Algorithm> = LazyLock::new(|| &digest::SHA512);`; code: `digest::SHA512`",
+            "additionalContext": "[reachable] [static] in ext_hash_static::ARCHIVE::{closure#0}; owner at src/main.rs:5:69-5:71 as `||` line #d99e8fce within 5:69-5:87; instantiated by <{closure@ext_hash_static::ARCHIVE::{closure#0}} as core::ops::function::FnOnce<()>>::call_once at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:4 (call of `core::ops::function::FnMut::call_mut`, to 250:70 as `extern \"rust-call\" fn call_once(self, args: Args) -> Self::O` line #3f47b1c8, caller at /rustc/f7575a9da8e4a4fca3b5668d5a2ea7476db44b3f/library/core/src/ops/function.rs:250:26-250:35 within 250:4-250:70); line: `static ARCHIVE: LazyLock<&'static digest::Algorithm> = LazyLock::new(|| &digest::SHA512);`; code: `digest::SHA512`",
             "line": 5,
             "location": "src/main.rs",
             "offset": 73,
             "symbol": "ring::digest::SHA512"
           },
           {
-            "additionalContext": "[reachable] [call] in ext_hash_static::main; use: digest; algorithm possibly from ring::digest::SHA512, the only one found reaching the call from another function; member: static, possible (the value `static ext_hash_static::ARCHIVE` holds); line: `let b = digest::digest(*ARCHIVE, b\"lazy\");`; code: `digest::digest`",
+            "additionalContext": "[reachable] [call] in ext_hash_static::main; use: digest; algorithm possibly from ring::digest::SHA512, the only one found reaching the call from another function; member: static, possible (the value `static ext_hash_static::ARCHIVE` holds); owner at src/main.rs:7:3-7:7 within 7:0-11:1; line: `let b = digest::digest(*ARCHIVE, b\"lazy\");`; code: `digest::digest`",
             "line": 9,
             "location": "src/main.rs",
             "offset": 12,
@@ -309,7 +309,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:656863c2-1c1b-85b6-acd8-7b84f5c1704f",
+  "serialNumber": "urn:uuid:b5118b43-c3cc-8114-9a62-4da7fd22c18c",
   "specVersion": "1.7",
   "version": 1
 }

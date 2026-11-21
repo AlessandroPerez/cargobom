@@ -104,35 +104,35 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: caller, passed by `m3::main`; key: computed (m3::arg) or hard-coded (32 bytes, literal at line 37) or parameter (argument 0 of the enclosing function); line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: caller, passed by `m3::main`; key: computed (m3::arg) or hard-coded (32 bytes, literal at line 37) or parameter (argument 0 of the enclosing function); owner at src/main.rs:15:3-15:7 within 15:0-18:1; line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: caller, passed by `m3::main`; nonce: hard-coded (all zero, 12 bytes, literal at line 17); line: `let _ = lk.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), buf); // AES-256-GCM (k3), ChaCha20-Poly1305 (k1, k2)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in m3::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::AES_256_GCM; member: caller, passed by `m3::main`; nonce: hard-coded (all zero, 12 bytes, literal at line 17); owner at src/main.rs:15:3-15:7 within 15:0-18:1; line: `let _ = lk.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), buf); // AES-256-GCM (k3), ChaCha20-Poly1305 (k1, k2)`; code: `seal_in_place_append_tag`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [static] in m3::main; line: `let mut k1 = K { key: [7; 32], alg: &AES_256_GCM };`; code: `AES_256_GCM`",
+            "additionalContext": "[reachable] [static] in m3::main; owner at src/main.rs:27:3-27:7 within 27:0-42:1; line: `let mut k1 = K { key: [7; 32], alg: &AES_256_GCM };`; code: `AES_256_GCM`",
             "line": 29,
             "location": "src/main.rs",
             "offset": 41,
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [static] in m3::main; line: `let mut k2 = K { key: [7; 32], alg: &AES_256_GCM };`; code: `AES_256_GCM`",
+            "additionalContext": "[reachable] [static] in m3::main; owner at src/main.rs:27:3-27:7 within 27:0-42:1; line: `let mut k2 = K { key: [7; 32], alg: &AES_256_GCM };`; code: `AES_256_GCM`",
             "line": 33,
             "location": "src/main.rs",
             "offset": 41,
             "symbol": "ring::aead::algorithm::AES_256_GCM"
           },
           {
-            "additionalContext": "[reachable] [static] in m3::main; line: `let k3 = K { key: [9; 32], alg: &AES_256_GCM };`; code: `AES_256_GCM`",
+            "additionalContext": "[reachable] [static] in m3::main; owner at src/main.rs:27:3-27:7 within 27:0-42:1; line: `let k3 = K { key: [9; 32], alg: &AES_256_GCM };`; code: `AES_256_GCM`",
             "line": 37,
             "location": "src/main.rs",
             "offset": 37,
@@ -200,56 +200,56 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in <m3::K as m3::Rekey>::rekey; line: `fn rekey(&mut self) { self.key.copy_from_slice(&arg(1).as_bytes()[..32]); self.alg = &CHACHA20_POLY1305; }`; code: `CHACHA20_POLY1305`",
+            "additionalContext": "[reachable] [static] in <m3::K as m3::Rekey>::rekey; owner at src/main.rs:10:7-10:12 within 10:4-10:110; line: `fn rekey(&mut self) { self.key.copy_from_slice(&arg(1).as_bytes()[..32]); self.alg = &CHACHA20_POLY1305; }`; code: `CHACHA20_POLY1305`",
             "line": 10,
             "location": "src/main.rs",
             "offset": 90,
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [static] in m3::K::rekey_inherent; line: `fn rekey_inherent(&mut self) { self.key.copy_from_slice(&arg(1).as_bytes()[..32]); self.alg = &CHACHA20_POLY1305; }`; code: `CHACHA20_POLY1305`",
+            "additionalContext": "[reachable] [static] in m3::K::rekey_inherent; owner at src/main.rs:13:7-13:21 within 13:4-13:119; line: `fn rekey_inherent(&mut self) { self.key.copy_from_slice(&arg(1).as_bytes()[..32]); self.alg = &CHACHA20_POLY1305; }`; code: `CHACHA20_POLY1305`",
             "line": 13,
             "location": "src/main.rs",
             "offset": 99,
             "symbol": "ring::aead::algorithm::CHACHA20_POLY1305"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `<m3::K as m3::Rekey>::rekey`; key: computed (m3::arg) or hard-coded (32 bytes, literal at line 37) or parameter (argument 0 of the enclosing function); line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in m3::seal; new: setup, not a use; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `<m3::K as m3::Rekey>::rekey`; key: computed (m3::arg) or hard-coded (32 bytes, literal at line 37) or parameter (argument 0 of the enclosing function); owner at src/main.rs:15:3-15:7 within 15:0-18:1; line: `let lk = LessSafeKey::new(UnboundKey::new(k.alg, &k.key).unwrap());`; code: `UnboundKey::new`",
             "line": 16,
             "location": "src/main.rs",
             "offset": 30,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `<m3::K as m3::Rekey>::rekey`; nonce: hard-coded (all zero, 12 bytes, literal at line 17); line: `let _ = lk.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), buf); // AES-256-GCM (k3), ChaCha20-Poly1305 (k1, k2)`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in m3::seal; use: encrypt; algorithm one of 2 that may reach the call from other functions: ring::aead::algorithm::CHACHA20_POLY1305; member: object, from `<m3::K as m3::Rekey>::rekey`; nonce: hard-coded (all zero, 12 bytes, literal at line 17); owner at src/main.rs:15:3-15:7 within 15:0-18:1; line: `let _ = lk.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), buf); // AES-256-GCM (k3), ChaCha20-Poly1305 (k1, k2)`; code: `seal_in_place_append_tag`",
             "line": 17,
             "location": "src/main.rs",
             "offset": 15,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::main; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `<m3::K as m3::Rekey>::rekey`; key: computed (m3::arg); line: `let lk1 = LessSafeKey::new(UnboundKey::new(k1.alg, &k1.key).unwrap()); // key computed (args), ChaCha20-Poly1305`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in m3::main; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `<m3::K as m3::Rekey>::rekey`; key: computed (m3::arg); owner at src/main.rs:27:3-27:7 within 27:0-42:1; line: `let lk1 = LessSafeKey::new(UnboundKey::new(k1.alg, &k1.key).unwrap()); // key computed (args), ChaCha20-Poly1305`; code: `UnboundKey::new`",
             "line": 31,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::main; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `<m3::K as m3::Rekey>::rekey`; nonce: hard-coded (all zero, 12 bytes, literal at line 32); line: `let _ = lk1.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), &mut buf); // ChaCha20-Poly1305`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in m3::main; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `<m3::K as m3::Rekey>::rekey`; nonce: hard-coded (all zero, 12 bytes, literal at line 32); owner at src/main.rs:27:3-27:7 within 27:0-42:1; line: `let _ = lk1.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), &mut buf); // ChaCha20-Poly1305`; code: `seal_in_place_append_tag`",
             "line": 32,
             "location": "src/main.rs",
             "offset": 16,
             "symbol": "ring::aead::less_safe_key::LessSafeKey::seal_in_place_append_tag"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::main; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `m3::K::rekey_inherent`; key: computed (m3::arg); line: `let lk2 = LessSafeKey::new(UnboundKey::new(k2.alg, &k2.key).unwrap()); // key computed (args), ChaCha20-Poly1305`; code: `UnboundKey::new`",
+            "additionalContext": "[reachable] [call] in m3::main; new: setup, not a use; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `m3::K::rekey_inherent`; key: computed (m3::arg); owner at src/main.rs:27:3-27:7 within 27:0-42:1; line: `let lk2 = LessSafeKey::new(UnboundKey::new(k2.alg, &k2.key).unwrap()); // key computed (args), ChaCha20-Poly1305`; code: `UnboundKey::new`",
             "line": 35,
             "location": "src/main.rs",
             "offset": 31,
             "symbol": "ring::aead::unbound_key::UnboundKey::new"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::main; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `m3::K::rekey_inherent`; nonce: hard-coded (all zero, 12 bytes, literal at line 36); line: `let _ = lk2.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), &mut buf); // ChaCha20-Poly1305`; code: `seal_in_place_append_tag`",
+            "additionalContext": "[reachable] [call] in m3::main; use: encrypt; algorithm from ring::aead::algorithm::CHACHA20_POLY1305, reaching the call from another function; member: object, from `m3::K::rekey_inherent`; nonce: hard-coded (all zero, 12 bytes, literal at line 36); owner at src/main.rs:27:3-27:7 within 27:0-42:1; line: `let _ = lk2.seal_in_place_append_tag(Nonce::assume_unique_for_key([0; 12]), Aad::empty(), &mut buf); // ChaCha20-Poly1305`; code: `seal_in_place_append_tag`",
             "line": 36,
             "location": "src/main.rs",
             "offset": 16,
@@ -317,14 +317,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `m3::main`; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA1_FOR_LEGACY_USE_ONLY; member: caller, passed by `m3::main`; owner at src/main.rs:22:3-22:8 within 22:0-25:1; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m3::main; line: `mixed(&s, &SHA1, arg(2).len(), &buf);`; code: `SHA1`",
+            "additionalContext": "[reachable] [static] in m3::main; owner at src/main.rs:27:3-27:7 within 27:0-42:1; line: `mixed(&s, &SHA1, arg(2).len(), &buf);`; code: `SHA1`",
             "line": 41,
             "location": "src/main.rs",
             "offset": 15,
@@ -380,14 +380,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in m3::mixed; line: `let a = match n { 0 => &SHA256, 1 => p, 2 => s.alg, _ => pick() };`; code: `SHA256`",
+            "additionalContext": "[reachable] [static] in m3::mixed; owner at src/main.rs:22:3-22:8 within 22:0-25:1; line: `let a = match n { 0 => &SHA256, 1 => p, 2 => s.alg, _ => pick() };`; code: `SHA256`",
             "line": 23,
             "location": "src/main.rs",
             "offset": 28,
             "symbol": "ring::digest::SHA256"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call: ring::digest::SHA256 in the arguments; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call: ring::digest::SHA256 in the arguments; owner at src/main.rs:22:3-22:8 within 22:0-25:1; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
@@ -439,14 +439,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [static] in m3::pick; line: `fn pick() -> &'static Digest { &SHA384 }`; code: `SHA384`",
+            "additionalContext": "[reachable] [static] in m3::pick; owner at src/main.rs:20:3-20:7 within 20:0-20:40; line: `fn pick() -> &'static Digest { &SHA384 }`; code: `SHA384`",
             "line": 20,
             "location": "src/main.rs",
             "offset": 32,
             "symbol": "ring::digest::SHA384"
           },
           {
-            "additionalContext": "[reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA384; member: object, from `m3::pick`; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA384; member: object, from `m3::pick`; owner at src/main.rs:22:3-22:8 within 22:0-25:1; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
@@ -498,14 +498,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA512; member: caller, passed by `m3::main`; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`",
+            "additionalContext": "[reachable] [call] in m3::mixed; use: digest; algorithm one of 4 that may reach the call from other functions: ring::digest::SHA512; member: caller, passed by `m3::main`; owner at src/main.rs:22:3-22:8 within 22:0-25:1; line: `let _ = digest(a, d); // SHA-256, SHA-1 (p), SHA-512 (s.alg), SHA-384 (pick)`; code: `digest`",
             "line": 24,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "ring::digest::digest"
           },
           {
-            "additionalContext": "[reachable] [static] in m3::main; line: `let s = S { alg: &SHA512 };`; code: `SHA512`",
+            "additionalContext": "[reachable] [static] in m3::main; owner at src/main.rs:27:3-27:7 within 27:0-42:1; line: `let s = S { alg: &SHA512 };`; code: `SHA512`",
             "line": 40,
             "location": "src/main.rs",
             "offset": 22,
@@ -659,7 +659,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:161ed12a-ad84-8edf-9d15-ddf2a739dc9a",
+  "serialNumber": "urn:uuid:38c8d61a-6d71-8255-8dfd-e1f53b888859",
   "specVersion": "1.7",
   "version": 1
 }
