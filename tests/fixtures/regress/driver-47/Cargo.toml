@@ -1,0 +1,13 @@
+# The walk check builds the binaries once more, unoptimised, and here that build fails: the
+# binary names a native library that is not there, which a check does not ask for and a link
+# does. So does a build that runs out of memory (x0x 0.48.1 on a machine of 16 GB: the compiler
+# was killed at 9 GB on the unoptimised library). The run ended there with no CBOM, the
+# analysis done. The CBOM is written without the check, saying so
+# (`rcbom:run:walk-check=not run: ..`), and the run fails after it (`walk-fails`).
+[package]
+name = "driver-47"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"

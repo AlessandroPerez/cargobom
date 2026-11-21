@@ -164,10 +164,16 @@ fn generate(a: &GenArgs) -> Result<()> {
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
     let mut an = analyze(&kb, &man, &facts);
     an.layer2 = !a.manifest_only;
-    let walk_check = if a.check_walk && !a.manifest_only {
-        walkcheck::run(a, &sel, &man, &facts, &dir)?
+    // (the walk check builds the binaries once more, unoptimised. Where that build fails, for
+    // want of memory or at the link, the analysis is done all the same: the CBOM is written
+    // without the check, says so, and the run fails after it)
+    let (walk_check, walk_failed) = if a.check_walk && !a.manifest_only {
+        match walkcheck::run(a, &sel, &man, &facts, &dir) {
+            Ok(r) => (r, None),
+            Err(e) => (Vec::new(), Some(format!("{e:#}"))),
+        }
     } else {
-        Vec::new()
+        (Vec::new(), None)
     };
     let run = RunInfo {
         tool_version: env!("CARGO_PKG_VERSION").into(),
@@ -184,7 +190,11 @@ fn generate(a: &GenArgs) -> Result<()> {
         },
         packages: man.packages.len(),
         sandbox: "none (draft: run only on trusted code)".into(),
-        walk_check: walk_check.iter().map(walkcheck::Report::summary).collect(),
+        walk_check: walk_check
+            .iter()
+            .map(walkcheck::Report::summary)
+            .chain(walk_failed.iter().map(|e| format!("not run: {e}")))
+            .collect(),
     };
     let bom = to_cyclonedx(&kb, &man, &an, &run);
     let errors = validate::validate(&bom)?;
@@ -214,6 +224,9 @@ fn generate(a: &GenArgs) -> Result<()> {
     if let Some(p) = &a.boundary_list {
         let lines: String = an.coverage.calls.iter().map(|c| c.line() + "\n").collect();
         std::fs::write(p, lines)?;
+    }
+    if let Some(e) = walk_failed {
+        bail!("the walk check was not run ({e}): the CBOM is written without it");
     }
     Ok(())
 }

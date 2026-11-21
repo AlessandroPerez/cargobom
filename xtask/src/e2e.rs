@@ -171,6 +171,8 @@ impl Env {
         // (a fixture's `cbom-args`: what of it is built, as cargo's selection flags, and
         // `--check-walk` in the probes of the walk check)
         let selection = std::fs::read_to_string(dir.join("cbom-args")).unwrap_or_default();
+        // (no CBOM of an earlier run is taken for this one's)
+        let _ = std::fs::remove_file(&cbom_path);
         let ok = self
             .cli(dir, name)
             .args(["cbom", "--driver"])
@@ -184,7 +186,21 @@ impl Env {
             .status()?
             .success();
         let cli_log = std::fs::read_to_string(self.path(name, "log")).unwrap_or_default();
-        if !ok {
+        // (a fixture's `walk-fails`: its binaries do not link, so the walk check's own build
+        // fails; the run then fails after it has written the CBOM, saying so, and the CBOM is
+        // checked as any other)
+        let walk_fails = dir.join("walk-fails").exists() && (self.walk || asks_walk(&selection));
+        if walk_fails {
+            let said = cli_log.contains("the walk check was not run");
+            if ok || !said || !cbom_path.exists() {
+                log.push_str(&cli_log);
+                log.push_str(
+                    "a fixture whose binaries do not link: the run is to fail after writing \
+                     the CBOM, saying that the walk check was not run\n",
+                );
+                return Ok(false);
+            }
+        } else if !ok {
             log.push_str(&cli_log);
             return Ok(false);
         }
