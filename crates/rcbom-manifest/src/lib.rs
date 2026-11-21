@@ -157,8 +157,37 @@ pub fn normalize(path: &Path) -> PathBuf {
     out
 }
 
+/// The toolchain of every cargo and rustc a run launches, once it has one (`use_toolchain`).
+static TOOLCHAIN: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+
+/// The run builds with `toolchain`: what Layer 1 reads (the packages and their features, where
+/// their sources are, the target's `cfg`) is read with that toolchain's cargo and rustc too,
+/// whatever the project's directory selects. A project that pins its own (a `rust-toolchain`
+/// file) had Layer 1 read by another cargo than the one that builds: hdwallet's 1.63 keeps the
+/// registry's sources in another directory, so no file of a dependency was the build's, and
+/// QuantCrypt's 1.81 cannot read a dependency's manifest at all.
+pub fn use_toolchain(toolchain: &str) {
+    let _ = TOOLCHAIN.set(toolchain.to_string());
+}
+
+/// `cargo` or `rustc`, of the run's toolchain when it has one; else as the environment gives
+/// them (cargo's own `$CARGO` when it runs the tool as a subcommand).
+pub fn tool(name: &str) -> std::process::Command {
+    match TOOLCHAIN.get() {
+        Some(t) => {
+            let mut c = std::process::Command::new(name);
+            c.env("RUSTUP_TOOLCHAIN", t);
+            c
+        }
+        None if name == "cargo" => {
+            std::process::Command::new(std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into()))
+        }
+        None => std::process::Command::new(name),
+    }
+}
+
 pub fn host_triple() -> Result<String> {
-    let out = std::process::Command::new("rustc")
+    let out = tool("rustc")
         .arg("-vV")
         .output()
         .context("running rustc -vV")?;
@@ -266,6 +295,9 @@ pub fn load_locked(manifest_path: &Path, sel: &Selection, kb: &Kb) -> Result<Man
 fn load_with(manifest_path: &Path, sel: &Selection, kb: &Kb, locked: bool) -> Result<Manifest> {
     let mut cmd = MetadataCommand::new();
     cmd.manifest_path(manifest_path);
+    if let Some(t) = TOOLCHAIN.get() {
+        cmd.cargo_path("cargo").env("RUSTUP_TOOLCHAIN", t);
+    }
     // (`cargo metadata` has no `-p`: it resolves every member, with these features where a
     // member has them; what the selected ones are built with is `build_features`'s)
     let mut opts = vec!["--filter-platform".to_string(), sel.target.clone()];
@@ -295,8 +327,7 @@ fn build_features(
     sel: &Selection,
     locked: bool,
 ) -> Option<HashMap<(String, String), BTreeSet<String>>> {
-    let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
-    let mut cmd = std::process::Command::new(cargo);
+    let mut cmd = tool("cargo");
     cmd.arg("tree")
         .args(sel.package_args())
         .args([
@@ -350,7 +381,7 @@ fn build_features(
 
 /// The `cfg` values of the target, for platform-specific dependency tables.
 fn target_cfg(target: &str) -> Result<Vec<cargo_metadata::cargo_platform::Cfg>> {
-    let out = std::process::Command::new("rustc")
+    let out = tool("rustc")
         .args(["--print", "cfg", "--target", target])
         .output()
         .context("rustc --print cfg")?;

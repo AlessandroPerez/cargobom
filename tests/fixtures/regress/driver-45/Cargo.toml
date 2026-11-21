@@ -1,0 +1,15 @@
+# A project that pins its own toolchain (`rust-toolchain`: hdwallet 1.63, QuantCrypt 1.81).
+# Layer 1 ran the cargo the directory selects and Layer 2 the pinned nightly: two cargos, one
+# build. The old one keeps the registry's sources in another directory, so a file of a
+# dependency the build compiled was no file of a package Layer 1 knew, and a macro's record
+# (lazy_static's, around the hash) named it by its path on this machine; or it cannot read a
+# dependency's manifest at all, and the run ends there. Every cargo and rustc of a run is of
+# the run's toolchain now, whatever the directory selects.
+[package]
+name = "driver-45"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lazy_static = "1.4"
+sha2 = "0.10"

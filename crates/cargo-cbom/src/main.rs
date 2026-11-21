@@ -145,6 +145,10 @@ impl GenArgs {
 
 fn generate(a: &GenArgs) -> Result<()> {
     let kb = Kb::seed()?;
+    // (one toolchain for the whole run: Layer 1 reads what the build of Layer 2 is made of)
+    if !a.manifest_only {
+        rcbom_manifest::use_toolchain(TOOLCHAIN);
+    }
     let sel = a.selection()?;
     eprintln!("cbom: layer 1 (cargo metadata)");
     let man = rcbom_manifest::load(&a.manifest_path, &sel, &kb)?;

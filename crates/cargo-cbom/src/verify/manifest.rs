@@ -9,8 +9,7 @@ pub(super) fn load_externs(
     manifest_path: &Path,
     sel: &rcbom_manifest::Selection,
 ) -> Option<(Externs, Libs, Vec<PathBuf>, HashSet<String>)> {
-    let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
-    let mut cmd = Command::new(cargo);
+    let mut cmd = rcbom_manifest::tool("cargo");
     cmd.args([
         "metadata",
         "--format-version",

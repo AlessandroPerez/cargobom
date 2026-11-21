@@ -373,6 +373,17 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             .collect()
     };
     let kb = Kb::seed()?;
+    // the toolchain the CBOM was made with reads the packages here too, where this machine has
+    // it (the project's directory may select another, whose cargo keeps them elsewhere)
+    if let Some(t) = run_prop("rcbom:run:toolchain").filter(|t| *t != "none")
+        && std::process::Command::new("rustc")
+            .env("RUSTUP_TOOLCHAIN", t)
+            .arg("-vV")
+            .output()
+            .is_ok_and(|o| o.status.success())
+    {
+        rcbom_manifest::use_toolchain(t);
+    }
     let sel = rcbom_manifest::Selection {
         target: match run_prop("rcbom:run:target") {
             Some(t) => t.to_string(),
