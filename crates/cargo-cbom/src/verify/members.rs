@@ -753,392 +753,27 @@ impl Files<'_> {
         })
     }
 
-    /// The type of parameter `idx` of the function `name` that a call in `src` names with the
-    /// path `prefix` (`tlib::by_dyn`, or `by_dyn` imported from `tlib`), read from the sources
-    /// of the package the path or the import leads to (the file's own for a `crate::` path).
-    pub(super) fn foreign_param(
-        &mut self,
-        src: &Source,
-        owner: Option<&rcbom_manifest::Pkg>,
-        prefix: &[String],
-        name: &str,
-        idx: usize,
-    ) -> Option<String> {
-        let owner_id = owner.map(|p| p.id.repr.clone());
-        let roots: Vec<String> = match prefix.first() {
-            Some(f) if matches!(f.as_str(), "crate" | "self" | "super") => Vec::new(),
-            Some(f) => import_roots(&src.binds, f)
-                .map(|r| r.into_iter().collect())
-                .unwrap_or_else(|| vec![f.clone()]),
-            None => import_roots(&src.binds, name)?.into_iter().collect(),
-        };
-        let mut dirs: Vec<PathBuf> = Vec::new();
-        for r in &roots {
-            for p in self.crate_refs(owner_id.as_deref(), r) {
-                if let Some(pkg) = self
-                    .man
-                    .packages
-                    .iter()
-                    .find(|k| pkg_ref(&k.name, &k.version.to_string()) == p)
-                    && !dirs.contains(&pkg.manifest_dir)
-                {
-                    dirs.push(pkg.manifest_dir.clone());
-                }
-            }
-        }
-        if dirs.is_empty() {
-            dirs.extend(owner.map(|p| p.manifest_dir.clone()));
-        }
-        for d in dirs {
-            for f in package_files(&d) {
-                let Some(s2) = self.source(&f) else { continue };
-                for it in s2.items.iter().filter(|it| {
-                    it.kind == ItemKind::Fn
-                        && it.name == name
-                        && !s2.items.iter().any(|o| {
-                            matches!(o.kind, ItemKind::Impl | ItemKind::Trait)
-                                && o.contains(it.start)
-                        })
-                }) {
-                    if let Some(p) = fn_sig(&s2, it).params.get(idx) {
-                        return Some(p.1.clone());
-                    }
-                }
-            }
-        }
-        None
-    }
-
-    /// "dyn: `T` is coerced to `dyn Tr` at F:L" (or "in a static at F:L"): line L of F makes a
-    /// `T` a pointer there that becomes a `dyn Tr` (or a trait object of a trait whose
-    /// supertraits include `Tr`; `coercion_traits`): it names the type (`Box::new(Fast)`,
-    /// `&Legacy`, `W::<A>(..)` with its type arguments, `3u8`), or a variable or parameter whose
-    /// binding does (`&mut c4` with `let mut c4 = Ctx { .. }`, a parameter declared of the type or
-    /// of a type parameter of its function).
+    /// "dyn: `T` is coerced to `dyn Tr` at <span> as `text` line #.." (or "in a static at ..",
+    /// the static's item): where the compiler has the coercion. Which type the expression there
+    /// has is the compiler's to say, and no name in the text holds it (a variable, a call's
+    /// result, a type the source writes through an alias): the place is read as its record
+    /// gives it, from a token's edge to a token's edge, starting with that text on a line of
+    /// that fingerprint.
     pub(super) fn check_coercions(&mut self, details: &str) -> Result<(), String> {
-        for m in re!(
-            r"dyn: `([^`]+)`(?:, the only type)? (?:is )?coerced to `([^`]+)` (in a static )?at ([^\s;)]+?):(\d+)\)"
-        )
-        .captures_iter(details)
+        for m in
+            re!(r"dyn: `[^`]+`(?:, the only type)? (?:is )?coerced to `[^`]+` (?:in a static )?at ")
+                .find_iter(details)
         {
-            let (ty, file, line) = (&m[1], &m[4], m[5].parse::<usize>().unwrap_or(0));
-            let what = m[0].trim_end_matches(')');
-            let want = type_name(m[2].trim().trim_start_matches("dyn ").trim());
-            let path = self.resolve(file)?;
-            let src = self
-                .source(&path)
-                .ok_or_else(|| format!("cannot read {file}, named in `{what}`"))?;
-            // the traits whose objects are objects of `want` too (their supertraits include it)
-            let supers = self.supertraits(&path, &m[2]);
-            let fits = |ts: &[String]| {
-                ts.iter().any(|t| {
-                    let mut seen = vec![t.clone()];
-                    let mut k = 0;
-                    while k < seen.len() {
-                        if seen[k] == want {
-                            return true;
-                        }
-                        for s2 in supers.get(&seen[k]).into_iter().flatten() {
-                            if !seen.contains(s2) {
-                                seen.push(s2.clone());
-                            }
-                        }
-                        k += 1;
-                    }
-                    false
-                })
+            let rest = &details[m.end()..];
+            let what = m.as_str().trim_end_matches(" at ");
+            let Some(record) =
+                re!(r"^[^\s;)]+?:\d+:\d+-\d+:\d+(?: as `[^`]*`)?(?: line #[0-9a-f]{8})?")
+                    .find(rest)
+            else {
+                return Err(format!("`{what}`: where it is cannot be read"));
             };
-            let Some(text) = src.lines.get(line.wrapping_sub(1)) else {
-                return Err(format!("`{what}`: no line {line} in {file}"));
-            };
-            // a static's value is "in a static", a function's or a const's not
-            let in_static = src
-                .enclosing((line, text.chars().count()), &[ItemKind::Static])
-                .or_else(|| src.enclosing((line, 0), &[ItemKind::Static]))
-                .is_some_and(|i| kw(&src.code, src.span(i).0, "static"));
-            if in_static != m.get(3).is_some() {
-                return Err(format!(
-                    "`{what}`: line {line} of {file} is {}in a static",
-                    if in_static { "" } else { "not " }
-                ));
-            }
-            // (a coercion in the value of a static or const is cited at the item, which may
-            // write it on a later line: rustls 0.21's `pub static TLS_..: SupportedCipherSuite
-            // =\n    SupportedCipherSuite::Tls12(&Tls12CipherSuite { .. aead_alg: &AesGcm, .. });`)
-            let lines: Vec<usize> = src
-                .items
-                .iter()
-                .find(|i| i.kind == ItemKind::Static && i.start.0 == line && i.end.0 > line)
-                .map_or(vec![line], |i| (i.start.0..=i.end.0).collect());
-            let mut made = false;
-            for line in lines {
-                let Some(text) = src.lines.get(line.wrapping_sub(1)) else {
-                    continue;
-                };
-                let ok = 'line: {
-            let code: String = text
-                .chars()
-                .zip(&src.class[line - 1])
-                .map(|(c, k)| if *k == Class::Code { c } else { ' ' })
-                .collect();
-            // the type by the name the line writes it under: its own, or an alias of the whole
-            // type (`Sha256` for sha2's `CoreWrapper<CtVariableCoreWrapper<Sha256VarCore, U32,
-            // OidSha256>>`, which the line never spells)
-            let alias = {
-                let man = self.man;
-                let owner = man.owner_of(&path);
-                let full = fold_typenum(&norm_path(ty));
-                // (with the path written before it: `sha2::Sha256`, an alias of that crate)
-                let names: Vec<String> = re!(r"\b(?:[A-Za-z_]\w*::)*[A-Z]\w*\b")
-                    .find_iter(&code)
-                    .map(|w| w.as_str().to_string())
-                    .collect();
-                names
-                    .into_iter()
-                    .find(|w| {
-                        let mut aliases = |a: &str| self.alias_targets(&src, owner, a);
-                        aliases(w).iter().any(|t| {
-                            expansions(t, &mut aliases)
-                                .iter()
-                                .any(|e| fold_typenum(&norm_path(e)) == full)
-                        })
-                    })
-                    .map(|w| w.rsplit("::").next().unwrap_or(&w).to_string())
-            };
-            let base = alias.clone().unwrap_or_else(|| type_name(ty));
-            // the type's arguments (`d3::W<d3::A>`: `A`)
-            let args: Vec<String> = ty
-                .find('<')
-                .map(|i| {
-                    let inner = &ty[i + 1..ty.len().saturating_sub(1)];
-                    inner
-                        .split(',')
-                        .map(type_name)
-                        .filter(|a| !a.is_empty() && a.chars().all(is_ident))
-                        .collect()
-                })
-                .unwrap_or_default();
-            // (an alias of the whole type stands for its arguments too)
-            let args = if alias.is_some() { Vec::new() } else { args };
-            let word = |w: &str| {
-                Regex::new(&format!(r"\b{}\b", regex::escape(w))).is_ok_and(|r| r.is_match(&code))
-            };
-            const PRIMS: &[&str] = &[
-                "u8", "u16", "u32", "u64", "u128", "usize", "i8", "i16", "i32", "i64", "i128",
-                "isize", "f32", "f64",
-            ];
-            let s = &src.code;
-            let (l0, l1) = (src.idx((line, 0)), src.idx((line + 1, 0)));
-            let dyn_here = word("dyn");
-            // a value made a pointer at `i`: `&x`, `&mut x`, `Box::new(x`, `Rc::new(x`, or the
-            // value of a statement with a `dyn` type (`let d: Box<dyn Tr> = b;`)
-            let made_pointer = |i: usize| -> bool {
-                let Some(p) = before_blank(s, i) else {
-                    return false;
-                };
-                match s[p] {
-                    '&' => true,
-                    // `&*b`: what the box holds
-                    '*' => before_blank(s, p).is_some_and(|q| s[q] == '&'),
-                    '=' => dyn_here,
-                    // `Box::<Md5>::default()`: the type the box is made of
-                    '<' => re!(r"\b(?:Box|Rc|Arc)\s*::\s*$")
-                        .is_match(src.text(l0.min(p), p).trim_end()),
-                    '(' => {
-                        let w = word_before_at(s, p);
-                        let start = before_blank(s, p).map_or(p, |e| e + 1 - w.len().min(e + 1));
-                        let head = src.text(l0.min(start), start);
-                        matches!(w.as_str(), "new" | "pin")
-                            && re!(r"\b(?:Box|Rc|Arc)\s*::\s*$").is_match(head.trim_end())
-                    }
-                    c if is_ident(c) => {
-                        word_before_at(s, i) == "mut"
-                            && p >= 2
-                            && before_blank(s, p - 2).is_some_and(|q| s[q] == '&')
-                    }
-                    _ => false,
-                }
-            };
-            // where it is made a pointer, it becomes an object of the trait (`coercion_traits`;
-            // another crate's function's parameter read from its sources)
-            let man = self.man;
-            let owner = man.owner_of(&path);
-            let mut foreign = |prefix: &[String], name: &str, idx: usize| {
-                self.foreign_param(&src, owner, prefix, name, idx)
-            };
-            let mut coerced =
-                |i: usize| coercion_traits(&src, i, &mut foreign).is_some_and(|ts| fits(&ts));
-            // its arguments are written on the line, or the line is in a generic function whose
-            // instance gives them (`Box::new(W(t))` in `fn boxed<T: Pick>(t: T) -> Box<dyn Gen>`)
-            let generic_at = |i: usize| {
-                src.enclosing(src.pos(i), &[ItemKind::Fn]).is_some_and(|f| {
-                    let (fa, fb) = src.span(f);
-                    let open = scan_to(s, fa, fb, |k| s[k] == '(');
-                    src.text(fa, open).contains('<')
-                })
-            };
-            let args_written = args.iter().all(|a| word(a));
-            // (where the path the type is written by starts: `sha2::Sha256` at `sha2`)
-            let path_start = |mut i: usize| {
-                while let Some(p) = before_blank(s, i).filter(|&p| p > 0 && s[p] == ':' && s[p - 1] == ':')
-                    && let Some(e) = before_blank(s, p - 1).filter(|&e| is_ident(s[e]))
-                {
-                    i = e;
-                    while i > 0 && is_ident(s[i - 1]) {
-                        i -= 1;
-                    }
-                }
-                i
-            };
-            // the type, with its arguments, made a pointer
-            let names_type = ((l0..l1).any(|i| {
-                kw(s, i, &base)
-                    && (args_written || generic_at(i))
-                    && made_pointer(path_start(i))
-                    && coerced(path_start(i))
-            }))
-                || (PRIMS.contains(&base.as_str())
-                    && (l0..l1).any(|i| {
-                        s[i].is_ascii_digit()
-                            && (i == 0 || !is_ident(s[i - 1]))
-                            && word_of(s, i).ends_with(base.as_str())
-                            && made_pointer(i)
-                            && coerced(i)
-                    }))
-                // (or a type parameter of the function, or of its impl, which the instance
-                // gives the type: `Box::new(T::new())` in rsa's `fn new<T: Digest + DynDigest>()`)
-                || (l0..l1).any(|i| {
-                    word_start(s, i)
-                        && before_blank(s, i).is_none_or(|p| s[p] != '.' && s[p] != ':')
-                        && src.enclosing(src.pos(i), &[ItemKind::Fn]).is_some_and(|f| {
-                            let w = word_of(s, i);
-                            let impl_params = impl_of(&src, f)
-                                .map(|b| {
-                                    let (ba, bb) = src.span(b);
-                                    src.text(ba, scan_to(s, ba, bb, |k| s[k] == '{'))
-                                })
-                                .filter(|h| {
-                                    h.trim_start()
-                                        .strip_prefix("impl")
-                                        .is_some_and(|r| r.trim_start().starts_with('<'))
-                                })
-                                .unwrap_or_default();
-                            fn_sig(&src, f).generics.contains(&w)
-                                || re!(r"[<,]\s*(\w+)\s*[:,>]")
-                                    .captures_iter(&impl_params)
-                                    .any(|x| x[1] == w)
-                        })
-                        && made_pointer(i)
-                        && coerced(i)
-                });
-            if names_type {
-                break 'line true;
-            }
-            // a variable or parameter of the type, made a pointer there
-            let ty_word = Regex::new(&format!(r"\b{}\b", regex::escape(&base))).ok();
-            (l0..l1).any(|i| {
-                    if !word_start(s, i)
-                        || before_blank(s, i).is_some_and(|p| s[p] == '.' || s[p] == ':')
-                        || !made_pointer(i)
-                        || !coerced(i)
-                    {
-                        return false;
-                    }
-                    let w = word_of(s, i);
-                    if !w.chars().next().is_some_and(|c| c.is_lowercase() || c == '_')
-                        || (is_keyword(&w) && w != "self")
-                    {
-                        return false;
-                    }
-                    // a field of `self` (`&self.t` in a method of `impl Own8`): its declared type
-                    let after = skip_blank(s, i + w.chars().count());
-                    if s.get(after) == Some(&'.') {
-                        let fb = skip_blank(s, after + 1);
-                        let field = word_of(s, fb);
-                        let next = skip_blank(s, fb + field.chars().count());
-                        if w != "self" || field.is_empty() || s.get(next) == Some(&'(') {
-                            return false;
-                        }
-                        return src
-                            .enclosing(src.pos(i), &[ItemKind::Fn])
-                            .and_then(|f| impl_of(&src, f))
-                            .and_then(|b| field_type(&src, &b.name, &field))
-                            .is_some_and(|t| type_name(&deref_type(&t)) == base);
-                    }
-                    if w == "self" {
-                        return false;
-                    }
-                    match binding(&src, i, &w) {
-                        // (not one that is a trait object already: `let up: &dyn Super = s;`
-                        // with `let s: &dyn Sub = &S1;` coerces no `S1`: its own annotation)
-                        Some(Bound::Let {
-                            init, first, last, at,
-                        }) => {
-                            let stmt: Vec<&str> =
-                                (first..=last).map(|l| src.lines[l - 1].as_str()).collect();
-                            let head = src.text(src.idx((first, 0)), at);
-                            let own_dyn = Regex::new(&format!(
-                                r"\blet\s+(?:mut\s+)?{}\b([^=]*)=\s*$",
-                                regex::escape(&w)
-                            ))
-                            .ok()
-                            .and_then(|r| r.captures(&head).map(|m| m[1].contains("dyn")))
-                            .unwrap_or_else(|| stmt.iter().any(|l| re!(r"\bdyn\b").is_match(l)));
-                            ty_word.as_ref().is_some_and(|r| {
-                                r.is_match(&init) || stmt.iter().any(|l| r.is_match(l))
-                            }) && !own_dyn
-                        }
-                        // a closure's parameter (`vec![T4].into_iter().map(|x| Box::new(x) as
-                        // ..)`): the type named on the line before the closure
-                        Some(Bound::ClosureParam) => ty_word
-                            .as_ref()
-                            .is_some_and(|r| r.is_match(&src.text(l0, i))),
-                        // a parameter declared of the type, or of a type parameter of its
-                        // function or impl block
-                        Some(Bound::Param { .. }) => {
-                            src.enclosing(src.pos(i), &[ItemKind::Fn]).is_some_and(|f| {
-                                let sig = fn_sig(&src, f);
-                                let impl_params = impl_of(&src, f)
-                                    .map(|b| {
-                                        let (ba, bb) = src.span(b);
-                                        let h = src.text(
-                                            ba,
-                                            scan_to(&src.code, ba, bb, |k| src.code[k] == '{'),
-                                        );
-                                        h.trim_start()
-                                            .strip_prefix("impl")
-                                            .filter(|r| r.trim_start().starts_with('<'))
-                                            .map(|r| r.to_string())
-                                            .unwrap_or_default()
-                                    })
-                                    .unwrap_or_default();
-                                sig.params.iter().any(|(p, t)| {
-                                    p.trim_start_matches("mut ").trim() == w && {
-                                        let tn = type_name(&deref_type(t));
-                                        tn == base
-                                            || sig.generics.contains(&tn)
-                                            || t.trim_start_matches('&').trim().starts_with("impl ")
-                                            || re!(r"[<,]\s*(\w+)\s*[:,>]")
-                                                .captures_iter(&impl_params)
-                                                .any(|x| x[1] == tn)
-                                    }
-                                })
-                            })
-                        }
-                        _ => false,
-                    }
-                })
-                };
-                if ok {
-                    made = true;
-                    break;
-                }
-            }
-            if !made {
-                return Err(format!(
-                    "`{what}`: line {line} of {file} makes no `{ty}` a pointer to a trait object"
-                ));
-            }
+            self.check_place(record.as_str())
+                .map_err(|e| format!("`{what}`: {e}"))?;
         }
         Ok(())
     }
@@ -1232,6 +867,19 @@ impl Files<'_> {
                     return tie(self);
                 }
             }
+        }
+        // a static no text declares by that name (a macro writes it, and its invocation names
+        // it: `table!(TABLE, read, SHA256, SHA384)`): what it holds is what the CBOM cites in
+        // it, each such occurrence read at its own position with the compiler's record of the
+        // item
+        if !found
+            && self
+                .graph
+                .cited_in
+                .iter()
+                .any(|(item, d)| item == table && (last.is_empty() || *d == last))
+        {
+            return tie(self);
         }
         Err(if found {
             format!("`{table}` holds no `{last}`")

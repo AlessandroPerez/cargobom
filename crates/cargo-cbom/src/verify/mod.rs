@@ -104,21 +104,11 @@
 //!   `member: static`) is held by the static or const `T` of the package (the fields read, where
 //!   the context reads some), and, where the argument carrying the algorithm reads no value from
 //!   elsewhere, that code reads `T` and, through the fields it reads, X; a coercion ("`T` is
-//!   coerced to `dyn Tr` at F:L") is a pointer made of a `T` (or of a variable bound to one, a
-//!   parameter declared of `T` or of a type parameter of its function, a type parameter's value
-//!   in a generic function) on that line that becomes an object of `Tr`, or of a trait whose
-//!   supertraits include `Tr`, there: by the innermost context it is in (an `as` cast after it,
-//!   the parameter of the function it is passed to, also another crate's, the field of the
-//!   struct literal or of a field assignment, the field of the file's tuple struct or enum
-//!   variant constructed, the variable whose method stores it, the annotation of the `let`,
-//!   `static` or `const` whose value, tuple element or array element it is, a closure's return
-//!   annotation, the return type of the function whose tail or `return` it is; through blocks'
-//!   tails, the file's type aliases and traits imported under another name), also a field of
-//!   `self` declared of `T` (`&self.t`), a box's contents (`&*b`), and a closure's parameter
-//!   where `T` is named on the line before the closure; in a static's item exactly when the
-//!   detail says "in a static", on any line of an item cited at its first; `T` may be written
-//!   as a type parameter of the function or its impl (`Box::new(T::new())`), which the
-//!   instance gives the type;
+//!   coerced to `dyn Tr` at <span> as `text` line #..", or "in a static at ..", the static's
+//!   item) is where the compiler has it: the span runs from a token's edge to a token's edge,
+//!   starts with that text and is on a line of that fingerprint. Which type the expression
+//!   there has is not asked of the text (a variable, a call's result, an alias): that is the
+//!   compiler's typing;
 //! - a pointer's `named at` is where the variable called is bound, the binding in scope (blocks,
 //!   closures, nested functions, shadowing, `let f = f;`, a macro's `let`), or the statement
 //!   storing it into the container it is read from (`map.insert("a", digest)`, also a field's,
@@ -162,10 +152,9 @@
 //! candidates apart (a method called on the result of a call of the same name), within a range
 //! of them (counted apart, never as exact; the self-test counts a shift that lands only within
 //! such a range as rejected, and shifts a detail once per function, position and text it
-//! cites, not once per instance of a generic function citing the same). A shifted coercion
-//! detail that lands on another line coercing a value of the type to the trait is as true, and
-//! so is a shifted step or macro detail whose position has the fingerprint recorded (the same
-//! column of a line that reads the same): counted apart and printed (`AS TRUE`), not hidden.
+//! cites, not once per instance of a generic function citing the same). A shifted step, macro
+//! or coercion detail whose position has the fingerprint recorded (the same column of a line
+//! that reads the same) is as true: counted apart and printed (`AS TRUE`), not hidden.
 //!
 //! Not checked, by design (the walk, the value search and the knowledge base decide them, which
 //! a reader of the text cannot redo): the reachability tier (`[reachable]`, `[present]`,
@@ -205,9 +194,8 @@
 //! - Witness functions are checked in the build's packages, not the standard library's, and by
 //!   what their bodies name and their signatures can carry, not by whether the call's value
 //!   comes through them.
-//! - A coercion's detail is checked as a coercion of the type to the trait on that line, not as
-//!   the one whose value reaches the call: of two lines coercing the same type to the same trait
-//!   (two generic functions boxing their `T`), a shift from one to the other is as true.
+//! - A coercion's detail is held to the place the compiler records of it, not to the type the
+//!   expression there has, nor to whether its value is the one that reaches the call.
 //! - A step of an instantiation chain is held to what the compiler records of its position,
 //!   not to which function the code there calls: that the call at the position is of the
 //!   function instantiated, with the type arguments the instance has, is the compiler's
@@ -317,10 +305,6 @@ type Pending = (
 /// Where `Files::resolve_foreign` found one: the file, the item's extent, its module.
 type Spot = (PathBuf, (usize, usize), Option<Vec<String>>);
 
-/// Reads the type of a parameter of another crate's function (`Files::foreign_param`): the
-/// path written before the function's name, the name, the argument's index.
-type ForeignParam<'a> = dyn FnMut(&[String], &str, usize) -> Option<String> + 'a;
-
 /// What the CBOM says about packages: which assets each provides, and its dependencies.
 struct Graph {
     /// bom-refs of the packages that are components of the CBOM
@@ -337,6 +321,9 @@ struct Graph {
     /// asset bom-ref -> its `cryptoFunctions`, and whether it is reachable (its functions are
     /// then those of its reachable occurrences or entries)
     functions: HashMap<String, (Vec<String>, bool)>,
+    /// what the CBOM cites in each item: the item an occurrence is in, and the last name of
+    /// its symbol
+    cited_in: HashSet<(String, String)>,
 }
 
 impl Graph {
@@ -413,6 +400,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         family: HashMap::new(),
         primitive: HashMap::new(),
         functions: HashMap::new(),
+        cited_in: HashSet::new(),
     };
     // the components, and the root package (`metadata.component`)
     let root = doc["metadata"]["component"].clone();
@@ -534,6 +522,23 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             });
         }
     }
+    for o in &occs {
+        let ctx = split_context(&o.context);
+        let details = ctx.details.strip_prefix(ctx.tags).unwrap_or(ctx.details);
+        let last = o.symbol.rsplit("::").next().unwrap_or(&o.symbol);
+        // (the item the occurrence names, and the others it is in: one file compiled in two
+        // crates gives each position an item of each)
+        let own = details
+            .strip_prefix("in ")
+            .and_then(|d| parts(d).into_iter().next());
+        let others = parts(details)
+            .into_iter()
+            .filter_map(witness::owner_detail)
+            .filter_map(|(item, _)| item);
+        for item in own.into_iter().chain(others) {
+            graph.cited_in.insert((item.to_string(), last.to_string()));
+        }
+    }
     let mut at_pos: HashMap<(String, usize, usize), Vec<usize>> = HashMap::new();
     let mut at_line: HashMap<(String, usize), Vec<usize>> = HashMap::new();
     for (i, o) in occs.iter().enumerate() {
@@ -573,7 +578,6 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         roots,
         pkg_mods: HashMap::new(),
         std_items: HashMap::new(),
-        std_aliases: HashMap::new(),
         chains: HashMap::new(),
         found_items: HashMap::new(),
         open_fns: HashMap::new(),
@@ -689,18 +693,15 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                         .is_match(&o.context[m.get(0).map_or(0, |g| g.end())..]);
                     (m, marked)
                 });
-                let coercions = re!(r"coerced to `[^`]+` (?:in a static )?at [^\s;)]+?:(\d+)\)")
-                    .captures_iter(&o.context)
-                    .map(|m| (m, true));
                 let spans = re!(
-                    r"(?:expanded from|owner(?: `[^`]*`)? at|caller at|, from|by (?:macro|derive|attribute|rewrite) \S+ at) [^\s;]+?:(\d+):(\d+)-\d+:\d+(?: as `[^`]*`)?( line #[0-9a-f]{8})?"
+                    r"(?:expanded from|owner(?: `[^`]*`)? at|caller at|, from|by (?:macro|derive|attribute|rewrite) \S+ at|coerced to `[^`]+` (?:in a static )?at) [^\s;]+?:(\d+):(\d+)-\d+:\d+(?: as `[^`]*`)?( line #[0-9a-f]{8})?"
                 )
                 .captures_iter(&o.context)
                 .map(|m| {
                     let marked = m.get(3).is_some();
                     (m, marked)
                 });
-                let details = steps.chain(coercions).chain(spans);
+                let details = steps.chain(spans);
                 for (m, marked) in details {
                     let (Some(lg), cg) = (m.get(1), m.get(2)) else {
                         continue;
@@ -753,9 +754,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     if !ok || RANGED.with(|r| r.get()) {
                         caught += 1;
                     } else if marked {
-                        // the shifted line coerces the type to the trait too (a value of the type
-                        // becomes an object of that trait there, as `check_coercions` reads it),
-                        // or the shifted position has the fingerprint the compiler's has (the
+                        // the shifted position has the fingerprint the compiler's has (the
                         // same column of a line that reads the same): the claim is as true, no
                         // wrong position; printed, not hidden
                         total -= 1;
@@ -783,8 +782,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             if also_true > 0 {
                 println!(
                     "self-test {what}: {caught}/{total} shifted positions rejected ({also_true} \
-                     more landed on another coercion of the same type, or on the same column \
-                     of a line that reads the same, as true)"
+                     more landed on the same column of a line that reads the same, as true)"
                 );
             } else {
                 println!("self-test {what}: {caught}/{total} shifted positions rejected");
@@ -888,8 +886,6 @@ struct Files<'a> {
     pkg_mods: HashMap<PathBuf, Rc<PkgMods>>,
     /// standard-library paths checked (`std_item`)
     std_items: HashMap<String, bool>,
-    /// the standard library's type aliases read, by path (`std_alias`)
-    std_aliases: HashMap<String, Option<String>>,
     /// `module_chains` of a file, as asked for the file itself (depth 0).
     chains: HashMap<PathBuf, Option<Vec<Vec<String>>>>,
     /// `find_item`'s answers: a name looked up through a package's re-exports is asked for
@@ -1886,9 +1882,60 @@ static T: LazyLock<HashMap<&'static str, &(dyn Cipher + Send)>> =
         // a step without a record is left as it is; one whose record cannot be read is an error
         assert!(split_via("instantiated by a::f").unwrap().1.is_none());
         assert!(split_via("instantiated by a::f at src/a.rs:1:2 (call, to x)").is_err());
+        // a path's last name, as a macro writes the path
+        let last = |t: &str| super::witness::last_segment(t);
+        assert_eq!(
+            last("$mode::$mode2::<aes::Aes128>::new").as_deref(),
+            Some("new")
+        );
+        assert_eq!(last("ring::digest::$alg").as_deref(), Some("$alg"));
+        assert_eq!(last("<$t as Digest>::digest").as_deref(), Some("digest"));
+        assert_eq!(last("$crate::h::chain::<$h>").as_deref(), Some("chain"));
+        assert_eq!(last("Vec<u8>::r#new").as_deref(), Some("r#new"));
+        assert_eq!(last("$a + $b::c"), None);
+        assert_eq!(last("f(a::b)"), None);
         // a fingerprint is of a column of a line
         assert_ne!(line_mark("a.f(b)", 2), line_mark("a.f(b)", 3));
         assert_ne!(line_mark("a.f(b)", 2), line_mark("c.f(b)", 2));
         assert_eq!(line_mark("a.f(b)", 2), line_mark("a.f(b)", 2));
+    }
+    #[test]
+    fn a_procedural_macro_package_is_known_by_its_manifest() {
+        use super::manifest::in_proc_macro_package;
+        let root = std::env::temp_dir().join(format!("rcbom-pm-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        let put = |dir: &str, manifest: &str| {
+            let d = root.join(dir).join("src");
+            std::fs::create_dir_all(&d).unwrap();
+            std::fs::write(root.join(dir).join("Cargo.toml"), manifest).unwrap();
+            d.join("lib.rs")
+        };
+        let package = "[package]\nname = \"p\"\nversion = \"0.1.0\"\n";
+        let a = put(
+            "a",
+            &format!("{package}[lib]\nproc-macro = true # a macro crate\n"),
+        );
+        let b = put(
+            "b",
+            &format!("{package}[lib]\ncrate-type = [\n  \"proc-macro\",\n]\n"),
+        );
+        let c = put("c", &format!("{package}[lib]\nproc-macro = false\n"));
+        let d = put(
+            "d",
+            &format!("{package}[dependencies]\nproc-macro = true\n"),
+        );
+        // (a workspace's manifest without a package is not the file's: the one above it is)
+        let e = put("a/ws", "[workspace]\nmembers = []\n");
+        let f = put(
+            "c/ws",
+            "[workspace]\nmembers = []\n[lib]\nproc-macro = true\n",
+        );
+        assert!(in_proc_macro_package(&a));
+        assert!(in_proc_macro_package(&b));
+        assert!(!in_proc_macro_package(&c));
+        assert!(!in_proc_macro_package(&d));
+        assert!(in_proc_macro_package(&e));
+        assert!(!in_proc_macro_package(&f));
+        let _ = std::fs::remove_dir_all(&root);
     }
 }

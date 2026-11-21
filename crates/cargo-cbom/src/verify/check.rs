@@ -1163,6 +1163,52 @@ impl Files<'_> {
         // closure on: a detail naming the closure's parent continues from the closure.
         let mut chain: Vec<(String, Held)> =
             callee.iter().map(|c| (c.clone(), inner.clone())).collect();
+        // whether the code at the occurrence names a type parameter of the function or the
+        // impl it is in: its asset is then what an instance's arguments choose
+        let by_param = self.source(at.0).is_some_and(|occ| {
+            let (rs, rc) = rest(&occ, at.1, at.2);
+            let Some((quals, last, generics)) = path_and_generics(&rs, &rc) else {
+                return false;
+            };
+            let Some(f) = occ.enclosing((at.1, at.2), &[ItemKind::Fn]) else {
+                return false;
+            };
+            let mut params = fn_sig(&occ, f).generics;
+            if let Some(b) = impl_of(&occ, f) {
+                let (ba, bb) = occ.span(b);
+                let head = occ.text(ba, scan_to(&occ.code, ba, bb, |k| occ.code[k] == '{'));
+                // (the parameters the impl declares: the first `<..>` after `impl`)
+                if let Some(h) = head
+                    .trim_start()
+                    .strip_prefix("impl")
+                    .map(str::trim_start)
+                    .filter(|r| r.starts_with('<'))
+                {
+                    let hs: Vec<char> = h.chars().collect();
+                    let cls = vec![Class::Code; hs.len()];
+                    if let Some(e) = skip_angle(&hs, &cls, 0) {
+                        let inner: String = hs[1..e - 1].iter().collect();
+                        params.extend(split_top(&inner).iter().filter_map(|g| {
+                            let g = g.trim().trim_start_matches("const ").trim();
+                            let n: String = g.chars().take_while(|c| is_ident(*c)).collect();
+                            (!n.is_empty() && !g.starts_with('\'')).then_some(n)
+                        }));
+                    }
+                }
+            }
+            quals
+                .iter()
+                .chain(&generics)
+                .chain(std::iter::once(&last))
+                .any(|w| params.contains(w))
+        });
+        // the items the occurrence is in beside the one it names, each with the compiler's
+        // record of where it is
+        let owners: Vec<&str> = parts(details)
+            .into_iter()
+            .filter_map(witness::owner_detail)
+            .filter_map(|(item, _)| item)
+            .collect();
         for part in parts(details) {
             if let Some(c) = &callee
                 && chain.last().is_none_or(|(k, _)| k != c)
@@ -1199,42 +1245,13 @@ impl Files<'_> {
                             });
                             inner = at.clone();
                         }
-                        // (or another item the macro invocation at the occurrence makes of
-                        // the same code: picky's `define_oid! { A => a => "..", B => b => "..",
-                        // }` writes `a::{closure#0}` and `b::{closure#0}`, one line of the macro
-                        // each time. The items differ in one segment, which the invocation
-                        // names)
-                        Some((first, held))
-                            if re!(r"\[macro [\w:]+!\]").is_match(tags)
-                                && self.source(at.0).is_some_and(|occ| {
-                                    let segs = |x: &str| -> Vec<String> {
-                                        strip_generics(x)
-                                            .split("::")
-                                            .map(|g| g.trim().to_string())
-                                            .filter(|g| !g.is_empty())
-                                            .collect()
-                                    };
-                                    let (a, b) = (segs(first), segs(k));
-                                    let differing: Vec<&String> = a
-                                        .iter()
-                                        .zip(&b)
-                                        .filter(|(x, y)| x != y)
-                                        .map(|(_, y)| y)
-                                        .collect();
-                                    a.len() == b.len()
-                                        && differing.len() == 1
-                                        && differing[0].chars().all(is_ident)
-                                        && invocation_text(&occ, (at.1, at.2)).is_some_and(
-                                            |(_, text)| {
-                                                Regex::new(&format!(
-                                                    r"\b{}\b",
-                                                    regex::escape(differing[0])
-                                                ))
-                                                .is_ok_and(|r| r.is_match(&text))
-                                            },
-                                        )
-                                }) =>
-                        {
+                        // (or another item the occurrence is in: the instances of a generic
+                        // function share its code, and so do the functions one macro
+                        // invocation writes from one line, picky's `define_oid! { A => a =>
+                        // "..", B => b => ".." }` or cosmian_cover_crypt's `enc` and `dec` of
+                        // `make_mlkem!`. The compiler's record of that item is among the
+                        // details, `owner `k` at ..`, and is read with the position)
+                        Some((_, held)) if owners.contains(&k) => {
                             callee = Some(k.to_string());
                             inner = held.clone();
                         }
@@ -1322,9 +1339,14 @@ impl Files<'_> {
             // nothing of it: the function instantiated may use an algorithm of its own beside
             // the one its type argument chooses (the SHA-1 of pgp's integrity check, in a
             // decryptor instantiated with its cipher); nor of an operation of unknown algorithm
-            // (cfb-mode's, run over the cipher chosen there)
+            // (cfb-mode's, run over the cipher chosen there). And it is held so only where the
+            // occurrence's own code is written with a type parameter of its function or impl
+            // (`D::new()`, `Hmac::<D>::new_from_slice(k)`): code that names a type of its own
+            // runs it whatever the instance (cotp's `Sha256::new()` in a function generic
+            // over the hash of its HMAC, instantiated with SHA-1)
             if let (Some(_), Some(c0)) = (&caller, col)
                 && !component_ref.starts_with("crypto:algorithm:unknown")
+                && by_param
             {
                 let here: Vec<usize> = self
                     .at_pos

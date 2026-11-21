@@ -567,21 +567,6 @@ pub(super) fn is_keyword(w: &str) -> bool {
             | "box"
     )
 }
-/// Where the path whose last segment starts at `wb` starts (`Box::new`: at `Box`).
-pub(super) fn path_start(s: &[char], wb: usize) -> usize {
-    let mut st = wb;
-    while let Some(c) = before_blank(s, st).filter(|&c| s[c] == ':' && c > 0 && s[c - 1] == ':') {
-        let Some(e2) = before_blank(s, c - 1).filter(|&e2| is_ident(s[e2])) else {
-            break;
-        };
-        let mut b = e2 + 1;
-        while b > 0 && is_ident(s[b - 1]) {
-            b -= 1;
-        }
-        st = b;
-    }
-    st
-}
 /// The call whose arguments the bracket at `ob` opens: the start of its callee's last segment
 /// and that name (`f`, `m::f::<T>`, `.m`), skipping a turbofish.
 pub(super) fn callee_before(s: &[char], ob: usize) -> Option<(usize, String)> {

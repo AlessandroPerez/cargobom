@@ -333,6 +333,45 @@ pub(super) fn split_via(part: &str) -> Result<(&str, Option<Via>), String> {
     ))
 }
 
+/// The last name of a path as a macro's code writes it, metavariables and all
+/// (`$mode::$mode2::<aes::Aes128>::new`: `new`; `ring::digest::$alg`: `$alg`): what follows the
+/// last `::` outside brackets. `None` where the text is no path: each segment is a name, with
+/// generic arguments or not, or bracketed whole.
+pub(super) fn last_segment(text: &str) -> Option<String> {
+    let cs: Vec<char> = text.trim().chars().collect();
+    let mut segments: Vec<String> = Vec::new();
+    let (mut depth, mut start, mut i) = (0usize, 0usize, 0usize);
+    while i < cs.len() {
+        match cs[i] {
+            '<' | '(' | '[' | '{' => depth += 1,
+            '>' if i > 0 && cs[i - 1] == '-' => {}
+            '>' | ')' | ']' | '}' => depth = depth.checked_sub(1)?,
+            ':' if depth == 0 && cs.get(i + 1) == Some(&':') => {
+                segments.push(cs[start..i].iter().collect());
+                start = i + 2;
+                i += 1;
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+    if depth != 0 {
+        return None;
+    }
+    segments.push(cs[start..].iter().collect());
+    let mut last = None;
+    for seg in &segments {
+        let seg = seg.trim();
+        // (`<T as Trait>`, a turbofish's `<u8>`)
+        if seg.starts_with('<') && seg.ends_with('>') {
+            continue;
+        }
+        let m = re!(r"^(\$?(?:r#)?[A-Za-z_]\w*)\s*(?:<.*>)?$").captures(seg)?;
+        last = Some(m[1].to_string());
+    }
+    last
+}
+
 /// The last name of an item's path, without generic arguments (`<a::S as T>::f::<u8>`: `f`); a
 /// closure's is `{closure#0}`.
 fn last_name(item: &str) -> String {
@@ -529,6 +568,21 @@ impl Holder {
 }
 
 impl Files<'_> {
+    /// A place the compiler records and no name in the text holds (`<span> as `text` line
+    /// #mark`, a coercion's): the span runs from a token's edge to a token's edge, starts with
+    /// that text, and is on a line of that fingerprint.
+    pub(super) fn check_place(&mut self, record: &str) -> Result<(), String> {
+        let w = written_whole(record).ok_or_else(|| format!("`{record}` cannot be read"))?;
+        let Some(mark) = &w.line else {
+            return Err(format!(
+                "no fingerprint of the line of {}:{}:{}",
+                w.at.file, w.at.start.0, w.at.start.1
+            ));
+        };
+        let (_, src) = self.span_at(&w.at, true)?;
+        reads_as(&src, &w.at, w.at.start, w.text.as_deref(), Some(mark))
+    }
+
     /// A span's file read, the span in it: from a token's edge to a token's edge, in code
     /// (`literal`: or in a literal, a format string's part).
     fn span_at(&mut self, s: &Span, literal: bool) -> Result<(PathBuf, Rc<Source>), String> {
@@ -650,7 +704,7 @@ impl Files<'_> {
             match &st.kind {
                 StepKind::Macro => {
                     if !named("", r"\s*!") {
-                        return Err(format!("{here}: no invocation of `{}!`", st.name));
+                        unread.push((i, format!("{here}: no invocation of `{}!`", st.name)));
                     }
                 }
                 StepKind::Derive => {
@@ -658,9 +712,12 @@ impl Files<'_> {
                         re!(r"^(?:derive|cfg_attr)\s*\(").is_match(&a) && open_in(&a, "derive")
                     });
                     if !(named("", r"\b") && listed) {
-                        return Err(format!(
-                            "{here}: `{}` is not named in a `#[derive(..)]` there",
-                            st.name
+                        unread.push((
+                            i,
+                            format!(
+                                "{here}: `{}` is not named in a `#[derive(..)]` there",
+                                st.name
+                            ),
                         ));
                     }
                 }
@@ -669,7 +726,7 @@ impl Files<'_> {
                     let inside =
                         named("", r"\b") && attribute_before(&csrc, start.0, start.1).is_some();
                     if !(direct || inside) {
-                        return Err(format!("{here}: no attribute `{}`", st.name));
+                        unread.push((i, format!("{here}: no attribute `{}`", st.name)));
                     }
                 }
                 StepKind::Rewrite(r) => {
@@ -723,7 +780,12 @@ impl Files<'_> {
                     // (a macro the compiler implements: its definition's text is not its code)
                     let built_in = (l0.saturating_sub(4).max(1)..=*l0)
                         .any(|l| code_line(&dsrc, l).contains("rustc_builtin_macro"));
-                    let function = re!(r"\bfn\b").is_match(&code);
+                    // a procedural macro is a function of a procedural-macro crate. The
+                    // line reads `fn`, or it is whatever a macro that writes the function
+                    // gave it (`#[proc_macro_error]` over the function puts it at its own
+                    // line): then the package's manifest says what the crate is
+                    let function = re!(r"\bfn\b").is_match(&code)
+                        || super::manifest::in_proc_macro_package(&dpath);
                     if !(declared || function) {
                         return Err(format!("{file}:{l0}: no macro is defined there"));
                     }
@@ -745,9 +807,11 @@ impl Files<'_> {
             }
             holders.push(holder);
         }
-        // a rewrite's code reads as what it rewrites, where it is written as it reads: a
-        // procedural macro puts the syntax it writes at a span of its choosing (its invocation,
-        // a token of the item it is on), whose text is not that syntax
+        // an invocation reads as its macro's, and a rewrite's code as what it rewrites, where
+        // it is written as it reads: a procedural macro puts what it writes at a span of its
+        // choosing (its own invocation, a token of the item it is on), whose text is not that
+        // syntax (rust-s3's `#[maybe_async::maybe_async]` writes `#[async_trait::async_trait]`
+        // over the trait it is on, at its own span)
         if let Some((_, e)) = unread
             .into_iter()
             .find(|(i, _)| !procedural.get(i + 1).copied().unwrap_or(false))
@@ -813,12 +877,25 @@ impl Files<'_> {
         if super::check::operator_of(symbol).is_some_and(|op| text.contains(op)) {
             return Ok(true);
         }
-        // a name the macro takes from its invocation (`ring::digest::$alg`, `$f(..)`): the
-        // code is written with a metavariable, and an invocation around it names the symbol,
-        // by its name or by one its file imports it as
         if !re!(r"\$[A-Za-z_]\w*").is_match(&text) {
             return Ok(false);
         }
+        // a path with a metavariable before its last name (`$mode::$mode2::<aes::Aes128>::new`):
+        // the name is what follows the path's last `::`
+        if let Some(l) = last_segment(&text) {
+            let l = l.trim_start_matches("r#");
+            if l == ident
+                || src
+                    .binds
+                    .iter()
+                    .any(|b| b.name == l && b.path.last() == Some(&ident))
+            {
+                return Ok(true);
+            }
+        }
+        // a name the macro takes from its invocation (`ring::digest::$alg`, `$f(..)`): the
+        // code is written with a metavariable, and an invocation around it names the symbol,
+        // by its name or by one its file imports it as
         for st in &w.steps {
             let Some(call) = &st.call else { continue };
             let cpath = self.resolve(&call.file)?;

@@ -581,6 +581,50 @@ pub(super) fn check_toml(
         Err(format!("unrecognized manifest context {context:?}"))
     }
 }
+/// Whether the package a file is in builds a procedural-macro crate: the nearest manifest
+/// above it that has a `[package]` sets `proc-macro = true` in its `[lib]`, or lists
+/// `"proc-macro"` among the `crate-type`s there.
+pub(super) fn in_proc_macro_package(file: &Path) -> bool {
+    for dir in file.ancestors().skip(1) {
+        let Ok(text) = std::fs::read_to_string(dir.join("Cargo.toml")) else {
+            continue;
+        };
+        let keys = toml_keys(&text);
+        // (a workspace's manifest without a package is not the file's)
+        if !keys
+            .iter()
+            .any(|k| k.path.first().is_some_and(|p| p == "package"))
+        {
+            continue;
+        }
+        let lines: Vec<&str> = text.lines().collect();
+        return keys.iter().any(|k| {
+            let [table, key] = k.path.as_slice() else {
+                return false;
+            };
+            if table != "lib" {
+                return false;
+            }
+            // the value as written, from the key on: to the line's end, or to the `]` that
+            // closes a list
+            let from: String = lines
+                .get(k.line.wrapping_sub(1)..)
+                .unwrap_or_default()
+                .join("\n")
+                .chars()
+                .skip(k.col)
+                .collect();
+            match key.as_str() {
+                "proc-macro" | "proc_macro" => re!(r"^\S+\s*=\s*true\b").is_match(&from),
+                "crate-type" | "crate_type" => {
+                    re!(r#"^\S+\s*=\s*\[[^\]]*"proc-macro""#).is_match(&from)
+                }
+                _ => false,
+            }
+        });
+    }
+    false
+}
 /// The package a dependency key of the manifest in `dir` renames (`algs = { package =
 /// "picklib", .. }`: `picklib`, as a crate name), for the name the code writes.
 pub(super) fn renamed_dep(dir: &Path, name: &str) -> Option<String> {
