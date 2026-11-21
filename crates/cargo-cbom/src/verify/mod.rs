@@ -1,6 +1,13 @@
 //! `cargo cbom verify`: reopen every file a CBOM cites and check that the code at
-//! `line`/`offset` names what `symbol` says was found. Independent of the driver's span
-//! handling, so an off-by-one line or column fails.
+//! `line`/`offset` names what `symbol` says was found, so an off-by-one line or column fails.
+//!
+//! Where code is (the item it is in, the macros that write it, the call a step of an
+//! instantiation chain is, a closure's extent) is not looked for in the text: the generator
+//! gives what the compiler records of it, and each span of that record is read and held to what
+//! the record says of it (`witness`). The verifier is independent of the analysis, whose
+//! conclusions it checks; it takes the structure of the source from the compiler, as the
+//! analysis does. What a path at a position names, and the values a call reads, it still reads
+//! from the text.
 //!
 //! A code position must start a token (not inside an identifier, not after `::`), lie in code
 //! (not in a comment or a literal), and begin a path (comments between its segments skipped, raw
@@ -117,51 +124,48 @@
 //!   storing it into the container it is read from (`map.insert("a", digest)`, also a field's,
 //!   `t.map.insert(1, digest)`); a variable computed by code not followed (another crate's
 //!   function, a labelled block) must read a variable bound there;
-//! - a closure's instantiation detail (its caller written `f::<..>` or not) cites the innermost
-//!   closure, or `async` closure's body,
-//!   whose extent strictly holds the next position inward, and a closure caller that is the
-//!   closure's parent but for closure indexes is its parent; an instantiation detail citing an
-//!   `[instantiation]` occurrence's position is of one of that position's assets, and an
-//!   `[instantiation]` occurrence cited by details is cited by its own asset's; a method call it
-//!   cites on a value whose type the code says (a variable's annotation or initializer, a
-//!   field's declared type, a tuple's element, a function's or method's return type, a derived
-//!   `T::default()`, `vec![..]`'s and an array literal's elements, `Some(..)`, through
-//!   parentheses and the file's type aliases) is of
-//!   the chain's type, or of one implementing the chain's trait; a generic function's instance
-//!   (`pass::<A>`) is called with those type arguments, written or given by an argument of a
-//!   type of the file (`pass(&B, ..)` is `pass::<B>`); an instance written `f::<..>` whose
-//!   call's arguments set up assets of the asset's primitive (`Algorithm::hash(HmacSha256::
-//!   new_from_slice(k)?, d)`) sets up this asset among them; a vtable's detail cites the coercion's
-//!   expression from its first token (a cast to a pointer, not `as fn(..)`), also a value made
-//!   an object of the method's trait by a function's parameter (`up_dyn(&mut a1)`, a default
-//!   body only for a type whose impl does not write it); an `async fn`'s body (`f::{closure#0}`)
-//!   is cited on a line calling `f`, at the `await` of a call of `f` (`f(..)` on the line before
-//!   `.await`), at the `async` of `async fn f` (an `#[async_trait]` method's), or where the
-//!   future is polled (`as `poll``); an impl a `#[derive(..)]` writes, at the trait's name in the
-//!   attribute on the type; a call a macro
-//!   invoked in the function
-//!   makes is cited at the invocation, one through a variable bound to a function item running
-//!   the chain's body at the variable's call (not at the `let` binding it);
+//! - a step of an instantiation chain (`instantiated by X at F:L:C as `text` (call of `f`, to
+//!   L:C as `..` line #.., from .., caller at ..)`) is as the compiler records it: the code at
+//!   the position starts with the text given and has the fingerprint given (of its column in
+//!   its line), a macro writing it is as the record says (below), a closure or an `async` block
+//!   built there holds the code instantiated in it, and the caller, named where the record
+//!   says, holds the position. An instantiation detail citing an `[instantiation]`
+//!   occurrence's position is of one of that position's assets, and an `[instantiation]`
+//!   occurrence cited by details is cited by its own asset's; an instance written `f::<..>`
+//!   whose call's arguments set up assets of the asset's primitive (`Algorithm::hash(
+//!   HmacSha256::new_from_slice(k)?, d)`) sets up this asset among them;
+//! - the item an occurrence is in (`owner at <span> within L:C-L:C`) is named at the span,
+//!   after `fn`, `static` or `const`, and holds the position; a closure or an `async` block,
+//!   which has no name, starts with the text and has the fingerprint its record gives (`owner
+//!   at <span> as `..` line #.. within L:C-L:C`), and holds the position between where it
+//!   starts and where it ends; an item a macro writes is named in that macro's code or
+//!   invocation, and the position is in the invocation. An occurrence several items share (one
+//!   invocation writing each, with the operation in it) gives each one's, the others' by name
+//!   (``owner `item` at ..``);
 //! - a type alias is the one in scope where it is written: a block's own `type K = ..;`, else the
 //!   module's (`m::K`: module `m`'s), else the package's; an impl's self type (of a context, of a
 //!   witness) and a generic instance's type argument are compared whole, with their references
 //!   and type arguments, where the code writes more than a name (`impl Put for &mut A` is no
 //!   `<&'static Algorithm as Put>`'s, `apply(&mut a)` no `apply::<&Algorithm>`);
-//! - a macro's body line cited is in the rule the invocation matches (rustc's first; repetitions
-//!   `$(..)sep*+?` matched), and uses the metavariable that rule binds to the symbol; of several
-//!   invocations of one macro, the one inside the modules the item's path names and naming most
-//!   of its words (and the occurrence's descriptor: the algorithm a call's comes from, a
-//!   static's own symbol) makes it.
+//! - a macro's code (`expanded from <span> as `text` line #.. (by macro m! at <span> line #..
+//!   defined F:L-L, by derive D at <span> line #.., by rewrite await at <span> line #..)`) is
+//!   written where the record says, in the expansions it lists, innermost first: each
+//!   invocation has the fingerprint given and is its macro's (`m!`, the name in a
+//!   `#[derive(..)]`, an attribute; what a rewrite of the language's syntax rewrites, unless a
+//!   procedural macro around it writes that syntax), each definition a `macro_rules!`, a
+//!   `macro` or a procedural macro's function, each span inside the definition or the
+//!   invocation of an expansion around it (or the item an attribute or a derive around it is
+//!   on), and the last invocation the position cited. Code that no procedural macro and no
+//!   macro built into the compiler writes names the symbol.
 //!
-//! Verdicts: a position is verified exactly, or, where the context cannot tell identical
-//! candidates apart (invocations of one macro that make the same item as far as its path says),
-//! within a range of them (counted apart, never as exact; the self-test counts a shift that
-//! lands only within such a range as rejected, and shifts a detail once per function, position
-//! and text it cites, not once per instance of a generic function citing the same). A shifted
-//! coercion detail that lands on another line coercing a value of the type to the trait is as
-//! true, and so is a shifted instantiation detail that lands on another call of the method by the
-//! same caller on a value whose type the code says is the instance's (`a2.ext()` with `a2: E2`
-//! beside `E2.ext()`): counted apart and printed (`AS TRUE`), not hidden.
+//! Verdicts: a position is verified exactly, or, where the text cannot tell identical
+//! candidates apart (a method called on the result of a call of the same name), within a range
+//! of them (counted apart, never as exact; the self-test counts a shift that lands only within
+//! such a range as rejected, and shifts a detail once per function, position and text it
+//! cites, not once per instance of a generic function citing the same). A shifted coercion
+//! detail that lands on another line coercing a value of the type to the trait is as true, and
+//! so is a shifted step or macro detail whose position has the fingerprint recorded (the same
+//! column of a line that reads the same): counted apart and printed (`AS TRUE`), not hidden.
 //!
 //! Not checked, by design (the walk, the value search and the knowledge base decide them, which
 //! a reader of the text cannot redo): the reachability tier (`[reachable]`, `[present]`,
@@ -204,22 +208,13 @@
 //! - A coercion's detail is checked as a coercion of the type to the trait on that line, not as
 //!   the one whose value reaches the call: of two lines coercing the same type to the same trait
 //!   (two generic functions boxing their `T`), a shift from one to the other is as true.
-//! - A generic call's type arguments are compared only where written, or given by an argument
-//!   whose type is one of the file's; an elided `<..>` is not compared. Where they are not and
-//!   the caller calls the function by the same text elsewhere, the position is verified within
-//!   that range. A closure's index is not counted against the closures of its parent's body.
-//! - An occurrence in a generic item that several instances reach is written in one of them
-//!   (`in generic::<Fast>`) with every instance's chain: a second chain's calls are not held to
-//!   that instance's type arguments, and a detail of it moved to a neighbouring call of the
-//!   item is accepted.
-//! - A method's receiver is typed where the code says its type: a value of one of the file's
-//!   types, with its type arguments where an enum's variant declares them (`Self::Aes128(i) =>
-//!   i.read(..)`). On a variable of another crate's type it is not, and an instantiation detail
-//!   moved to another call of that method on the same variable (`mac.update(..)` three lines
-//!   running) is accepted: the same instance when the method has no type arguments of its own,
-//!   which the text does not say.
-//! - A standard-library macro's line is checked against the symbol or a metavariable, not
-//!   against the rule the invocation matches (the standard library's `macro` items are not read).
+//! - A step of an instantiation chain is held to what the compiler records of its position,
+//!   not to which function the code there calls: that the call at the position is of the
+//!   function instantiated, with the type arguments the instance has, is the compiler's
+//!   resolution, which the text is not asked again. A closure's index is not counted against
+//!   the closures of its parent's body.
+//! - In the standard library, compiled with functions put into their callers, a position need
+//!   not be inside the item that runs it: not checked there.
 //! - That a claim without an unknown lists every value that may reach the call is not checked,
 //!   only that no store the verifier reads replaced the claimed value on every way: a value
 //!   stored at a constant index before a read at a variable index (`a[0] = &SHA512; digest(a[i],
@@ -232,13 +227,9 @@
 //! - Coercions not read: a `match` arm whose type only another arm gives (`E::B =>
 //!   Box::new(U)` with `E::A(p) => p`); the closure-parameter rule takes the type named on the
 //!   line before the closure for the parameter's.
-//! - A receiver whose type the code says only through an `if`/`match` block's value, or a field
-//!   of a generic struct whose type is a type parameter, is not typed (a chain moved onto it is
-//!   accepted); a generic struct receiver's type arguments are not compared.
 //! - Correct positions still rejected: a store through an `Option` holder re-pointed before the
 //!   write (`o = Some(&mut g); if let Some(r) = o { *r = v }`), a write through a holder after a
-//!   chain of reborrows; a `thread_local!` declared inside a function; a default body run through
-//!   `Option::map(Trait::m)`; nested closures of a generic function instantiated twice.
+//!   chain of reborrows.
 //! - A store through a pointer a struct pattern binds (`let S { a, .. } = &mut s; *a = v`) or a
 //!   `Box` holding the pointer is a possible store: the value before is still accepted.
 //! - `#[cfg(..)]` is not evaluated (both `#[cfg]` sibling `let`s are read). A shifted position that lands on an identical line that the
@@ -296,6 +287,7 @@ mod reads;
 mod source;
 mod stores;
 mod types;
+mod witness;
 
 use lex::*;
 use macros::*;
@@ -556,7 +548,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
     }
     let mut cited: HashMap<(String, usize, usize), HashSet<String>> = HashMap::new();
     for o in &occs {
-        for m in re!(r"instantiated by .*? at ([^\s;]+?):(\d+):(\d+)(?: as `[^`]*`)?(?:;|$)")
+        for m in re!(r"instantiated by .*? at ([^\s;]+?):(\d+):(\d+)(?: as `[^`]*`)?(?: \(|;|$)")
             .captures_iter(&o.context)
         {
             cited
@@ -598,7 +590,6 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
     let mut verified = vec![false; occs.len()];
     for (i, o) in occs.iter().enumerate() {
         RANGED.with(|r| r.set(false));
-        TYPED.with(|t| t.borrow_mut().clear());
         match files.check(i, o.line, o.offset) {
             Ok(()) if RANGED.with(|r| r.get()) => {
                 // identical candidates the context cannot tell apart: a range, not exact
@@ -672,8 +663,10 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                 shifted.len()
             );
         }
-        // the positions the details cite (`instantiated by X at F:L:C`, `expanded from F:L`,
-        // `named at F:L:C` of a function pointer)
+        // the positions the details give: where a generic instance was instantiated
+        // (`instantiated by X at F:L:C`), where a function pointer was named (`named at
+        // F:L:C`), where a type was coerced, and every span of the compiler's record (where a
+        // macro's code is written, each invocation around it, where an item is named)
         for (dl, dc, what) in [
             (1i64, 0i64, "detail line +1"),
             (-1, 0, "detail line -1"),
@@ -685,15 +678,30 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                 // one shift per function, position and text cited: the instances of a generic
                 // function cite the same lines (thousands, in a chain of macro-made types)
                 let mut tried = HashSet::new();
-                let details = re!(
-                    r"(?:instantiated by .*? at|expanded from|named at) [^\s;]+?:(\d+)(?::(\d+))?(?: as `[^`]*`)?(?:;|$)"
+                // (with whether the position has a fingerprint of its own: a step's is after
+                // where its span ends, a span's after its text)
+                let steps = re!(
+                    r"(?:instantiated by .*? at|named at) [^\s;]+?:(\d+)(?::(\d+))?(?: as `[^`]*`)?(?: \(|;|$)"
                 )
                 .captures_iter(&o.context)
-                .chain(
-                    re!(r"coerced to `[^`]+` (?:in a static )?at [^\s;)]+?:(\d+)\)")
-                        .captures_iter(&o.context),
-                );
-                for m in details {
+                .map(|m| {
+                    let marked = re!(r"^[a-z ]+(?: of `[^`]*`)?, to \d+:\d+(?: as `[^`]*`)? line #")
+                        .is_match(&o.context[m.get(0).map_or(0, |g| g.end())..]);
+                    (m, marked)
+                });
+                let coercions = re!(r"coerced to `[^`]+` (?:in a static )?at [^\s;)]+?:(\d+)\)")
+                    .captures_iter(&o.context)
+                    .map(|m| (m, true));
+                let spans = re!(
+                    r"(?:expanded from|owner(?: `[^`]*`)? at|caller at|, from|by (?:macro|derive|attribute|rewrite) \S+ at) [^\s;]+?:(\d+):(\d+)-\d+:\d+(?: as `[^`]*`)?( line #[0-9a-f]{8})?"
+                )
+                .captures_iter(&o.context)
+                .map(|m| {
+                    let marked = m.get(3).is_some();
+                    (m, marked)
+                });
+                let details = steps.chain(coercions).chain(spans);
+                for (m, marked) in details {
                     let (Some(lg), cg) = (m.get(1), m.get(2)) else {
                         continue;
                     };
@@ -739,116 +747,17 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     }
                     total += 1;
                     RANGED.with(|r| r.set(false));
-                    TYPED.with(|t| t.borrow_mut().clear());
                     let ok = files
                         .check_with(i, o.line, o.offset, Some(&shifted))
                         .is_ok();
-                    // (the method instantiated: the item before the detail in the chain; one
-                    // with type arguments of its own may be another instance at another call)
-                    let whole = m.get(0).map_or("", |g| g.as_str());
-                    // (the item the detail names, where it does not follow the one before)
-                    let named_item = o.context[..start]
-                        .strip_suffix("` ")
-                        .and_then(|t| t.rfind('`').map(|k| t[k + 1..].to_string()));
-                    let callee = named_item
-                        .clone()
-                        .or_else(|| {
-                            re!(r"instantiated by (.*?) at [^\s;]+:\d+")
-                                .captures_iter(&o.context[..start])
-                                .last()
-                                .map(|c| c[1].trim().to_string())
-                        })
-                        .or_else(|| {
-                            let k = o.context.find("] in ")?;
-                            lex::parts(&o.context[k + "] in ".len()..])
-                                .into_iter()
-                                .next()
-                                .map(|p| p.trim().to_string())
-                        });
-                    // (a position in its body: the detail before this one, or the one whose
-                    // caller the detail names, else the occurrence's own)
-                    let inside = re!(r"instantiated by (.*?) at ([^\s;]+?):(\d+):(\d+)")
-                        .captures_iter(&o.context[..start])
-                        .filter(|c| named_item.as_deref().is_none_or(|k| c[1].trim() == k))
-                        .last()
-                        .map(|c| {
-                            let n = |k: usize| c[k].parse::<usize>().unwrap_or(0);
-                            (c[2].to_string(), n(3), n(4))
-                        })
-                        .unwrap_or_else(|| (o.location.clone(), o.line, o.offset));
-                    let same_variable = ok
-                        && callee.as_deref().is_some_and(|k| !k.ends_with('>'))
-                        && re!(r" at ([^\s;]+?):(\d+):(\d+)")
-                            .captures(whole)
-                            .is_some_and(|at| {
-                                let n = |k: usize| at[k].parse::<i64>().unwrap_or(0);
-                                let (l0, c0) = (n(2), n(3));
-                                if l0 + dl < 1 || c0 + dc < 0 {
-                                    return false;
-                                }
-                                let (a, b) = (
-                                    (l0 as usize, c0 as usize),
-                                    ((l0 + dl) as usize, (c0 + dc) as usize),
-                                );
-                                files.same_receiver(&at[1], a, b)
-                                    || files.chained_call(
-                                        &at[1],
-                                        a,
-                                        b,
-                                        (&inside.0, inside.1, inside.2),
-                                    )
-                            });
-                    // (the call that builds an `async` function's future and the `await` that
-                    // polls it: the body is made by the one, run by the other)
-                    let same_future = ok
-                        && callee.as_deref().is_some_and(|k| k.ends_with('}'))
-                        && re!(r" at ([^\s;]+?):(\d+):(\d+)")
-                            .captures(whole)
-                            .is_some_and(|at| {
-                                let n = |k: usize| at[k].parse::<i64>().unwrap_or(0);
-                                let (l0, c0) = (n(2), n(3));
-                                l0 + dl >= 1
-                                    && c0 + dc >= 0
-                                    && files.awaited_pair(
-                                        &at[1],
-                                        (l0 as usize, c0 as usize),
-                                        ((l0 + dl) as usize, (c0 + dc) as usize),
-                                    )
-                            });
-                    // (another token that starts the same closure or `async` body: `async`
-                    // of `(async move { .. })`, cited at its parenthesis)
-                    let same_body = ok
-                        && re!(r" at ([^\s;]+?):(\d+):(\d+)")
-                            .captures(whole)
-                            .is_some_and(|at| {
-                                let n = |k: usize| at[k].parse::<i64>().unwrap_or(0);
-                                let (l0, c0) = (n(2), n(3));
-                                l0 + dl >= 1
-                                    && c0 + dc >= 0
-                                    && files.same_closure(
-                                        &at[1],
-                                        (l0 as usize, c0 as usize),
-                                        ((l0 + dl) as usize, (c0 + dc) as usize),
-                                    )
-                            });
                     if !ok || RANGED.with(|r| r.get()) {
                         caught += 1;
-                    } else if m[0].starts_with("coerced to")
-                        || TYPED.with(|t| t.borrow().iter().any(|p| p == part))
-                        || same_variable
-                        || same_future
-                        || same_body
-                    {
+                    } else if marked {
                         // the shifted line coerces the type to the trait too (a value of the type
                         // becomes an object of that trait there, as `check_coercions` reads it),
-                        // or the caller calls the method there too on a value the code says is
-                        // of the instance's type (`E2.ext()` below `a2.ext()`, `a2` an `E2`), or
-                        // on the same variable (`xof.absorb(a);` above `xof.absorb(b);`, a method
-                        // without type parameters: one variable has one type), or on the result
-                        // of that call, of a method returning its own type (`.absorb(a)` above
-                        // `.absorb(b)` in one chain), or the shift goes from the `await` of a
-                        // future to the call that builds it:
-                        // the claim is as true, no wrong position; printed, not hidden
+                        // or the shifted position has the fingerprint the compiler's has (the
+                        // same column of a line that reads the same): the claim is as true, no
+                        // wrong position; printed, not hidden
                         total -= 1;
                         also_true += 1;
                         println!(
@@ -874,8 +783,8 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             if also_true > 0 {
                 println!(
                     "self-test {what}: {caught}/{total} shifted positions rejected ({also_true} \
-                     more landed on another coercion of the same type or call of the same \
-                     instance, as true)"
+                     more landed on another coercion of the same type, or on the same column \
+                     of a line that reads the same, as true)"
                 );
             } else {
                 println!("self-test {what}: {caught}/{total} shifted positions rejected");
@@ -1059,19 +968,11 @@ enum Bound {
 /// `in r1::Jar::<J>::seal`): its name, and the type and trait of the impl block it is a
 /// method of (`A`, `T`), when its path names them.
 struct InItem {
-    /// the path whole
-    path: String,
     name: String,
     self_ty: Option<String>,
     /// the type whole, as `norm_path` writes it
     self_full: Option<String>,
     trait_name: Option<String>,
-    /// the modules and functions a plain path names the item in (`v02::a::f` is in `[a]`,
-    /// `app::outer::inner` in `[outer]`), after the crate; None for a method
-    mods: Option<Vec<String>>,
-    /// a method's type or trait (`<v02::a::S as T>::f`, `v02::a::Tr::f`) and the modules its
-    /// path names it in
-    owner: Option<(String, Vec<String>)>,
 }
 
 /// How a name is bound in a function's body: by a `let` (or a macro whose expansion lets it),
@@ -1237,18 +1138,6 @@ thread_local! {
     /// Set by a check that could tell its position only within a range of identical candidates:
     /// invocations of one macro that make the same item as far as the context says.
     static RANGED: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
-    /// The instantiation details a check confirmed by the receiver's type the code says, which
-    /// is the instance's (`instantiated by main at src/main.rs:24:22 as `ext`` for `E2.ext()`).
-    static TYPED: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
-}
-
-/// Which macro invocation makes an item: this one only, this one among others the context
-/// cannot tell apart (a range), or another one.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Pick {
-    Exact,
-    Range,
-    No,
 }
 
 #[cfg(test)]
@@ -1310,8 +1199,6 @@ mod tests {
         );
         let i = in_item("t1::xchacha").unwrap();
         assert_eq!((i.name.as_str(), i.self_ty), ("xchacha", None));
-        assert!(same_trait("TryFrom", "TryFrom<&PrivateKeyDer>"));
-        assert!(!same_trait("TryFrom<&[u8]>", "TryFrom<&PrivateKeyDer>"));
     }
 
     fn code_at(src: &str, needle: &str) -> bool {
@@ -1779,24 +1666,6 @@ ring = "0.17"
     }
 
     #[test]
-    fn closures_have_extents() {
-        let s: Vec<char> = "run2(|x| a(x).len(), move |y| { b(y) }, async move |z| c(z));"
-            .chars()
-            .collect();
-        let text: String = s.iter().collect();
-        let first = text.find('|').unwrap();
-        let (a, b) = closure_span(&s, first).unwrap();
-        assert_eq!(&text[a..b], "|x| a(x).len()");
-        let mv = text.find("move |y|").unwrap();
-        let (a, b) = closure_span(&s, mv).unwrap();
-        assert_eq!(&text[a..b], "move |y| { b(y) }");
-        let body = text.find("c(z)").unwrap();
-        let (a, b) = async_body_at(&s, body).unwrap();
-        assert_eq!(&text[a..b], "c(z)");
-        assert!(async_body_at(&s, text.find("a(x)").unwrap()).is_none());
-    }
-
-    #[test]
     fn generic_arguments_are_stripped_past_a_function_types_arrow() {
         assert_eq!(
             strip_generics("m::MapErr<S, fn(E<A, !>) -> E<A, B> {E::<..>::into::<..>}, E<A, B>>"),
@@ -1880,23 +1749,6 @@ ring = "0.17"
     }
 
     #[test]
-    fn a_path_is_read_over_its_lines() {
-        let code: Vec<char> = "x(stream::KeyStream::<
-    stream::Aes128,
->::new(key)); a < b; c.d()"
-            .chars()
-            .collect();
-        let (p, end) = long_path(&code, 2);
-        assert_eq!(p, "stream::KeyStream::<stream::Aes128,>::new");
-        assert_eq!(code[end], '(');
-        // (a comparison is no generic argument list, a method call no path)
-        let at = code.iter().collect::<String>().find("a <").unwrap();
-        assert_eq!(long_path(&code, at).0, "a");
-        let at = code.iter().collect::<String>().find("c.d").unwrap();
-        assert_eq!(long_path(&code, at).0, "c");
-    }
-
-    #[test]
     fn aliases_are_replaced_with_their_arguments() {
         let mut aliases = |n: &str| -> Vec<String> {
             match n {
@@ -1933,21 +1785,6 @@ ring = "0.17"
     }
 
     #[test]
-    fn a_trait_argument_written_as_an_alias_says_nothing() {
-        let mut aliases = |n: &str| -> Vec<String> {
-            if n == "Ciphertext" {
-                vec!["Ciphertext<XWingKem>".into()]
-            } else {
-                Vec::new()
-            }
-        };
-        let want = "From<&Array<u8,<XWingKemasKem>::CiphertextSize>>";
-        assert!(trait_of("From<&Ciphertext>", want, &mut aliases));
-        assert!(!trait_of("From<&Other>", want, &mut aliases));
-        assert!(!trait_of("Into<&Ciphertext>", want, &mut aliases));
-    }
-
-    #[test]
     fn items_are_read_from_nested_and_foreign_impl_paths() {
         // a type declared in a closure of a method, implementing a trait
         let n =
@@ -1956,14 +1793,6 @@ ring = "0.17"
         assert_eq!(n.name, "finalize");
         assert_eq!(n.self_ty.as_deref(), Some("Fin"));
         assert_eq!(n.trait_name.as_deref(), Some("Finalizer"));
-        // a standard-library trait implemented in another module than the type's
-        assert!(std_impl(
-            "p::kdf::<impl core::convert::TryFrom<&p::kdf::ScryptParams> for scrypt::Params>::try_from"
-        ));
-        assert!(std_impl("<Key as core::convert::From<[u8; 32]>>::from"));
-        assert!(!std_impl(
-            "p::kdf::<impl p::Derive for scrypt::Params>::derive"
-        ));
     }
 
     #[test]
@@ -1988,66 +1817,78 @@ static T: LazyLock<HashMap<&'static str, &(dyn Cipher + Send)>> =
             Some("Block<Ctr<Aes128>>")
         );
     }
+
     #[test]
-    fn a_derived_types_body_names_its_derives() {
-        let src = Source::new(
-            "/// doc
-#[derive(ContentHash, Hash, Debug)]
-pub struct Timestamp {
-    /// doc
-    pub timestamp: MillisSinceEpoch,
-    pub tz_offset: i32,
-}
-macro_rules! _id_type {
-    (   $(#[$attr:meta])*
-        $vis:vis $name:ident { $hex_method:ident() }
-    ) => {
-        $(#[$attr])*
-        #[derive($crate::content_hash::ContentHash, PartialEq)]
-        $vis struct $name(Vec<u8>);
-    };
-}
-#[cfg_attr(feature = \"x\", derive(a::B))]
-#[derive(
-    C,
-)]
-pub(crate) enum E<T: Fn(u8) -> u8>
-where
-    T: Clone,
-{
-    V(T),
-}
-fn f() { let x = S { a: 1 }; }
-",
-            true,
-            false,
-        );
-        let names = |at| derived_type_at(&src, at).map(|(n, d)| (n, d.join(",")));
-        assert_eq!(
-            names((5, 19)),
-            Some(("Timestamp".into(), "ContentHash,Hash,Debug".into()))
-        );
-        assert_eq!(names((3, 4)), None);
-        assert_eq!(
-            names((14, 27)),
-            Some(("$name".into(), "ContentHash,PartialEq".into()))
-        );
-        assert_eq!(names((24, 6)), Some(("E".into(), "C,B".into())));
-        assert_eq!(names((26, 20)), None);
+    fn a_generic_header_is_told() {
         use super::files::generic_header;
         assert!(generic_header("fn make_rng<R: SeedableRng>() -> R "));
         assert!(generic_header("pub fn fill(rng: &mut impl Rng, n: usize) "));
         assert!(!generic_header(
             "fn new<'a, const N: usize>(k: &'a [u8; N]) -> impl Sized "
         ));
-        assert!(same_type("[?]", "[(A,B)]", None, &mut |_| Vec::new()));
-        assert!(same_type(
-            "Vec<?>",
-            "Vec<Option<[u8;4]>>",
-            None,
-            &mut |_| Vec::new()
-        ));
-        assert!(!same_type("(?,?)", "(A,B,C)", None, &mut |_| Vec::new()));
-        assert!(!same_type("[u8;?]", "[u8;4];4", None, &mut |_| Vec::new()));
+    }
+
+    #[test]
+    fn what_the_compiler_records_is_read() {
+        use super::witness::{StepKind, line_mark, owner_detail, split_via, written_whole};
+        // a macro's code: where it is written, how it reads, the expansions it is in, each
+        // with its invocation's fingerprint
+        let w = written_whole(
+            "src/h.rs:19:17-19:40 as `$crate::h::_chain` line #7fd81dce (by macro chained! at \
+             src/h.rs:34:33-34:91 line #0a0b0c0d defined src/h.rs:17-24, by macro long! at \
+             src/m.rs:17:12-17:24 line #01020304 defined src/h.rs:32-36)",
+        )
+        .unwrap();
+        assert_eq!(w.steps[0].line.as_deref(), Some("0a0b0c0d"));
+        assert_eq!((w.at.start, w.at.end), ((19, 17), (19, 40)));
+        assert_eq!(w.text.as_deref(), Some("$crate::h::_chain"));
+        assert_eq!(w.line.as_deref(), Some("7fd81dce"));
+        assert_eq!(w.steps.len(), 2);
+        assert_eq!(w.steps[1].kind, StepKind::Macro);
+        assert_eq!(w.steps[1].def, Some(("src/h.rs".to_string(), 32, 36)));
+        // an item whole; one with no name, as it starts
+        let w = written_whole("src/a.rs:60:7-60:16 within 60:4-62:5").unwrap();
+        assert_eq!(w.within, Some(((60, 4), (62, 5))));
+        assert!(written_whole("src/a.rs:60:7-60:16 and more").is_none());
+        let w = written_whole("src/a.rs:9:18-9:28 as `|d: &[u8]|` line #0a0b0c0d within 9:18-13:9")
+            .unwrap();
+        assert_eq!(w.text.as_deref(), Some("|d: &[u8]|"));
+        assert_eq!(w.within, Some(((9, 18), (13, 9))));
+        // the occurrence's own item, and another sharing the occurrence, by name
+        assert_eq!(
+            owner_detail("owner at src/a.rs:60:7-60:16"),
+            Some((None, "src/a.rs:60:7-60:16"))
+        );
+        assert_eq!(
+            owner_detail("owner `<a::K as a::T>::g` at src/a.rs:64:7-64:8"),
+            Some((Some("<a::K as a::T>::g"), "src/a.rs:64:7-64:8"))
+        );
+        assert_eq!(owner_detail("owned by a::f"), None);
+        // a step: the call of a function under another name, in a rewrite, with its caller
+        let (step, via) = split_via(
+            "instantiated by a::remote::{closure#0} at src/a.rs:73:5 (call of \
+             `core::future::future::Future::poll`, to 73:10 as `await` line #01020304, from \
+             src/a.rs:73:5-73:10 as `await` (by rewrite await at src/a.rs:73:5-73:10), caller at \
+             src/a.rs:69:46-75:1 within 69:46-75:1)",
+        )
+        .unwrap();
+        assert_eq!(
+            step,
+            "instantiated by a::remote::{closure#0} at src/a.rs:73:5"
+        );
+        let via = via.unwrap();
+        assert_eq!(
+            via.named.as_deref(),
+            Some("core::future::future::Future::poll")
+        );
+        assert_eq!((via.to, via.text.as_deref()), ((73, 10), Some("await")));
+        assert!(via.from.is_some() && via.caller.is_some());
+        // a step without a record is left as it is; one whose record cannot be read is an error
+        assert!(split_via("instantiated by a::f").unwrap().1.is_none());
+        assert!(split_via("instantiated by a::f at src/a.rs:1:2 (call, to x)").is_err());
+        // a fingerprint is of a column of a line
+        assert_ne!(line_mark("a.f(b)", 2), line_mark("a.f(b)", 3));
+        assert_ne!(line_mark("a.f(b)", 2), line_mark("c.f(b)", 2));
+        assert_eq!(line_mark("a.f(b)", 2), line_mark("a.f(b)", 2));
     }
 }

@@ -327,68 +327,6 @@ pub(super) fn token_start(src: &Source, line: usize, col: usize) -> bool {
     }
     prev != [':', ':']
 }
-/// The length of the path written at `start` of a line: segments, `::`, and generic or
-/// qualified-path brackets (`<T as Tr>::f`, `seal::<Aes256Gcm>`).
-pub(super) fn path_len(chars: &[char], start: usize) -> usize {
-    let (mut j, mut depth) = (start, 0i32);
-    while j < chars.len() {
-        let c = chars[j];
-        match c {
-            '<' => depth += 1,
-            '>' if depth > 0 => depth -= 1,
-            _ if is_ident(c) || c == ':' => {}
-            _ if depth > 0 => {}
-            _ => break,
-        }
-        j += 1;
-    }
-    j - start
-}
-/// The path written from `start` in a file's code, over as many lines as it takes
-/// (`m::Stream::<\n    m::Aes128,\n>::new`), without its blanks, and where it ends.
-pub(super) fn long_path(s: &[char], start: usize) -> (String, usize) {
-    let mut out = String::new();
-    let (mut j, mut depth) = (start, 0i32);
-    while j < s.len() {
-        let c = s[j];
-        if depth > 0 {
-            match c {
-                '<' => depth += 1,
-                '>' if s[j - 1] != '-' => depth -= 1,
-                _ => {}
-            }
-            if !c.is_whitespace() {
-                out.push(c);
-            }
-            j += 1;
-            continue;
-        }
-        if is_ident(c) {
-            out.push(c);
-            j += 1;
-            continue;
-        }
-        if c == '<' && (out.is_empty() || out.ends_with("::")) {
-            depth = 1;
-            out.push(c);
-            j += 1;
-            continue;
-        }
-        // `::`, with blanks around it
-        let k = skip_blank(s, j);
-        if s.get(k) == Some(&':') && s.get(k + 1) == Some(&':') {
-            out.push_str("::");
-            j = skip_blank(s, k + 2);
-            continue;
-        }
-        break;
-    }
-    (out, j)
-}
-/// A path names an item: one of its segments is the item's name.
-pub(super) fn path_names(path: &str, name: &str) -> bool {
-    re!(r"\w+").find_iter(path).any(|m| m.as_str() == name)
-}
 /// A context's parts, split at the `; ` outside brackets (`in <[u8; 32] as From>::from; ..`).
 pub(super) fn parts(details: &str) -> Vec<&str> {
     let b = details.as_bytes();
@@ -505,43 +443,6 @@ pub(super) fn call_args_span(s: &[char], k: usize) -> Option<(usize, usize)> {
         }
     }
     Some((i, close_of_at(s, i).filter(|_| s.get(i) == Some(&'('))?))
-}
-/// Where the name of the call an `await` at `k` awaits starts: `f` in `f(x).await`, in
-/// `x.f::<T>(y)` with `.await` on the next line.
-pub(super) fn awaited_call(s: &[char], k: usize) -> Option<usize> {
-    if !kw(s, k, "await") {
-        return None;
-    }
-    let mut i = before_blank(s, k).filter(|&i| s[i] == '.')?;
-    i = before_blank(s, i).filter(|&i| s[i] == ')')?;
-    // back over the arguments, then a turbofish's `::<..>`
-    let back = |open: char, close: char, mut i: usize| -> Option<usize> {
-        let mut depth = 0i32;
-        loop {
-            if s[i] == close {
-                depth += 1;
-            } else if s[i] == open {
-                depth -= 1;
-                if depth == 0 {
-                    return Some(i);
-                }
-            }
-            i = i.checked_sub(1)?;
-        }
-    };
-    i = before_blank(s, back('(', ')', i)?)?;
-    if s[i] == '>' {
-        i = before_blank(s, back('<', '>', i)?).filter(|&i| s[i] == ':')?;
-        i = i.checked_sub(1).filter(|&i| s[i] == ':')?;
-        i = before_blank(s, i)?;
-    }
-    if !is_ident(s[i]) {
-        return None;
-    }
-    while i > 0 && is_ident(s[i - 1]) {
-        i -= 1;
-    }
-    word_start(s, i).then_some(i)
 }
 /// The word that ends before `i`, blanks skipped (empty when a symbol does).
 pub(super) fn word_before_at(s: &[char], i: usize) -> String {
