@@ -236,6 +236,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             usage_statics: HashSet::new(),
             crates: BTreeSet::new(),
             parent: HashMap::new(),
+            body_spans: HashMap::new(),
             statics: BTreeSet::new(),
             static_refs: Vec::new(),
             static_seen: HashSet::new(),
@@ -413,7 +414,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                     sysroot,
                 };
                 edges.visit_body(&body);
-                edges.found.into_iter().map(|(i, _)| i).collect()
+                edges.found.into_iter().map(|(i, ..)| i).collect()
             }))
             .unwrap_or_default();
             stack.extend(found);
@@ -422,21 +423,17 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         out
     }
 
-    pub(super) fn enqueue(
-        &mut self,
-        inst: Instance,
-        from: Option<(Instance, Loc, Option<String>)>,
-    ) {
+    pub(super) fn enqueue(&mut self, inst: Instance, from: Option<From>) {
         if matches!(
             inst.kind,
             InstanceKind::Virtual { .. } | InstanceKind::Intrinsic | InstanceKind::LlvmIntrinsic
         ) {
             return;
         }
-        if let Some((from, ..)) = &from {
+        if let Some(from) = &from {
             let c = self.callers.entry(inst).or_default();
-            if !c.contains(from) {
-                c.push(*from);
+            if !c.contains(&from.inst) {
+                c.push(from.inst);
             }
         }
         if self.seen.insert(inst) {
@@ -560,6 +557,13 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                         expansion: a.expansion.clone(),
                         std_entry: a.call.as_ref().map(|c| c.named.clone()),
                         self_ty: self_tree(tcx, did, rustc_internal::internal(tcx, c).args),
+                        owner_at: crate::names::item_at(
+                            tcx,
+                            rustc_internal::internal(tcx, a.caller.def.def_id()),
+                            self.body_spans
+                                .get(&a.caller)
+                                .map(|s| rustc_internal::internal(tcx, *s)),
+                        ),
                     });
                 }
                 for p in self.callers.get(&s).into_iter().flatten() {
@@ -637,15 +641,27 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
     pub(super) fn via(&self, inst: Instance) -> Vec<ViaStep> {
         let mut out = Vec::new();
         let mut cur = inst;
-        while let Some((p, loc, text)) = self.parent.get(&cur) {
+        while let Some(from) = self.parent.get(&cur) {
             // only generic instantiations need the chain to explain their arguments
             if cur.args().0.is_empty() || out.len() >= 4 {
                 break;
             }
+            let p = &from.inst;
             out.push(ViaStep {
                 caller: instance_name(self.cx.tcx, p),
-                span: loc.clone(),
-                text: text.clone(),
+                span: from.loc.clone(),
+                text: from.text.clone(),
+                edge: Some(from.edge.clone()),
+                expansion: from.expansion.clone(),
+                caller_at: crate::names::item_at(
+                    self.cx.tcx,
+                    rustc_internal::internal(self.cx.tcx, p.def.def_id()),
+                    self.body_spans
+                        .get(p)
+                        .map(|s| rustc_internal::internal(self.cx.tcx, *s)),
+                ),
+                head: from.head.clone(),
+                mark: from.mark.clone(),
             });
             cur = *p;
         }
@@ -708,6 +724,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             }
             return;
         };
+        self.body_spans.insert(inst, body.span);
         let stop = self.cx.stop_crate(did.krate);
         let shim = matches!(inst.kind, InstanceKind::Shim);
         let program = !usage
@@ -938,31 +955,43 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // (a closure or `async` block the body builds and also calls or awaits: from where it
         // builds it)
         let built = std::mem::take(&mut edges.built);
-        for (callee, span) in &mut found {
+        for (callee, span, edge) in &mut found {
             if let Some(b) = built.get(callee) {
                 *span = *b;
+                *edge = Edge::Built;
             }
         }
-        for (key, methods, span) in std::mem::take(&mut edges.deferred) {
+        for (key, methods, span, edge) in std::mem::take(&mut edges.deferred) {
             if self.dyn_used.contains(&key) {
-                found.extend(methods.into_iter().map(|m| (m, span)));
+                found.extend(methods.into_iter().map(|m| (m, span, edge.clone())));
             } else {
                 let p = self.pending.entry(key).or_default();
-                p.extend(methods.into_iter().map(|m| (m, inst, span)));
+                p.extend(methods.into_iter().map(|m| (m, inst, span, edge.clone())));
             }
         }
         for k in newly {
-            for (callee, from, span) in self.pending.remove(&k).unwrap_or_default() {
-                let loc = locate_stable(tcx, span).0;
+            for (callee, from, span, edge) in self.pending.remove(&k).unwrap_or_default() {
+                let (loc, expansion) = locate_stable(tcx, span);
                 let internal = rustc_internal::internal(tcx, span);
                 let text = callee_span(tcx, internal)
                     .is_none()
                     .then(|| span_text(tcx, internal))
                     .flatten();
-                self.enqueue(callee, Some((from, loc, text)));
+                self.enqueue(
+                    callee,
+                    Some(From {
+                        inst: from,
+                        loc,
+                        text,
+                        edge,
+                        expansion,
+                        head: cited_head(tcx, internal),
+                        mark: cited_mark(tcx, internal),
+                    }),
+                );
             }
         }
-        for (callee, span) in found {
+        for (callee, span, edge) in found {
             if debug.is_some() {
                 eprintln!("rcbom-walk:   -> {} ({:?})", callee.name(), callee.kind);
             }
@@ -972,7 +1001,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 self.enqueue_usage(callee);
                 continue;
             }
-            let loc = locate_stable(self.cx.tcx, span).0;
+            let (loc, expansion) = locate_stable(self.cx.tcx, span);
             // the text of the function named at the call (`decrypt::aes_ctr::<Aes128Ctr>`: the
             // span is the callee's); none for a call through a value (the span is the call's)
             let internal = rustc_internal::internal(self.cx.tcx, span);
@@ -980,7 +1009,18 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 .is_none()
                 .then(|| span_text(self.cx.tcx, internal))
                 .flatten();
-            self.enqueue(callee, Some((inst, loc, text)));
+            self.enqueue(
+                callee,
+                Some(From {
+                    inst,
+                    loc,
+                    text,
+                    edge,
+                    expansion,
+                    head: cited_head(self.cx.tcx, internal),
+                    mark: cited_mark(self.cx.tcx, internal),
+                }),
+            );
         }
     }
 
@@ -1205,7 +1245,8 @@ impl Edges<'_, '_> {
                         Operand::Constant(c) => c.span,
                         _ => term.source_info.span,
                     };
-                    self.found.push((i, span));
+                    let named = path_of(self.tcx, rustc_internal::internal(self.tcx, def.def_id()));
+                    self.found.push((i, span, Edge::Call { named }));
                     callee = Some(i);
                     let d = rustc_internal::internal(self.tcx, i.def.def_id());
                     let into = self.tcx.crate_name(d.krate);
@@ -1227,7 +1268,7 @@ impl Edges<'_, '_> {
                 if let Ok(ty) = place.ty(self.body.locals()) {
                     let i = Instance::resolve_drop_in_place(ty);
                     if !i.is_empty_shim() {
-                        self.found.push((i, term.source_info.span));
+                        self.found.push((i, term.source_info.span, Edge::Drop));
                     }
                 }
             }
@@ -1269,12 +1310,16 @@ impl Edges<'_, '_> {
                     let i = rustc_middle::ty::Instance::new_raw(did, iargs);
                     let span = self.cur.unwrap_or(self.body.span);
                     if let Some(key) = object {
-                        self.deferred
-                            .push((key, vec![rustc_internal::stable(i)], span));
+                        self.deferred.push((
+                            key,
+                            vec![rustc_internal::stable(i)],
+                            span,
+                            Edge::Built,
+                        ));
                     } else {
                         let i = rustc_internal::stable(i);
                         self.built.entry(i).or_insert(span);
-                        self.found.push((i, span));
+                        self.found.push((i, span, Edge::Built));
                     }
                 }
             }
@@ -1287,7 +1332,7 @@ impl Edges<'_, '_> {
                         if let Some(RigidTy::FnDef(def, args)) = src.kind_of().rigid()
                             && let Ok(i) = Instance::resolve_for_fn_ptr(*def, args)
                         {
-                            self.found.push((i, span));
+                            self.found.push((i, span, Edge::Pointer));
                         }
                     }
                     CastKind::PointerCoercion(PointerCoercion::ClosureFnPointer(_)) => {
@@ -1295,7 +1340,7 @@ impl Edges<'_, '_> {
                             && let Ok(i) =
                                 Instance::resolve_closure(*def, args, ClosureKind::FnOnce)
                         {
-                            self.found.push((i, span));
+                            self.found.push((i, span, Edge::ClosurePointer));
                         }
                     }
                     CastKind::PointerCoercion(PointerCoercion::Unsize) => {
@@ -1316,7 +1361,7 @@ impl Edges<'_, '_> {
                                     self.found.extend(
                                         vtable_methods(self.tcx, concrete, dynamic)
                                             .into_iter()
-                                            .map(|i| (i, span)),
+                                            .map(|i| (i, span, Edge::Object)),
                                     );
                                 }
                                 (_, rustc_middle::ty::Dynamic(preds, ..))
@@ -1324,14 +1369,17 @@ impl Edges<'_, '_> {
                                         && let Some(key) = dyn_key(self.tcx, preds) =>
                                 {
                                     let methods = vtable_methods_internal(self.tcx, c, preds);
-                                    self.deferred.push((key, methods, span));
+                                    self.deferred.push((key, methods, span, Edge::Object));
                                     // (its drop glue runs when the object is dropped)
-                                    self.found
-                                        .push((Instance::resolve_drop_in_place(concrete), span));
+                                    self.found.push((
+                                        Instance::resolve_drop_in_place(concrete),
+                                        span,
+                                        Edge::Object,
+                                    ));
                                 }
                                 _ => {
                                     for i in vtable_methods(self.tcx, concrete, dynamic) {
-                                        self.found.push((i, span));
+                                        self.found.push((i, span, Edge::Object));
                                     }
                                 }
                             }
@@ -1349,7 +1397,8 @@ impl Edges<'_, '_> {
             let mut found = Vec::new();
             let mut coerced = Vec::new();
             alloc_callees(self.tcx, a, &mut found, &mut Vec::new(), &mut coerced, 0);
-            self.found.extend(found.into_iter().map(|i| (i, c.span)));
+            self.found
+                .extend(found.into_iter().map(|i| (i, c.span, Edge::Constant)));
             self.coerced
                 .extend(coerced.into_iter().map(|x| (x, c.span, true)));
         }
@@ -1646,4 +1695,23 @@ fn only_coerced(tcx: TyCtxt<'_>, body: &Body, local: rustc_public::mir::Local) -
         rustc_middle::ty::Dynamic(preds, ..) => dyn_key(tcx, preds),
         _ => None,
     }
+}
+/// The start of the source text where a span is cited (for a macro's code, at the outermost
+/// invocation).
+fn cited_head(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+    let at = if span.from_expansion() {
+        span.source_callsite()
+    } else {
+        span
+    };
+    crate::names::span_head(tcx, at, 60)
+}
+/// The fingerprint of where a span is cited, in its line.
+fn cited_mark(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+    let at = if span.from_expansion() {
+        span.source_callsite()
+    } else {
+        span
+    };
+    crate::names::span_mark(tcx, at)
 }

@@ -1376,6 +1376,7 @@ mod tests {
                     version: "0.1.0".into(),
                     cwd: "/".into(),
                     unit: String::new(),
+                    externs: Vec::new(),
                 },
                 sites: Vec::new(),
                 data_edges: Vec::new(),

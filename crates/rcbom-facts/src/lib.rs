@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 37;
+pub const FACTS_VERSION: u32 = 39;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -414,6 +414,11 @@ pub struct CrateInfo {
     /// current build.
     #[serde(default)]
     pub unit: String,
+    /// Every crate this one is compiled against, its dependencies' dependencies too: one name
+    /// can be two crates of the build (two versions of a package), and this crate's paths name
+    /// the one it sees.
+    #[serde(default)]
+    pub externs: Vec<CrateRef>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
@@ -893,6 +898,29 @@ pub struct Site {
     /// For a site that is a call, which call: what its boundary edges name too.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub call: Option<CallId>,
+    /// Where the source names the owner.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub owner_at: Option<ItemAt>,
+}
+
+/// Where the source names an item, as the compiler records it: its identifier (`f` of `fn f`;
+/// for a closure or an `async` block, which have none, where it starts), with the expansions
+/// it is in when a macro writes it.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ItemAt {
+    pub name: Loc,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expansion: Option<Expansion>,
+    /// The item whole, to the end of its body, where the compiler has it at hand.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub body: Option<Loc>,
+    /// For an item with no identifier that the source writes: how the code at `name` starts,
+    /// and the fingerprint of that position in its line (`line_mark`). A named item is held to
+    /// its name.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mark: Option<String>,
 }
 
 /// One call, as its site and its boundary edges both name it: where the compiler writes its
@@ -925,6 +953,105 @@ pub struct Expansion {
     /// desugarings.
     pub macro_name: String,
     pub def_site: Loc,
+    /// Every expansion the code is in, innermost first, as the compiler records them. The last
+    /// is the one `kind` and `macro_name` name, invoked in the source.
+    #[serde(default)]
+    pub steps: Vec<ExpansionStep>,
+    /// The start of the source text at `def_site`: its first line, to 120 characters.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+    /// The fingerprint of `def_site`'s start in its line (`line_mark`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mark: Option<String>,
+}
+
+/// One expansion code is in: a macro invoked, or a rewrite of the language's syntax by the
+/// compiler.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ExpansionStep {
+    pub kind: StepKind,
+    /// The macro's name (`hash_all`, `Clone`); empty for a rewrite.
+    pub name: String,
+    /// Where it is invoked: `m!(..)`, the name in `#[derive(..)]`, the attribute; for a
+    /// rewrite, the code rewritten. Inside the definition or the invocation of the next step's
+    /// macro; in the source for the last step.
+    pub call: Loc,
+    /// The macro's definition; without a line where the compiler has none (a rewrite, a
+    /// built-in macro).
+    pub def: Loc,
+    /// The fingerprint of the invocation's position in its line (`line_mark`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mark: Option<String>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum StepKind {
+    /// `name!(..)`.
+    Bang,
+    /// `#[name]`.
+    Attr,
+    /// `#[derive(Name)]`.
+    Derive,
+    /// A rewrite of the language's syntax.
+    Rewrite(Rewrite),
+    /// Code the compiler adds to a crate (the prelude's import, a test harness, a procedural
+    /// macro's).
+    Pass,
+}
+
+/// The compiler's rewrites of syntax (`rustc_span::DesugaringKind`, each one of the pinned
+/// toolchain's).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum Rewrite {
+    /// `x?`.
+    QuestionMark,
+    /// `try { .. }`.
+    TryBlock,
+    /// `do yeet x`.
+    Yeet,
+    /// `impl Trait` in a type.
+    OpaqueTy,
+    /// `async { .. }`, `async fn`, an `async` closure.
+    Async,
+    /// `x.await`.
+    Await,
+    /// `for p in x { .. }`.
+    ForLoop,
+    /// `while c { .. }`.
+    WhileLoop,
+    /// `async Fn()` bounds.
+    BoundModifier,
+    /// A contract's check.
+    Contract,
+    /// A pattern type's range.
+    PatTyRange,
+    /// A format string's literal.
+    FormatLiteral,
+    /// `a..b`.
+    RangeExpr,
+}
+
+/// How the code at a position comes to a function the walk reaches from it, as the compiler's
+/// code has it.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum Edge {
+    /// A call. `named` is the function it names before the compiler resolves it to the one
+    /// that runs (`core::future::future::Future::poll`, `digest::digest::Digest::update`);
+    /// empty for a call through a pointer.
+    Call { named: String },
+    /// A value dropped: its drop glue.
+    Drop,
+    /// A closure, an `async` block or a coroutine built.
+    Built,
+    /// A function named as a value: made a function pointer.
+    Pointer,
+    /// A closure made a function pointer.
+    ClosurePointer,
+    /// A value made a trait object: the methods its type has for the object's traits, and its
+    /// drop glue.
+    Object,
+    /// A constant whose memory holds function pointers or trait objects.
+    Constant,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -936,6 +1063,38 @@ pub struct ViaStep {
     /// instantiates the function with other type arguments.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub text: Option<String>,
+    /// How the code there reaches the function instantiated.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge: Option<Edge>,
+    /// The expansions the code there is in.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expansion: Option<Expansion>,
+    /// Where the source names the caller.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub caller_at: Option<ItemAt>,
+    /// The start of the source text at `span`: its first line, to 60 characters.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub head: Option<String>,
+    /// The fingerprint of `span`'s start in its line (`line_mark`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mark: Option<String>,
+}
+
+/// A short fingerprint of a position in its source line, for a detail to hold where the line
+/// itself cannot be quoted: FNV-1a over the line's bytes with a zero byte where the position is
+/// (`col` characters in, from 0), as 8 hexadecimal digits. Another line, or another column of
+/// the same line, has another.
+pub fn line_mark(line: &str, col: usize) -> String {
+    let at = line.char_indices().nth(col).map_or(line.len(), |(i, _)| i);
+    let mut h: u32 = 0x811c_9dc5;
+    let mut eat = |b: u8| {
+        h ^= u32::from(b);
+        h = h.wrapping_mul(0x0100_0193);
+    };
+    line.as_bytes()[..at].iter().for_each(|b| eat(*b));
+    eat(0);
+    line.as_bytes()[at..].iter().for_each(|b| eat(*b));
+    format!("{h:08x}")
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -1043,6 +1202,9 @@ pub struct BoundaryEdge {
     /// itself is named by what the knowledge base says of that type.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub self_ty: Option<TyTree>,
+    /// Where the source names the owner.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub owner_at: Option<ItemAt>,
 }
 
 /// Whose code a call of `BoundaryEdge` runs for.

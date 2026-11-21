@@ -60,8 +60,8 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, exit};
 
 use rcbom_facts::{
-    CrateFacts, CrateInfo, CrateRef, DefRef, Expansion, FACTS_VERSION, Loc, MacroKind, Origin,
-    Owner, OwnerKind, Reach, Site, Target, Tier, TyTree, ViaStep,
+    CrateFacts, CrateInfo, CrateRef, DefRef, Edge, Expansion, FACTS_VERSION, Loc, MacroKind,
+    Origin, Owner, OwnerKind, Reach, Site, Target, Tier, TyTree, ViaStep,
 };
 use rustc_middle::ty::{TyCtxt, TypeVisitableExt};
 use rustc_public::mir::alloc::GlobalAlloc;
@@ -314,6 +314,18 @@ fn analyze(tcx: TyCtxt<'_>) {
         cwd: std::env::current_dir().unwrap().display().to_string(),
         unit: codegen_opt(&std::env::args().collect::<Vec<_>>(), "extra-filename")
             .unwrap_or_default(),
+        externs: {
+            let mut e: Vec<CrateRef> = tcx
+                .crates(())
+                .iter()
+                .map(|&c| CrateRef {
+                    name: tcx.crate_name(c).to_string(),
+                    stable_id: format!("{:016x}", tcx.stable_crate_id(c).as_u64()),
+                })
+                .collect();
+            e.sort();
+            e
+        },
     };
 
     let mut sites = Vec::new();
@@ -743,6 +755,8 @@ struct Scanner<'a, 'tcx> {
     unconvertible: bool,
     /// The item the body is of.
     def: Option<rustc_span::def_id::DefId>,
+    /// Where the source names it.
+    owner_at: Option<rcbom_facts::ItemAt>,
     /// The body is of a library's generic function its users can call, or of a closure in one
     /// (`lib_generic`): no instance of the library's own may show its calls.
     lib_generic: bool,
@@ -769,7 +783,9 @@ struct Walker<'a, 'tcx> {
     usage_statics: HashSet<rustc_span::def_id::DefId>,
     /// Crates whose code the walk reached.
     crates: BTreeSet<rustc_span::def_id::CrateNum>,
-    parent: HashMap<Instance, (Instance, Loc, Option<String>)>,
+    parent: HashMap<Instance, From>,
+    /// The span of each walked instance's body: where a caller is, whole.
+    body_spans: HashMap<Instance, Span>,
     statics: BTreeSet<String>,
     static_refs: Vec<DefRef>,
     static_seen: HashSet<String>,
@@ -795,13 +811,26 @@ struct Walker<'a, 'tcx> {
     dyn_used: HashSet<String>,
     /// What waits for a trait object to be used (`dyn_key`): the methods a type coerced to it
     /// in the program's code runs, and a closure made one there; with the body and position.
-    pending: HashMap<String, Vec<(Instance, Instance, Span)>>,
+    pending: HashMap<String, Vec<(Instance, Instance, Span, Edge)>>,
     /// The trait objects each type holds (`Walker::dyn_keys`).
     dyn_cache: HashMap<rustc_middle::ty::Ty<'tcx>, Vec<String>>,
     /// The calls of walked code (not the standard library's, a stop crate's or a shim) into each
     /// standard-library instance.
     std_anchors: HashMap<Instance, Vec<Anchor>>,
     limit: usize,
+}
+
+/// The edge the walk first reached an instance by: from which instance, where, the callee's
+/// text there, and how the code there reaches it.
+#[derive(Clone)]
+struct From {
+    inst: Instance,
+    loc: Loc,
+    text: Option<String>,
+    edge: Edge,
+    expansion: Option<Expansion>,
+    head: Option<String>,
+    mark: Option<String>,
 }
 
 /// The statics the constants of a body point at.
@@ -811,7 +840,7 @@ struct AllocStatics(Vec<rustc_public::mir::mono::StaticDef>);
 struct Edges<'a, 'tcx> {
     tcx: TyCtxt<'tcx>,
     body: &'a Body,
-    found: Vec<(Instance, Span)>,
+    found: Vec<(Instance, Span, Edge)>,
     /// The closures and `async` blocks this body builds, with where. One it also calls or
     /// polls is reached from where it builds it, whichever of the two its blocks have first
     /// (the blocks of an `async fn`'s state machine are not in the order of the source).
@@ -830,7 +859,7 @@ struct Edges<'a, 'tcx> {
     program: bool,
     /// Methods of trait objects made here, by `dyn_key`, and a closure made one, with where:
     /// edges once such an object is used.
-    deferred: Vec<(String, Vec<Instance>, Span)>,
+    deferred: Vec<(String, Vec<Instance>, Span, Edge)>,
     /// Trait objects this body uses without a call (`dyn_key`): an upcast.
     used: Vec<String>,
     /// The calls (the instance, none through a pointer) and their arguments' types.

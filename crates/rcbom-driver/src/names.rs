@@ -256,11 +256,185 @@ pub(crate) fn locate(tcx: TyCtxt<'_>, span: rustc_span::Span) -> (Loc, Option<Ex
             kind,
             macro_name,
             def_site: raw_loc(tcx, span),
+            steps: expansion_steps(tcx, span),
+            text: span_head(tcx, span, 120),
+            mark: span_mark(tcx, span),
         };
         (raw_loc(tcx, call), Some(exp))
     } else {
         (raw_loc(tcx, span), None)
     }
+}
+/// The start of a span's source text where it is written (inside a macro's definition, for a
+/// macro's code): its first line, to `max` characters.
+pub(crate) fn span_head(tcx: TyCtxt<'_>, span: rustc_span::Span, max: usize) -> Option<String> {
+    let t = tcx.sess.source_map().span_to_snippet(span).ok()?;
+    let h: String = t.lines().next()?.chars().take(max).collect();
+    (!h.trim().is_empty()).then_some(h)
+}
+/// The fingerprint of a span's start in its source line, where it is written
+/// (`rcbom_facts::line_mark`).
+pub(crate) fn span_mark(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+    if span.is_dummy() {
+        return None;
+    }
+    let sm = tcx.sess.source_map();
+    let line = sm
+        .span_to_snippet(sm.span_extend_to_line(span.shrink_to_lo()))
+        .ok()?;
+    let (_, _, col, _, _) = sm.span_to_location_info(span);
+    Some(rcbom_facts::line_mark(&line, col.saturating_sub(1)))
+}
+/// Every expansion a span is in, innermost first, as the compiler records them.
+fn expansion_steps(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Vec<rcbom_facts::ExpansionStep> {
+    if !span.from_expansion() {
+        return Vec::new();
+    }
+    steps_from(tcx, span.ctxt().outer_expn_data())
+}
+/// An expansion and those it is in, innermost first.
+fn steps_from(
+    tcx: TyCtxt<'_>,
+    first: rustc_span::hygiene::ExpnData,
+) -> Vec<rcbom_facts::ExpansionStep> {
+    use rcbom_facts::{Rewrite as R, StepKind};
+    use rustc_span::hygiene::{DesugaringKind as D, ExpnKind, MacroKind as K};
+    let mut out = Vec::new();
+    let mut next = Some(first);
+    while let Some(expn) = next.take()
+        && out.len() < 64
+    {
+        let (kind, name) = match expn.kind {
+            ExpnKind::Root => break,
+            ExpnKind::Macro(K::Bang, name) => (StepKind::Bang, name.to_string()),
+            ExpnKind::Macro(K::Attr, name) => (StepKind::Attr, name.to_string()),
+            ExpnKind::Macro(K::Derive, name) => (StepKind::Derive, name.to_string()),
+            ExpnKind::AstPass(_) => (StepKind::Pass, String::new()),
+            // (no arm for the rest: a rewrite a later toolchain adds does not build here)
+            ExpnKind::Desugaring(d) => (
+                StepKind::Rewrite(match d {
+                    D::QuestionMark => R::QuestionMark,
+                    D::TryBlock => R::TryBlock,
+                    D::YeetExpr => R::Yeet,
+                    D::OpaqueTy => R::OpaqueTy,
+                    D::Async => R::Async,
+                    D::Await => R::Await,
+                    D::ForLoop => R::ForLoop,
+                    D::WhileLoop => R::WhileLoop,
+                    D::BoundModifier => R::BoundModifier,
+                    D::Contract => R::Contract,
+                    D::PatTyRange => R::PatTyRange,
+                    D::FormatLiteral { .. } => R::FormatLiteral,
+                    D::RangeExpr => R::RangeExpr,
+                }),
+                String::new(),
+            ),
+        };
+        out.push(rcbom_facts::ExpansionStep {
+            kind,
+            name,
+            call: raw_loc(tcx, expn.call_site),
+            def: raw_loc(tcx, expn.def_site),
+            mark: span_mark(tcx, expn.call_site),
+        });
+        if expn.call_site.from_expansion() {
+            next = Some(expn.call_site.ctxt().outer_expn_data());
+        }
+    }
+    out
+}
+/// The expansion that defines an item, as the compiler records it; the root's for one the
+/// source writes. Of another crate's items, the metadata keeps it for modules, types, traits
+/// and impls only: an item in one of those a macro defines is that macro's.
+fn defining_expansion(
+    tcx: TyCtxt<'_>,
+    did: rustc_span::def_id::DefId,
+) -> rustc_span::hygiene::ExpnId {
+    use rustc_hir::def::DefKind as K;
+    let root = rustc_span::hygiene::ExpnId::root();
+    if did.is_local() {
+        return tcx.expn_that_defined(did);
+    }
+    let mut d = did;
+    while !d.is_crate_root() {
+        if matches!(
+            tcx.def_kind(d),
+            K::Mod | K::Struct | K::Union | K::Enum | K::Trait | K::Impl { .. }
+        ) {
+            let e = tcx.expn_that_defined(d);
+            if e != root {
+                return e;
+            }
+        }
+        match tcx.opt_parent(d) {
+            Some(p) => d = p,
+            None => break,
+        }
+    }
+    root
+}
+/// Where the source names an item: its identifier; for a closure or an `async` block, where it
+/// is written. An item a macro defines is so whatever spans its tokens have (a procedural macro
+/// gives its code the spans of what it was made from: `#[async_trait]`'s `async move { .. }`
+/// block has the span of the `async` of the `async fn` it rewrites; a `macro_rules!` writing
+/// `fn $name() { .. }` has the invocation's `$name`): with the expansions that define it, as
+/// the compiler records them of the definition.
+pub(crate) fn item_at(
+    tcx: TyCtxt<'_>,
+    did: rustc_span::def_id::DefId,
+    body: Option<rustc_span::Span>,
+) -> Option<rcbom_facts::ItemAt> {
+    let ident = tcx.def_ident_span(did);
+    let span = ident.unwrap_or_else(|| tcx.def_span(did));
+    if span.is_dummy() {
+        return None;
+    }
+    let (name, mut expansion) = locate(tcx, span);
+    let defined = defining_expansion(tcx, did);
+    if expansion.is_none() && defined != rustc_span::hygiene::ExpnId::root() {
+        let steps = steps_from(tcx, defined.expn_data());
+        // (a module an invocation declares out of line, `cfg_rt! { mod task; }`, is defined
+        // in that expansion with all its file holds, and the macro writes none of it: an item
+        // named in another file than the expansions' invocations and definitions is the
+        // source's, as its file writes it)
+        let file = raw_loc(tcx, span).file;
+        let written = steps
+            .iter()
+            .any(|s| s.call.file == file || s.def.file == file);
+        if let Some(last) = steps.last().filter(|_| written) {
+            let kind = match last.kind {
+                rcbom_facts::StepKind::Bang => MacroKind::Bang,
+                rcbom_facts::StepKind::Derive => MacroKind::Derive,
+                rcbom_facts::StepKind::Attr => MacroKind::Attr,
+                rcbom_facts::StepKind::Rewrite(_) | rcbom_facts::StepKind::Pass => {
+                    MacroKind::Desugaring
+                }
+            };
+            expansion = Some(Expansion {
+                kind,
+                macro_name: last.name.clone(),
+                def_site: raw_loc(tcx, span),
+                steps,
+                text: span_head(tcx, span, 120),
+                mark: span_mark(tcx, span),
+            });
+        }
+    }
+    // (the item whole, for one the source writes: its body's span, or for one of this crate,
+    // its source's)
+    let body = body
+        .or_else(|| did.as_local().map(|l| tcx.source_span(l)))
+        .filter(|b| expansion.is_none() && !b.is_dummy() && !b.from_expansion())
+        .map(|b| raw_loc(tcx, b));
+    // (an item with no identifier: how it starts and its line's fingerprint say where it is)
+    let read = ident.is_none() && expansion.is_none();
+    (name.line != 0).then_some(rcbom_facts::ItemAt {
+        text: span_head(tcx, span, 120).filter(|_| read),
+        mark: span_mark(tcx, span).filter(|_| read),
+        name,
+        expansion,
+        body,
+    })
 }
 pub(super) fn raw_loc(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Loc {
     // no position at all (a call the compiler generated, in the standard library's MIR): not

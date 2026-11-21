@@ -73,6 +73,9 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             origins = origins.with_item(item, args);
         }
         let unconvertible = has_unconvertible(cx.tcx, body);
+        let owner_at = def.and_then(|d| {
+            crate::names::item_at(cx.tcx, d, Some(rustc_internal::internal(cx.tcx, body.span)))
+        });
         Scanner {
             cx,
             body,
@@ -84,6 +87,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             origins,
             unconvertible,
             def,
+            owner_at,
             lib_generic: false,
             boundary: Vec::new(),
             cur_call: None,
@@ -193,6 +197,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             expansion,
             std_entry: None,
             self_ty: self_tree(tcx, did, iargs),
+            owner_at: self.owner_at.clone(),
         });
     }
 
@@ -222,6 +227,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             target,
             via: self.via.clone(),
             call: self.cur_call.clone(),
+            owner_at: self.owner_at.clone(),
         });
     }
 

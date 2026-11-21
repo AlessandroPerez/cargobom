@@ -68,6 +68,8 @@ pub(crate) fn local_data_sites(cx: &mut Cx<'_>) -> (Vec<Site>, Vec<DataEdge>) {
             cx.errors += 1;
             continue;
         };
+        // (where the static is, whole: its initializer's body is at hand)
+        let owner_at = crate::names::item_at(tcx, did, Some(tcx.mir_for_ctfe(did).span));
         let mut named: HashSet<DefId> = HashSet::new();
         // Every edge is kept, whatever the crate: rustls's SUPPORTED_SIG_ALGS reaches ring's
         // descriptors only through rustls-webpki statics.
@@ -75,7 +77,7 @@ pub(crate) fn local_data_sites(cx: &mut Cx<'_>) -> (Vec<Site>, Vec<DataEdge>) {
             named.insert(match n {
                 Named::Static(d) | Named::Const(d) => d,
             });
-            if let Some(s) = site(tcx, &owner, n, span, did, Tier::Present, &[]) {
+            if let Some(s) = site(tcx, &owner, n, span, did, &owner_at, Tier::Present, &[]) {
                 out.push(s);
             }
         }
@@ -161,6 +163,7 @@ pub(crate) fn fn_data_sites<'tcx>(
         cx.errors += 1;
         return Vec::new();
     };
+    let owner_at = crate::names::item_at(tcx, did, Some(tcx.optimized_mir(did).span));
     let mut out = Vec::new();
     for (named, span) in found {
         // local data, data of knowledge-base crates, and statics leading to them
@@ -175,7 +178,7 @@ pub(crate) fn fn_data_sites<'tcx>(
                         .is_some_and(|s| s.into_iter().any(|s| cx.static_interesting(s)))
             }
         };
-        if keep && let Some(s) = site(tcx, owner, named, span, did, tier, via) {
+        if keep && let Some(s) = site(tcx, owner, named, span, did, &owner_at, tier, via) {
             out.push(s);
         }
     }
@@ -189,6 +192,7 @@ fn site(
     named: Named,
     span: rustc_span::Span,
     self_did: DefId,
+    owner_at: &Option<rcbom_facts::ItemAt>,
     tier: Tier,
     via: &[ViaStep],
 ) -> Option<Site> {
@@ -220,6 +224,7 @@ fn site(
         },
         via: via.to_vec(),
         call: None,
+        owner_at: owner_at.clone(),
     })
 }
 
