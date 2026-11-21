@@ -190,6 +190,8 @@ pub enum Via {
         /// The coercion is in a static's value (`at`: the static's item).
         in_static: bool,
         only: bool,
+        /// How the code at `at` starts, and the fingerprint of its line at its column.
+        reads: Reads,
     },
     /// The standard-library method that put it in a container it is read from
     /// (`HashMap::insert`; `+` before it: a value already in the list it adds to), or the
@@ -284,6 +286,22 @@ type Coerced = (
     Option<rcbom_facts::Loc>,
     bool,
     Vec<(String, String, String)>,
+    Reads,
+);
+
+/// What the compiler records of a place no name in the text holds: how its code starts, and
+/// the fingerprint of its line at its column.
+pub type Reads = (Option<String>, Option<String>);
+
+/// A type the build coerces to a trait object (`LinkIndex::coerced_to`): its name, where the
+/// coercion is, whether that is a static's value, the type as the knowledge base matches
+/// types, and what the compiler records of the place.
+pub type CoercedTo<'a> = (
+    &'a str,
+    Option<&'a rcbom_facts::Loc>,
+    bool,
+    Option<&'a rcbom_facts::TyTree>,
+    &'a Reads,
 );
 
 /// A read being resolved: the value, the fields read from it, the function it is read in.
@@ -293,25 +311,18 @@ impl LinkIndex {
     /// The types the build coerces to a trait object of `trait_path`: the name the coercion
     /// gives each, where it is written (in a static's value or not), and for a struct or enum
     /// the type as the knowledge base matches types.
-    pub fn coerced_to(
-        &self,
-        trait_path: &str,
-    ) -> Vec<(
-        &str,
-        Option<&rcbom_facts::Loc>,
-        bool,
-        Option<&rcbom_facts::TyTree>,
-    )> {
+    pub fn coerced_to(&self, trait_path: &str) -> Vec<CoercedTo<'_>> {
         self.coerced
             .get(trait_path)
             .into_iter()
             .flatten()
-            .map(|(ty, at, in_static, _)| {
+            .map(|(ty, at, in_static, _, reads)| {
                 (
                     ty.as_str(),
                     at.as_ref(),
                     *in_static,
                     self.coerced_types.get(ty),
+                    reads,
                 )
             })
             .collect()
@@ -416,7 +427,13 @@ impl LinkIndex {
                         };
                         l
                     });
-                    v.push((c.ty.clone(), at, c.in_static, c.methods.clone()));
+                    v.push((
+                        c.ty.clone(),
+                        at,
+                        c.in_static,
+                        c.methods.clone(),
+                        (c.text.clone(), c.mark.clone()),
+                    ));
                 }
             }
             for s in &f.links.statics {
@@ -495,13 +512,14 @@ impl LinkIndex {
             if bodies.is_empty() {
                 ix.dyn_open.insert(c.call.callee.clone());
             }
-            for (body, (ty, at, in_static, _)) in &bodies {
+            for (body, (ty, at, in_static, _, reads)) in &bodies {
                 let via = Via::Dyn {
                     trait_path: c.trait_path.clone(),
                     ty: ty.clone(),
                     at: at.clone(),
                     in_static: *in_static,
                     only: bodies.len() == 1,
+                    reads: reads.clone(),
                 };
                 let v = dyn_calls.entry((*body).clone()).or_default();
                 let call = (c.call.caller.clone(), c.call.args.clone(), via);
@@ -1664,7 +1682,7 @@ impl LinkIndex {
                             .coerced
                             .get(tr)
                             .and_then(|v| v.iter().find(|(t, ..)| t == ty))
-                            .and_then(|(.., methods)| {
+                            .and_then(|(.., methods, _)| {
                                 methods
                                     .iter()
                                     .find(|(m, ..)| m == callee)
@@ -1723,7 +1741,7 @@ impl LinkIndex {
         let mut out = Vec::new();
         if let Some(t) = self_ty.strip_prefix("dyn ") {
             let types = self.coerced.get(t)?;
-            for (ty, at, in_static, methods) in types {
+            for (ty, at, in_static, methods, reads) in types {
                 let name = match methods.iter().find(|(m, ..)| m == callee) {
                     Some((_, body, _)) => body.clone(),
                     // a body the driver could not name (another crate's generic impl): the
@@ -1736,6 +1754,7 @@ impl LinkIndex {
                     at: at.clone(),
                     in_static: *in_static,
                     only: types.len() == 1,
+                    reads: reads.clone(),
                 };
                 out.push((name, via));
             }
@@ -1765,7 +1784,7 @@ impl LinkIndex {
             return (out, false);
         };
         let mut all = true;
-        for (ty, at, in_static, methods) in types {
+        for (ty, at, in_static, methods, reads) in types {
             // the body the method runs for the type (its implementation, or the trait's
             // default body), as the driver resolved it; else the type's own method (by its
             // type's path, or as an impl's item: `<u8 as app::Pick>::alg`)
@@ -1797,6 +1816,7 @@ impl LinkIndex {
                 at: at.clone(),
                 in_static: *in_static,
                 only: types.len() == 1,
+                reads: reads.clone(),
             });
             let mut found = Vec::new();
             for r in &self.returns[&(name, fields(&path[..k]))] {

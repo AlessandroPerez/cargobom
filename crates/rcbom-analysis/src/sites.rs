@@ -635,7 +635,7 @@ pub(super) fn site_matches(
                 let types = ctx.flow.coerced_to(tr);
                 let mut members: Vec<(Match, links::Via)> = Vec::new();
                 let mut unnamed = 0usize;
-                for (ty, at, in_static, tree) in &types {
+                for (ty, at, in_static, tree, reads) in &types {
                     let found: Vec<Match> = tree
                         .map(|t| match_types(kb, std::slice::from_ref(t), &supported))
                         .unwrap_or_default()
@@ -653,6 +653,7 @@ pub(super) fn site_matches(
                         at: at.cloned(),
                         in_static: *in_static,
                         only: types.len() == 1,
+                        reads: (*reads).clone(),
                     };
                     members.extend(found.into_iter().map(|m| (m, via.clone())));
                 }

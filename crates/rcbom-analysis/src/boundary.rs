@@ -653,11 +653,20 @@ fn witness(via: &Via) -> String {
             at,
             in_static,
             only,
+            reads,
         } => {
+            // (where the compiler has the coercion: its span, how the code there starts and
+            // the fingerprint of its line, which the verifier holds it to)
             let place = if *in_static { " in a static" } else { "" };
             let at = at
                 .as_ref()
-                .map(|l| format!("{place} at {}:{}", l.file, l.line))
+                .map(|l| {
+                    format!(
+                        "{place} at {}{}",
+                        crate::witness::span(l, &|f: &str| f.to_string()),
+                        crate::witness::reads(reads.0.as_ref(), reads.1.as_ref())
+                    )
+                })
                 .unwrap_or_else(|| {
                     if *in_static {
                         " in a static".to_string()

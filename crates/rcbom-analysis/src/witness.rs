@@ -51,7 +51,7 @@ pub(crate) fn quotable(t: &str) -> &str {
 
 /// ` as `text`` and ` line #mark`: the start of the text at a position, and the fingerprint of
 /// the position in its line (`rcbom_facts::line_mark`).
-fn reads(text: Option<&String>, mark: Option<&String>) -> String {
+pub(crate) fn reads(text: Option<&String>, mark: Option<&String>) -> String {
     let mut out = String::new();
     if let Some(t) = text.map(|t| quotable(t)).filter(|t| !t.is_empty()) {
         out.push_str(&format!(" as `{t}`"));
