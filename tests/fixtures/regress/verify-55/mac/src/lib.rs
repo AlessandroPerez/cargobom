@@ -129,3 +129,31 @@ macro_rules! boxed {
         b
     }};
 }
+
+// A macro handed to another by name (kryptering's `dispatch_hash!(hash, do_sign)`): the
+// invocation is written `$callback!(..)`, a metavariable where the macro's name is, and the
+// invocation around it names the macro.
+#[macro_export]
+macro_rules! dispatch {
+    ($n:expr, $callback:ident) => {
+        match $n {
+            0 => $callback!(sha2::Sha256),
+            _ => $callback!(sha2::Sha512),
+        }
+    };
+}
+
+// Two calls one invocation writes, one of a less specific asset than the other (cms's
+// `encrypt_block_mode!`): the key size asked of the block cipher, AES-128, beside the CBC
+// encryptor made of it, AES-128-CBC. They are cited together, each with its own code.
+#[macro_export]
+macro_rules! cbc_with {
+    ($alg:ident, $key:expr, $iv:expr, $data:expr) => {{
+        use cbc::cipher::{BlockEncryptMut, KeyIvInit, KeySizeUser, block_padding::Pkcs7};
+        if $key.len() != $alg::key_size() {
+            return Vec::new();
+        }
+        let e = cbc::Encryptor::<$alg>::new_from_slices($key, $iv).expect("sizes checked");
+        e.encrypt_padded_vec_mut::<Pkcs7>($data)
+    }};
+}

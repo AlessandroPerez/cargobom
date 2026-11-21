@@ -2,12 +2,104 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
+      "bom-ref": "pkg:cargo/aead@0.5.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by dep (dependencies); features [\"alloc\"]",
+            "line": 14,
+            "location": "dep/Cargo.toml",
+            "offset": 0,
+            "symbol": "aead"
+          },
+          {
+            "additionalContext": "[manifest] declared by verify-55 (dependencies); features [\"alloc\"]",
+            "line": 25,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "aead"
+          },
+          {
+            "additionalContext": "[manifest] locked aead 0.5.2; reached via dep -> aead",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "aead"
+          }
+        ]
+      },
+      "name": "aead",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/aead@0.5.2",
+      "type": "library",
+      "version": "0.5.2"
+    },
+    {
+      "bom-ref": "pkg:cargo/aes@0.8.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by dep (dependencies)",
+            "line": 12,
+            "location": "dep/Cargo.toml",
+            "offset": 0,
+            "symbol": "aes"
+          },
+          {
+            "additionalContext": "[manifest] declared by verify-55 (dependencies)",
+            "line": 23,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "aes"
+          },
+          {
+            "additionalContext": "[manifest] locked aes 0.8.4; reached via dep -> aes",
+            "line": 16,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "aes"
+          }
+        ]
+      },
+      "name": "aes",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/aes@0.8.4",
+      "type": "library",
+      "version": "0.8.4"
+    },
+    {
       "bom-ref": "pkg:cargo/block-buffer@0.10.4",
       "evidence": {
         "occurrences": [
           {
             "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via dep -> hmac -> digest -> block-buffer",
-            "line": 6,
+            "line": 27,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "block-buffer"
@@ -38,12 +130,122 @@
       "version": "0.10.4"
     },
     {
+      "bom-ref": "pkg:cargo/block-padding@0.3.3",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-padding 0.3.3; reached via dep -> aes -> cipher -> inout -> block-padding",
+            "line": 36,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-padding"
+          }
+        ]
+      },
+      "name": "block-padding",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/block-padding@0.3.3",
+      "type": "library",
+      "version": "0.3.3"
+    },
+    {
+      "bom-ref": "pkg:cargo/cbc@0.1.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by dep (dependencies); features [\"alloc\"]",
+            "line": 13,
+            "location": "dep/Cargo.toml",
+            "offset": 0,
+            "symbol": "cbc"
+          },
+          {
+            "additionalContext": "[manifest] declared by verify-55 (dependencies); features [\"alloc\"]",
+            "line": 24,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "cbc"
+          },
+          {
+            "additionalContext": "[manifest] locked cbc 0.1.2; reached via dep -> cbc",
+            "line": 45,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "cbc"
+          }
+        ]
+      },
+      "name": "cbc",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/cbc@0.1.2",
+      "type": "library",
+      "version": "0.1.2"
+    },
+    {
+      "bom-ref": "pkg:cargo/cipher@0.4.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked cipher 0.4.4; reached via dep -> aes -> cipher",
+            "line": 70,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "cipher"
+          }
+        ]
+      },
+      "name": "cipher",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/cipher@0.4.4",
+      "type": "library",
+      "version": "0.4.4"
+    },
+    {
       "bom-ref": "pkg:cargo/crypto-common@0.1.7",
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via dep -> hmac -> digest -> crypto-common",
-            "line": 40,
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via dep -> aead -> crypto-common",
+            "line": 89,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "crypto-common"
@@ -84,7 +286,7 @@
         "occurrences": [
           {
             "additionalContext": "[manifest] locked digest 0.10.7; reached via dep -> hmac -> digest",
-            "line": 61,
+            "line": 114,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "digest"
@@ -112,7 +314,7 @@
         "occurrences": [
           {
             "additionalContext": "[manifest] locked getrandom 0.2.17; reached via dep -> ring -> getrandom",
-            "line": 88,
+            "line": 141,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "getrandom"
@@ -158,7 +360,7 @@
           },
           {
             "additionalContext": "[manifest] locked hmac 0.12.1; reached via dep -> hmac",
-            "line": 99,
+            "line": 152,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "hmac"
@@ -211,6 +413,34 @@
       "version": "0.1.0"
     },
     {
+      "bom-ref": "pkg:cargo/rand_core@0.6.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked rand_core 0.6.4; reached via dep -> aead -> crypto-common -> rand_core",
+            "line": 185,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "rand_core"
+          }
+        ]
+      },
+      "name": "rand_core",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/rand_core@0.6.4",
+      "type": "library",
+      "version": "0.6.4"
+    },
+    {
       "bom-ref": "pkg:cargo/ring@0.17.14",
       "evidence": {
         "occurrences": [
@@ -230,7 +460,7 @@
           },
           {
             "additionalContext": "[manifest] locked ring 0.17.14; reached via dep -> ring",
-            "line": 122,
+            "line": 191,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "ring"
@@ -291,7 +521,7 @@
           },
           {
             "additionalContext": "[manifest] locked sha2 0.10.9; reached via dep -> sha2",
-            "line": 136,
+            "line": 205,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "sha2"
@@ -323,7 +553,7 @@
         "occurrences": [
           {
             "additionalContext": "[manifest] locked subtle 2.6.1; reached via dep -> hmac -> digest -> subtle",
-            "line": 153,
+            "line": 222,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "subtle"
@@ -352,6 +582,101 @@
       "purl": "pkg:cargo/subtle@2.6.1",
       "type": "library",
       "version": "2.6.1"
+    },
+    {
+      "bom-ref": "crypto:algorithm:AES-128-CBC",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "AES",
+          "cryptoFunctions": [
+            "encrypt"
+          ],
+          "mode": "cbc",
+          "parameterSetIdentifier": "128",
+          "primitive": "block-cipher"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] [macro mac::cbc_with!] in dep::cases::sized; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of dep::cases::all) or parameter (argument 0 of the enclosing function); iv: hard-coded (all zero, 16 bytes, literal at line 114); owner at dep/src/cases.rs:112:7-112:12 within 112:0-115:1; expanded from mac/src/lib.rs:156:16-156:55 as `cbc::Encryptor::<$alg>::new_from_slices` line #c594f20a (by macro mac::cbc_with! at dep/src/cases.rs:114:4-114:46 line #99265f4f defined mac/src/lib.rs:150-150); key: environment (std::env::args) or parameter (argument 0 of the enclosing function) or parameter (argument 0 of verify_55::shared::all); owner `verify_55::shared::sized` at dep/src/cases.rs:112:7-112:12 within 112:0-115:1; key_size: setup, not a use; expanded `crypto_common::KeySizeUser::key_size` from mac/src/lib.rs:153:25-153:39 as `$alg::key_size` line #8b2e7eee (by macro mac::cbc_with! at dep/src/cases.rs:114:4-114:46 line #99265f4f defined mac/src/lib.rs:150-150); line: `mac::cbc_with!(Aes128, key, &[0u8; 16], d)`",
+            "line": 114,
+            "location": "dep/src/cases.rs",
+            "offset": 4,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] [macro mac::cbc_with!] in dep::cases::sized; use: encrypt; owner at dep/src/cases.rs:112:7-112:12 within 112:0-115:1; expanded from mac/src/lib.rs:157:10-157:32 as `encrypt_padded_vec_mut` line #6e46cdab (by macro mac::cbc_with! at dep/src/cases.rs:114:4-114:46 line #99265f4f defined mac/src/lib.rs:150-150); owner `verify_55::shared::sized` at dep/src/cases.rs:112:7-112:12 within 112:0-115:1; line: `mac::cbc_with!(Aes128, key, &[0u8; 16], d)`",
+            "line": 114,
+            "location": "dep/src/cases.rs",
+            "offset": 4,
+            "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_vec_mut"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] [macro mac::cbc_with!] in verify_55::cases::sized; new_from_slices: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function) or parameter (argument 0 of verify_55::cases::all); iv: hard-coded (all zero, 16 bytes, literal at line 114); owner at src/cases.rs:112:7-112:12 within 112:0-115:1; expanded from mac/src/lib.rs:156:16-156:55 as `cbc::Encryptor::<$alg>::new_from_slices` line #c594f20a (by macro mac::cbc_with! at src/cases.rs:114:4-114:46 line #99265f4f defined mac/src/lib.rs:150-150); key_size: setup, not a use; expanded `crypto_common::KeySizeUser::key_size` from mac/src/lib.rs:153:25-153:39 as `$alg::key_size` line #8b2e7eee (by macro mac::cbc_with! at src/cases.rs:114:4-114:46 line #99265f4f defined mac/src/lib.rs:150-150); line: `mac::cbc_with!(Aes128, key, &[0u8; 16], d)`",
+            "line": 114,
+            "location": "src/cases.rs",
+            "offset": 4,
+            "symbol": "crypto_common::KeyIvInit::new_from_slices"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] [macro mac::cbc_with!] in verify_55::cases::sized; use: encrypt; owner at src/cases.rs:112:7-112:12 within 112:0-115:1; expanded from mac/src/lib.rs:157:10-157:32 as `encrypt_padded_vec_mut` line #6e46cdab (by macro mac::cbc_with! at src/cases.rs:114:4-114:46 line #99265f4f defined mac/src/lib.rs:150-150); line: `mac::cbc_with!(Aes128, key, &[0u8; 16], d)`",
+            "line": 114,
+            "location": "src/cases.rs",
+            "offset": 4,
+            "symbol": "cipher::block::BlockEncryptMut::encrypt_padded_vec_mut"
+          }
+        ]
+      },
+      "name": "AES-128-CBC",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin verify-55"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib dep"
+        },
+        {
+          "name": "rcbom:provenance:iv",
+          "value": "hard-coded"
+        },
+        {
+          "name": "rcbom:finding",
+          "value": "hard-coded-iv"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "environment,parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
     },
     {
       "bom-ref": "crypto:algorithm:HMAC-SHA-256",
@@ -502,36 +827,57 @@
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; new: setup, not a use; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); line: `let mut h = D::new();`; code: `D::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; new: setup, not a use; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let mut h = D::new();`; code: `D::new`",
             "line": 96,
             "location": "dep/src/cases.rs",
             "offset": 16,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); line: `h.update(key);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `h.update(key);`; code: `update`",
             "line": 97,
             "location": "dep/src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::Digest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); line: `h.finalize().to_vec()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `h.finalize().to_vec()`; code: `finalize`",
             "line": 98,
             "location": "dep/src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::Digest::finalize"
           },
           {
-            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55, lib dep] in dep::cases::all; chosen as generic argument of dep::cases::mixed; owner at dep/src/cases.rs:111:7-111:10 within 111:0-137:1; line: `mixed::<sha2::Sha224>(d),`; code: `mixed::<sha2::Sha224>`",
-            "line": 134,
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::two::<..>; use: digest; owner at dep/src/cases.rs:120:7-120:10 within 120:0-124:1; instantiated by dep::cases::one::<..> at dep/src/cases.rs:127:4 as `two::<D, sha2::Sha224>` (call, to 127:26 as `two::<D, sha2::Sha224>` line #90d798c4, caller at dep/src/cases.rs:126:7-126:10 within 126:0-128:1); instantiated by dep::cases::all at dep/src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::two::<..>` at dep/src/cases.rs:120:7-120:10 within 120:0-124:1; `verify_55::shared::two::<..>` instantiated by verify_55::shared::one::<..> at dep/src/cases.rs:127:4 as `two::<D, sha2::Sha224>` (call, to 127:26 as `two::<D, sha2::Sha224>` line #90d798c4, caller at dep/src/cases.rs:126:7-126:10 within 126:0-128:1); instantiated by verify_55::shared::all at dep/src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `v.extend(M::digest(d));`; code: `M::digest`",
+            "line": 122,
+            "location": "dep/src/cases.rs",
+            "offset": 13,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55, lib dep] in dep::cases::one::<..>; chosen as generic argument of dep::cases::two; owner at dep/src/cases.rs:126:7-126:10 within 126:0-128:1; instantiated by dep::cases::all at dep/src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `two::<D, sha2::Sha224>(d)`; code: `two::<D, sha2::Sha224>`",
+            "line": 127,
+            "location": "dep/src/cases.rs",
+            "offset": 4,
+            "symbol": "dep::cases::two"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55, lib dep] in dep::cases::all; chosen as generic argument of dep::cases::mixed; owner at dep/src/cases.rs:172:7-172:10 within 172:0-205:1; line: `mixed::<sha2::Sha224>(d),`; code: `mixed::<sha2::Sha224>`",
+            "line": 195,
             "location": "dep/src/cases.rs",
             "offset": 8,
             "symbol": "dep::cases::mixed"
           },
           {
-            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::shared::all; chosen as generic argument of verify_55::shared::mixed; owner at dep/src/cases.rs:111:7-111:10 within 111:0-137:1; line: `mixed::<sha2::Sha224>(d),`; code: `mixed::<sha2::Sha224>`",
-            "line": 134,
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::shared::one::<..>; chosen as generic argument of verify_55::shared::two; owner at dep/src/cases.rs:126:7-126:10 within 126:0-128:1; instantiated by verify_55::shared::all at dep/src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `two::<D, sha2::Sha224>(d)`; code: `two::<D, sha2::Sha224>`",
+            "line": 127,
+            "location": "dep/src/cases.rs",
+            "offset": 4,
+            "symbol": "verify_55::shared::two"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::shared::all; chosen as generic argument of verify_55::shared::mixed; owner at dep/src/cases.rs:172:7-172:10 within 172:0-205:1; line: `mixed::<sha2::Sha224>(d),`; code: `mixed::<sha2::Sha224>`",
+            "line": 195,
             "location": "dep/src/cases.rs",
             "offset": 8,
             "symbol": "verify_55::shared::mixed"
@@ -558,29 +904,43 @@
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; new: setup, not a use; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); line: `let mut h = D::new();`; code: `D::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; new: setup, not a use; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let mut h = D::new();`; code: `D::new`",
             "line": 96,
             "location": "src/cases.rs",
             "offset": 16,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); line: `h.update(key);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `h.update(key);`; code: `update`",
             "line": 97,
             "location": "src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::Digest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); line: `h.finalize().to_vec()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `h.finalize().to_vec()`; code: `finalize`",
             "line": 98,
             "location": "src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::Digest::finalize"
           },
           {
-            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::cases::all; chosen as generic argument of verify_55::cases::mixed; owner at src/cases.rs:111:7-111:10 within 111:0-137:1; line: `mixed::<sha2::Sha224>(d),`; code: `mixed::<sha2::Sha224>`",
-            "line": 134,
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::two::<..>; use: digest; owner at src/cases.rs:120:7-120:10 within 120:0-124:1; instantiated by verify_55::cases::one::<..> at src/cases.rs:127:4 as `two::<D, sha2::Sha224>` (call, to 127:26 as `two::<D, sha2::Sha224>` line #90d798c4, caller at src/cases.rs:126:7-126:10 within 126:0-128:1); instantiated by verify_55::cases::all at src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `v.extend(M::digest(d));`; code: `M::digest`",
+            "line": 122,
+            "location": "src/cases.rs",
+            "offset": 13,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::cases::one::<..>; chosen as generic argument of verify_55::cases::two; owner at src/cases.rs:126:7-126:10 within 126:0-128:1; instantiated by verify_55::cases::all at src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `two::<D, sha2::Sha224>(d)`; code: `two::<D, sha2::Sha224>`",
+            "line": 127,
+            "location": "src/cases.rs",
+            "offset": 4,
+            "symbol": "verify_55::cases::two"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::cases::all; chosen as generic argument of verify_55::cases::mixed; owner at src/cases.rs:172:7-172:10 within 172:0-205:1; line: `mixed::<sha2::Sha224>(d),`; code: `mixed::<sha2::Sha224>`",
+            "line": 195,
             "location": "src/cases.rs",
             "offset": 8,
             "symbol": "verify_55::cases::mixed"
@@ -619,7 +979,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "15"
+          "value": "20"
         }
       ],
       "type": "cryptographic-asset"
@@ -737,25 +1097,39 @@
             "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; new: setup, not a use; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); `dep::cases::mixed::<..>` instantiated by dep::cases::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); line: `let mut fixed = sha2::Sha256::new();`; code: `sha2::Sha256::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; new: setup, not a use; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); `dep::cases::mixed::<..>` instantiated by dep::cases::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let mut fixed = sha2::Sha256::new();`; code: `sha2::Sha256::new`",
             "line": 93,
             "location": "dep/src/cases.rs",
             "offset": 20,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); `dep::cases::mixed::<..>` instantiated by dep::cases::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); line: `fixed.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); `dep::cases::mixed::<..>` instantiated by dep::cases::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `fixed.update(d);`; code: `update`",
             "line": 94,
             "location": "dep/src/cases.rs",
             "offset": 10,
             "symbol": "digest::digest::Digest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); `dep::cases::mixed::<..>` instantiated by dep::cases::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); line: `let key = fixed.finalize();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); `dep::cases::mixed::<..>` instantiated by dep::cases::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let key = fixed.finalize();`; code: `finalize`",
             "line": 95,
             "location": "dep/src/cases.rs",
             "offset": 20,
             "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] [macro mac::dispatch!] in dep::cases::handed; use: digest; owner at dep/src/cases.rs:102:7-102:13 within 102:0-109:1; expanded from dep/src/cases.rs:105:12-105:40 as `<$h as sha2::Digest>::digest` line #5c938d6d (by macro hash_with! at mac/src/lib.rs:140:17-140:41 line #19d6c846 defined dep/src/cases.rs:103-107, by macro mac::dispatch! at dep/src/cases.rs:108:4-108:42 line #93a4f704 defined mac/src/lib.rs:137-137); owner `verify_55::shared::handed` at dep/src/cases.rs:102:7-102:13 within 102:0-109:1; line: `mac::dispatch!(d.len() % 2, hash_with)`",
+            "line": 108,
+            "location": "dep/src/cases.rs",
+            "offset": 4,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; owner `verify_55::shared::feeding::fed` at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "line": 5,
+            "location": "dep/src/feeding.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
           },
           {
             "additionalContext": "[reachable] [via-static] [artifacts: bin verify-55] [macro mac::table!] in verify_55::shared::pick; verify_55::shared::TABLE -> ring::digest::SHA256; owner at dep/src/cases.rs:35:19-35:23 as `pick` line #46badc5e (by macro mac::table! at dep/src/cases.rs:35:0-35:48 line #2a17418a defined mac/src/lib.rs:100-100); expanded from mac/src/lib.rs:105:33-105:38 as `$name` line #228dff74 (by macro mac::table! at dep/src/cases.rs:35:0-35:48 line #2a17418a defined mac/src/lib.rs:100-100); expanded from mac/src/lib.rs:105:43-105:48 as `$name` line #0f8c8554 (by macro mac::table! at dep/src/cases.rs:35:0-35:48 line #2a17418a defined mac/src/lib.rs:100-100); line: `mac::table!(TABLE, pick, SHA256, SHA384, SHA512);`",
@@ -863,25 +1237,53 @@
             "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; new: setup, not a use; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); `verify_55::cases::mixed::<..>` instantiated by verify_55::cases::all at src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); line: `let mut fixed = sha2::Sha256::new();`; code: `sha2::Sha256::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; new: setup, not a use; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); `verify_55::cases::mixed::<..>` instantiated by verify_55::cases::all at src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let mut fixed = sha2::Sha256::new();`; code: `sha2::Sha256::new`",
             "line": 93,
             "location": "src/cases.rs",
             "offset": 20,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); `verify_55::cases::mixed::<..>` instantiated by verify_55::cases::all at src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); line: `fixed.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); `verify_55::cases::mixed::<..>` instantiated by verify_55::cases::all at src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `fixed.update(d);`; code: `update`",
             "line": 94,
             "location": "src/cases.rs",
             "offset": 10,
             "symbol": "digest::digest::Digest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); `verify_55::cases::mixed::<..>` instantiated by verify_55::cases::all at src/cases.rs:134:8 as `mixed::<sha2::Sha224>` (call, to 134:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); line: `let key = fixed.finalize();`; code: `finalize`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); `verify_55::cases::mixed::<..>` instantiated by verify_55::cases::all at src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let key = fixed.finalize();`; code: `finalize`",
             "line": 95,
             "location": "src/cases.rs",
             "offset": 20,
             "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] [macro mac::dispatch!] in verify_55::cases::handed; use: digest; owner at src/cases.rs:102:7-102:13 within 102:0-109:1; expanded from src/cases.rs:105:12-105:40 as `<$h as sha2::Digest>::digest` line #5c938d6d (by macro hash_with! at mac/src/lib.rs:140:17-140:41 line #19d6c846 defined src/cases.rs:103-107, by macro mac::dispatch! at src/cases.rs:108:4-108:42 line #93a4f704 defined mac/src/lib.rs:137-137); line: `mac::dispatch!(d.len() % 2, hash_with)`",
+            "line": 108,
+            "location": "src/cases.rs",
+            "offset": 4,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "line": 5,
+            "location": "src/feeding.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin other-tool] in other_tool::pick::<..>; use: digest; owner at src/other.rs:6:3-6:7 within 6:0-8:1; instantiated by other_tool::main at src/other.rs:12:19 as `pick::<sha2::Sha256>` (call, to 12:39 as `pick::<sha2::Sha256>` line #6fab49dc, caller at src/other.rs:10:3-10:7 within 10:0-13:1); line: `D::digest(d).to_vec()`; code: `D::digest`",
+            "line": 7,
+            "location": "src/other.rs",
+            "offset": 4,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin other-tool] in other_tool::main; chosen as generic argument of other_tool::pick; owner at src/other.rs:10:3-10:7 within 10:0-13:1; line: `println!(\"{}\", pick::<sha2::Sha256>(&input).len());`; code: `pick::<sha2::Sha256>`",
+            "line": 12,
+            "location": "src/other.rs",
+            "offset": 19,
+            "symbol": "other_tool::pick"
           }
         ]
       },
@@ -909,6 +1311,10 @@
         },
         {
           "name": "rcbom:artifact",
+          "value": "bin other-tool"
+        },
+        {
+          "name": "rcbom:artifact",
           "value": "bin verify-55"
         },
         {
@@ -917,7 +1323,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "35"
+          "value": "41"
         }
       ],
       "type": "cryptographic-asset"
@@ -1007,6 +1413,41 @@
             "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::narrow; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: caller, passed by `dep::cases::pointed`; owner at dep/src/cases.rs:149:3-149:9 within 149:0-151:1; member: caller, passed by `verify_55::shared::pointed`; owner `verify_55::shared::narrow` at dep/src/cases.rs:149:3-149:9 within 149:0-151:1; line: `ring::digest::digest(a, &d[..d.len() / 2])`; code: `ring::digest::digest`",
+            "line": 150,
+            "location": "dep/src/cases.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::pointed; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at dep/src/cases.rs:153:7-153:14 within 153:0-160:1; called through a function pointer to `ring::digest::digest` named at dep/src/cases.rs:155:8; owner `verify_55::shared::pointed` at dep/src/cases.rs:153:7-153:14 within 153:0-160:1; line: `digest(&ring::digest::SHA384, d).as_ref().to_vec()`; code: `digest`",
+            "line": 159,
+            "location": "dep/src/cases.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] [artifacts: bin verify-55, lib dep] in dep::cases::pointed; owner at dep/src/cases.rs:153:7-153:14 within 153:0-160:1; owner `verify_55::shared::pointed` at dep/src/cases.rs:153:7-153:14 within 153:0-160:1; line: `digest(&ring::digest::SHA384, d).as_ref().to_vec()`; code: `ring::digest::SHA384`",
+            "line": 159,
+            "location": "dep/src/cases.rs",
+            "offset": 12,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::all; default: setup, not a use; owner at dep/src/cases.rs:172:7-172:10 within 172:0-205:1; owner `verify_55::shared::all` at dep/src/cases.rs:172:7-172:10 within 172:0-205:1; line: `let mut h = sha2::Sha384::default();`; code: `sha2::Sha384::default`",
+            "line": 201,
+            "location": "dep/src/cases.rs",
+            "offset": 16,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; owner `verify_55::shared::feeding::fed` at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "line": 5,
+            "location": "dep/src/feeding.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
             "additionalContext": "[reachable] [via-static] [artifacts: bin verify-55] [macro mac::table!] in verify_55::shared::pick; verify_55::shared::TABLE -> ring::digest::SHA384; owner at dep/src/cases.rs:35:19-35:23 as `pick` line #46badc5e (by macro mac::table! at dep/src/cases.rs:35:0-35:48 line #2a17418a defined mac/src/lib.rs:100-100); expanded from mac/src/lib.rs:105:33-105:38 as `$name` line #228dff74 (by macro mac::table! at dep/src/cases.rs:35:0-35:48 line #2a17418a defined mac/src/lib.rs:100-100); expanded from mac/src/lib.rs:105:43-105:48 as `$name` line #0f8c8554 (by macro mac::table! at dep/src/cases.rs:35:0-35:48 line #2a17418a defined mac/src/lib.rs:100-100); line: `mac::table!(TABLE, pick, SHA256, SHA384, SHA512);`",
             "line": 35,
             "location": "dep/src/cases.rs",
@@ -1082,6 +1523,41 @@
             "location": "src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::finalize_reset"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::narrow; use: digest; algorithm from ring::digest::SHA384, reaching the call from another function; member: caller, passed by `verify_55::cases::pointed`; owner at src/cases.rs:149:3-149:9 within 149:0-151:1; line: `ring::digest::digest(a, &d[..d.len() / 2])`; code: `ring::digest::digest`",
+            "line": 150,
+            "location": "src/cases.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::pointed; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at src/cases.rs:153:7-153:14 within 153:0-160:1; called through a function pointer to `ring::digest::digest` named at src/cases.rs:155:8; line: `digest(&ring::digest::SHA384, d).as_ref().to_vec()`; code: `digest`",
+            "line": 159,
+            "location": "src/cases.rs",
+            "offset": 4,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] [artifacts: bin verify-55] in verify_55::cases::pointed; owner at src/cases.rs:153:7-153:14 within 153:0-160:1; line: `digest(&ring::digest::SHA384, d).as_ref().to_vec()`; code: `ring::digest::SHA384`",
+            "line": 159,
+            "location": "src/cases.rs",
+            "offset": 12,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::all; default: setup, not a use; owner at src/cases.rs:172:7-172:10 within 172:0-205:1; line: `let mut h = sha2::Sha384::default();`; code: `sha2::Sha384::default`",
+            "line": 201,
+            "location": "src/cases.rs",
+            "offset": 16,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "line": 5,
+            "location": "src/feeding.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
           }
         ]
       },
@@ -1117,7 +1593,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "21"
+          "value": "31"
         }
       ],
       "type": "cryptographic-asset"
@@ -1137,14 +1613,14 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] [macro mac::pair!] in dep::cases::plain; use: digest; owner at dep/src/cases.rs:25:11-25:16 as `plain` line #4399fb67 (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); expanded from mac/src/lib.rs:57:12-57:28 as `sha2::$h::digest` line #2dc541c7 (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); owner `dep::cases::generic::<&&[u8]>` at dep/src/cases.rs:25:18-25:25 as `generic` line #a2fab2eb (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); expanded from mac/src/lib.rs:62:12-62:28 as `sha2::$h::digest` line #727b5676 (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); `dep::cases::generic::<&&[u8]>` instantiated by dep::cases::through::<&[u8]>::{closure#0} at dep/src/cases.rs:28:30 as `generic` (call, to 28:37 as `generic` line #327120d4, caller at dep/src/cases.rs:28:26-28:29 as `|p|` line #599ca834 within 28:26-28:40); instantiated by dep::cases::through::<&[u8]> at dep/src/cases.rs:28:26 (built, to 28:40 as `|p| generic(p)` line #599ca834, caller at dep/src/cases.rs:27:7-27:14 within 27:0-29:1); instantiated by dep::cases::all at dep/src/cases.rs:119:8 as `through` (call, to 119:15 as `through` line #b4b99647, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); owner `verify_55::shared::plain` at dep/src/cases.rs:25:11-25:16 as `plain` line #4399fb67 (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); owner `verify_55::shared::generic::<&&[u8]>` at dep/src/cases.rs:25:18-25:25 as `generic` line #a2fab2eb (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); `verify_55::shared::generic::<&&[u8]>` instantiated by verify_55::shared::through::<&[u8]>::{closure#0} at dep/src/cases.rs:28:30 as `generic` (call, to 28:37 as `generic` line #327120d4, caller at dep/src/cases.rs:28:26-28:29 as `|p|` line #599ca834 within 28:26-28:40); instantiated by verify_55::shared::through::<&[u8]> at dep/src/cases.rs:28:26 (built, to 28:40 as `|p| generic(p)` line #599ca834, caller at dep/src/cases.rs:27:7-27:14 within 27:0-29:1); instantiated by verify_55::shared::all at dep/src/cases.rs:119:8 as `through` (call, to 119:15 as `through` line #b4b99647, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); line: `mac::pair!(plain, generic, Sha512_224);`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] [macro mac::pair!] in dep::cases::plain; use: digest; owner at dep/src/cases.rs:25:11-25:16 as `plain` line #4399fb67 (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); expanded from mac/src/lib.rs:57:12-57:28 as `sha2::$h::digest` line #2dc541c7 (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); owner `dep::cases::generic::<&&[u8]>` at dep/src/cases.rs:25:18-25:25 as `generic` line #a2fab2eb (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); expanded from mac/src/lib.rs:62:12-62:28 as `sha2::$h::digest` line #727b5676 (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); `dep::cases::generic::<&&[u8]>` instantiated by dep::cases::through::<&[u8]>::{closure#0} at dep/src/cases.rs:28:30 as `generic` (call, to 28:37 as `generic` line #327120d4, caller at dep/src/cases.rs:28:26-28:29 as `|p|` line #599ca834 within 28:26-28:40); instantiated by dep::cases::through::<&[u8]> at dep/src/cases.rs:28:26 (built, to 28:40 as `|p| generic(p)` line #599ca834, caller at dep/src/cases.rs:27:7-27:14 within 27:0-29:1); instantiated by dep::cases::all at dep/src/cases.rs:180:8 as `through` (call, to 180:15 as `through` line #b4b99647, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::plain` at dep/src/cases.rs:25:11-25:16 as `plain` line #4399fb67 (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); owner `verify_55::shared::generic::<&&[u8]>` at dep/src/cases.rs:25:18-25:25 as `generic` line #a2fab2eb (by macro mac::pair! at dep/src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); `verify_55::shared::generic::<&&[u8]>` instantiated by verify_55::shared::through::<&[u8]>::{closure#0} at dep/src/cases.rs:28:30 as `generic` (call, to 28:37 as `generic` line #327120d4, caller at dep/src/cases.rs:28:26-28:29 as `|p|` line #599ca834 within 28:26-28:40); instantiated by verify_55::shared::through::<&[u8]> at dep/src/cases.rs:28:26 (built, to 28:40 as `|p| generic(p)` line #599ca834, caller at dep/src/cases.rs:27:7-27:14 within 27:0-29:1); instantiated by verify_55::shared::all at dep/src/cases.rs:180:8 as `through` (call, to 180:15 as `through` line #b4b99647, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `mac::pair!(plain, generic, Sha512_224);`",
             "line": 25,
             "location": "dep/src/cases.rs",
             "offset": 0,
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] [macro mac::pair!] in verify_55::cases::plain; use: digest; owner at src/cases.rs:25:11-25:16 as `plain` line #4399fb67 (by macro mac::pair! at src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); expanded from mac/src/lib.rs:57:12-57:28 as `sha2::$h::digest` line #2dc541c7 (by macro mac::pair! at src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); owner `verify_55::cases::generic::<&&[u8]>` at src/cases.rs:25:18-25:25 as `generic` line #a2fab2eb (by macro mac::pair! at src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); expanded from mac/src/lib.rs:62:12-62:28 as `sha2::$h::digest` line #727b5676 (by macro mac::pair! at src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); `verify_55::cases::generic::<&&[u8]>` instantiated by verify_55::cases::through::<&[u8]>::{closure#0} at src/cases.rs:28:30 as `generic` (call, to 28:37 as `generic` line #327120d4, caller at src/cases.rs:28:26-28:29 as `|p|` line #599ca834 within 28:26-28:40); instantiated by verify_55::cases::through::<&[u8]> at src/cases.rs:28:26 (built, to 28:40 as `|p| generic(p)` line #599ca834, caller at src/cases.rs:27:7-27:14 within 27:0-29:1); instantiated by verify_55::cases::all at src/cases.rs:119:8 as `through` (call, to 119:15 as `through` line #b4b99647, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); line: `mac::pair!(plain, generic, Sha512_224);`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] [macro mac::pair!] in verify_55::cases::plain; use: digest; owner at src/cases.rs:25:11-25:16 as `plain` line #4399fb67 (by macro mac::pair! at src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); expanded from mac/src/lib.rs:57:12-57:28 as `sha2::$h::digest` line #2dc541c7 (by macro mac::pair! at src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); owner `verify_55::cases::generic::<&&[u8]>` at src/cases.rs:25:18-25:25 as `generic` line #a2fab2eb (by macro mac::pair! at src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); expanded from mac/src/lib.rs:62:12-62:28 as `sha2::$h::digest` line #727b5676 (by macro mac::pair! at src/cases.rs:25:0-25:38 line #dd18972b defined mac/src/lib.rs:53-53); `verify_55::cases::generic::<&&[u8]>` instantiated by verify_55::cases::through::<&[u8]>::{closure#0} at src/cases.rs:28:30 as `generic` (call, to 28:37 as `generic` line #327120d4, caller at src/cases.rs:28:26-28:29 as `|p|` line #599ca834 within 28:26-28:40); instantiated by verify_55::cases::through::<&[u8]> at src/cases.rs:28:26 (built, to 28:40 as `|p| generic(p)` line #599ca834, caller at src/cases.rs:27:7-27:14 within 27:0-29:1); instantiated by verify_55::cases::all at src/cases.rs:180:8 as `through` (call, to 180:15 as `through` line #b4b99647, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `mac::pair!(plain, generic, Sha512_224);`",
             "line": 25,
             "location": "src/cases.rs",
             "offset": 0,
@@ -1355,32 +1831,67 @@
             "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; new: setup, not a use; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); line: `let mut h = D::new();`; code: `D::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; new: setup, not a use; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let mut h = D::new();`; code: `D::new`",
             "line": 96,
             "location": "dep/src/cases.rs",
             "offset": 16,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); line: `h.update(key);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `h.update(key);`; code: `update`",
             "line": 97,
             "location": "dep/src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::Digest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:111:7-111:10 within 111:0-137:1); line: `h.finalize().to_vec()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; use: digest; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `h.finalize().to_vec()`; code: `finalize`",
             "line": 98,
             "location": "dep/src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::Digest::finalize"
           },
           {
-            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55, lib dep] in dep::cases::all; chosen as generic argument of dep::cases::mixed; owner at dep/src/cases.rs:111:7-111:10 within 111:0-137:1; line: `mixed::<sha2::Sha512>(d),`; code: `mixed::<sha2::Sha512>`",
-            "line": 133,
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] [macro mac::dispatch!] in dep::cases::handed; use: digest; owner at dep/src/cases.rs:102:7-102:13 within 102:0-109:1; expanded from dep/src/cases.rs:105:12-105:40 as `<$h as sha2::Digest>::digest` line #5c938d6d (by macro hash_with! at mac/src/lib.rs:141:17-141:41 line #3f74db92 defined dep/src/cases.rs:103-107, by macro mac::dispatch! at dep/src/cases.rs:108:4-108:42 line #93a4f704 defined mac/src/lib.rs:137-137); owner `verify_55::shared::handed` at dep/src/cases.rs:102:7-102:13 within 102:0-109:1; line: `mac::dispatch!(d.len() % 2, hash_with)`",
+            "line": 108,
+            "location": "dep/src/cases.rs",
+            "offset": 4,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::two::<..>; use: digest; owner at dep/src/cases.rs:120:7-120:10 within 120:0-124:1; instantiated by dep::cases::one::<..> at dep/src/cases.rs:127:4 as `two::<D, sha2::Sha224>` (call, to 127:26 as `two::<D, sha2::Sha224>` line #90d798c4, caller at dep/src/cases.rs:126:7-126:10 within 126:0-128:1); instantiated by dep::cases::all at dep/src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::two::<..>` at dep/src/cases.rs:120:7-120:10 within 120:0-124:1; `verify_55::shared::two::<..>` instantiated by verify_55::shared::one::<..> at dep/src/cases.rs:127:4 as `two::<D, sha2::Sha224>` (call, to 127:26 as `two::<D, sha2::Sha224>` line #90d798c4, caller at dep/src/cases.rs:126:7-126:10 within 126:0-128:1); instantiated by verify_55::shared::all at dep/src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let mut v = D::digest(d).to_vec();`; code: `D::digest`",
+            "line": 121,
+            "location": "dep/src/cases.rs",
+            "offset": 16,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55, lib dep] in dep::cases::one::<..>; chosen as generic argument of dep::cases::two; owner at dep/src/cases.rs:126:7-126:10 within 126:0-128:1; instantiated by dep::cases::all at dep/src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `two::<D, sha2::Sha224>(d)`; code: `two::<D, sha2::Sha224>`",
+            "line": 127,
+            "location": "dep/src/cases.rs",
+            "offset": 4,
+            "symbol": "dep::cases::two"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55, lib dep] in dep::cases::all; chosen as generic argument of dep::cases::mixed; owner at dep/src/cases.rs:172:7-172:10 within 172:0-205:1; line: `mixed::<sha2::Sha512>(d),`; code: `mixed::<sha2::Sha512>`",
+            "line": 194,
             "location": "dep/src/cases.rs",
             "offset": 8,
             "symbol": "dep::cases::mixed"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55, lib dep] in dep::cases::all; chosen as generic argument of dep::cases::one; owner at dep/src/cases.rs:172:7-172:10 within 172:0-205:1; line: `one::<sha2::Sha512>(d),`; code: `one::<sha2::Sha512>`",
+            "line": 198,
+            "location": "dep/src/cases.rs",
+            "offset": 8,
+            "symbol": "dep::cases::one"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; owner `verify_55::shared::feeding::fed` at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "line": 5,
+            "location": "dep/src/feeding.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
           },
           {
             "additionalContext": "[reachable] [via-static] [artifacts: bin verify-55] [macro mac::table!] in verify_55::shared::pick; verify_55::shared::TABLE -> ring::digest::SHA512; owner at dep/src/cases.rs:35:19-35:23 as `pick` line #46badc5e (by macro mac::table! at dep/src/cases.rs:35:0-35:48 line #2a17418a defined mac/src/lib.rs:100-100); expanded from mac/src/lib.rs:105:33-105:38 as `$name` line #228dff74 (by macro mac::table! at dep/src/cases.rs:35:0-35:48 line #2a17418a defined mac/src/lib.rs:100-100); expanded from mac/src/lib.rs:105:43-105:48 as `$name` line #0f8c8554 (by macro mac::table! at dep/src/cases.rs:35:0-35:48 line #2a17418a defined mac/src/lib.rs:100-100); line: `mac::table!(TABLE, pick, SHA256, SHA384, SHA512);`",
@@ -1390,11 +1901,25 @@
             "symbol": "verify_55::shared::TABLE"
           },
           {
-            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::shared::all; chosen as generic argument of verify_55::shared::mixed; owner at dep/src/cases.rs:111:7-111:10 within 111:0-137:1; line: `mixed::<sha2::Sha512>(d),`; code: `mixed::<sha2::Sha512>`",
-            "line": 133,
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::shared::one::<..>; chosen as generic argument of verify_55::shared::two; owner at dep/src/cases.rs:126:7-126:10 within 126:0-128:1; instantiated by verify_55::shared::all at dep/src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `two::<D, sha2::Sha224>(d)`; code: `two::<D, sha2::Sha224>`",
+            "line": 127,
+            "location": "dep/src/cases.rs",
+            "offset": 4,
+            "symbol": "verify_55::shared::two"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::shared::all; chosen as generic argument of verify_55::shared::mixed; owner at dep/src/cases.rs:172:7-172:10 within 172:0-205:1; line: `mixed::<sha2::Sha512>(d),`; code: `mixed::<sha2::Sha512>`",
+            "line": 194,
             "location": "dep/src/cases.rs",
             "offset": 8,
             "symbol": "verify_55::shared::mixed"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::shared::all; chosen as generic argument of verify_55::shared::one; owner at dep/src/cases.rs:172:7-172:10 within 172:0-205:1; line: `one::<sha2::Sha512>(d),`; code: `one::<sha2::Sha512>`",
+            "line": 198,
+            "location": "dep/src/cases.rs",
+            "offset": 8,
+            "symbol": "verify_55::shared::one"
           },
           {
             "additionalContext": "[reachable] [call] [artifacts: bin verify-55] [macro mac::whole_impl!] in verify_55::cases::K::whole; use: digest; owner at mac/src/lib.rs:31:19-31:24 as `whole` line #5732fdff (by macro mac::whole_impl! at src/cases.rs:18:0-18:27 line #d3033f7c defined mac/src/lib.rs:28-28); expanded from mac/src/lib.rs:33:16-33:32 as `sha2::$h::digest` line #9e945e2d (by macro mac::whole_impl! at src/cases.rs:18:0-18:27 line #d3033f7c defined mac/src/lib.rs:28-28); line: `mac::whole_impl!(K, Sha512);`",
@@ -1467,32 +1992,67 @@
             "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; new: setup, not a use; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); line: `let mut h = D::new();`; code: `D::new`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; new: setup, not a use; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let mut h = D::new();`; code: `D::new`",
             "line": 96,
             "location": "src/cases.rs",
             "offset": 16,
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); line: `h.update(key);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `h.update(key);`; code: `update`",
             "line": 97,
             "location": "src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::Digest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:133:8 as `mixed::<sha2::Sha512>` (call, to 133:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:111:7-111:10 within 111:0-137:1); line: `h.finalize().to_vec()`; code: `finalize`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; use: digest; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:194:8 as `mixed::<sha2::Sha512>` (call, to 194:29 as `mixed::<sha2::Sha512>` line #35e4eaab, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `h.finalize().to_vec()`; code: `finalize`",
             "line": 98,
             "location": "src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::Digest::finalize"
           },
           {
-            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::cases::all; chosen as generic argument of verify_55::cases::mixed; owner at src/cases.rs:111:7-111:10 within 111:0-137:1; line: `mixed::<sha2::Sha512>(d),`; code: `mixed::<sha2::Sha512>`",
-            "line": 133,
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] [macro mac::dispatch!] in verify_55::cases::handed; use: digest; owner at src/cases.rs:102:7-102:13 within 102:0-109:1; expanded from src/cases.rs:105:12-105:40 as `<$h as sha2::Digest>::digest` line #5c938d6d (by macro hash_with! at mac/src/lib.rs:141:17-141:41 line #3f74db92 defined src/cases.rs:103-107, by macro mac::dispatch! at src/cases.rs:108:4-108:42 line #93a4f704 defined mac/src/lib.rs:137-137); line: `mac::dispatch!(d.len() % 2, hash_with)`",
+            "line": 108,
+            "location": "src/cases.rs",
+            "offset": 4,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::two::<..>; use: digest; owner at src/cases.rs:120:7-120:10 within 120:0-124:1; instantiated by verify_55::cases::one::<..> at src/cases.rs:127:4 as `two::<D, sha2::Sha224>` (call, to 127:26 as `two::<D, sha2::Sha224>` line #90d798c4, caller at src/cases.rs:126:7-126:10 within 126:0-128:1); instantiated by verify_55::cases::all at src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let mut v = D::digest(d).to_vec();`; code: `D::digest`",
+            "line": 121,
+            "location": "src/cases.rs",
+            "offset": 16,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::cases::one::<..>; chosen as generic argument of verify_55::cases::two; owner at src/cases.rs:126:7-126:10 within 126:0-128:1; instantiated by verify_55::cases::all at src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `two::<D, sha2::Sha224>(d)`; code: `two::<D, sha2::Sha224>`",
+            "line": 127,
+            "location": "src/cases.rs",
+            "offset": 4,
+            "symbol": "verify_55::cases::two"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::cases::all; chosen as generic argument of verify_55::cases::mixed; owner at src/cases.rs:172:7-172:10 within 172:0-205:1; line: `mixed::<sha2::Sha512>(d),`; code: `mixed::<sha2::Sha512>`",
+            "line": 194,
             "location": "src/cases.rs",
             "offset": 8,
             "symbol": "verify_55::cases::mixed"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::cases::all; chosen as generic argument of verify_55::cases::one; owner at src/cases.rs:172:7-172:10 within 172:0-205:1; line: `one::<sha2::Sha512>(d),`; code: `one::<sha2::Sha512>`",
+            "line": 198,
+            "location": "src/cases.rs",
+            "offset": 8,
+            "symbol": "verify_55::cases::one"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "line": 5,
+            "location": "src/feeding.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
           }
         ]
       },
@@ -1528,7 +2088,91 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "30"
+          "value": "42"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:aead",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::put::<alloc::vec::Vec<u8>>; use: unknown; algorithm unresolved: the boundary check: `<alloc::vec::Vec<u8> as aead::Buffer>::extend_from_slice` of aead 0.5.2, a call nothing else in the CBOM accounts for: what it does is not known; owner at dep/src/cases.rs:143:7-143:10 within 143:0-145:1; owner `verify_55::shared::put::<alloc::vec::Vec<u8>>` at dep/src/cases.rs:143:7-143:10 within 143:0-145:1; line: `b.extend_from_slice(d).map_or(0, |()| b.len())`; code: `extend_from_slice`",
+            "line": 144,
+            "location": "dep/src/cases.rs",
+            "offset": 6,
+            "symbol": "<alloc::vec::Vec<u8> as aead::Buffer>::extend_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::put::<alloc::vec::Vec<u8>>::{closure#0}; use: unknown; algorithm unresolved: the boundary check: `aead::Buffer::len` of aead 0.5.2, a call nothing else in the CBOM accounts for: what it does is not known; owner at dep/src/cases.rs:144:37-144:41 as `|()|` line #39b0abaa within 144:37-144:49; owner `verify_55::shared::put::<alloc::vec::Vec<u8>>::{closure#0}` at dep/src/cases.rs:144:37-144:41 as `|()|` line #39b0abaa within 144:37-144:49; line: `b.extend_from_slice(d).map_or(0, |()| b.len())`; code: `len`",
+            "line": 144,
+            "location": "dep/src/cases.rs",
+            "offset": 44,
+            "symbol": "aead::Buffer::len"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::put::<alloc::vec::Vec<u8>>; use: unknown; algorithm unresolved: the boundary check: `<alloc::vec::Vec<u8> as aead::Buffer>::extend_from_slice` of aead 0.5.2, a call nothing else in the CBOM accounts for: what it does is not known; owner at src/cases.rs:143:7-143:10 within 143:0-145:1; line: `b.extend_from_slice(d).map_or(0, |()| b.len())`; code: `extend_from_slice`",
+            "line": 144,
+            "location": "src/cases.rs",
+            "offset": 6,
+            "symbol": "<alloc::vec::Vec<u8> as aead::Buffer>::extend_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::put::<alloc::vec::Vec<u8>>::{closure#0}; use: unknown; algorithm unresolved: the boundary check: `aead::Buffer::len` of aead 0.5.2, a call nothing else in the CBOM accounts for: what it does is not known; owner at src/cases.rs:144:37-144:41 as `|()|` line #39b0abaa within 144:37-144:49; line: `b.extend_from_slice(d).map_or(0, |()| b.len())`; code: `len`",
+            "line": 144,
+            "location": "src/cases.rs",
+            "offset": 44,
+            "symbol": "aead::Buffer::len"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin verify-55"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib dep"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
         }
       ],
       "type": "cryptographic-asset"
@@ -1536,15 +2180,58 @@
   ],
   "dependencies": [
     {
+      "dependsOn": [
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:aead"
+      ],
+      "ref": "pkg:cargo/aead@0.5.2"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-128-CBC"
+      ],
+      "ref": "pkg:cargo/aes@0.8.4"
+    },
+    {
       "dependsOn": [],
       "ref": "pkg:cargo/block-buffer@0.10.4"
     },
     {
       "dependsOn": [],
+      "ref": "pkg:cargo/block-padding@0.3.3"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/cipher@0.4.4"
+      ],
+      "provides": [
+        "crypto:algorithm:AES-128-CBC"
+      ],
+      "ref": "pkg:cargo/cbc@0.1.2"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/block-padding@0.3.3",
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/cipher@0.4.4"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/rand_core@0.6.4"
+      ],
       "ref": "pkg:cargo/crypto-common@0.1.7"
     },
     {
       "dependsOn": [
+        "pkg:cargo/aead@0.5.2",
+        "pkg:cargo/aes@0.8.4",
+        "pkg:cargo/cbc@0.1.2",
         "pkg:cargo/hmac@0.12.1",
         "pkg:cargo/mac@0.1.0",
         "pkg:cargo/pm@0.1.0",
@@ -1583,6 +2270,10 @@
       "ref": "pkg:cargo/pm@0.1.0"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/rand_core@0.6.4"
+    },
+    {
       "dependsOn": [
         "pkg:cargo/getrandom@0.2.17"
       ],
@@ -1613,6 +2304,9 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/aead@0.5.2",
+        "pkg:cargo/aes@0.8.4",
+        "pkg:cargo/cbc@0.1.2",
         "pkg:cargo/dep@0.1.0",
         "pkg:cargo/hmac@0.12.1",
         "pkg:cargo/mac@0.1.0",
@@ -1627,6 +2321,10 @@
         "crypto:algorithm:SHA-256"
       ],
       "ref": "crypto:algorithm:HMAC-SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:AES-128-CBC"
     },
     {
       "dependsOn": [],
@@ -1651,6 +2349,10 @@
     {
       "dependsOn": [],
       "ref": "crypto:algorithm:SHA-512"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:aead"
     }
   ],
   "metadata": {
@@ -1686,7 +2388,7 @@
       },
       {
         "name": "rcbom:run:packages",
-        "value": "22"
+        "value": "29"
       },
       {
         "name": "rcbom:run:sandbox",
@@ -1698,7 +2400,11 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "634"
+        "value": "841"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin other-tool"
       },
       {
         "name": "rcbom:run:artifact",
@@ -1710,7 +2416,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "85 calls into crypto packages: 81 cited, 0 cited by the check as unknown, 4 excused (format 2, view 2)"
+        "value": "121 calls into crypto packages: 106 cited, 6 cited by the check as unknown, 9 excused (format 4, view 5)"
       }
     ],
     "tools": {
@@ -1723,7 +2429,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:ed0996e8-0388-8f54-a65e-d2305c117f38",
+  "serialNumber": "urn:uuid:194a11fe-bf57-83df-a7c8-98d85d1a9340",
   "specVersion": "1.7",
   "version": 1
 }
