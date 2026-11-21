@@ -746,11 +746,15 @@ impl Files<'_> {
                 }
             }
         }
-        Err(if found {
-            format!("`{w}` gives no `{last}`")
-        } else {
-            format!("no function `{w}` in its package")
-        })
+        if !found {
+            // (no text declares it: a macro may write it, `suite!(S6, SHA384)` with `pub fn
+            // alg()` in its body; that there is such a function is the compiler's word)
+            unshown(format!(
+                "no text of its package declares the function `{w}` (a macro may write it)"
+            ));
+            return Ok(());
+        }
+        Err(format!("`{w}` gives no `{last}`"))
     }
 
     /// "dyn: `T` is coerced to `dyn Tr` at <span> as `text` line #.." (or "in a static at ..",

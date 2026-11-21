@@ -5,13 +5,30 @@
 # derive, a function-like procedural macro), what it writes (a free function, a method, an impl,
 # a closure, an `async fn`, a static), where the item's name comes from (the invocation, the
 # macro) and how the call is written. Each is commented where its macro is.
+#
+# And what the verifier still reads from the text, each written in the ways the language allows
+# that a check might misread (`src/hyp.rs`, one function a way, numbered there; the files beside
+# it are the other files those ways need): a function pointer's way from where the function is
+# named to its call (a field a constructor or a setter sets, a function between, a table, a
+# macro's binding, a constant called by a path, a call's result called, two statics of one name
+# under `cfg`), the callee of such a call (a struct's field value, nested indexes, two lines),
+# names (a re-export imported under another name, by a glob, a macro body's alias of the
+# invoking file and of `$crate`), a trait object behind a type alias of another file or an
+# `impl Trait`, an algorithm a macro names or a dependency renamed in a manifest table gives,
+# a function a macro writes, and paths written from the root, over two lines, with a blank
+# before the `!`, as a raw identifier, far below their `#[derive(`, after `# [`. Where the text
+# shows the fact it is checked; where it does not, the position is verified and the fact is
+# counted as not shown.
 [package]
 name = "verify-55"
 version = "0.1.0"
 edition = "2024"
 
 [workspace]
-members = ["dep", "mac", "pm"]
+members = ["dep", "mac", "pm", "picklib"]
+
+[workspace.dependencies]
+shax = { package = "sha2", version = "0.10" }
 
 [dependencies]
 dep = { path = "dep" }
@@ -23,6 +40,11 @@ ring = "=0.17.14"
 aes = "0.8"
 cbc = { version = "0.1", features = ["alloc"] }
 aead = { version = "0.5", features = ["alloc"] }
+rand = "0.8"
+
+[dependencies.algs]
+package = "picklib"
+path = "picklib"
 
 [[bin]]
 name = "verify-55"

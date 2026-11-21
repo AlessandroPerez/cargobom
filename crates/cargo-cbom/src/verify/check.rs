@@ -553,9 +553,14 @@ impl Files<'_> {
                 // of the file's function it calls (`let g = get();`: `get`'s)
                 if !root.is_empty() && self.resolve(file).ok().as_deref() == Some(path.as_path()) {
                     let root_at = src.idx(root_pos);
-                    pointer_bound(&src, root_at, &root, l2, src.idx((l2, c2))).map_err(|e| {
-                        format!("{e}, not where the function is named ({file}:{l2}:{c2})")
-                    })?;
+                    // (where the text does not lead from the call to the naming, a field a
+                    // constructor sets, a pointer another function hands on: not shown)
+                    if let Err(e) = pointer_bound(&src, root_at, &root, l2, src.idx((l2, c2))) {
+                        unshown(format!(
+                            "{e}: the text does not show that it holds the function named at \
+                             {file}:{l2}:{c2}"
+                        ));
+                    }
                 }
                 let p2 = self.resolve(file)?;
                 let src2 = self
@@ -834,8 +839,12 @@ impl Files<'_> {
                         false
                     })
                 {
-                    return Err(format!(
-                        "the call calls no method on a `dyn {want}` (its trait objects: {})",
+                    // (the receivers' types as the text of the file gives them: an alias
+                    // another file defines, an `impl Trait`, a trait object of a trait whose
+                    // supertrait this is are not read)
+                    unshown(format!(
+                        "the text does not show the call's receiver to be a `dyn {want}` (the \
+                         trait objects it reads there: {})",
                         if ts.is_empty() { "none".to_string() } else { ts.join(", ") }
                     ));
                 }
@@ -1147,17 +1156,24 @@ impl Files<'_> {
             }))
             .collect();
         if !(call.open || call.foreign) || (!others.is_empty() && !call.replaced) {
-            let read = if others.is_empty() {
-                "no descriptor of its kind".to_string()
-            } else {
+            // (no descriptor at all in what is read: the value comes through code not read
+            // here, a macro's invocation, another crate's item under a name not resolved; the
+            // text names no other descriptor in its place and does not show this one)
+            if others.is_empty() {
+                unshown(format!(
+                    "the code the call reads names no descriptor of its kind: the text does \
+                     not show {}",
+                    lasts.join(", ")
+                ));
+                return Ok(());
+            }
+            return Err(format!(
+                "the code the call reads names {}, not {}",
                 others
                     .iter()
                     .map(|w| w.as_str())
                     .collect::<Vec<_>>()
-                    .join(", ")
-            };
-            return Err(format!(
-                "the code the call reads names {read}, not {}",
+                    .join(", "),
                 lasts.join(", ")
             ));
         }

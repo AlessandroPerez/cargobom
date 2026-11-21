@@ -113,7 +113,10 @@
 //!   closures, nested functions, shadowing, `let f = f;`, a macro's `let`), or the statement
 //!   storing it into the container it is read from (`map.insert("a", digest)`, also a field's,
 //!   `t.map.insert(1, digest)`); a variable computed by code not followed (another crate's
-//!   function, a labelled block) must read a variable bound there;
+//!   function, a labelled block) reads a variable bound there. The position named must name
+//!   the function (by its name, an alias, or a macro invoked there whose body does); where the
+//!   text does not lead from the call to it (a field a constructor sets, a pointer another
+//!   function hands on, a macro's binding), the fact is not shown (below), no mismatch;
 //! - a step of an instantiation chain (`instantiated by X at F:L:C as `text` (call of `f`, to
 //!   L:C as `..` line #.., from .., caller at ..)`) is as the compiler records it: the code at
 //!   the position starts with the text given and has the fingerprint given (of its column in
@@ -155,6 +158,18 @@
 //! cites, not once per instance of a generic function citing the same). A shifted step, macro
 //! or coercion detail whose position has the fingerprint recorded (the same column of a line
 //! that reads the same) is as true: counted apart and printed (`AS TRUE`), not hidden.
+//!
+//! Not shown: the checks above are of two kinds. What a position and the positions its
+//! context cites must read (a name, an alias, a macro's or a derive's path, a key, the line
+//! recorded) is in the text, and a text that reads otherwise is a mismatch. What a value is
+//! where it is used (which function a pointer holds, what type a receiver has, which
+//! descriptor an argument carries, whether a macro writes the function named) is derived from
+//! the text only as far as this reader follows it: where it follows, a value it finds to be
+//! another is a mismatch; where it does not (it finds no value at all: a field set elsewhere, a
+//! type alias of another file, a macro's invocation), the fact is the compiler's word. The
+//! position is then verified and the fact printed and counted apart (`NOT SHOWN`, "verified
+//! with a fact the text does not show"), never as a mismatch. The self-test counts a shifted
+//! position or detail that passes only so as rejected, and says how many.
 //!
 //! Not checked, by design (the walk, the value search and the knowledge base decide them, which
 //! a reader of the text cannot redo): the reachability tier (`[reachable]`, `[present]`,
@@ -603,10 +618,27 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
     };
     let mut bad = 0;
     let mut ranged = 0;
+    let mut not_shown = 0;
     let mut verified = vec![false; occs.len()];
     for (i, o) in occs.iter().enumerate() {
         RANGED.with(|r| r.set(false));
-        match files.check(i, o.line, o.offset) {
+        take_unshown();
+        let checked = files.check(i, o.line, o.offset);
+        let facts = take_unshown();
+        if checked.is_ok() && !facts.is_empty() {
+            // the position is the one the context says; a fact it states is the compiler's
+            // word, which the text does not show
+            not_shown += 1;
+            println!(
+                "NOT SHOWN {} {}:{}:{}: {}",
+                o.component,
+                o.location,
+                o.line,
+                o.offset,
+                facts.join("; ")
+            );
+        }
+        match checked {
             Ok(()) if RANGED.with(|r| r.get()) => {
                 // identical candidates the context cannot tell apart: a range, not exact
                 verified[i] = true;
@@ -628,12 +660,17 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
     }
     println!(
         "{}: {} positions verified, {} mismatched, {} occurrences without a line, {} within a range \
-         of identical candidates",
+         of identical candidates{}",
         cbom.display(),
         occs.len() - bad - ranged,
         bad,
         without_line,
-        ranged
+        ranged,
+        if not_shown > 0 {
+            format!(", {not_shown} verified with a fact the text does not show")
+        } else {
+            String::new()
+        }
     );
     let bad = bad + without_line;
     if self_test {
@@ -655,16 +692,23 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     Some((i, l, c))
                 })
                 .collect();
-            let (mut caught, mut in_range) = (0, 0);
+            let (mut caught, mut in_range, mut unread) = (0, 0, 0);
             for &(i, l, c) in &shifted {
                 RANGED.with(|r| r.set(false));
+                take_unshown();
                 let ok = files.check(i, l, c).is_ok();
+                let facts = take_unshown();
                 if ok && RANGED.with(|r| r.get()) {
                     // not confirmed: one of identical candidates (a range)
                     caught += 1;
                     in_range += 1;
                 } else if !ok {
                     caught += 1;
+                } else if !facts.is_empty() {
+                    // not confirmed: the text there reads as the context says and does not
+                    // show the fact that would tell the two positions apart
+                    caught += 1;
+                    unread += 1;
                 } else {
                     let o = &occs[i];
                     println!(
@@ -675,8 +719,13 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             }
             println!(
                 "self-test {what}: {caught}/{} shifted positions rejected ({in_range} of them \
-                 only placed within a range of identical candidates)",
-                shifted.len()
+                 only placed within a range of identical candidates{})",
+                shifted.len(),
+                if unread > 0 {
+                    format!(", {unread} only where the text does not show a fact")
+                } else {
+                    String::new()
+                }
             );
         }
         // the positions the details give: where a generic instance was instantiated
@@ -689,7 +738,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             (0, 1, "detail column +1"),
             (0, -1, "detail column -1"),
         ] {
-            let (mut caught, mut total, mut also_true) = (0, 0, 0);
+            let (mut caught, mut total, mut also_true, mut unread) = (0, 0, 0, 0);
             for (i, o) in occs.iter().enumerate().filter(|&(i, _)| verified[i]) {
                 // one shift per function, position and text cited: the instances of a generic
                 // function cite the same lines (thousands, in a chain of macro-made types)
@@ -760,11 +809,18 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     }
                     total += 1;
                     RANGED.with(|r| r.set(false));
+                    take_unshown();
                     let ok = files
                         .check_with(i, o.line, o.offset, Some(&shifted))
                         .is_ok();
+                    let facts = take_unshown();
                     if !ok || RANGED.with(|r| r.get()) {
                         caught += 1;
+                    } else if !facts.is_empty() {
+                        // (the shifted position reads as the cited one does, and the text does
+                        // not show the fact that would tell them apart: not confirmed)
+                        caught += 1;
+                        unread += 1;
                     } else if marked {
                         // the shifted position has the fingerprint the compiler's has (the
                         // same column of a line that reads the same): the claim is as true, no
@@ -791,13 +847,18 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     }
                 }
             }
+            let unread = if unread > 0 {
+                format!(" ({unread} of them only where the text does not show a fact)")
+            } else {
+                String::new()
+            };
             if also_true > 0 {
                 println!(
                     "self-test {what}: {caught}/{total} shifted positions rejected ({also_true} \
-                     more landed on the same column of a line that reads the same, as true)"
+                     more landed on the same column of a line that reads the same, as true){unread}"
                 );
             } else {
-                println!("self-test {what}: {caught}/{total} shifted positions rejected");
+                println!("self-test {what}: {caught}/{total} shifted positions rejected{unread}");
             }
         }
     }
@@ -1148,6 +1209,29 @@ thread_local! {
     /// Set by a check that could tell its position only within a range of identical candidates:
     /// invocations of one macro that make the same item as far as the context says.
     static RANGED: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+    /// The facts of the occurrence being checked that its text does not show (`unshown`).
+    static UNSHOWN: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
+}
+
+/// A fact the context states that the source text does not show: where the value of a function
+/// pointer comes from, what type a receiver is, which descriptor an argument carries, when the
+/// code between is more than the text read here follows (a field a constructor sets, a macro
+/// of another file, a type alias elsewhere). The compiler's record says it and the text
+/// neither confirms nor contradicts it: the position is verified, the fact is counted and
+/// printed as not shown, and it is no mismatch. What the text does show is checked as before:
+/// the position names what the context says, and so does every position the context cites.
+pub(super) fn unshown(what: String) {
+    UNSHOWN.with(|u| {
+        let mut u = u.borrow_mut();
+        if !u.contains(&what) {
+            u.push(what);
+        }
+    });
+}
+
+/// The facts not shown since the last call.
+fn take_unshown() -> Vec<String> {
+    UNSHOWN.with(|u| std::mem::take(&mut *u.borrow_mut()))
 }
 
 #[cfg(test)]
