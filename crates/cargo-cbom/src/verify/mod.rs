@@ -385,11 +385,11 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         packages: list("rcbom:run:members"),
     };
     let man = rcbom_manifest::load_locked(manifest_path, &sel, &kb)?;
-    let (externs, libs, roots) = match load_externs(manifest_path, &sel) {
-        Some((e, l, r)) => (Some(e), Some(l), Some(r)),
+    let (externs, libs, roots, bins) = match load_externs(manifest_path, &sel) {
+        Some((e, l, r, b)) => (Some(e), Some(l), Some(r), b),
         None => {
             eprintln!("verify: cargo metadata failed; crate names are resolved by package name");
-            (None, None, None)
+            (None, None, None, HashSet::new())
         }
     };
     let mut graph = Graph {
@@ -571,6 +571,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         kb: &kb,
         externs,
         libs,
+        bins,
         toolchain: None,
         cache: HashMap::new(),
         pkg_binds: HashMap::new(),
@@ -694,7 +695,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                     (m, marked)
                 });
                 let spans = re!(
-                    r"(?:expanded from|owner(?: `[^`]*`)? at|caller at|, from|by (?:macro|derive|attribute|rewrite) \S+ at|coerced to `[^`]+` (?:in a static )?at) [^\s;]+?:(\d+):(\d+)-\d+:\d+(?: as `[^`]*`)?( line #[0-9a-f]{8})?"
+                    r"(?:expanded (?:`[^`]*` )?from|owner(?: `[^`]*`)? at|caller at|, from|by (?:macro|derive|attribute|rewrite) \S+ at|coerced to `[^`]+` (?:in a static )?at) [^\s;]+?:(\d+):(\d+)-\d+:\d+(?: as `[^`]*`)?( line #[0-9a-f]{8})?"
                 )
                 .captures_iter(&o.context)
                 .map(|m| {
@@ -870,6 +871,8 @@ struct Files<'a> {
     kb: &'a Kb,
     externs: Option<Externs>,
     libs: Option<Libs>,
+    /// The crate names of the workspace's binaries, from `cargo metadata`.
+    bins: HashSet<String>,
     /// The pinned toolchain's sysroot and commit, for `/rustc/<commit>/library/..` locations;
     /// read when first needed
     toolchain: Option<Option<(PathBuf, String)>>,
@@ -1883,6 +1886,17 @@ static T: LazyLock<HashMap<&'static str, &(dyn Cipher + Send)>> =
         assert!(split_via("instantiated by a::f").unwrap().1.is_none());
         assert!(split_via("instantiated by a::f at src/a.rs:1:2 (call, to x)").is_err());
         // a path's last name, as a macro writes the path
+        // a qualified path's trait: the crate of an implementation for a type of the standard
+        // library is the trait's
+        assert_eq!(
+            qualified_trait("alloc::vec::Vec<u8> as aead::Buffer>::extend_from_slice"),
+            Some("aead::Buffer")
+        );
+        assert_eq!(
+            qualified_trait("D as digest::Digest<fn(u8) -> u8>>::update"),
+            Some("digest::Digest<fn(u8) -> u8>")
+        );
+        assert_eq!(qualified_trait("T>::new"), None);
         let last = |t: &str| super::witness::last_segment(t);
         assert_eq!(
             last("$mode::$mode2::<aes::Aes128>::new").as_deref(),

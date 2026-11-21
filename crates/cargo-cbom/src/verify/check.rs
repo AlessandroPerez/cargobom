@@ -299,14 +299,20 @@ impl Files<'_> {
             .unwrap_or("");
         // (of a type parameter's, `<D as digest::digest::Digest>::update`, its trait's)
         let first = first.split(" as ").last().unwrap_or(first);
-        let known = matches!(first, "core" | "std" | "alloc")
-            || self.libs.as_ref().is_some_and(|l| l.contains_key(first))
-            || self
-                .man
-                .packages
-                .iter()
-                .any(|p| p.name.replace('-', "_") == first);
-        if !known {
+        // (and of a standard-library type's implementation of another crate's trait, `<alloc::
+        // vec::Vec<u8> as aead::Buffer>::extend_from_slice`, its trait's: only the trait's
+        // crate can implement it for that type)
+        let of_trait = o
+            .symbol
+            .strip_prefix('<')
+            .and_then(|q| qualified_trait(q))
+            .and_then(|t| t.split("::").next())
+            .filter(|t| !matches!(*t, "core" | "std" | "alloc"));
+        let first = match of_trait {
+            Some(t) if matches!(first, "core" | "std" | "alloc") => t,
+            _ => first,
+        };
+        if !self.crate_known(first) {
             return Err(format!("`{}`: no crate `{first}` in the build", o.symbol));
         }
         // a standard-library path names a type or trait and a function of it that exist
@@ -445,7 +451,7 @@ impl Files<'_> {
                         .and_then(|r| r.find(&rest))
                         .map_or(0, |m| rest[..m.start()].chars().count());
                     let root_at = src.idx((line, offset + k));
-                    pointer_bound(&src, root_at, &root, l2).map_err(|e| {
+                    pointer_bound(&src, root_at, &root, l2, src.idx((l2, c2))).map_err(|e| {
                         format!("{e}, not where the function is named ({file}:{l2}:{c2})")
                     })?;
                 }
@@ -754,6 +760,13 @@ impl Files<'_> {
                 let m = [&m[0], &m[2]];
                 let want = type_name(m[1].trim().trim_start_matches("dyn ").trim());
                 let supers = self.supertraits(&path, m[1]);
+                // (a trait the package imports under another name, in whatever file:
+                // hqckem-ref's `pub(crate) use sha3::digest::XofReader as Xof;`, its functions
+                // taking a `&mut dyn Xof`)
+                let renames = match self.man.owner_of(&path).map(|p| p.manifest_dir.clone()) {
+                    Some(d) => self.package_binds(&d),
+                    None => Rc::new(Vec::new()),
+                };
                 if let Some(ts) = call_dyn_receivers(&src, src.idx(at))
                     && !ts.iter().any(|t| {
                         let mut seen = vec![t.clone()];
@@ -762,7 +775,12 @@ impl Files<'_> {
                             if seen[k] == want {
                                 return true;
                             }
-                            for s2 in supers.get(&seen[k]).into_iter().flatten() {
+                            let here = seen[k].clone();
+                            let named = renames
+                                .iter()
+                                .filter(|b| b.name == here)
+                                .filter_map(|b| b.path.last());
+                            for s2 in supers.get(&here).into_iter().flatten().chain(named) {
                                 if !seen.contains(s2) {
                                     seen.push(s2.clone());
                                 }
@@ -835,11 +853,12 @@ impl Files<'_> {
             // ..)` may be either)
             if p.ends_with(" in the arguments") {
                 let members = named.clone();
-                let expanded: Vec<usize> = re!(r"expanded from ([^\s;]+?):(\d+)(?::\d+-|;|$)")
-                    .captures_iter(ctx.details)
-                    .filter(|m| self.resolve(&m[1]).ok().as_deref() == Some(path.as_path()))
-                    .filter_map(|m| m[2].parse().ok())
-                    .collect();
+                let expanded: Vec<usize> =
+                    re!(r"expanded (?:`[^`]*` )?from ([^\s;]+?):(\d+)(?::\d+-|;|$)")
+                        .captures_iter(ctx.details)
+                        .filter(|m| self.resolve(&m[1]).ok().as_deref() == Some(path.as_path()))
+                        .filter_map(|m| m[2].parse().ok())
+                        .collect();
                 self.check_args(
                     &src,
                     &path,
@@ -1164,7 +1183,13 @@ impl Files<'_> {
         let mut chain: Vec<(String, Held)> =
             callee.iter().map(|c| (c.clone(), inner.clone())).collect();
         // whether the code at the occurrence names a type parameter of the function or the
-        // impl it is in: its asset is then what an instance's arguments choose
+        // impl it is in: its asset is then what an instance's arguments choose. Not where it
+        // also names a type that is this asset by itself (`run_oaep_primitive::<D, Sha1>` is
+        // SHA-1's whatever `D` is, xml-sec)
+        let asset = component_ref
+            .strip_prefix("crypto:algorithm:")
+            .unwrap_or(component_ref);
+        let kb = self.kb;
         let by_param = self.source(at.0).is_some_and(|occ| {
             let (rs, rc) = rest(&occ, at.1, at.2);
             let Some((quals, last, generics)) = path_and_generics(&rs, &rc) else {
@@ -1196,12 +1221,44 @@ impl Files<'_> {
                     }
                 }
             }
-            quals
+            // (every name in the path's generic arguments: `sha2::Sha224` is `Sha224`'s)
+            let mut inside: Vec<String> = Vec::new();
+            let mut i = 0;
+            while i < rs.len() && rc[i] == Class::Code {
+                if rs[i] == '<' {
+                    let Some(close) = skip_angle(&rs, &rc, i) else {
+                        break;
+                    };
+                    let text: String = rs[i + 1..close - 1].iter().collect();
+                    inside.extend(
+                        re!(r"[A-Za-z_]\w*")
+                            .find_iter(&text)
+                            .map(|m| m.as_str().to_string()),
+                    );
+                    i = close;
+                } else if is_ident(rs[i]) || rs[i] == ':' || rs[i].is_whitespace() {
+                    i += 1;
+                } else {
+                    break;
+                }
+            }
+            let own = quals.iter().chain(&inside).any(|w| {
+                !params.contains(w)
+                    && kb
+                        .types
+                        .iter()
+                        .any(|e| e.name == *w && e.algo.asset == asset)
+            });
+            !own && quals
                 .iter()
                 .chain(&generics)
                 .chain(std::iter::once(&last))
                 .any(|w| params.contains(w))
         });
+        // what the instantiations of the chains choose: one that chooses others of this
+        // asset's kind and not it, and whether one chooses it
+        let mut unchosen: Option<String> = None;
+        let mut chosen_by_one = false;
         // the items the occurrence is in beside the one it names, each with the compiler's
         // record of where it is
         let owners: Vec<&str> = parts(details)
@@ -1270,7 +1327,17 @@ impl Files<'_> {
             }
             // a macro's code, as the compiler records where it is written: in the expansions
             // the occurrence is cited at; written as it reads, it names the symbol
-            if let Some(p) = part.strip_prefix("expanded from ") {
+            // (the code of another call cited here with the occurrence's, one of a less
+            // specific asset the same invocation writes, says which: ``expanded `f` from ..``,
+            // cms's `$alg::key_size()` beside the `generate_key_iv` of its CBC encryptor)
+            let expanded = part
+                .strip_prefix("expanded from ")
+                .map(|p| (symbol, p))
+                .or_else(|| {
+                    part.strip_prefix("expanded `")
+                        .and_then(|r| r.split_once("` from "))
+                });
+            if let Some((symbol, p)) = expanded {
                 let w = witness::written_whole(p)
                     .filter(|w| !w.steps.is_empty())
                     .ok_or_else(|| format!("`{part}`: where the code is written cannot be read"))?;
@@ -1385,17 +1452,23 @@ impl Files<'_> {
                     })
                     .map(|&j| self.occs[j].component.as_str())
                     .collect();
-                if !chosen.is_empty()
-                    && !here.iter().any(|&j| {
+                // (held of the chains together: a function of two type parameters is given
+                // one by one caller and the other by the next, `run_oaep_primitive::<D, Sha1>`
+                // in `run_oaep_mgf::<Sha512>`: SHA-1 is chosen at the first, and the second
+                // chooses another hash for another parameter)
+                if !chosen.is_empty() {
+                    if here.iter().any(|&j| {
                         self.occs[j].component_ref == component_ref
                             || parts.is_some_and(|p| p.contains(&self.occs[j].component_ref))
                             || self.refines(&self.occs[j].component_ref, component_ref)
-                    })
-                {
-                    return Err(format!(
-                        "`{part}`: the instantiation at {file}:{line}:{c0} chooses {}",
-                        chosen.join(", ")
-                    ));
+                    }) {
+                        chosen_by_one = true;
+                    } else {
+                        unchosen.get_or_insert(format!(
+                            "`{part}`: the instantiation at {file}:{line}:{c0} chooses {}",
+                            chosen.join(", ")
+                        ));
+                    }
                 }
             }
             // an instance its arguments choose, its `<..>` not written (`Algorithm::hash(
@@ -1456,7 +1529,10 @@ impl Files<'_> {
                 "`{whole}`: the step does not say what the compiler records at its position"
             ));
         }
-        Ok(())
+        match unchosen {
+            Some(e) if !chosen_by_one => Err(e),
+            _ => Ok(()),
+        }
     }
 }
 /// Whether two instance names are of one item of the source: one path once their generic

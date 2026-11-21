@@ -703,7 +703,20 @@ impl Files<'_> {
             };
             match &st.kind {
                 StepKind::Macro => {
-                    if !named("", r"\s*!") {
+                    // (a macro another one is handed by name and invokes through its
+                    // metavariable, kryptering's `$callback!(sha2::Sha256)` in `dispatch_hash!`
+                    // invoked as `dispatch_hash!(hash, do_sign)`: an invocation around this
+                    // one names it)
+                    let handed = re!(r"^\$[A-Za-z_]\w*\s*!").is_match(&head)
+                        && w.steps[i + 1..].iter().any(|outer| {
+                            outer.call.as_ref().is_some_and(|c| {
+                                self.span_at(c, false).is_ok_and(|(_, s)| {
+                                    Regex::new(&format!(r"\b{}\b", regex::escape(name)))
+                                        .is_ok_and(|r| r.is_match(&text_of(&s, c.start, c.end)))
+                                })
+                            })
+                        });
+                    if !named("", r"\s*!") && !handed {
                         unread.push((i, format!("{here}: no invocation of `{}!`", st.name)));
                     }
                 }
@@ -1112,14 +1125,7 @@ impl Files<'_> {
                 .split("::")
                 .next()
                 .unwrap_or_default();
-            let known = matches!(first, "core" | "std" | "alloc")
-                || self.libs.as_ref().is_some_and(|l| l.contains_key(first))
-                || self
-                    .man
-                    .packages
-                    .iter()
-                    .any(|p| p.name.replace('-', "_") == first);
-            if !known {
+            if !self.crate_known(first) {
                 return Err(err(format!("`{n}` is of no crate of the build")));
             }
         }

@@ -394,6 +394,19 @@ impl Files<'_> {
 
     /// The packages of the CBOM whose library is the crate `name` (the crate a symbol's path
     /// starts with).
+    /// Is `name` a crate of the build: the standard library's, a package's library, one of the
+    /// workspace's binaries, or a package by its name?
+    pub(super) fn crate_known(&self, name: &str) -> bool {
+        matches!(name, "core" | "std" | "alloc")
+            || self.libs.as_ref().is_some_and(|l| l.contains_key(name))
+            || self.bins.contains(name)
+            || self
+                .man
+                .packages
+                .iter()
+                .any(|p| p.name.replace('-', "_") == name)
+    }
+
     pub(super) fn lib_refs(&self, name: &str) -> Vec<String> {
         let refs = match &self.libs {
             Some(l) => l.get(name).cloned().unwrap_or_default(),

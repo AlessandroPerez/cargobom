@@ -723,6 +723,7 @@ pub(super) fn pointer_bound(
     at: usize,
     name: &str,
     named: usize,
+    named_at: usize,
 ) -> Result<(), String> {
     let mut cur = (at, name.to_string());
     let file_fns = |n: &str| -> Vec<&Item> {
@@ -780,8 +781,10 @@ pub(super) fn pointer_bound(
                 at,
             } => (first, last, init, at),
         };
-        // the statement names it
-        if (first..=last).contains(&named) {
+        // the statement names it: in the value it gives the variable, not by the variable's
+        // own name (superboring's `let from_components = if balanced {` over the line that
+        // names `PrivateKey::from_components`, at the same column)
+        if (first..=last).contains(&named) && named_at >= init_at {
             return Ok(());
         }
         let init = init.trim();

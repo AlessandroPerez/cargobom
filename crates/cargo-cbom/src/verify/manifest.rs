@@ -8,7 +8,7 @@ pub(super) fn pkg_ref(name: &str, version: &str) -> String {
 pub(super) fn load_externs(
     manifest_path: &Path,
     sel: &rcbom_manifest::Selection,
-) -> Option<(Externs, Libs, Vec<PathBuf>)> {
+) -> Option<(Externs, Libs, Vec<PathBuf>, HashSet<String>)> {
     let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
     let mut cmd = Command::new(cargo);
     cmd.args([
@@ -31,6 +31,15 @@ pub(super) fn load_externs(
     let mut ext: Externs = HashMap::new();
     let mut libs: Libs = HashMap::new();
     let mut roots = Vec::new();
+    // the binaries of the workspace's packages: crates of the build too, each under its
+    // target's name (`mldsa_wrapper::sign` is of katwalk's `[[bin]] name = "mldsa_wrapper"`)
+    let mut bins: HashSet<String> = HashSet::new();
+    let members: Vec<&str> = md["workspace_members"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|m| m.as_str())
+        .collect();
     for p in md["packages"].as_array()? {
         let (Some(id), Some(n), Some(v)) =
             (p["id"].as_str(), p["name"].as_str(), p["version"].as_str())
@@ -65,6 +74,17 @@ pub(super) fn load_externs(
                     .or_default()
                     .push(r.clone());
             }
+            let bin = t["kind"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .any(|k| k == "bin");
+            if bin
+                && members.contains(&id)
+                && let Some(tn) = t["name"].as_str()
+            {
+                bins.insert(tn.replace('-', "_"));
+            }
         }
     }
     for n in md["resolve"]["nodes"].as_array()? {
@@ -82,7 +102,7 @@ pub(super) fn load_externs(
             }
         }
     }
-    Some((ext, libs, roots))
+    Some((ext, libs, roots, bins))
 }
 /// The pinned toolchain's sysroot and commit (`rustc -vV`).
 pub(super) fn toolchain() -> Option<(PathBuf, String)> {

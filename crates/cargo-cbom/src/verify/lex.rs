@@ -27,6 +27,25 @@ pub(super) fn strip_generics(s: &str) -> String {
         .filter_map(|(c, k)| k.then_some(*c))
         .collect()
 }
+/// The trait of a qualified path, read from after its `<`: `aead::Buffer` of `alloc::vec::
+/// Vec<u8> as aead::Buffer>::extend_from_slice`. None for one that names no trait (`<T>::f`).
+pub(super) fn qualified_trait(q: &str) -> Option<&str> {
+    let b = q.as_bytes();
+    let (mut depth, mut from) = (0usize, None);
+    for i in 0..b.len() {
+        match b[i] {
+            b'<' => depth += 1,
+            b'>' if i > 0 && b[i - 1] == b'-' => {}
+            b'>' if depth == 0 => return from.map(|a: usize| q[a..i].trim()),
+            b'>' => depth -= 1,
+            b' ' if depth == 0 && from.is_none() && q[i..].starts_with(" as ") => {
+                from = Some(i + " as ".len());
+            }
+            _ => {}
+        }
+    }
+    None
+}
 pub(super) fn is_ident(c: char) -> bool {
     c.is_alphanumeric() || c == '_'
 }
