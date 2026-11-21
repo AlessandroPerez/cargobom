@@ -1,0 +1,458 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.3.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.3.4; reached via a196 -> pqcrypto-mlkem -> pqcrypto-internals -> getrandom",
+            "line": 44,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.3.4",
+      "type": "library",
+      "version": "0.3.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/pqcrypto-internals@0.2.11",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] native library `pqcrypto_internals`; code behind the FFI boundary is not analysed",
+            "line": 17,
+            "location": "pqcrypto-internals-0.2.11/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "pqcrypto-internals",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "pqcrypto_internals"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        }
+      ],
+      "purl": "pkg:cargo/pqcrypto-internals@0.2.11",
+      "type": "library",
+      "version": "0.2.11"
+    },
+    {
+      "bom-ref": "pkg:cargo/pqcrypto-mlkem@0.1.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a196 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "pqcrypto-mlkem"
+          },
+          {
+            "additionalContext": "[manifest] locked pqcrypto-mlkem 0.1.1; reached via a196 -> pqcrypto-mlkem",
+            "line": 101,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "pqcrypto-mlkem"
+          }
+        ]
+      },
+      "name": "pqcrypto-mlkem",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/pqcrypto-mlkem@0.1.1",
+      "type": "library",
+      "version": "0.1.1"
+    },
+    {
+      "bom-ref": "pkg:cargo/pqcrypto-traits@0.3.5",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by a196 (dependencies)",
+            "line": 10,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "pqcrypto-traits"
+          },
+          {
+            "additionalContext": "[manifest] locked pqcrypto-traits 0.3.5; reached via a196 -> pqcrypto-traits",
+            "line": 114,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "pqcrypto-traits"
+          }
+        ]
+      },
+      "name": "pqcrypto-traits",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/pqcrypto-traits@0.3.5",
+      "type": "library",
+      "version": "0.3.5"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ML-KEM-1024",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ML-KEM",
+          "cryptoFunctions": [
+            "encapsulate",
+            "keygen"
+          ],
+          "primitive": "kem"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a196::main; use: keygen; owner at src/main.rs:7:3-7:7 within 7:0-16:1; line: `let (pk2, _) = mlkem1024::keypair();`; code: `mlkem1024::keypair`",
+            "line": 12,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "pqcrypto_mlkem::mlkem1024::keypair"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a196::main; from_bytes: setup, not a use; owner at src/main.rs:7:3-7:7 within 7:0-16:1; line: `let stored = mlkem1024::PublicKey::from_bytes(pk2.as_bytes()).unwrap();`; code: `mlkem1024::PublicKey::from_bytes`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "pqcrypto_traits::kem::PublicKey::from_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a196::main; as_bytes: setup, not a use; owner at src/main.rs:7:3-7:7 within 7:0-16:1; line: `let stored = mlkem1024::PublicKey::from_bytes(pk2.as_bytes()).unwrap();`; code: `as_bytes`",
+            "line": 13,
+            "location": "src/main.rs",
+            "offset": 54,
+            "symbol": "pqcrypto_traits::kem::PublicKey::as_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a196::main; use: encapsulate; owner at src/main.rs:7:3-7:7 within 7:0-16:1; line: `let (k3, ct2) = mlkem1024::encapsulate(&stored);`; code: `mlkem1024::encapsulate`",
+            "line": 14,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "pqcrypto_mlkem::mlkem1024::encapsulate"
+          }
+        ]
+      },
+      "name": "ML-KEM-1024",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ML-KEM-768",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ML-KEM",
+          "cryptoFunctions": [
+            "decapsulate",
+            "encapsulate",
+            "keygen"
+          ],
+          "primitive": "kem"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in a196::main; use: keygen; owner at src/main.rs:7:3-7:7 within 7:0-16:1; line: `let (pk, sk) = mlkem768::keypair();`; code: `mlkem768::keypair`",
+            "line": 8,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "pqcrypto_mlkem::mlkem768::keypair"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a196::main; use: encapsulate; owner at src/main.rs:7:3-7:7 within 7:0-16:1; line: `let (k1, ct) = mlkem768::encapsulate(&pk);`; code: `mlkem768::encapsulate`",
+            "line": 9,
+            "location": "src/main.rs",
+            "offset": 19,
+            "symbol": "pqcrypto_mlkem::mlkem768::encapsulate"
+          },
+          {
+            "additionalContext": "[reachable] [call] in a196::main; use: decapsulate; owner at src/main.rs:7:3-7:7 within 7:0-16:1; line: `let k2 = mlkem768::decapsulate(&ct, &sk);`; code: `mlkem768::decapsulate`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 13,
+            "symbol": "pqcrypto_mlkem::mlkem768::decapsulate"
+          }
+        ]
+      },
+      "name": "ML-KEM-768",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:OS-RNG",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "generate"
+          ],
+          "primitive": "drbg"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[present] [call] in pqcrypto_internals::PQCRYPTO_RUST_randombytes; use: generate; owner at pqcrypto-internals-0.2.11/src/lib.rs:19:25-19:50 within 19:0-23:1; line: `getrandom::fill(buf).expect(\"RNG Failed\");`; code: `getrandom::fill`",
+            "line": 21,
+            "location": "pqcrypto-internals-0.2.11/src/lib.rs",
+            "offset": 4,
+            "symbol": "getrandom::fill"
+          }
+        ]
+      },
+      "name": "OS-RNG",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "present"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:registry-name",
+          "value": "unmatched"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/pqcrypto-mlkem@0.1.1",
+        "pkg:cargo/pqcrypto-traits@0.3.5"
+      ],
+      "ref": "pkg:cargo/a196@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:OS-RNG"
+      ],
+      "ref": "pkg:cargo/getrandom@0.3.4"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.3.4"
+      ],
+      "ref": "pkg:cargo/pqcrypto-internals@0.2.11"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/pqcrypto-internals@0.2.11",
+        "pkg:cargo/pqcrypto-traits@0.3.5"
+      ],
+      "provides": [
+        "crypto:algorithm:ML-KEM-1024",
+        "crypto:algorithm:ML-KEM-768"
+      ],
+      "ref": "pkg:cargo/pqcrypto-mlkem@0.1.1"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/pqcrypto-traits@0.3.5"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:ML-KEM-1024"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:ML-KEM-768"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:OS-RNG"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/a196@0.1.0",
+      "name": "a196",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/a196@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "13"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "26"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin a196"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "12 calls into crypto packages: 7 cited, 0 cited by the check as unknown, 5 excused (encoding 4, format 1)"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:9e513596-7d86-864e-b46b-c911252fee63",
+  "specVersion": "1.7",
+  "version": 1
+}

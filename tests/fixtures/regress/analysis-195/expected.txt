@@ -1,0 +1,212 @@
+  occ HashML-DSA-87 | crypto:algorithm:HashML-DSA-87 | src/main.rs:24:18 | fips204::traits::Signer::try_hash_sign | [reachable] [call] in a195::lattice; use: sign; owner at src/main.rs:20:3-20:10 within 20:0-27:1; line: `let pre = sk2.try_hash_sign(msg, b"", &fips204::Ph::SHA512).unwrap();`; code: `try_hash_sign`
+  occ HashML-DSA-87 | crypto:algorithm:HashML-DSA-87 | src/main.rs:26:40 | fips204::traits::Verifier::hash_verify | [reachable] [call] in a195::lattice; use: verify; owner at src/main.rs:20:3-20:10 within 20:0-27:1; line: `pk.verify(msg, &sig, b"") && stored.hash_verify(msg, &pre, b"", &fips204::Ph::SHA512)`; code: `hash_verify`
+  occ HashSLH-DSA-SHA2-192s | crypto:algorithm:HashSLH-DSA-SHA2-192s | src/main.rs:33:18 | fips205::traits::Signer::try_hash_sign | [reachable] [call] in a195::hashes; use: sign; owner at src/main.rs:29:3-29:9 within 29:0-35:1; line: `let pre = sk2.try_hash_sign(msg, b"", &fips205::Ph::SHA256, true).unwrap();`; code: `try_hash_sign`
+  occ HashSLH-DSA-SHA2-192s | crypto:algorithm:HashSLH-DSA-SHA2-192s | src/main.rs:34:37 | fips205::traits::Verifier::hash_verify | [reachable] [call] in a195::hashes; use: verify; owner at src/main.rs:29:3-29:9 within 29:0-35:1; line: `pk.verify(msg, &sig, b"") && pk2.hash_verify(msg, &pre, b"", &fips205::Ph::SHA256)`; code: `hash_verify`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | src/main.rs:21:19 | fips204::ml_dsa_65::try_keygen | [reachable] [call] in a195::lattice; use: keygen; owner at src/main.rs:20:3-20:10 within 20:0-27:1; line: `let (pk, sk) = fips204::ml_dsa_65::try_keygen().unwrap();`; code: `fips204::ml_dsa_65::try_keygen`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | src/main.rs:22:17 | fips204::traits::Signer::try_sign | [reachable] [call] in a195::lattice; use: sign; owner at src/main.rs:20:3-20:10 within 20:0-27:1; line: `let sig = sk.try_sign(msg, b"").unwrap();`; code: `try_sign`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | src/main.rs:26:7 | fips204::traits::Verifier::verify | [reachable] [call] in a195::lattice; use: verify; owner at src/main.rs:20:3-20:10 within 20:0-27:1; line: `pk.verify(msg, &sig, b"") && stored.hash_verify(msg, &pre, b"", &fips204::Ph::SHA512)`; code: `verify`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:23:21 | fips204::traits::KeyGen::keygen_from_seed | [reachable] [call] in a195::lattice; use: keygen; owner at src/main.rs:20:3-20:10 within 20:0-27:1; line: `let (pk2, sk2) = fips204::ml_dsa_87::KG::keygen_from_seed(&[3u8; 32]);`; code: `fips204::ml_dsa_87::KG::keygen_from_seed`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:25:17 | fips204::traits::SerDes::try_from_bytes | [reachable] [call] in a195::lattice; try_from_bytes: setup, not a use; owner at src/main.rs:20:3-20:10 within 20:0-27:1; line: `let stored = fips204::ml_dsa_87::PublicKey::try_from_bytes(pk2.clone().into_bytes()).unwrap();`; code: `fips204::ml_dsa_87::PublicKey::try_from_bytes`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:25:75 | fips204::traits::SerDes::into_bytes | [reachable] [call] in a195::lattice; into_bytes: setup, not a use; owner at src/main.rs:20:3-20:10 within 20:0-27:1; line: `let stored = fips204::ml_dsa_87::PublicKey::try_from_bytes(pk2.clone().into_bytes()).unwrap();`; code: `into_bytes`
+  occ ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | src/main.rs:14:22 | fips203::traits::KeyGen::keygen_from_seed | [reachable] [call] in a195::kem; use: keygen; owner at src/main.rs:10:3-10:6 within 10:0-18:1; line: `let (ek2, _dk2) = fips203::ml_kem_1024::KG::keygen_from_seed([1u8; 32], [2u8; 32]);`; code: `fips203::ml_kem_1024::KG::keygen_from_seed`
+  occ ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | src/main.rs:16:21 | fips203::traits::SerDes::into_bytes | [reachable] [call] in a195::kem; into_bytes: setup, not a use; owner at src/main.rs:10:3-10:6 within 10:0-18:1; line: `let public = ek2.into_bytes();`; code: `into_bytes`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:11:19 | fips203::traits::KeyGen::try_keygen | [reachable] [call] in a195::kem; use: keygen; owner at src/main.rs:10:3-10:6 within 10:0-18:1; line: `let (ek, dk) = fips203::ml_kem_768::KG::try_keygen().unwrap();`; code: `fips203::ml_kem_768::KG::try_keygen`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:12:22 | fips203::traits::Encaps::try_encaps | [reachable] [call] in a195::kem; use: encapsulate; owner at src/main.rs:10:3-10:6 within 10:0-18:1; line: `let (k1, ct) = ek.try_encaps().unwrap();`; code: `try_encaps`
+  occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:13:16 | fips203::traits::Decaps::try_decaps | [reachable] [call] in a195::kem; use: decapsulate; owner at src/main.rs:10:3-10:6 within 10:0-18:1; line: `let k2 = dk.try_decaps(&ct).unwrap();`; code: `try_decaps`
+  occ SLH-DSA-SHA2-192s | crypto:algorithm:SLH-DSA-SHA2-192s | src/main.rs:32:21 | fips205::traits::KeyGen::try_keygen | [reachable] [call] in a195::hashes; use: keygen; owner at src/main.rs:29:3-29:9 within 29:0-35:1; line: `let (pk2, sk2) = fips205::slh_dsa_sha2_192s::KG::try_keygen().unwrap();`; code: `fips205::slh_dsa_sha2_192s::KG::try_keygen`
+  occ SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | src/main.rs:30:19 | fips205::slh_dsa_shake_128f::try_keygen | [reachable] [call] in a195::hashes; use: keygen; owner at src/main.rs:29:3-29:9 within 29:0-35:1; line: `let (pk, sk) = fips205::slh_dsa_shake_128f::try_keygen().unwrap();`; code: `fips205::slh_dsa_shake_128f::try_keygen`
+  occ SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | src/main.rs:31:17 | fips205::traits::Signer::try_sign | [reachable] [call] in a195::hashes; use: sign; owner at src/main.rs:29:3-29:9 within 29:0-35:1; line: `let sig = sk.try_sign(msg, b"", true).unwrap();`; code: `try_sign`
+  occ SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | src/main.rs:34:7 | fips205::traits::Verifier::verify | [reachable] [call] in a195::hashes; use: verify; owner at src/main.rs:29:3-29:9 within 29:0-35:1; line: `pk.verify(msg, &sig, b"") && pk2.hash_verify(msg, &pre, b"", &fips205::Ph::SHA256)`; code: `verify`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:15:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via a195 -> fips203 -> sha3 -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:39:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via a195 -> fips203 -> sha3 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:49:0 | digest | [manifest] locked digest 0.10.7; reached via a195 -> fips203 -> sha3 -> digest
+  occ fips203 | pkg:cargo/fips203@0.4.3 | Cargo.lock:59:0 | fips203 | [manifest] locked fips203 0.4.3; reached via a195 -> fips203
+  occ fips203 | pkg:cargo/fips203@0.4.3 | Cargo.toml:9:0 | fips203 | [manifest] declared by a195 (dependencies)
+  occ fips204 | pkg:cargo/fips204@0.4.6 | Cargo.lock:71:0 | fips204 | [manifest] locked fips204 0.4.6; reached via a195 -> fips204
+  occ fips204 | pkg:cargo/fips204@0.4.6 | Cargo.toml:10:0 | fips204 | [manifest] declared by a195 (dependencies)
+  occ fips205 | pkg:cargo/fips205@0.4.1 | Cargo.lock:83:0 | fips205 | [manifest] locked fips205 0.4.1; reached via a195 -> fips205
+  occ fips205 | pkg:cargo/fips205@0.4.1 | Cargo.toml:11:0 | fips205 | [manifest] declared by a195 (dependencies)
+  occ getrandom | pkg:cargo/getrandom@0.2.17 | Cargo.lock:105:0 | getrandom | [manifest] locked getrandom 0.2.17; reached via a195 -> fips203 -> rand_core -> getrandom
+  occ keccak | pkg:cargo/keccak@0.1.6 | Cargo.lock:116:0 | keccak | [manifest] locked keccak 0.1.6; reached via a195 -> fips203 -> sha3 -> keccak
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:149:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via a195 -> fips203 -> rand_core
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:158:0 | sha2 | [manifest] locked sha2 0.10.9; reached via a195 -> fips204 -> sha2
+  occ sha3 | pkg:cargo/sha3@0.10.9 | Cargo.lock:169:0 | sha3 | [manifest] locked sha3 0.10.9; reached via a195 -> fips203 -> sha3
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:179:0 | subtle | [manifest] locked subtle 2.6.1; reached via a195 -> fips203 -> subtle
+  occ zeroize | pkg:cargo/zeroize@1.9.2 | Cargo.lock:220:0 | zeroize | [manifest] locked zeroize 1.9.2; reached via a195 -> fips203 -> zeroize
+  prop HashML-DSA-87 | crypto:algorithm:HashML-DSA-87 | rcbom:confidence=high
+  prop HashML-DSA-87 | crypto:algorithm:HashML-DSA-87 | rcbom:detection:method=type-resolved
+  prop HashML-DSA-87 | crypto:algorithm:HashML-DSA-87 | rcbom:functions:source=observed
+  prop HashML-DSA-87 | crypto:algorithm:HashML-DSA-87 | rcbom:kb:version=0.2.0
+  prop HashML-DSA-87 | crypto:algorithm:HashML-DSA-87 | rcbom:occurrences=2
+  prop HashML-DSA-87 | crypto:algorithm:HashML-DSA-87 | rcbom:param:unresolved=pre-hash function: an argument of the call
+  prop HashML-DSA-87 | crypto:algorithm:HashML-DSA-87 | rcbom:reachability=reachable
+  prop HashSLH-DSA-SHA2-192s | crypto:algorithm:HashSLH-DSA-SHA2-192s | rcbom:confidence=high
+  prop HashSLH-DSA-SHA2-192s | crypto:algorithm:HashSLH-DSA-SHA2-192s | rcbom:detection:method=type-resolved
+  prop HashSLH-DSA-SHA2-192s | crypto:algorithm:HashSLH-DSA-SHA2-192s | rcbom:functions:source=observed
+  prop HashSLH-DSA-SHA2-192s | crypto:algorithm:HashSLH-DSA-SHA2-192s | rcbom:kb:version=0.2.0
+  prop HashSLH-DSA-SHA2-192s | crypto:algorithm:HashSLH-DSA-SHA2-192s | rcbom:occurrences=2
+  prop HashSLH-DSA-SHA2-192s | crypto:algorithm:HashSLH-DSA-SHA2-192s | rcbom:param:unresolved=pre-hash function: an argument of the call
+  prop HashSLH-DSA-SHA2-192s | crypto:algorithm:HashSLH-DSA-SHA2-192s | rcbom:reachability=reachable
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:confidence=high
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:detection:method=type-resolved
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:functions:source=observed
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:kb:version=0.2.0
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:occurrences=3
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:reachability=reachable
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:confidence=high
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:detection:method=type-resolved
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:functions:source=observed
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:kb:version=0.2.0
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:occurrences=3
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:reachability=reachable
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:confidence=high
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:detection:method=type-resolved
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:functions:source=observed
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:kb:version=0.2.0
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:occurrences=2
+  prop ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | rcbom:reachability=reachable
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:confidence=high
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:detection:method=type-resolved
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:functions:source=observed
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:kb:version=0.2.0
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:occurrences=3
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:reachability=reachable
+  prop SLH-DSA-SHA2-192s | crypto:algorithm:SLH-DSA-SHA2-192s | rcbom:confidence=high
+  prop SLH-DSA-SHA2-192s | crypto:algorithm:SLH-DSA-SHA2-192s | rcbom:detection:method=type-resolved
+  prop SLH-DSA-SHA2-192s | crypto:algorithm:SLH-DSA-SHA2-192s | rcbom:functions:source=observed
+  prop SLH-DSA-SHA2-192s | crypto:algorithm:SLH-DSA-SHA2-192s | rcbom:kb:version=0.2.0
+  prop SLH-DSA-SHA2-192s | crypto:algorithm:SLH-DSA-SHA2-192s | rcbom:occurrences=1
+  prop SLH-DSA-SHA2-192s | crypto:algorithm:SLH-DSA-SHA2-192s | rcbom:reachability=reachable
+  prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:confidence=high
+  prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:detection:method=type-resolved
+  prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:functions:source=observed
+  prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:kb:version=0.2.0
+  prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:occurrences=3
+  prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop fips203 | pkg:cargo/fips203@0.4.3 | rcbom:crypto-role=algorithm
+  prop fips203 | pkg:cargo/fips203@0.4.3 | rcbom:scope=required
+  prop fips203 | pkg:cargo/fips203@0.4.3 | rcbom:usage=reachable
+  prop fips204 | pkg:cargo/fips204@0.4.6 | rcbom:crypto-role=algorithm
+  prop fips204 | pkg:cargo/fips204@0.4.6 | rcbom:scope=required
+  prop fips204 | pkg:cargo/fips204@0.4.6 | rcbom:usage=reachable
+  prop fips205 | pkg:cargo/fips205@0.4.1 | rcbom:crypto-role=algorithm
+  prop fips205 | pkg:cargo/fips205@0.4.1 | rcbom:scope=required
+  prop fips205 | pkg:cargo/fips205@0.4.1 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:usage=reachable
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.1.6 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:usage=reachable
+asset HashML-DSA-87 | crypto:algorithm:HashML-DSA-87 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset HashSLH-DSA-SHA2-192s | crypto:algorithm:HashSLH-DSA-SHA2-192s | {"algorithmProperties": {"algorithmFamily": "SLH-DSA", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset ML-DSA-65 | crypto:algorithm:ML-DSA-65 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset ML-DSA-87 | crypto:algorithm:ML-DSA-87 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen"], "primitive": "signature"}, "assetType": "algorithm"}
+asset ML-KEM-1024 | crypto:algorithm:ML-KEM-1024 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["keygen"], "primitive": "kem"}, "assetType": "algorithm"}
+asset ML-KEM-768 | crypto:algorithm:ML-KEM-768 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["decapsulate", "encapsulate", "keygen"], "primitive": "kem"}, "assetType": "algorithm"}
+asset SLH-DSA-SHA2-192s | crypto:algorithm:SLH-DSA-SHA2-192s | {"algorithmProperties": {"algorithmFamily": "SLH-DSA", "cryptoFunctions": ["keygen"], "primitive": "signature"}, "assetType": "algorithm"}
+asset SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | {"algorithmProperties": {"algorithmFamily": "SLH-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library fips203 0.4.3 | pkg:cargo/fips203@0.4.3 | purl pkg:cargo/fips203@0.4.3
+component library fips204 0.4.6 | pkg:cargo/fips204@0.4.6 | purl pkg:cargo/fips204@0.4.6
+component library fips205 0.4.1 | pkg:cargo/fips205@0.4.1 | purl pkg:cargo/fips205@0.4.1
+component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
+component library keccak 0.1.6 | pkg:cargo/keccak@0.1.6 | purl pkg:cargo/keccak@0.1.6
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library sha3 0.10.9 | pkg:cargo/sha3@0.10.9 | purl pkg:cargo/sha3@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library zeroize 1.9.2 | pkg:cargo/zeroize@1.9.2 | purl pkg:cargo/zeroize@1.9.2
+dep pkg:cargo/a195@0.1.0 -> pkg:cargo/fips203@0.4.3
+dep pkg:cargo/a195@0.1.0 -> pkg:cargo/fips204@0.4.6
+dep pkg:cargo/a195@0.1.0 -> pkg:cargo/fips205@0.4.1
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/fips203@0.4.3 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/fips203@0.4.3 -> pkg:cargo/sha3@0.10.9
+dep pkg:cargo/fips203@0.4.3 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/fips203@0.4.3 -> pkg:cargo/zeroize@1.9.2
+dep pkg:cargo/fips204@0.4.6 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/fips204@0.4.6 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/fips204@0.4.6 -> pkg:cargo/sha3@0.10.9
+dep pkg:cargo/fips204@0.4.6 -> pkg:cargo/zeroize@1.9.2
+dep pkg:cargo/fips205@0.4.1 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/fips205@0.4.1 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/fips205@0.4.1 -> pkg:cargo/sha3@0.10.9
+dep pkg:cargo/fips205@0.4.1 -> pkg:cargo/zeroize@1.9.2
+dep pkg:cargo/rand_core@0.6.4 -> pkg:cargo/getrandom@0.2.17
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha3@0.10.9 -> pkg:cargo/keccak@0.1.6
+dependency crypto:algorithm:HashML-DSA-87
+dependency crypto:algorithm:HashSLH-DSA-SHA2-192s
+dependency crypto:algorithm:ML-DSA-65
+dependency crypto:algorithm:ML-DSA-87
+dependency crypto:algorithm:ML-KEM-1024
+dependency crypto:algorithm:ML-KEM-768
+dependency crypto:algorithm:SLH-DSA-SHA2-192s
+dependency crypto:algorithm:SLH-DSA-SHAKE-128f
+dependency pkg:cargo/a195@0.1.0
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/fips203@0.4.3
+dependency pkg:cargo/fips204@0.4.6
+dependency pkg:cargo/fips205@0.4.1
+dependency pkg:cargo/getrandom@0.2.17
+dependency pkg:cargo/keccak@0.1.6
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/sha3@0.10.9
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/zeroize@1.9.2
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/fips203@0.4.3 -> crypto:algorithm:ML-KEM-1024
+provides pkg:cargo/fips203@0.4.3 -> crypto:algorithm:ML-KEM-768
+provides pkg:cargo/fips204@0.4.6 -> crypto:algorithm:HashML-DSA-87
+provides pkg:cargo/fips204@0.4.6 -> crypto:algorithm:ML-DSA-65
+provides pkg:cargo/fips204@0.4.6 -> crypto:algorithm:ML-DSA-87
+provides pkg:cargo/fips205@0.4.1 -> crypto:algorithm:HashSLH-DSA-SHA2-192s
+provides pkg:cargo/fips205@0.4.1 -> crypto:algorithm:SLH-DSA-SHA2-192s
+provides pkg:cargo/fips205@0.4.1 -> crypto:algorithm:SLH-DSA-SHAKE-128f
+root {"bom-ref": "pkg:cargo/a195@0.1.0", "name": "a195", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a195@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a195
+run rcbom:run:boundary-check=22 calls into crypto packages: 19 cited, 0 cited by the check as unknown, 3 excused (comparison 1, copy 1, encoding 1)
+run rcbom:run:features=
+run rcbom:run:packages=25
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=90
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

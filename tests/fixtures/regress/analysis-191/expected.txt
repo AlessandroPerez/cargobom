@@ -1,0 +1,190 @@
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:22:16 | crypto_common::generate::Generate::generate | [reachable] [call] in a191::main; use: keygen; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let small = SigningKey::<MlDsa44>::generate();`; code: `SigningKey::<MlDsa44>::generate`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:23:20 | ml_dsa::signing::SigningKey::<P>::expanded_key | [reachable] [call] in a191::main; expanded_key: setup, not a use; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let det = small.expanded_key().sign_deterministic(msg, b"ctx").unwrap();`; code: `expanded_key`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:23:35 | ml_dsa::signing::ExpandedSigningKey::<P>::sign_deterministic | [reachable] [call] in a191::main; use: sign; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let det = small.expanded_key().sign_deterministic(msg, b"ctx").unwrap();`; code: `sign_deterministic`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:24:20 | signature::keypair::Keypair::verifying_key | [reachable] [call] in a191::main; verifying_key: setup, not a use; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let ok2 = small.verifying_key().verify_with_context(msg, b"ctx", &det);`; code: `verifying_key`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:24:36 | ml_dsa::verifying::VerifyingKey::<P>::verify_with_context | [reachable] [call] in a191::main; use: verify; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let ok2 = small.verifying_key().verify_with_context(msg, b"ctx", &det);`; code: `verify_with_context`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | src/main.rs:14:13 | crypto_common::generate::Generate::generate | [reachable] [call] in a191::main; use: keygen; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let sk = SigningKey::<MlDsa65>::generate();`; code: `SigningKey::<MlDsa65>::generate`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | src/main.rs:15:17 | signature::signer::Signer::sign | [reachable] [call] in a191::main; use: sign; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let sig = sk.sign(msg);`; code: `sign`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | src/main.rs:16:16 | signature::keypair::Keypair::verifying_key | [reachable] [call] in a191::main; verifying_key: setup, not a use; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let vk = sk.verifying_key();`; code: `verifying_key`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | src/main.rs:17:16 | signature::verifier::Verifier::verify | [reachable] [call] in a191::main; use: verify; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let ok = vk.verify(msg, &sig).is_ok();`; code: `verify`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:27:17 | signature::keypair::Keypair::verifying_key | [reachable] [call] in a191::main; verifying_key: setup, not a use; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let pk = old.verifying_key().encode();`; code: `verifying_key`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:27:33 | ml_dsa::verifying::VerifyingKey::<P>::encode | [reachable] [call] in a191::main; encode: setup, not a use; owner at src/main.rs:12:3-12:7 within 12:0-29:1; line: `let pk = old.verifying_key().encode();`; code: `encode`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:9:4 | ml_dsa::signing::SigningKey::<P>::from_seed | [reachable] [call] in a191::stored; from_seed: setup, not a use; owner at src/main.rs:8:3-8:9 within 8:0-10:1; line: `SigningKey::<MlDsa87>::from_seed(&(*seed).into())`; code: `SigningKey::<MlDsa87>::from_seed`
+  occ cmov | pkg:cargo/cmov@0.5.4 | Cargo.lock:31:0 | cmov | [manifest] locked cmov 0.5.4; reached via a191 -> ml-dsa -> ctutils -> cmov
+  occ const-oid | pkg:cargo/const-oid@0.10.3 | Cargo.lock:37:0 | const-oid | [manifest] locked const-oid 0.10.3; reached via a191 -> ml-dsa -> const-oid
+  occ crypto-common | pkg:cargo/crypto-common@0.2.2 | Cargo.lock:52:0 | crypto-common | [manifest] locked crypto-common 0.2.2; reached via a191 -> ml-dsa -> crypto-common
+  occ ctutils | pkg:cargo/ctutils@0.4.8 | Cargo.lock:63:0 | ctutils | [manifest] locked ctutils 0.4.8; reached via a191 -> ml-dsa -> ctutils
+  occ der | pkg:cargo/der@0.8.3 | Cargo.lock:72:0 | der | [manifest] locked der 0.8.3; reached via a191 -> ml-dsa -> pkcs8 -> der
+  occ digest | pkg:cargo/digest@0.11.3 | Cargo.lock:82:0 | digest | [manifest] locked digest 0.11.3; reached via a191 -> ml-dsa -> shake -> digest
+  occ getrandom | pkg:cargo/getrandom@0.4.3 | Cargo.lock:91:0 | getrandom | [manifest] locked getrandom 0.4.3; reached via a191 -> ml-dsa -> crypto-common -> getrandom
+  occ keccak | pkg:cargo/keccak@0.2.2 | Cargo.lock:113:0 | keccak | [manifest] locked keccak 0.2.2; reached via a191 -> ml-dsa -> shake -> keccak
+  occ ml-dsa | pkg:cargo/ml-dsa@0.1.2 | Cargo.lock:129:0 | ml-dsa | [manifest] locked ml-dsa 0.1.2; reached via a191 -> ml-dsa
+  occ ml-dsa | pkg:cargo/ml-dsa@0.1.2 | Cargo.toml:9:0 | ml-dsa | [manifest] declared by a191 (dependencies)
+  occ module-lattice | pkg:cargo/module-lattice@0.2.4 | Cargo.lock:145:0 | module-lattice | [manifest] locked module-lattice 0.2.4; reached via a191 -> ml-dsa -> module-lattice
+  occ pkcs8 | pkg:cargo/pkcs8@0.11.0 | Cargo.lock:165:0 | pkcs8 | [manifest] locked pkcs8 0.11.0; reached via a191 -> ml-dsa -> pkcs8
+  occ rand_core | pkg:cargo/rand_core@0.10.1 | Cargo.lock:181:0 | rand_core | [manifest] locked rand_core 0.10.1; reached via a191 -> ml-dsa -> crypto-common -> rand_core
+  occ shake | pkg:cargo/shake@0.1.0 | Cargo.lock:187:0 | shake | [manifest] locked shake 0.1.0; reached via a191 -> ml-dsa -> shake
+  occ signature | pkg:cargo/signature@3.0.0 | Cargo.lock:198:0 | signature | [manifest] locked signature 3.0.0; reached via a191 -> ml-dsa -> signature
+  occ spki | pkg:cargo/spki@0.8.1 | Cargo.lock:208:0 | spki | [manifest] locked spki 0.8.1; reached via a191 -> ml-dsa -> pkcs8 -> spki
+  occ sponge-cursor | pkg:cargo/sponge-cursor@0.1.0 | Cargo.lock:218:0 | sponge-cursor | [manifest] locked sponge-cursor 0.1.0; reached via a191 -> ml-dsa -> shake -> sponge-cursor
+  occ zeroize | pkg:cargo/zeroize@1.9.2 | Cargo.lock:230:0 | zeroize | [manifest] locked zeroize 1.9.2; reached via a191 -> ml-dsa -> pkcs8 -> der -> zeroize
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:confidence=high
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:detection:method=type-resolved
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:functions:source=observed
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:kb:version=0.2.0
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:occurrences=5
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:reachability=reachable
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:confidence=high
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:detection:method=type-resolved
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:functions:source=observed
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:kb:version=0.2.0
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:occurrences=4
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:reachability=reachable
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:confidence=high
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:detection:method=type-resolved
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:functions:source=knowledge-base
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:kb:version=0.2.0
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:occurrences=3
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:reachability=reachable
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:crypto-role=support
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:kb-coverage=unmodelled
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:scope=required
+  prop cmov | pkg:cargo/cmov@0.5.4 | rcbom:usage=reachable
+  prop const-oid | pkg:cargo/const-oid@0.10.3 | rcbom:crypto-role=support
+  prop const-oid | pkg:cargo/const-oid@0.10.3 | rcbom:kb-coverage=unmodelled
+  prop const-oid | pkg:cargo/const-oid@0.10.3 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.10.3 | rcbom:usage=present
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.2.2 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:crypto-role=support
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:kb-coverage=unmodelled
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.8 | rcbom:usage=reachable
+  prop der | pkg:cargo/der@0.8.3 | rcbom:crypto-role=support
+  prop der | pkg:cargo/der@0.8.3 | rcbom:kb-coverage=unmodelled
+  prop der | pkg:cargo/der@0.8.3 | rcbom:scope=required
+  prop der | pkg:cargo/der@0.8.3 | rcbom:usage=present
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.11.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.3 | rcbom:usage=reachable
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.2.2 | rcbom:usage=reachable
+  prop ml-dsa | pkg:cargo/ml-dsa@0.1.2 | rcbom:crypto-role=algorithm
+  prop ml-dsa | pkg:cargo/ml-dsa@0.1.2 | rcbom:scope=required
+  prop ml-dsa | pkg:cargo/ml-dsa@0.1.2 | rcbom:usage=reachable
+  prop module-lattice | pkg:cargo/module-lattice@0.2.4 | rcbom:crypto-role=support
+  prop module-lattice | pkg:cargo/module-lattice@0.2.4 | rcbom:kb-coverage=unmodelled
+  prop module-lattice | pkg:cargo/module-lattice@0.2.4 | rcbom:scope=required
+  prop module-lattice | pkg:cargo/module-lattice@0.2.4 | rcbom:usage=reachable
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0 | rcbom:crypto-role=support
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0 | rcbom:kb-coverage=unmodelled
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0 | rcbom:scope=required
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0 | rcbom:usage=present
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:scope=required
+  prop shake | pkg:cargo/shake@0.1.0 | rcbom:crypto-role=unmodelled
+  prop shake | pkg:cargo/shake@0.1.0 | rcbom:kb-coverage=unmodelled
+  prop shake | pkg:cargo/shake@0.1.0 | rcbom:scope=required
+  prop shake | pkg:cargo/shake@0.1.0 | rcbom:usage=reachable
+  prop signature | pkg:cargo/signature@3.0.0 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@3.0.0 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.8.1 | rcbom:crypto-role=support
+  prop spki | pkg:cargo/spki@0.8.1 | rcbom:kb-coverage=unmodelled
+  prop spki | pkg:cargo/spki@0.8.1 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.8.1 | rcbom:usage=present
+  prop sponge-cursor | pkg:cargo/sponge-cursor@0.1.0 | rcbom:crypto-role=unmodelled
+  prop sponge-cursor | pkg:cargo/sponge-cursor@0.1.0 | rcbom:kb-coverage=unmodelled
+  prop sponge-cursor | pkg:cargo/sponge-cursor@0.1.0 | rcbom:scope=required
+  prop sponge-cursor | pkg:cargo/sponge-cursor@0.1.0 | rcbom:usage=reachable
+  prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:usage=present
+asset ML-DSA-44 | crypto:algorithm:ML-DSA-44 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset ML-DSA-65 | crypto:algorithm:ML-DSA-65 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset ML-DSA-87 | crypto:algorithm:ML-DSA-87 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+component library cmov 0.5.4 | pkg:cargo/cmov@0.5.4 | purl pkg:cargo/cmov@0.5.4
+component library const-oid 0.10.3 | pkg:cargo/const-oid@0.10.3 | purl pkg:cargo/const-oid@0.10.3
+component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
+component library ctutils 0.4.8 | pkg:cargo/ctutils@0.4.8 | purl pkg:cargo/ctutils@0.4.8
+component library der 0.8.3 | pkg:cargo/der@0.8.3 | purl pkg:cargo/der@0.8.3
+component library digest 0.11.3 | pkg:cargo/digest@0.11.3 | purl pkg:cargo/digest@0.11.3
+component library getrandom 0.4.3 | pkg:cargo/getrandom@0.4.3 | purl pkg:cargo/getrandom@0.4.3
+component library keccak 0.2.2 | pkg:cargo/keccak@0.2.2 | purl pkg:cargo/keccak@0.2.2
+component library ml-dsa 0.1.2 | pkg:cargo/ml-dsa@0.1.2 | purl pkg:cargo/ml-dsa@0.1.2
+component library module-lattice 0.2.4 | pkg:cargo/module-lattice@0.2.4 | purl pkg:cargo/module-lattice@0.2.4
+component library pkcs8 0.11.0 | pkg:cargo/pkcs8@0.11.0 | purl pkg:cargo/pkcs8@0.11.0
+component library rand_core 0.10.1 | pkg:cargo/rand_core@0.10.1 | purl pkg:cargo/rand_core@0.10.1
+component library shake 0.1.0 | pkg:cargo/shake@0.1.0 | purl pkg:cargo/shake@0.1.0
+component library signature 3.0.0 | pkg:cargo/signature@3.0.0 | purl pkg:cargo/signature@3.0.0
+component library spki 0.8.1 | pkg:cargo/spki@0.8.1 | purl pkg:cargo/spki@0.8.1
+component library sponge-cursor 0.1.0 | pkg:cargo/sponge-cursor@0.1.0 | purl pkg:cargo/sponge-cursor@0.1.0
+component library zeroize 1.9.2 | pkg:cargo/zeroize@1.9.2 | purl pkg:cargo/zeroize@1.9.2
+dep pkg:cargo/a191@0.1.0 -> pkg:cargo/ml-dsa@0.1.2
+dep pkg:cargo/crypto-common@0.2.2 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/crypto-common@0.2.2 -> pkg:cargo/getrandom@0.4.3
+dep pkg:cargo/crypto-common@0.2.2 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/ctutils@0.4.8 -> pkg:cargo/cmov@0.5.4
+dep pkg:cargo/der@0.8.3 -> pkg:cargo/const-oid@0.10.3
+dep pkg:cargo/der@0.8.3 -> pkg:cargo/zeroize@1.9.2
+dep pkg:cargo/digest@0.11.3 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/getrandom@0.4.3 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/ml-dsa@0.1.2 -> pkg:cargo/const-oid@0.10.3
+dep pkg:cargo/ml-dsa@0.1.2 -> pkg:cargo/crypto-common@0.2.2
+dep pkg:cargo/ml-dsa@0.1.2 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/ml-dsa@0.1.2 -> pkg:cargo/module-lattice@0.2.4
+dep pkg:cargo/ml-dsa@0.1.2 -> pkg:cargo/pkcs8@0.11.0
+dep pkg:cargo/ml-dsa@0.1.2 -> pkg:cargo/shake@0.1.0
+dep pkg:cargo/ml-dsa@0.1.2 -> pkg:cargo/signature@3.0.0
+dep pkg:cargo/module-lattice@0.2.4 -> pkg:cargo/ctutils@0.4.8
+dep pkg:cargo/pkcs8@0.11.0 -> pkg:cargo/der@0.8.3
+dep pkg:cargo/pkcs8@0.11.0 -> pkg:cargo/spki@0.8.1
+dep pkg:cargo/shake@0.1.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/shake@0.1.0 -> pkg:cargo/keccak@0.2.2
+dep pkg:cargo/shake@0.1.0 -> pkg:cargo/sponge-cursor@0.1.0
+dep pkg:cargo/signature@3.0.0 -> pkg:cargo/digest@0.11.3
+dep pkg:cargo/signature@3.0.0 -> pkg:cargo/rand_core@0.10.1
+dep pkg:cargo/spki@0.8.1 -> pkg:cargo/der@0.8.3
+dependency crypto:algorithm:ML-DSA-44
+dependency crypto:algorithm:ML-DSA-65
+dependency crypto:algorithm:ML-DSA-87
+dependency pkg:cargo/a191@0.1.0
+dependency pkg:cargo/cmov@0.5.4
+dependency pkg:cargo/const-oid@0.10.3
+dependency pkg:cargo/crypto-common@0.2.2
+dependency pkg:cargo/ctutils@0.4.8
+dependency pkg:cargo/der@0.8.3
+dependency pkg:cargo/digest@0.11.3
+dependency pkg:cargo/getrandom@0.4.3
+dependency pkg:cargo/keccak@0.2.2
+dependency pkg:cargo/ml-dsa@0.1.2
+dependency pkg:cargo/module-lattice@0.2.4
+dependency pkg:cargo/pkcs8@0.11.0
+dependency pkg:cargo/rand_core@0.10.1
+dependency pkg:cargo/shake@0.1.0
+dependency pkg:cargo/signature@3.0.0
+dependency pkg:cargo/spki@0.8.1
+dependency pkg:cargo/sponge-cursor@0.1.0
+dependency pkg:cargo/zeroize@1.9.2
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/ml-dsa@0.1.2 -> crypto:algorithm:ML-DSA-44
+provides pkg:cargo/ml-dsa@0.1.2 -> crypto:algorithm:ML-DSA-65
+provides pkg:cargo/ml-dsa@0.1.2 -> crypto:algorithm:ML-DSA-87
+root {"bom-ref": "pkg:cargo/a191@0.1.0", "name": "a191", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a191@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin a191
+run rcbom:run:boundary-check=15 calls into crypto packages: 12 cited, 0 cited by the check as unknown, 3 excused (encoding 2, format 1)
+run rcbom:run:features=
+run rcbom:run:packages=24
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=127
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}
