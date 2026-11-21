@@ -827,6 +827,27 @@
             "symbol": "digest::digest::Digest::digest"
           },
           {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U28, sha2::OidSha224>>` is coerced to `dyn digest::digest::DynDigest` at src/names.rs:41:9-41:15 as `&mut h` line #fcabe736); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
+            "line": 74,
+            "location": "dep/src/cases.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U28, sha2::OidSha224>>` is coerced to `dyn digest::digest::DynDigest` at src/names.rs:41:9-41:15 as `&mut h` line #fcabe736); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "line": 75,
+            "location": "dep/src/cases.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::finalize_reset"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::spread; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U28, sha2::OidSha224>>` is coerced to `dyn digest::digest::DynDigest` at src/names.rs:41:9-41:15 as `&mut h` line #fcabe736); owner at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner `verify_55::shared::spread` at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner at dep/src/cases.rs:80:7-80:13 within 80:0-86:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "line": 85,
+            "location": "dep/src/cases.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::finalize_reset"
+          },
+          {
             "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::mixed::<..>; new: setup, not a use; owner at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by dep::cases::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); owner `verify_55::shared::mixed::<..>` at dep/src/cases.rs:91:7-91:12 within 91:0-99:1; `verify_55::shared::mixed::<..>` instantiated by verify_55::shared::all at dep/src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let mut h = D::new();`; code: `D::new`",
             "line": 96,
             "location": "dep/src/cases.rs",
@@ -869,6 +890,13 @@
             "symbol": "dep::cases::mixed"
           },
           {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::feeding::fed; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U28, sha2::OidSha224>>` is coerced to `dyn digest::digest::DynDigest` at src/names.rs:41:9-41:15 as `&mut h` line #fcabe736); owner at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; owner `verify_55::shared::feeding::fed` at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "line": 5,
+            "location": "dep/src/feeding.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
             "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-55] in verify_55::shared::one::<..>; chosen as generic argument of verify_55::shared::two; owner at dep/src/cases.rs:126:7-126:10 within 126:0-128:1; instantiated by verify_55::shared::all at dep/src/cases.rs:198:8 as `one::<sha2::Sha512>` (call, to 198:27 as `one::<sha2::Sha512>` line #653865bc, caller at dep/src/cases.rs:172:7-172:10 within 172:0-205:1); line: `two::<D, sha2::Sha224>(d)`; code: `two::<D, sha2::Sha224>`",
             "line": 127,
             "location": "dep/src/cases.rs",
@@ -902,6 +930,27 @@
             "location": "src/cases.rs",
             "offset": 0,
             "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U28, sha2::OidSha224>>` is coerced to `dyn digest::digest::DynDigest` at src/names.rs:41:9-41:15 as `&mut h` line #fcabe736); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
+            "line": 74,
+            "location": "src/cases.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U28, sha2::OidSha224>>` is coerced to `dyn digest::digest::DynDigest` at src/names.rs:41:9-41:15 as `&mut h` line #fcabe736); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "line": 75,
+            "location": "src/cases.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::finalize_reset"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::spread; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U28, sha2::OidSha224>>` is coerced to `dyn digest::digest::DynDigest` at src/names.rs:41:9-41:15 as `&mut h` line #fcabe736); owner at src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at src/cases.rs:79:0-79:16 line #87f0cf90); line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "line": 85,
+            "location": "src/cases.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
             "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::mixed::<..>; new: setup, not a use; owner at src/cases.rs:91:7-91:12 within 91:0-99:1; instantiated by verify_55::cases::all at src/cases.rs:195:8 as `mixed::<sha2::Sha224>` (call, to 195:29 as `mixed::<sha2::Sha224>` line #466c4e3b, caller at src/cases.rs:172:7-172:10 within 172:0-205:1); line: `let mut h = D::new();`; code: `D::new`",
@@ -944,6 +993,34 @@
             "location": "src/cases.rs",
             "offset": 8,
             "symbol": "verify_55::cases::mixed"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::feeding::fed; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U28, sha2::OidSha224>>` is coerced to `dyn digest::digest::DynDigest` at src/names.rs:41:9-41:15 as `&mut h` line #fcabe736); owner at src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "line": 5,
+            "location": "src/feeding.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] [macro mk!] in verify_55::names::made2; use: digest; owner at src/names.rs:26:4-26:9 as `made2` line #91cdda5d (by macro mk! at src/names.rs:26:0-26:10 line #814ec66f defined pm/src/lib.rs:49-49); expanded from src/names.rs:26:0-26:10 as `mk!(made2)` line #814ec66f (by macro mk! at src/names.rs:26:0-26:10 line #814ec66f defined pm/src/lib.rs:49-49); line: `mk!(made2);`",
+            "line": 26,
+            "location": "src/names.rs",
+            "offset": 0,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::names::fed2; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U28, sha2::OidSha224>>` is coerced to `dyn digest::digest::DynDigest` at src/names.rs:41:9-41:15 as `&mut h` line #fcabe736); owner at src/names.rs:30:7-30:11 within 30:0-32:1; line: `h.update(d);`; code: `update`",
+            "line": 31,
+            "location": "src/names.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::names::all; default: setup, not a use; owner at src/names.rs:39:7-39:10 within 39:0-47:1; line: `let mut h = sha2::Sha224::default();`; code: `sha2::Sha224::default`",
+            "line": 40,
+            "location": "src/names.rs",
+            "offset": 16,
+            "symbol": "core::default::Default::default"
           }
         ]
       },
@@ -979,7 +1056,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "20"
+          "value": "31"
         }
       ],
       "type": "cryptographic-asset"
@@ -1076,21 +1153,21 @@
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
             "line": 74,
             "location": "dep/src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 75,
             "location": "dep/src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::spread; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner `verify_55::shared::spread` at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner at dep/src/cases.rs:80:7-80:13 within 80:0-86:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::spread; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner `verify_55::shared::spread` at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner at dep/src/cases.rs:80:7-80:13 within 80:0-86:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 85,
             "location": "dep/src/cases.rs",
             "offset": 6,
@@ -1125,7 +1202,7 @@
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; owner `verify_55::shared::feeding::fed` at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::feeding::fed; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; owner `verify_55::shared::feeding::fed` at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
             "line": 5,
             "location": "dep/src/feeding.rs",
             "offset": 6,
@@ -1216,21 +1293,21 @@
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
             "line": 74,
             "location": "src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 75,
             "location": "src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::spread; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at src/cases.rs:79:0-79:16 line #87f0cf90); line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::spread; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at src/cases.rs:79:0-79:16 line #87f0cf90); line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 85,
             "location": "src/cases.rs",
             "offset": 6,
@@ -1265,9 +1342,23 @@
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::feeding::fed; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
             "line": 5,
             "location": "src/feeding.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] [macro ff!] in verify_55::names::free2; use: digest; owner at src/names.rs:15:4-15:9 as `free2` line #cb72115f (by macro ff! at src/names.rs:15:0-15:18 line #b782e0a9 defined mac/src/lib.rs:7-7); expanded from mac/src/lib.rs:10:12-10:46 as `<sha2::$h as sha2::Digest>::digest` line #8b6d4db5 (by macro ff! at src/names.rs:15:0-15:18 line #b782e0a9 defined mac/src/lib.rs:7-7); line: `ff!(free2, Sha256);`",
+            "line": 15,
+            "location": "src/names.rs",
+            "offset": 0,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::names::fed2; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::U32, sha2::OidSha256>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:72:8-72:27 as `mac::boxed!(Sha256)` line #5ed786a7); owner at src/names.rs:30:7-30:11 within 30:0-32:1; line: `h.update(d);`; code: `update`",
+            "line": 31,
+            "location": "src/names.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
@@ -1323,7 +1414,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "41"
+          "value": "43"
         }
       ],
       "type": "cryptographic-asset"
@@ -1385,14 +1476,14 @@
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
             "line": 74,
             "location": "dep/src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 75,
             "location": "dep/src/cases.rs",
             "offset": 6,
@@ -1406,7 +1497,7 @@
             "symbol": "digest::digest::Digest::new_with_prefix"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::spread; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner `verify_55::shared::spread` at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner at dep/src/cases.rs:80:7-80:13 within 80:0-86:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::spread; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner `verify_55::shared::spread` at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner at dep/src/cases.rs:80:7-80:13 within 80:0-86:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 85,
             "location": "dep/src/cases.rs",
             "offset": 6,
@@ -1441,7 +1532,7 @@
             "symbol": "core::default::Default::default"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; owner `verify_55::shared::feeding::fed` at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::feeding::fed; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; owner `verify_55::shared::feeding::fed` at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
             "line": 5,
             "location": "dep/src/feeding.rs",
             "offset": 6,
@@ -1497,14 +1588,14 @@
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
             "line": 74,
             "location": "src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 75,
             "location": "src/cases.rs",
             "offset": 6,
@@ -1518,7 +1609,7 @@
             "symbol": "digest::digest::Digest::new_with_prefix"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::spread; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at src/cases.rs:79:0-79:16 line #87f0cf90); line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::spread; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at src/cases.rs:79:0-79:16 line #87f0cf90); line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 85,
             "location": "src/cases.rs",
             "offset": 6,
@@ -1553,9 +1644,23 @@
             "symbol": "core::default::Default::default"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::feeding::fed; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
             "line": 5,
             "location": "src/feeding.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::names::wrapped2::{closure#0}; use: digest; owner at src/names.rs:20:0-20:4 as `#[w]` line #44c8ded9 (by attribute w at src/names.rs:20:0-20:4 line #44c8ded9 defined pm/src/lib.rs:8-8); instantiated by verify_55::names::wrapped2 at src/names.rs:20:0 (built, to 20:4 as `#[w]` line #44c8ded9, from src/names.rs:20:0-20:4 as `#[w]` line #44c8ded9 (by attribute w at src/names.rs:20:0-20:4 line #44c8ded9 defined pm/src/lib.rs:8-8), caller at src/names.rs:21:7-21:15 as `wrapped2` line #195708b8 (by attribute w at src/names.rs:20:0-20:4 line #44c8ded9 defined pm/src/lib.rs:8-8)); line: `sha2::Sha384::digest(d).to_vec()`; code: `sha2::Sha384::digest`",
+            "line": 23,
+            "location": "src/names.rs",
+            "offset": 4,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::names::fed2; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U48, sha2::OidSha384>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:82:50-84:5 as `Box::new` line #44e830ef); owner at src/names.rs:30:7-30:11 within 30:0-32:1; line: `h.update(d);`; code: `update`",
+            "line": 31,
+            "location": "src/names.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           }
@@ -1593,7 +1698,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "31"
+          "value": "33"
         }
       ],
       "type": "cryptographic-asset"
@@ -1706,6 +1811,13 @@
             "location": "src/cases.rs",
             "offset": 9,
             "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] [derive S] in <verify_55::names::Blob2 as verify_55::names::Sum>::sum; use: digest; owner at src/names.rs:17:9-17:10 as `S` line #714b2ce3 (by derive S at src/names.rs:17:9-17:10 line #714b2ce3 defined pm/src/lib.rs:31-31); expanded from src/names.rs:17:9-17:10 as `S` line #714b2ce3 (by derive S at src/names.rs:17:9-17:10 line #714b2ce3 defined pm/src/lib.rs:31-31); line: `#[derive(S)]`",
+            "line": 17,
+            "location": "src/names.rs",
+            "offset": 9,
+            "symbol": "digest::digest::Digest::digest"
           }
         ]
       },
@@ -1741,7 +1853,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "5"
         }
       ],
       "type": "cryptographic-asset"
@@ -1810,21 +1922,21 @@
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
             "line": 74,
             "location": "dep/src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; owner `verify_55::shared::dynamic` at dep/src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 75,
             "location": "dep/src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::spread; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner `verify_55::shared::spread` at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner at dep/src/cases.rs:80:7-80:13 within 80:0-86:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::spread; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner `verify_55::shared::spread` at dep/src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at dep/src/cases.rs:79:0-79:16 line #87f0cf90); owner at dep/src/cases.rs:80:7-80:13 within 80:0-86:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 85,
             "location": "dep/src/cases.rs",
             "offset": 6,
@@ -1887,7 +1999,7 @@
             "symbol": "dep::cases::one"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; owner `verify_55::shared::feeding::fed` at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55, lib dep] in dep::cases::feeding::fed; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; owner `verify_55::shared::feeding::fed` at dep/src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
             "line": 5,
             "location": "dep/src/feeding.rs",
             "offset": 6,
@@ -1971,21 +2083,21 @@
             "symbol": "digest::digest::Digest::new"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.update(d);`; code: `update`",
             "line": 74,
             "location": "src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::dynamic; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at src/cases.rs:68:7-68:14 within 68:0-76:1; line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 75,
             "location": "src/cases.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::finalize_reset"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::spread; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at src/cases.rs:79:0-79:16 line #87f0cf90); line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::spread; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at src/cases.rs:80:7-80:13 as `spread` line #45edcaa6 (by attribute rustfmt::skip at src/cases.rs:79:0-79:16 line #87f0cf90); line: `h.finalize_reset().to_vec()`; code: `finalize_reset`",
             "line": 85,
             "location": "src/cases.rs",
             "offset": 6,
@@ -2048,11 +2160,25 @@
             "symbol": "verify_55::cases::one"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::feeding::fed; use: digest; receiver: one of 3 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::cases::feeding::fed; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at src/feeding.rs:4:7-4:10 within 4:0-6:1; line: `h.update(d);`; code: `update`",
             "line": 5,
             "location": "src/feeding.rs",
             "offset": 6,
             "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::names::fed2; use: digest; receiver: one of 4 types the build makes a `dyn DynDigest` of; member: dyn, possible (dyn: `digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::U64, sha2::OidSha512>>` is coerced to `dyn digest::digest::DynDigest` at dep/src/cases.rs:70:8-70:27 as `mac::boxed!(Sha512)` line #d8a62a70); owner at src/names.rs:30:7-30:11 within 30:0-32:1; line: `h.update(d);`; code: `update`",
+            "line": 31,
+            "location": "src/names.rs",
+            "offset": 6,
+            "symbol": "digest::digest::DynDigest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-55] in verify_55::names::renamed; use: digest; owner at src/names.rs:34:7-34:14 within 34:0-37:1; line: `hashes::Sha512::digest(d).to_vec()`; code: `hashes::Sha512::digest`",
+            "line": 36,
+            "location": "src/names.rs",
+            "offset": 4,
+            "symbol": "digest::digest::Digest::digest"
           }
         ]
       },
@@ -2088,7 +2214,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "42"
+          "value": "44"
         }
       ],
       "type": "cryptographic-asset"
@@ -2400,7 +2526,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "841"
+        "value": "860"
       },
       {
         "name": "rcbom:run:artifact",
@@ -2416,7 +2542,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "121 calls into crypto packages: 106 cited, 6 cited by the check as unknown, 9 excused (format 4, view 5)"
+        "value": "128 calls into crypto packages: 113 cited, 6 cited by the check as unknown, 9 excused (format 4, view 5)"
       }
     ],
     "tools": {
@@ -2429,7 +2555,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:194a11fe-bf57-83df-a7c8-98d85d1a9340",
+  "serialNumber": "urn:uuid:b6f257b9-4f85-8df3-a141-9f1527efd76e",
   "specVersion": "1.7",
   "version": 1
 }
