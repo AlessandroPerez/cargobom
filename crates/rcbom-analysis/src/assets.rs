@@ -113,6 +113,14 @@ pub(super) fn merge_less_specific(assets: &mut BTreeMap<String, Asset>) {
                         o.merged.extend(g.merged);
                         o.via_all.extend(g.via_all);
                         for d in g.detail {
+                            // (where a macro writes the merged call says whose code it is: the
+                            // occurrence's own record is of its own symbol)
+                            let d = match d.strip_prefix("expanded from ") {
+                                Some(at) if g.symbol != o.symbol => {
+                                    format!("expanded `{}` from {at}", g.symbol)
+                                }
+                                _ => d,
+                            };
                             if !o.detail.contains(&d) {
                                 o.detail.push(d);
                             }
