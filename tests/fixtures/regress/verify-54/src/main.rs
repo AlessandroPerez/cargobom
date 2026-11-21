@@ -1,7 +1,9 @@
 mod boxed;
 mod guarded;
+mod moded;
 mod paired;
 mod summed;
+mod tagged;
 mod traced;
 
 // Modules a macro's invocation declares, each in a file of its own (tokio's `cfg_rt! { mod
@@ -46,6 +48,10 @@ fn main() {
     let h = block_on(guarded::checked(input.clone()));
     let i = paired::wide::once(&input);
     let j = paired::wide::twice(&input);
-    let all = [a, b, c, d, e, f, g, h, i, j];
+    let k = tagged::tag(&input);
+    let l = paired::each(&[&input, &input]);
+    let m = moded::tag(&input, &input);
+    let n = inner::wide(&input);
+    let all = [a, b, c, d, e, f, g, h, i, j, k, l, m, n];
     println!("{}", all.iter().map(Vec::len).sum::<usize>());
 }

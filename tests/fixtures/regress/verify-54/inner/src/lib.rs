@@ -9,3 +9,18 @@ pub fn tag(data: &[u8]) -> Vec<u8> {
     };
     run(data)
 }
+
+// A free function a macro writes and its invocation names, in a crate the program depends on
+// (hpke-rs-rust-crypto's `implement_aead!(aes128_seal, aes128_open, ..)` under
+// openmls_rust_crypto). Its name reads as the source's own; of another crate's function the
+// compiler keeps no record of the expansion that defines it, and what says a macro wrote it is
+// the expansion its header is written in.
+macro_rules! digest_fn {
+    ($name:ident, $alg:ident) => {
+        pub fn $name(data: &[u8]) -> Vec<u8> {
+            digest::digest(&digest::$alg, data).as_ref().to_vec()
+        }
+    };
+}
+
+digest_fn!(wide, SHA384);

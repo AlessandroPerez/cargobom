@@ -1,0 +1,22 @@
+# The compiler's record by construction: the same cases are compiled in the program
+# (`src/cases.rs`) and in a crate it depends on (`dep/src/cases.rs`, the same text), so each is
+# recorded once by the unit that compiles it and once by the unit that walks it from another
+# crate. The cases cross who writes the code (a `macro_rules!` of another crate, an attribute, a
+# derive, a function-like procedural macro), what it writes (a free function, a method, an impl,
+# a closure, an `async fn`, a static), where the item's name comes from (the invocation, the
+# macro) and how the call is written. Each is commented where its macro is.
+[package]
+name = "verify-55"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["dep", "mac", "pm"]
+
+[dependencies]
+dep = { path = "dep" }
+mac = { path = "mac" }
+pm = { path = "pm" }
+sha2 = "0.10"
+hmac = "0.12"
+ring = "=0.17.14"

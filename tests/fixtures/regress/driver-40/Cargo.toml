@@ -1,0 +1,14 @@
+# An associated constant a `const fn` computes by rotating (bitcoin_hashes 1.1.0's tagged-hash
+# midstates, under nostr): `u32::rotate_left` reaches a method of a `const` trait of core
+# (`intrinsics::fallback::FunnelShift::unchecked_funnel_shl`), a declaration without a body.
+# Asking the compiler for its MIR panicked; the driver caught it and counted an item as not
+# analysed. A trait's method without a default has no body to evaluate: each impl gives its own.
+[package]
+name = "driver-40"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+
+[dependencies]
+sha2 = "0.10"

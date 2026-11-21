@@ -1,0 +1,20 @@
+# A dependency the manifest optimises on its own (cargo-deb sets `[profile.release.package.
+# serde_json] opt-level = 2`). The walk check links each binary once more unoptimised, to compare
+# what the linker keeps with what the walk reached; a package's own level outlived that, and in
+# an optimised unit two functions whose code is the same are one function in the binary, under
+# both names (serde_json's `error::<_, Reference<str>>` and `error::<_, Reference<[u8]>>`):
+# the one the program does not call was linked, not walked, and no gap of the walk. The check
+# builds every unit unoptimised, whatever the manifest sets.
+[package]
+name = "driver-41"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["helper"]
+
+[dependencies]
+helper = { path = "helper" }
+
+[profile.release.package.helper]
+opt-level = 3

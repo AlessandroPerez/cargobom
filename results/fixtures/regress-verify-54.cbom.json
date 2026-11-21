@@ -6,7 +6,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via verify-54 -> sha2 -> digest -> block-buffer",
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via verify-54 -> hmac -> digest -> block-buffer",
             "line": 6,
             "location": "Cargo.lock",
             "offset": 0,
@@ -42,7 +42,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via verify-54 -> sha2 -> digest -> crypto-common",
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via verify-54 -> hmac -> digest -> crypto-common",
             "line": 40,
             "location": "Cargo.lock",
             "offset": 0,
@@ -70,7 +70,7 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[manifest] locked digest 0.10.7; reached via verify-54 -> sha2 -> digest",
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via verify-54 -> hmac -> digest",
             "line": 50,
             "location": "Cargo.lock",
             "offset": 0,
@@ -99,7 +99,7 @@
         "occurrences": [
           {
             "additionalContext": "[manifest] locked getrandom 0.2.17; reached via inner -> ring -> getrandom",
-            "line": 76,
+            "line": 77,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "getrandom"
@@ -126,6 +126,45 @@
       "version": "0.2.17"
     },
     {
+      "bom-ref": "pkg:cargo/hmac@0.12.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by verify-54 (dependencies)",
+            "line": 17,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "hmac"
+          },
+          {
+            "additionalContext": "[manifest] locked hmac 0.12.1; reached via verify-54 -> hmac",
+            "line": 88,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "hmac"
+          }
+        ]
+      },
+      "name": "hmac",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/hmac@0.12.1",
+      "type": "library",
+      "version": "0.12.1"
+    },
+    {
       "bom-ref": "pkg:cargo/inner@0.1.0",
       "name": "inner",
       "properties": [
@@ -135,6 +174,19 @@
         }
       ],
       "purl": "pkg:cargo/inner@0.1.0",
+      "type": "library",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/over@0.1.0",
+      "name": "over",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/over@0.1.0",
       "type": "library",
       "version": "0.1.0"
     },
@@ -164,7 +216,7 @@
           },
           {
             "additionalContext": "[manifest] locked ring 0.17.14; reached via inner -> ring",
-            "line": 104,
+            "line": 121,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "ring"
@@ -218,7 +270,7 @@
           },
           {
             "additionalContext": "[manifest] locked sha2 0.10.9; reached via verify-54 -> sha2",
-            "line": 118,
+            "line": 135,
             "location": "Cargo.lock",
             "offset": 0,
             "symbol": "sha2"
@@ -243,6 +295,123 @@
       "purl": "pkg:cargo/sha2@0.10.9",
       "type": "library",
       "version": "0.10.9"
+    },
+    {
+      "bom-ref": "pkg:cargo/subtle@2.6.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked subtle 2.6.1; reached via verify-54 -> hmac -> digest -> subtle",
+            "line": 152,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "subtle"
+          }
+        ]
+      },
+      "name": "subtle",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/subtle@2.6.1",
+      "type": "library",
+      "version": "2.6.1"
+    },
+    {
+      "bom-ref": "crypto:algorithm:HMAC-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "HMAC",
+          "cryptoFunctions": [
+            "tag"
+          ],
+          "primitive": "mac"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] [macro keyed!] in verify_54::moded::tag; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function); owner at src/moded.rs:15:7-15:10 as `tag` line #4038b4d4 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); expanded from src/moded.rs:8:26-8:72 as `$outer::$inner::<sha2::Sha256>::new_from_slice` line #1f83a273 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); line: `keyed!(tag, hmac::Hmac);`",
+            "line": 15,
+            "location": "src/moded.rs",
+            "offset": 0,
+            "symbol": "digest::mac::Mac::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] [macro keyed!] in verify_54::moded::tag; use: tag; owner at src/moded.rs:15:7-15:10 as `tag` line #4038b4d4 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); expanded from src/moded.rs:9:16-9:22 as `update` line #d88606cd (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); line: `keyed!(tag, hmac::Hmac);`",
+            "line": 15,
+            "location": "src/moded.rs",
+            "offset": 0,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] [macro keyed!] in verify_54::moded::tag; use: tag; owner at src/moded.rs:15:7-15:10 as `tag` line #4038b4d4 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); expanded from src/moded.rs:10:16-10:24 as `finalize` line #066ad743 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); line: `keyed!(tag, hmac::Hmac);`",
+            "line": 15,
+            "location": "src/moded.rs",
+            "offset": 0,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] [macro keyed!] in verify_54::moded::tag; into_bytes: setup, not a use; owner at src/moded.rs:15:7-15:10 as `tag` line #4038b4d4 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); expanded from src/moded.rs:10:27-10:37 as `into_bytes` line #d659d601 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); line: `keyed!(tag, hmac::Hmac);`",
+            "line": 15,
+            "location": "src/moded.rs",
+            "offset": 0,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          }
+        ]
+      },
+      "name": "HMAC-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin verify-54"
+        },
+        {
+          "name": "rcbom:provenance:key",
+          "value": "environment,parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
     },
     {
       "bom-ref": "crypto:algorithm:SHA-224",
@@ -357,14 +526,42 @@
             "symbol": "digest::digest::Digest::digest"
           },
           {
-            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-54] in verify_54::main; chosen as generic argument of verify_54::traced::hash_with; owner at src/main.rs:36:3-36:7 within 36:0-51:1; line: `let c = traced::hash_with::<Sha256>(&input);`; code: `traced::hash_with::<Sha256>`",
-            "line": 41,
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-54] in verify_54::main; chosen as generic argument of verify_54::traced::hash_with; owner at src/main.rs:38:3-38:7 within 38:0-57:1; line: `let c = traced::hash_with::<Sha256>(&input);`; code: `traced::hash_with::<Sha256>`",
+            "line": 43,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "verify_54::traced::hash_with"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] in verify_54::traced::hash_with::<..>::{closure#0}; use: digest; owner at src/traced.rs:14:0-14:13 as `#[pm::traced]` line #b3083644 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74); instantiated by verify_54::traced::hash_with::<..> at src/traced.rs:14:0 (built, to 14:13 as `#[pm::traced]` line #b3083644, from src/traced.rs:14:0-14:13 as `#[pm::traced]` line #b3083644 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74), caller at src/traced.rs:15:7-15:16 as `hash_with` line #15e3c0a4 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74)); instantiated by verify_54::main at src/main.rs:41:12 as `traced::hash_with::<Sha256>` (call, to 41:39 as `traced::hash_with::<Sha256>` line #e2300ba7, caller at src/main.rs:36:3-36:7 within 36:0-51:1); line: `D::digest(data).to_vec()`; code: `D::digest`",
+            "additionalContext": "[reachable] [component] [artifacts: bin verify-54] [macro keyed!] in verify_54::moded::tag; part of HMAC-SHA-256; owner at src/moded.rs:15:7-15:10 as `tag` line #4038b4d4 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); expanded from src/moded.rs:8:26-8:72 as `$outer::$inner::<sha2::Sha256>::new_from_slice` line #1f83a273 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); line: `keyed!(tag, hmac::Hmac);`",
+            "line": 15,
+            "location": "src/moded.rs",
+            "offset": 0,
+            "symbol": "digest::mac::Mac::new_from_slice"
+          },
+          {
+            "additionalContext": "[reachable] [component] [artifacts: bin verify-54] [macro keyed!] in verify_54::moded::tag; part of HMAC-SHA-256; owner at src/moded.rs:15:7-15:10 as `tag` line #4038b4d4 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); expanded from src/moded.rs:9:16-9:22 as `update` line #d88606cd (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); line: `keyed!(tag, hmac::Hmac);`",
+            "line": 15,
+            "location": "src/moded.rs",
+            "offset": 0,
+            "symbol": "digest::mac::Mac::update"
+          },
+          {
+            "additionalContext": "[reachable] [component] [artifacts: bin verify-54] [macro keyed!] in verify_54::moded::tag; part of HMAC-SHA-256; owner at src/moded.rs:15:7-15:10 as `tag` line #4038b4d4 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); expanded from src/moded.rs:10:16-10:24 as `finalize` line #066ad743 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); line: `keyed!(tag, hmac::Hmac);`",
+            "line": 15,
+            "location": "src/moded.rs",
+            "offset": 0,
+            "symbol": "digest::mac::Mac::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [component] [artifacts: bin verify-54] [macro keyed!] in verify_54::moded::tag; part of HMAC-SHA-256; owner at src/moded.rs:15:7-15:10 as `tag` line #4038b4d4 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); expanded from src/moded.rs:10:27-10:37 as `into_bytes` line #d659d601 (by macro keyed! at src/moded.rs:15:0-15:23 line #64ea6b3a defined src/moded.rs:4-13); line: `keyed!(tag, hmac::Hmac);`",
+            "line": 15,
+            "location": "src/moded.rs",
+            "offset": 0,
+            "symbol": "digest::mac::CtOutput::<T>::into_bytes"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] in verify_54::traced::hash_with::<..>::{closure#0}; use: digest; owner at src/traced.rs:14:0-14:13 as `#[pm::traced]` line #b3083644 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74); instantiated by verify_54::traced::hash_with::<..> at src/traced.rs:14:0 (built, to 14:13 as `#[pm::traced]` line #b3083644, from src/traced.rs:14:0-14:13 as `#[pm::traced]` line #b3083644 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74), caller at src/traced.rs:15:7-15:16 as `hash_with` line #15e3c0a4 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74)); instantiated by verify_54::main at src/main.rs:43:12 as `traced::hash_with::<Sha256>` (call, to 43:39 as `traced::hash_with::<Sha256>` line #e2300ba7, caller at src/main.rs:38:3-38:7 within 38:0-57:1); line: `D::digest(data).to_vec()`; code: `D::digest`",
             "line": 16,
             "location": "src/traced.rs",
             "offset": 4,
@@ -404,7 +601,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "6"
+          "value": "10"
         }
       ],
       "type": "cryptographic-asset"
@@ -424,8 +621,22 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] [macro hashes!] in verify_54::paired::wide::once; use: digest; owner at src/paired.rs:9:19-9:23 as `once` line #f2f0ad6c (by macro hashes! at src/paired.rs:21:0-21:27 line #e3a4b082 defined src/paired.rs:4-19); expanded from src/paired.rs:10:16-10:28 as `<$h>::digest` line #90085cc9 (by macro hashes! at src/paired.rs:21:0-21:27 line #e3a4b082 defined src/paired.rs:4-19); owner `verify_54::paired::wide::twice` at src/paired.rs:13:19-13:24 as `twice` line #3d384d8f (by macro hashes! at src/paired.rs:21:0-21:27 line #e3a4b082 defined src/paired.rs:4-19); expanded from src/paired.rs:14:28-14:40 as `<$h>::digest` line #a341d2c9 (by macro hashes! at src/paired.rs:21:0-21:27 line #e3a4b082 defined src/paired.rs:4-19); expanded from src/paired.rs:15:16-15:28 as `<$h>::digest` line #bf520977 (by macro hashes! at src/paired.rs:21:0-21:27 line #e3a4b082 defined src/paired.rs:4-19); line: `hashes!(wide, sha2::Sha384);`",
-            "line": 21,
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-54, lib inner] [macro digest_fn!] in inner::wide; use: digest; algorithm from ring::digest::SHA384 in the arguments; owner at inner/src/lib.rs:26:11-26:15 as `wide` line #9e4fc28d (by macro digest_fn! at inner/src/lib.rs:26:0-26:24 line #99189da9 defined inner/src/lib.rs:18-24); expanded from inner/src/lib.rs:21:12-21:26 as `digest::digest` line #7057e0ba (by macro digest_fn! at inner/src/lib.rs:26:0-26:24 line #99189da9 defined inner/src/lib.rs:18-24); line: `digest_fn!(wide, SHA384);`",
+            "line": 26,
+            "location": "inner/src/lib.rs",
+            "offset": 0,
+            "symbol": "ring::digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [static] [artifacts: bin verify-54, lib inner] [macro digest_fn!] in inner::wide; owner at inner/src/lib.rs:26:11-26:15 as `wide` line #9e4fc28d (by macro digest_fn! at inner/src/lib.rs:26:0-26:24 line #99189da9 defined inner/src/lib.rs:18-24); expanded from inner/src/lib.rs:21:28-21:40 as `digest::$alg` line #a4c34dba (by macro digest_fn! at inner/src/lib.rs:26:0-26:24 line #99189da9 defined inner/src/lib.rs:18-24); line: `digest_fn!(wide, SHA384);`",
+            "line": 26,
+            "location": "inner/src/lib.rs",
+            "offset": 0,
+            "symbol": "ring::digest::SHA384"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] [macro hashes!] in verify_54::paired::wide::once; use: digest; owner at src/paired.rs:12:19-12:23 as `once` line #f2f0ad6c (by macro hashes! at src/paired.rs:28:0-28:27 line #e3a4b082 defined src/paired.rs:7-26); expanded from src/paired.rs:13:16-13:28 as `<$h>::digest` line #90085cc9 (by macro hashes! at src/paired.rs:28:0-28:27 line #e3a4b082 defined src/paired.rs:7-26); owner `verify_54::paired::wide::twice` at src/paired.rs:16:19-16:24 as `twice` line #3d384d8f (by macro hashes! at src/paired.rs:28:0-28:27 line #e3a4b082 defined src/paired.rs:7-26); expanded from src/paired.rs:17:28-17:40 as `<$h>::digest` line #a341d2c9 (by macro hashes! at src/paired.rs:28:0-28:27 line #e3a4b082 defined src/paired.rs:7-26); expanded from src/paired.rs:18:16-18:28 as `<$h>::digest` line #bf520977 (by macro hashes! at src/paired.rs:28:0-28:27 line #e3a4b082 defined src/paired.rs:7-26); owner `verify_54::paired::wide::spread::<&&alloc::vec::Vec<u8>>` at src/paired.rs:21:19-21:25 as `spread` line #f692fb15 (by macro hashes! at src/paired.rs:28:0-28:27 line #e3a4b082 defined src/paired.rs:7-26); expanded from src/paired.rs:22:16-22:28 as `<$h>::digest` line #9da2ae48 (by macro hashes! at src/paired.rs:28:0-28:27 line #e3a4b082 defined src/paired.rs:7-26); `verify_54::paired::wide::spread::<&&alloc::vec::Vec<u8>>` instantiated by verify_54::paired::each::<&alloc::vec::Vec<u8>>::{closure#0} at src/paired.rs:31:30 as `wide::spread` (call, to 31:42 as `wide::spread` line #b9538955, caller at src/paired.rs:31:26-31:29 as `|p|` line #fb11ae35 within 31:26-31:45); instantiated by verify_54::paired::each::<&alloc::vec::Vec<u8>> at src/paired.rs:31:26 (built, to 31:45 as `|p| wide::spread(p)` line #fb11ae35, caller at src/paired.rs:30:7-30:11 within 30:0-32:1); instantiated by verify_54::main at src/main.rs:52:12 as `paired::each` (call, to 52:24 as `paired::each` line #2e265473, caller at src/main.rs:38:3-38:7 within 38:0-57:1); line: `hashes!(wide, sha2::Sha384);`",
+            "line": 28,
             "location": "src/paired.rs",
             "offset": 0,
             "symbol": "digest::digest::Digest::digest"
@@ -480,8 +691,12 @@
           "value": "bin verify-54"
         },
         {
+          "name": "rcbom:artifact",
+          "value": "lib inner"
+        },
+        {
           "name": "rcbom:occurrences",
-          "value": "4"
+          "value": "6"
         }
       ],
       "type": "cryptographic-asset"
@@ -564,14 +779,21 @@
       "evidence": {
         "occurrences": [
           {
-            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-54] in verify_54::main; chosen as generic argument of verify_54::traced::hash_with; owner at src/main.rs:36:3-36:7 within 36:0-51:1; line: `let d = traced::hash_with::<Sha512_256>(&input);`; code: `traced::hash_with::<Sha512_256>`",
-            "line": 42,
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-54] in verify_54::main; chosen as generic argument of verify_54::traced::hash_with; owner at src/main.rs:38:3-38:7 within 38:0-57:1; line: `let d = traced::hash_with::<Sha512_256>(&input);`; code: `traced::hash_with::<Sha512_256>`",
+            "line": 44,
             "location": "src/main.rs",
             "offset": 12,
             "symbol": "verify_54::traced::hash_with"
           },
           {
-            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] in verify_54::traced::hash_with::<..>::{closure#0}; use: digest; owner at src/traced.rs:14:0-14:13 as `#[pm::traced]` line #b3083644 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74); instantiated by verify_54::traced::hash_with::<..> at src/traced.rs:14:0 (built, to 14:13 as `#[pm::traced]` line #b3083644, from src/traced.rs:14:0-14:13 as `#[pm::traced]` line #b3083644 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74), caller at src/traced.rs:15:7-15:16 as `hash_with` line #15e3c0a4 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74)); instantiated by verify_54::main at src/main.rs:42:12 as `traced::hash_with::<Sha512_256>` (call, to 42:43 as `traced::hash_with::<Sha512_256>` line #e7a7b461, caller at src/main.rs:36:3-36:7 within 36:0-51:1); line: `D::digest(data).to_vec()`; code: `D::digest`",
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] [derive pm::Tagged] in <verify_54::tagged::Blob as verify_54::tagged::Tagged>::tag; use: digest; owner at src/tagged.rs:7:9-7:19 as `pm::Tagged` line #4f2ef281 (by derive pm::Tagged at src/tagged.rs:7:9-7:19 line #4f2ef281 defined pm/src/lib.rs:178-178); expanded from src/tagged.rs:7:9-7:19 as `pm::Tagged` line #4f2ef281 (by derive pm::Tagged at src/tagged.rs:7:9-7:19 line #4f2ef281 defined pm/src/lib.rs:178-178); line: `#[derive(pm::Tagged)]`",
+            "line": 7,
+            "location": "src/tagged.rs",
+            "offset": 9,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-54] in verify_54::traced::hash_with::<..>::{closure#0}; use: digest; owner at src/traced.rs:14:0-14:13 as `#[pm::traced]` line #b3083644 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74); instantiated by verify_54::traced::hash_with::<..> at src/traced.rs:14:0 (built, to 14:13 as `#[pm::traced]` line #b3083644, from src/traced.rs:14:0-14:13 as `#[pm::traced]` line #b3083644 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74), caller at src/traced.rs:15:7-15:16 as `hash_with` line #15e3c0a4 (by attribute pm::traced at src/traced.rs:14:0-14:13 line #b3083644 defined pm/src/lib.rs:74-74)); instantiated by verify_54::main at src/main.rs:44:12 as `traced::hash_with::<Sha512_256>` (call, to 44:43 as `traced::hash_with::<Sha512_256>` line #e7a7b461, caller at src/main.rs:38:3-38:7 within 38:0-57:1); line: `D::digest(data).to_vec()`; code: `D::digest`",
             "line": 16,
             "location": "src/traced.rs",
             "offset": 4,
@@ -607,7 +829,7 @@
         },
         {
           "name": "rcbom:occurrences",
-          "value": "2"
+          "value": "3"
         }
       ],
       "type": "cryptographic-asset"
@@ -681,7 +903,8 @@
     {
       "dependsOn": [
         "pkg:cargo/block-buffer@0.10.4",
-        "pkg:cargo/crypto-common@0.1.7"
+        "pkg:cargo/crypto-common@0.1.7",
+        "pkg:cargo/subtle@2.6.1"
       ],
       "ref": "pkg:cargo/digest@0.10.7"
     },
@@ -691,12 +914,27 @@
     },
     {
       "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:HMAC-SHA-256"
+      ],
+      "ref": "pkg:cargo/hmac@0.12.1"
+    },
+    {
+      "dependsOn": [
         "pkg:cargo/ring@0.17.14"
       ],
       "ref": "pkg:cargo/inner@0.1.0"
     },
     {
       "dependsOn": [],
+      "ref": "pkg:cargo/over@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/over@0.1.0"
+      ],
       "ref": "pkg:cargo/pm@0.1.0"
     },
     {
@@ -704,7 +942,8 @@
         "pkg:cargo/getrandom@0.2.17"
       ],
       "provides": [
-        "crypto:algorithm:SHA-256"
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384"
       ],
       "ref": "pkg:cargo/ring@0.17.14"
     },
@@ -723,12 +962,23 @@
       "ref": "pkg:cargo/sha2@0.10.9"
     },
     {
+      "dependsOn": [],
+      "ref": "pkg:cargo/subtle@2.6.1"
+    },
+    {
       "dependsOn": [
+        "pkg:cargo/hmac@0.12.1",
         "pkg:cargo/inner@0.1.0",
         "pkg:cargo/pm@0.1.0",
         "pkg:cargo/sha2@0.10.9"
       ],
       "ref": "pkg:cargo/verify-54@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:HMAC-SHA-256"
     },
     {
       "dependsOn": [],
@@ -788,7 +1038,7 @@
       },
       {
         "name": "rcbom:run:packages",
-        "value": "19"
+        "value": "22"
       },
       {
         "name": "rcbom:run:sandbox",
@@ -800,7 +1050,7 @@
       },
       {
         "name": "rcbom:run:reachable-instances",
-        "value": "240"
+        "value": "292"
       },
       {
         "name": "rcbom:run:artifact",
@@ -812,7 +1062,7 @@
       },
       {
         "name": "rcbom:run:boundary-check",
-        "value": "16 calls into crypto packages: 15 cited, 0 cited by the check as unknown, 1 excused (view 1)"
+        "value": "25 calls into crypto packages: 22 cited, 0 cited by the check as unknown, 3 excused (format 1, view 2)"
       }
     ],
     "tools": {
@@ -825,7 +1075,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:f20490e9-1f78-86b8-bda1-b44de2fe6c2b",
+  "serialNumber": "urn:uuid:4d401506-56e2-8d0b-8b00-43bf0019308a",
   "specVersion": "1.7",
   "version": 1
 }

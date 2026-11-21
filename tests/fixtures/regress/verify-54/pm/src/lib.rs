@@ -170,3 +170,23 @@ pub fn guarded(_attr: TokenStream, item: TokenStream) -> TokenStream {
     )));
     out.into_iter().collect()
 }
+
+// A derive whose own function an attribute macro writes again (conflate's `Merge` under
+// `#[proc_macro_error]`): the compiler has the derive defined where that attribute is, on a
+// line that reads no `fn`. What says the macro is procedural is its package's manifest.
+#[proc_macro_derive(Tagged)]
+#[over::through]
+pub fn tagged(input: TokenStream) -> TokenStream {
+    let toks: Vec<TokenTree> = input.into_iter().collect();
+    let at = toks
+        .iter()
+        .position(|t| t.to_string() == "struct")
+        .expect("a struct");
+    let name = toks[at + 1].to_string();
+    format!(
+        "impl crate::tagged::Tagged for {name} {{ fn tag(&self) -> Vec<u8> {{ \
+         <sha2::Sha512_256 as sha2::Digest>::digest(&self.0).to_vec() }} }}"
+    )
+    .parse()
+    .unwrap()
+}
