@@ -6,17 +6,23 @@
 //! - a panic the driver caught ("N items could not be analysed"; `RCBOM_DEBUG=1` prints them);
 //! - a call of the walked code into a crypto package the CBOM neither cites nor excuses (the
 //!   boundary check's "not cited" lines);
+//! - code a binary links that the walk did not reach, where the fixture's `cbom-args` run the
+//!   walk check (`--check-walk`: the probes of that check);
 //! - a difference from the fixture's golden file (`expected.txt`, the whole CBOM as text:
 //!   `cargo xtask summary`);
 //! - for the labelled rusi fixtures, a score that is not perfect, or that differs in any field
 //!   from the committed one (`expected-score.json`).
 //!
-//! `cargo xtask e2e [--realapp] [--regress] [--suite] [--only GLOB]...`:
+//! `cargo xtask e2e [--realapp] [--regress] [--suite] [--walk] [--only GLOB]...`:
 //! - with no option, the designed fixtures (`micro`, `libonly`, `threads`) and the rusi ones;
 //! - `--realapp`: also `tests/fixtures/realapp`;
 //! - `--regress`: also `tests/fixtures/regress/*` (the audit probes);
 //! - `--suite`: also `tests/fixtures/suite/*` (the ground-truth suite: labels written from
 //!   source before any tool run; its score must equal the committed `expected-score.json`);
+//! - `--walk`: the walk check on every fixture, not only on its probes: each binary linked
+//!   once more and compared with the walk (about as long again as a cold run, and as much
+//!   disk as the build caches). The golden files do not hold its counts, which are left out
+//!   of the comparison; not with `RCBOM_BLESS`, and the outputs are not those to commit;
 //! - `--only GLOB`: only the fixtures whose path in the repo matches GLOB (repeatable:
 //!   `--only 'tests/fixtures/regress/analysis-0*'`); the suite score is checked only when every
 //!   program ran.
@@ -71,7 +77,16 @@ struct Env {
     out: PathBuf,
     cache: Option<PathBuf>,
     bless: bool,
+    walk: bool,
     cargo_jobs: usize,
+}
+
+/// The run property of the walk check, as a line of the CBOM's text.
+const WALK_LINE: &str = "run rcbom:run:walk-check=";
+
+/// Do a fixture's `cbom-args` run the walk check?
+fn asks_walk(selection: &str) -> bool {
+    selection.split_whitespace().any(|a| a == "--check-walk")
 }
 
 /// Does `path` match the shell glob `pat` (`*`, `?`, `[a-z0-9]`)?
@@ -153,7 +168,8 @@ impl Env {
         log.push_str(&format!("== {}\n", rel(dir)));
         let cbom_path = self.path(name, "cbom.json");
         let stderr = std::fs::File::create(self.path(name, "log"))?;
-        // (a fixture's `cbom-args`: what of it is built, as cargo's selection flags)
+        // (a fixture's `cbom-args`: what of it is built, as cargo's selection flags, and
+        // `--check-walk` in the probes of the walk check)
         let selection = std::fs::read_to_string(dir.join("cbom-args")).unwrap_or_default();
         let ok = self
             .cli(dir, name)
@@ -162,6 +178,7 @@ impl Env {
             .arg("-o")
             .arg(&cbom_path)
             .args(selection.split_whitespace())
+            .args((self.walk && !asks_walk(&selection)).then_some("--check-walk"))
             .stdout(Stdio::null())
             .stderr(stderr)
             .status()?
@@ -189,6 +206,16 @@ impl Env {
             log.push_str(
                 "\ncalls into crypto packages the CBOM neither cites nor excuses (boundary check)\n",
             );
+            return Ok(false);
+        }
+        // (the walk check runs where a fixture's `cbom-args` ask for it)
+        let unwalked: Vec<&str> = cli_log
+            .lines()
+            .filter(|l| l.contains("walk check: ") && l.contains(": linked, not walked: "))
+            .collect();
+        if !unwalked.is_empty() {
+            log.push_str(&unwalked.join("\n"));
+            log.push_str("\ncode a binary links that the walk did not reach (walk check)\n");
             return Ok(false);
         }
         // the CBOM named by its file name, as it sits next to the report in the results (with
@@ -263,7 +290,18 @@ impl Env {
         let doc: serde_json::Value =
             serde_json::from_str(&std::fs::read_to_string(self.path(name, "cbom.json"))?)?;
         let txt = self.path(name, "txt");
-        std::fs::write(&txt, crate::summary::summary(&doc))?;
+        let mut text = crate::summary::summary(&doc);
+        // (`--walk` on a fixture that does not ask for the check: its golden file has no
+        // line for it)
+        let selection = std::fs::read_to_string(dir.join("cbom-args")).unwrap_or_default();
+        if self.walk && !asks_walk(&selection) {
+            text = text
+                .lines()
+                .filter(|l| !l.starts_with(WALK_LINE))
+                .flat_map(|l| [l, "\n"])
+                .collect();
+        }
+        std::fs::write(&txt, text)?;
         let expected = dir.join("expected.txt");
         if self.bless {
             std::fs::copy(&txt, &expected)?;
@@ -383,7 +421,7 @@ pub(crate) fn cargo_build(dir: &Path) -> Result<()> {
 }
 
 pub fn run(args: &[String]) -> Result<()> {
-    let (mut realapp, mut regress, mut suite) = (false, false, false);
+    let (mut realapp, mut regress, mut suite, mut walk) = (false, false, false, false);
     let mut only: Vec<Vec<char>> = Vec::new();
     let mut it = args.iter();
     while let Some(a) = it.next() {
@@ -391,9 +429,13 @@ pub fn run(args: &[String]) -> Result<()> {
             "--realapp" => realapp = true,
             "--regress" => regress = true,
             "--suite" => suite = true,
+            "--walk" => walk = true,
             "--only" => only.push(it.next().context("--only GLOB")?.chars().collect()),
             other => bail!("unknown option {other}"),
         }
+    }
+    if walk && std::env::var_os("RCBOM_BLESS").is_some() {
+        bail!("--walk checks: the golden files are written without it");
     }
     let root = root();
     crate::check::run()?;
@@ -421,6 +463,7 @@ pub fn run(args: &[String]) -> Result<()> {
         out: out.clone(),
         cache: std::env::var_os("RCBOM_E2E_CACHE").map(PathBuf::from),
         bless: std::env::var_os("RCBOM_BLESS").is_some(),
+        walk,
         cargo_jobs: (cores / jobs).max(1),
     };
 
