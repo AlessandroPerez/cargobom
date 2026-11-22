@@ -174,7 +174,7 @@ RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows be
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
-then the tool was run on 238 crates.io packages it had never been run on, in eight batches
+then the tool was run on 280 crates.io packages it had never been run on, in nine batches
 (Unseen packages, below): what those runs found is fixed in this build, but for one finding
 (two versions of one crate in a build: Limitations), and changed
 three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
@@ -187,9 +187,9 @@ honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HM
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (363 outputs, the suite's included): 21,580 positions verified (21 of them with a fact the text does not show, all in the fixture built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 201,337 positions and spans of the compiler's record shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,976 calls (3,970 cited, 19 cited by the check by name, 26 cited by the check as unknown, 7,961 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
-| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 355 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
+| evidence | every cited position, `verify --self-test` | fixtures (369 outputs, the suite's included): 21,636 positions verified (21 of them with a fact the text does not show, all in the fixture built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 201,829 positions and spans of the compiler's record shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 11,990 calls (3,981 cited, 19 cited by the check by name, 27 cited by the check as unknown, 7,963 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 361 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
@@ -223,9 +223,9 @@ Where it is not exact, the CBOM says so instead of guessing:
 published. They have no labels: what a run shows is whether it completes, whether the verifier
 confirms every position and rejects every shifted one, whether the walk check finds a gap and
 the boundary check leaves a call out. A batch passes when every package does on its first run.
-None of the eight batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
-34, 27 of 35, 30 of 33); a ninth was started and stopped for lack of memory, and is not counted
-(below). Each finding is fixed in this build and has a fixture, but for one (two
+None of the nine batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
+34, 27 of 35, 30 of 33, 27 of 32). Each finding is fixed in this build and has a fixture, but
+for one (two
 versions of one crate in a build: Limitations), and the packages are development material
 from then on (`in-too-deep.md` 8 says what such a run can and cannot show).
 - *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
@@ -374,6 +374,41 @@ from then on (`in-too-deep.md` 8 says what such a run can and cannot show).
   panic on s3s: a closure in an `async fn` handing a crypto call a slice the coroutine around
   it holds as a constant, read with the closure's generic arguments where the coroutine has its
   own.
+- *Forty-two, 22 November:* bitwarden 2.1.0, ap-proxy-protocol 0.11.0
+  (`experimental-post-quantum-crypto`), x0x 0.48.1, fips203-ffi 0.5.0, metamorphic-crypto 0.11.0,
+  pq-msg 0.2.0, thruput-signing 0.47.0, shin 0.17.0, exochain-core 0.3.1, near-kit-primitives
+  0.33.1, pqc-kem 0.3.2, huddle-core 2.2.1, tsp_sdk 0.16.0 (`pq`), ferrijs-std 0.9.2,
+  pqhybridsign 0.1.0, li2utils 0.2.0, evnx-crypto 0.2.1, noetl 6.4.1 (these eighteen, and three
+  of the nine below that do not build, are the most downloaded dependents of a post-quantum
+  package not yet seen), stun_codec 0.4.0, winter-crypto 0.13.1, envcrypt 0.5.0, imagepipe 0.5.1,
+  aliyun-oss-client 0.13.3, secret-toolkit-crypto 0.10.3, mostro-cli 0.17.1, midnight-base-crypto
+  1.1.1, renetcode2 1.0.1, nym-outfox 3.0.0, hsh 0.0.10, mockforge-collab 0.3.248, yubihsm2
+  0.45.3, papm 0.3.2 and hypershunt 1.5.0 (every ninety-fifth, by downloads, of the unseen
+  dependents of fifteen classical packages), the list fixed by that rule before any was looked
+  at, with the build that has the eighth batch's fixes, the boundary check's value edges and the
+  verifier's not-shown outcome (thrussh 0.49.0 needs libsodium; card-cli 1.13.21,
+  verifiable-credential-toolkit 0.7.0 and encryptedfs 0.1.26 the system's OpenSSL; the build
+  scripts of agntcy-slim-auth 0.17.10's aws-lc-sys, bun_runtime 0.6.0's BoringSSL and
+  trezor-crypto-lib 0.1.1 fail here; blockifier 0.8.0's size-of and agree 0.2.7's rustix do not
+  compile on the pinned nightly). x0x did not complete on this machine: the walk check's
+  unoptimised build of its library of 40,000 lines had the compiler killed at 9 GB of 16, twice
+  (and the first time the run ended there with no CBOM, the analysis done: it is written without
+  the check now, `regress/driver-47`). Twenty-seven of the other thirty-two passed. One run did
+  not end: imagepipe depends on qoi 0.4.1, in whose encoder each of three variables is made of
+  the others' values of the turn before on every branch, and the driver's search for where a
+  value comes from, which holds the places under way only along the way to each, multiplied its
+  ways at every step. The driver caught a compiler panic in nine functions of rtnetlink, under
+  huddle-core: a write through the `&mut` that `get_or_insert_with` returned into an `Option`
+  field, recorded at the field with the path the pointer adds, read as a path of the `Option`'s
+  own type. The walk check found a gap in two: the closure of arrow-array's `as_time::<T>` in the
+  arm of a `match T::DATA_TYPE` that twenty-six of its instances never take, under noetl, which
+  the walk rightly leaves out and a build without optimisation compiles; and `secp256k1_sys::
+  strlen` under mostro-cli, called by a function the crate defines under a C name for its C
+  library to call back, where no Rust code calls it and the walk did not start. And the verifier
+  rejected five positions in two: an unknown algorithm named by the same package twice, where
+  mostro-cli's build holds two versions of bitcoin_hashes and of secp256k1 (four); and in shin
+  the SHA-512 of Ed25519, cited in a generic function nine descriptors reach by value, held to
+  what the call making one of its three instances names.
 
 The fifth batch's findings were first fixed as the others had been, by more rules in the
 verifier (and by the driver citing a closure a function builds and also awaits where it
@@ -495,23 +530,29 @@ counted apart (`NOT SHOWN`, "verified with a fact the text does not show"), and 
 counts a shift that passes only so apart as well. The cases are in the fixture built by
 construction (`regress/verify-55`): 286 positions verified, 21 of them with a fact the text
 does not show, every shifted position and span rejected (2 of 3,125 shifted details only where
-the text does not show the fact). No position of the other 362 fixture outputs or of the
+the text does not show the fact). No position of the other 368 fixture outputs or of the
 labelled sets has such a fact.
 
-A ninth batch was started on the build with all of this: forty-two packages, the twenty-two
-most downloaded dependents of the post-quantum crates not yet seen and every ninety-fifth of
-the unseen dependents of fifteen classical ones, by a rule fixed before any was looked at. It
-was stopped for lack of memory at its sixth package and is not counted: the walk check's
-unoptimised build of x0x 0.48.1, a library of 40,000 lines, had the compiler killed at 9 GB of
-this machine's 16. Of the five before it, bitwarden 2.1.0 and ap-proxy-protocol 0.11.0 passed
-and three do not build here (thrussh on libsodium, card-cli and verifiable-credential-toolkit
-on OpenSSL). It showed one defect all the same: the run ended at the failed build with no CBOM,
-the analysis done. The CBOM is now written without the walk check, saying so, and the run fails
-after it (`regress/driver-47`). For the same want of memory the earlier batches were not run
-again whole on this build. What was: the three packages the eighth batch failed on, which pass
-(QuantCrypt, hdwallet, s3s); and the final verifier over the CBOMs of the sixty-seven packages
-of the seventh and eighth batches, which rejects no position but hdwallet's two in the CBOM
-made before its fix, accepts no shift and finds no fact the text does not show.
+The ninth batch ran on the build with all of this: twenty-seven of thirty-two. Its CBOMs hold
+14,616 verified positions, 8 more within a range and the 5 rejected ones; all 124,602 shifted
+positions and spans were rejected, and none of the positions has a fact the text does not show.
+They name ML-DSA in fifteen packages, ML-KEM in twelve and X-Wing in one. Its five failures are
+of six causes, none seen before and each a probe now: a search with no end
+(`regress/driver-49`: a search reads a bounded number of places), a path through a holder
+(`driver-48`), code behind a branch on a constant (`driver-50`: the walk records what only such
+a branch reaches, and the walk check names it), a function called by its C name from code that
+is not Rust's (`driver-51`: where a build links such code, the walk starts at every such
+function of its crates; the randomness that pqcrypto's C code draws through one is reachable
+now, where it was only present), two versions of a crypto package under one name
+(`analysis-198`) and an algorithm that reaches a generic function by value (`verify-56`). The
+five packages were run again on the build with the fixes and pass: shin 212 positions verified,
+imagepipe 8 (in two minutes), huddle-core 1,246, noetl 814 (its twenty-six closures named as
+behind a constant) and mostro-cli 691, every shifted position rejected, no panic and no gap.
+The earlier batches were not run again whole on this build: the machine has 16 GB, and a sweep
+was stopped twice for want of memory. What was run again of them: the three packages the eighth
+batch failed on, which pass (QuantCrypt, hdwallet, s3s), and the verifier over the CBOMs of the
+sixty-seven packages of the seventh and eighth batches (no position rejected but hdwallet's two
+in the CBOM made before its fix, no shift accepted).
 
 After the third batch every earlier package that builds here was re-run, versions pinned, on
 the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
