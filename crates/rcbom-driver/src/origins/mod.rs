@@ -60,6 +60,14 @@ const MAX_WIDTH: usize = 16;
 const MAX_FIELDS: usize = 32;
 /// Nodes (operands) per origin tree; past them nothing more is read, places either.
 const MAX_NODES: usize = 400;
+/// Places read per origin tree. A place read through a move, a borrow or a field costs no
+/// node and no depth, and the places under way are held only along the way to each (a loop is
+/// cut where it closes): in a function whose variables are each made of the others on several
+/// ways (qoi's encoder: a pixel, its hash index and the run length, each from the turn before
+/// on every branch) the ways to one place multiply at each step, and the search did not end.
+/// Past this many nothing more is read; no search of the fixtures or the labelled projects
+/// reads as many.
+const MAX_PLACES: usize = 20_000;
 /// Projections of a place followed: a loop walking a list (`q = (*q).next`) reads a longer
 /// path at each turn, and moves and borrows are free of the other limits.
 const MAX_PATH: usize = 16;
@@ -220,6 +228,8 @@ pub(crate) struct Origins<'a, 'tcx> {
     /// Captures looked up in the parent body (capture, what is read of it), computed once.
     parent_captures: RefCell<HashMap<CaptureRead, Option<Origin>>>,
     nodes: Cell<usize>,
+    /// The places the current query has read (`MAX_PLACES`).
+    places: Cell<usize>,
     /// For an instance body (a generic function's instance, a closure in the walk): the item
     /// it was instantiated from and the instance's generic arguments. The instance body has its
     /// named constants evaluated away (`&ECDSA_P256_SHA256_ASN1` is a bare pointer there); the
@@ -290,6 +300,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             captures: None,
             parent_captures: RefCell::new(HashMap::new()),
             nodes: Cell::new(0),
+            places: Cell::new(0),
             item: None,
             item_consts: OnceCell::new(),
         }

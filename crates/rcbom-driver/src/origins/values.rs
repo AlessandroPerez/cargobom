@@ -8,6 +8,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     /// number of statements).
     pub(crate) fn operand_at(&self, op: &Operand, bb: usize, idx: usize) -> Origin {
         self.nodes.set(0);
+        self.places.set(0);
         self.operand(op, At { bb, idx }, 0, &mut HashSet::new())
             .capped(MAX_ORIGIN_DEPTH)
     }
@@ -26,6 +27,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         idx: usize,
     ) -> Origin {
         self.nodes.set(0);
+        self.places.set(0);
         let at = At { bb, idx };
         match op {
             Operand::Copy(p) | Operand::Move(p) => {
@@ -59,6 +61,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         idx: usize,
     ) -> Origin {
         self.nodes.set(0);
+        self.places.set(0);
         self.rvalue(rv, span, rest, At { bb, idx }, 0, &mut HashSet::new())
             .capped(MAX_ORIGIN_DEPTH)
     }
@@ -86,6 +89,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         for (bb, block) in self.body.blocks.iter().enumerate() {
             if matches!(block.terminator.kind, TerminatorKind::Return) {
                 self.nodes.set(0);
+                self.places.set(0);
                 let at = At {
                     bb,
                     idx: block.statements.len(),
@@ -261,6 +265,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             return Origin::Unknown;
         };
         self.nodes.set(0);
+        self.places.set(0);
         let at = At {
             bb,
             idx: self.body.blocks[bb].statements.len(),
@@ -332,7 +337,8 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         // past the query's budget nothing is followed, places either: reads of places that
         // reach operands only further down (a value before each write through a raw pointer,
         // `width(l, r)` in a loop) would recompute the same definitions without bound
-        if path.len() > MAX_PATH || self.nodes.get() > MAX_NODES {
+        self.places.set(self.places.get() + 1);
+        if path.len() > MAX_PATH || self.nodes.get() > MAX_NODES || self.places.get() > MAX_PLACES {
             return Origin::Truncated;
         }
         let key = (local, path.clone(), at);

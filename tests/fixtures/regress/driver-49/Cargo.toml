@@ -1,0 +1,14 @@
+# A dependency whose analysis did not end: qoi 0.4.1's encoder keeps a pixel, its hash index
+# and a run length, each made of the others' values of the turn before on every branch of its
+# loop. The search for where a value comes from holds the places under way only along the way
+# to each, and a place read through a move, a borrow or a field costs no node and no depth: the
+# ways to one place multiplied at every step and the run of imagepipe 0.5.1, which depends on
+# it, was stopped after ninety minutes. A search now reads a bounded number of places.
+[package]
+name = "driver-49"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+qoi = "=0.4.1"
+sha2 = "0.10"
