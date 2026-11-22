@@ -1,0 +1,263 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/bitcoin_hashes@0.14.101",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by analysis-198 (dependencies)",
+            "line": 14,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "older"
+          },
+          {
+            "additionalContext": "[manifest] locked bitcoin_hashes 0.14.101; reached via analysis-198 -> bitcoin_hashes",
+            "line": 52,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "bitcoin_hashes"
+          }
+        ]
+      },
+      "name": "bitcoin_hashes",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/bitcoin_hashes@0.14.101",
+      "type": "library",
+      "version": "0.14.101"
+    },
+    {
+      "bom-ref": "pkg:cargo/bitcoin_hashes@1.2.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by analysis-198 (dependencies)",
+            "line": 15,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "newer"
+          },
+          {
+            "additionalContext": "[manifest] locked bitcoin_hashes 1.2.0; reached via analysis-198 -> bitcoin_hashes",
+            "line": 62,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "bitcoin_hashes"
+          }
+        ]
+      },
+      "name": "bitcoin_hashes",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/bitcoin_hashes@1.2.0",
+      "type": "library",
+      "version": "1.2.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:unknown:unknown:bitcoin_hashes",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "cryptoFunctions": [
+            "unknown"
+          ],
+          "primitive": "unknown"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in analysis_198::main; use: unknown; algorithm unresolved: `bitcoin_hashes::Hash::hash` of bitcoin_hashes 0.14.101, a crypto package the knowledge base does not model: what the call does is not known; owner at src/main.rs:1:3-1:7 within 1:0-7:1; line: `let a = <older::sha256::Hash as older::Hash>::hash(input.as_bytes());`; code: `<older::sha256::Hash as older::Hash>::hash`",
+            "line": 3,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "bitcoin_hashes::Hash::hash"
+          },
+          {
+            "additionalContext": "[reachable] [call] in analysis_198::main; use: unknown; algorithm unresolved: `bitcoin_hashes::sha256::Hash::hash` of bitcoin_hashes 1.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/main.rs:1:3-1:7 within 1:0-7:1; line: `let b = newer::sha256::Hash::hash(input.as_bytes());`; code: `newer::sha256::Hash::hash`",
+            "line": 4,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "bitcoin_hashes::sha256::Hash::hash"
+          },
+          {
+            "additionalContext": "[reachable] [call] in analysis_198::main; use: unknown; algorithm unresolved: `bitcoin_hashes::sha256::Hash::to_byte_array` of bitcoin_hashes 1.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/main.rs:1:3-1:7 within 1:0-7:1; line: `println!(\"{:02x} {:02x}\", a[..][0], b.to_byte_array()[0]);`; code: `to_byte_array`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 42,
+            "symbol": "bitcoin_hashes::sha256::Hash::to_byte_array"
+          },
+          {
+            "additionalContext": "[reachable] [call] in analysis_198::main; use: unknown; algorithm unresolved: the boundary check: `<bitcoin_hashes::sha256::Hash as core::ops::index::Index<I>>::index` of bitcoin_hashes 0.14.101, a call nothing else in the CBOM accounts for: what it does is not known; owner at src/main.rs:1:3-1:7 within 1:0-7:1; line: `println!(\"{:02x} {:02x}\", a[..][0], b.to_byte_array()[0]);`; code: `[..]`",
+            "line": 6,
+            "location": "src/main.rs",
+            "offset": 31,
+            "symbol": "<bitcoin_hashes::sha256::Hash as core::ops::index::Index<I>>::index"
+          }
+        ]
+      },
+      "name": "unknown",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:algorithm",
+          "value": "unresolved"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:cargo/bitcoin_hashes@0.14.101",
+        "pkg:cargo/bitcoin_hashes@1.2.0"
+      ],
+      "ref": "pkg:cargo/analysis-198@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:bitcoin_hashes"
+      ],
+      "ref": "pkg:cargo/bitcoin_hashes@0.14.101"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:unknown:unknown:bitcoin_hashes"
+      ],
+      "ref": "pkg:cargo/bitcoin_hashes@1.2.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:unknown:unknown:bitcoin_hashes"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/analysis-198@0.1.0",
+      "name": "analysis-198",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/analysis-198@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "252"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin analysis-198"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "4 calls into crypto packages: 3 cited, 1 cited by the check as unknown, 0 excused ()"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:dc0087bf-7dfb-8b07-8c99-6592e22f847f",
+  "specVersion": "1.7",
+  "version": 1
+}

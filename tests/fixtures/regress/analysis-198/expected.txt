@@ -1,0 +1,49 @@
+  occ bitcoin_hashes | pkg:cargo/bitcoin_hashes@0.14.101 | Cargo.lock:52:0 | bitcoin_hashes | [manifest] locked bitcoin_hashes 0.14.101; reached via analysis-198 -> bitcoin_hashes
+  occ bitcoin_hashes | pkg:cargo/bitcoin_hashes@0.14.101 | Cargo.toml:14:0 | older | [manifest] declared by analysis-198 (dependencies)
+  occ bitcoin_hashes | pkg:cargo/bitcoin_hashes@1.2.0 | Cargo.lock:62:0 | bitcoin_hashes | [manifest] locked bitcoin_hashes 1.2.0; reached via analysis-198 -> bitcoin_hashes
+  occ bitcoin_hashes | pkg:cargo/bitcoin_hashes@1.2.0 | Cargo.toml:15:0 | newer | [manifest] declared by analysis-198 (dependencies)
+  occ unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | src/main.rs:3:12 | bitcoin_hashes::Hash::hash | [reachable] [call] in analysis_198::main; use: unknown; algorithm unresolved: `bitcoin_hashes::Hash::hash` of bitcoin_hashes 0.14.101, a crypto package the knowledge base does not model: what the call does is not known; owner at src/main.rs:1:3-1:7 within 1:0-7:1; line: `let a = <older::sha256::Hash as older::Hash>::hash(input.as_bytes());`; code: `<older::sha256::Hash as older::Hash>::hash`
+  occ unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | src/main.rs:4:12 | bitcoin_hashes::sha256::Hash::hash | [reachable] [call] in analysis_198::main; use: unknown; algorithm unresolved: `bitcoin_hashes::sha256::Hash::hash` of bitcoin_hashes 1.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/main.rs:1:3-1:7 within 1:0-7:1; line: `let b = newer::sha256::Hash::hash(input.as_bytes());`; code: `newer::sha256::Hash::hash`
+  occ unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | src/main.rs:6:31 | <bitcoin_hashes::sha256::Hash as core::ops::index::Index<I>>::index | [reachable] [call] in analysis_198::main; use: unknown; algorithm unresolved: the boundary check: `<bitcoin_hashes::sha256::Hash as core::ops::index::Index<I>>::index` of bitcoin_hashes 0.14.101, a call nothing else in the CBOM accounts for: what it does is not known; owner at src/main.rs:1:3-1:7 within 1:0-7:1; line: `println!("{:02x} {:02x}", a[..][0], b.to_byte_array()[0]);`; code: `[..]`
+  occ unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | src/main.rs:6:42 | bitcoin_hashes::sha256::Hash::to_byte_array | [reachable] [call] in analysis_198::main; use: unknown; algorithm unresolved: `bitcoin_hashes::sha256::Hash::to_byte_array` of bitcoin_hashes 1.2.0, a crypto package the knowledge base does not model: what the call does is not known; owner at src/main.rs:1:3-1:7 within 1:0-7:1; line: `println!("{:02x} {:02x}", a[..][0], b.to_byte_array()[0]);`; code: `to_byte_array`
+  prop bitcoin_hashes | pkg:cargo/bitcoin_hashes@0.14.101 | rcbom:crypto-role=unmodelled
+  prop bitcoin_hashes | pkg:cargo/bitcoin_hashes@0.14.101 | rcbom:kb-coverage=unmodelled
+  prop bitcoin_hashes | pkg:cargo/bitcoin_hashes@0.14.101 | rcbom:scope=required
+  prop bitcoin_hashes | pkg:cargo/bitcoin_hashes@0.14.101 | rcbom:usage=reachable
+  prop bitcoin_hashes | pkg:cargo/bitcoin_hashes@1.2.0 | rcbom:crypto-role=unmodelled
+  prop bitcoin_hashes | pkg:cargo/bitcoin_hashes@1.2.0 | rcbom:kb-coverage=unmodelled
+  prop bitcoin_hashes | pkg:cargo/bitcoin_hashes@1.2.0 | rcbom:scope=required
+  prop bitcoin_hashes | pkg:cargo/bitcoin_hashes@1.2.0 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | rcbom:occurrences=4
+  prop unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | rcbom:reachability=reachable
+asset unknown | crypto:algorithm:unknown:unknown:bitcoin_hashes | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
+component library bitcoin_hashes 0.14.101 | pkg:cargo/bitcoin_hashes@0.14.101 | purl pkg:cargo/bitcoin_hashes@0.14.101
+component library bitcoin_hashes 1.2.0 | pkg:cargo/bitcoin_hashes@1.2.0 | purl pkg:cargo/bitcoin_hashes@1.2.0
+dep pkg:cargo/analysis-198@0.1.0 -> pkg:cargo/bitcoin_hashes@0.14.101
+dep pkg:cargo/analysis-198@0.1.0 -> pkg:cargo/bitcoin_hashes@1.2.0
+dependency crypto:algorithm:unknown:unknown:bitcoin_hashes
+dependency pkg:cargo/analysis-198@0.1.0
+dependency pkg:cargo/bitcoin_hashes@0.14.101
+dependency pkg:cargo/bitcoin_hashes@1.2.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/bitcoin_hashes@0.14.101 -> crypto:algorithm:unknown:unknown:bitcoin_hashes
+provides pkg:cargo/bitcoin_hashes@1.2.0 -> crypto:algorithm:unknown:unknown:bitcoin_hashes
+root {"bom-ref": "pkg:cargo/analysis-198@0.1.0", "name": "analysis-198", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/analysis-198@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin analysis-198
+run rcbom:run:boundary-check=4 calls into crypto packages: 3 cited, 1 cited by the check as unknown, 0 excused ()
+run rcbom:run:features=
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=252
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

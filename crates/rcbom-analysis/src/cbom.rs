@@ -161,8 +161,10 @@ fn asset_refs(an: &Analysis) -> BTreeMap<String, String> {
                 // an unknown algorithm: by primitive and providing packages, whatever else the
                 // CBOM holds
                 None if a.unresolved() => {
-                    let providers: Vec<&str> =
+                    // (each package once: two versions of one in a build are one name)
+                    let mut providers: Vec<&str> =
                         a.providers.iter().map(|(n, _)| n.as_str()).collect();
+                    providers.dedup();
                     format!(
                         "crypto:algorithm:unknown:{}:{}",
                         a.algo.primitive,

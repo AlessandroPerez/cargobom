@@ -460,13 +460,17 @@ impl Files<'_> {
     /// crypto package of the build, not the program's own nor a relay: one whose calls the
     /// boundary check accounts for?
     pub(super) fn crypto_package(&self, component_ref: &str) -> bool {
-        let pkg = component_ref.rsplit(':').next().unwrap_or("");
-        self.man.packages.iter().any(|p| {
-            p.name == pkg
-                && !p.local
-                && (p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto) || p.role.is_some())
-                && !p.lib_name.as_deref().is_some_and(|l| self.kb.relay(l))
-        })
+        // (the unknown's packages: one, or those providing it together, `ark-bls12-381+ark-ec`)
+        let named = component_ref.rsplit(':').next().unwrap_or("");
+        !named.is_empty()
+            && named.split('+').all(|pkg| {
+                self.man.packages.iter().any(|p| {
+                    p.name == pkg
+                        && !p.local
+                        && (p.unmodelled == Some(rcbom_kb::Unmodelled::Crypto) || p.role.is_some())
+                        && !p.lib_name.as_deref().is_some_and(|l| self.kb.relay(l))
+                })
+            })
     }
 
     pub(super) fn check_witness(
