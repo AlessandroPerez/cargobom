@@ -1,0 +1,14 @@
+# A place written through a pointer into it that a function returned: `self.kind
+# .get_or_insert_with(..)` gives a `&mut Kind` into an `Option<Kind>` field, and the write
+# through it is recorded at the field with the path the pointer adds, the `Option` between
+# left out. Read as a path of the field's own type it names a variant an `Option` does not
+# have, and walking the type along it indexed past its variants: the compiler panicked (caught)
+# in every function doing so, and none of those was analysed (rtnetlink 0.20's link builders,
+# nine functions, under huddle-core). Such a path is not of that type and is walked no further.
+[package]
+name = "driver-48"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"

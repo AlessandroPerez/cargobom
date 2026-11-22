@@ -23,6 +23,12 @@ pub(super) fn walk_ty<'tcx>(
             Step::Field(f) => match ty.kind() {
                 rustc_middle::ty::Adt(adt, args) => {
                     let v = match (adt.is_enum(), variant.take()) {
+                        // (a variant the enum does not have: the path is not of this type. One
+                        // made of a place and of what a pointer into it is written through
+                        // skips the layer between, `r.kind` with `Kind::D(v)` written through
+                        // the `&mut Kind` that `r.kind.get_or_insert_with(..)` returned, where
+                        // `r.kind` is an `Option<Kind>`)
+                        (true, Some(v)) if v >= adt.variants().len() => return ty,
                         (true, Some(v)) => adt.variant(rustc_abi::VariantIdx::from_usize(v)),
                         (true, None) => return ty,
                         _ => adt.non_enum_variant(),
