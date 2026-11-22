@@ -273,6 +273,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             sites: Vec::new(),
             boundary: Vec::new(),
             value_edges: Vec::new(),
+            folded: Vec::new(),
             held: HashMap::new(),
             holders_seen: HashSet::new(),
             callers: HashMap::new(),
@@ -361,6 +362,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 && a.call == b.call
         });
         let uncalled = self.uncalled();
+        let folded = self.folded(&uncalled);
         let tcx = self.cx.tcx;
         let crates = self
             .crates
@@ -377,6 +379,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             paths,
             shims,
             uncalled,
+            folded,
             generic: Vec::new(),
             crates,
             crates_complete: !truncated && usage_complete,
@@ -390,13 +393,29 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
     /// code that is not the program's, every coercion's methods at once: this says what a
     /// vtable keeps in the binary, not what runs.
     fn uncalled(&mut self) -> Vec<String> {
-        let tcx = self.cx.tcx;
-        let mut stack: Vec<Instance> = self
+        let starts: Vec<Instance> = self
             .pending
             .values()
             .flatten()
             .map(|(callee, ..)| *callee)
             .collect();
+        self.beside(starts, &HashSet::new(), false)
+    }
+
+    /// What only code behind a branch on a constant reaches, from the walked bodies' own such
+    /// branches on (`Reach::folded`): what a build without optimisation compiles of them, so
+    /// every block of each, the dead ones too.
+    fn folded(&mut self, uncalled: &[String]) -> Vec<String> {
+        let starts = std::mem::take(&mut self.folded);
+        let known: HashSet<&str> = uncalled.iter().map(String::as_str).collect();
+        self.beside(starts, &known, true)
+    }
+
+    /// The symbols of the instances `starts` reach that the walk did not, nor `known` holds:
+    /// followed as code that is not the program's (every coercion's methods at once), in
+    /// their live blocks, or in all of them (`whole`).
+    fn beside(&mut self, starts: Vec<Instance>, known: &HashSet<&str>, whole: bool) -> Vec<String> {
+        let mut stack = starts;
         let mut seen: HashSet<Instance> = HashSet::new();
         let mut out = Vec::new();
         while let Some(inst) = stack.pop() {
@@ -412,14 +431,20 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             {
                 continue;
             }
-            out.push(inst.mangled_name());
-            let sysroot = self.cx.sysroot().clone();
-            let cx = &*self.cx;
-            let found = catch_unwind(AssertUnwindSafe(|| {
-                let did = rustc_internal::internal(tcx, inst.def.def_id());
-                let Some(body) = inst.body().map(|b| live_body(tcx, &b)) else {
-                    // (a declaration: the function the build defines under its symbol)
-                    return cx
+            let name = inst.mangled_name();
+            if !known.contains(name.as_str()) {
+                out.push(name);
+            }
+            let body = inst
+                .body()
+                .map(|b| if whole { b } else { live_body(self.cx.tcx, &b) });
+            let found = match body {
+                Some(body) => self.callees_of(inst, &body),
+                // (a declaration: the function the build defines under its symbol)
+                None => {
+                    let tcx = self.cx.tcx;
+                    let did = rustc_internal::internal(tcx, inst.def.def_id());
+                    self.cx
                         .defined_as(did)
                         .filter(|_| tcx.is_foreign_item(did))
                         .and_then(|def| {
@@ -427,35 +452,45 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                                 .ok()
                         })
                         .into_iter()
-                        .collect::<Vec<_>>();
-                };
-                let mut edges = Edges {
-                    tcx,
-                    body: &body,
-                    found: Vec::new(),
-                    values: Vec::new(),
-                    built: HashMap::new(),
-                    coerced: Vec::new(),
-                    cur: None,
-                    unconvertible: has_unconvertible(tcx, &body),
-                    errors: 0,
-                    dest: None,
-                    program: false,
-                    deferred: Vec::new(),
-                    used: Vec::new(),
-                    calls: Vec::new(),
-                    std_calls: Vec::new(),
-                    own: tcx.crate_name(did.krate).to_string(),
-                    sysroot,
-                };
-                edges.visit_body(&body);
-                edges.found.into_iter().map(|(i, ..)| i).collect()
-            }))
-            .unwrap_or_default();
+                        .collect()
+                }
+            };
             stack.extend(found);
         }
         out.sort();
         out
+    }
+
+    /// The instances the code of `body`, a body of `inst`, calls, builds or names, read as code
+    /// that is not the program's is (every coercion's methods at once).
+    fn callees_of(&self, inst: Instance, body: &Body) -> Vec<Instance> {
+        let tcx = self.cx.tcx;
+        let sysroot = self.cx.sysroot().clone();
+        catch_unwind(AssertUnwindSafe(|| {
+            let did = rustc_internal::internal(tcx, inst.def.def_id());
+            let mut edges = Edges {
+                tcx,
+                body,
+                found: Vec::new(),
+                values: Vec::new(),
+                built: HashMap::new(),
+                coerced: Vec::new(),
+                cur: None,
+                unconvertible: has_unconvertible(tcx, body),
+                errors: 0,
+                dest: None,
+                program: false,
+                deferred: Vec::new(),
+                used: Vec::new(),
+                calls: Vec::new(),
+                std_calls: Vec::new(),
+                own: tcx.crate_name(did.krate).to_string(),
+                sysroot,
+            };
+            edges.visit_body(body);
+            edges.found.into_iter().map(|(i, ..)| i).collect()
+        }))
+        .unwrap_or_default()
     }
 
     pub(super) fn enqueue(&mut self, inst: Instance, from: Option<From>) {
@@ -744,7 +779,20 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // Not `inst.has_body()`: in this rustc_public it asks about the instance's *def*, which
         // for a shim (`<closure as FnOnce>::call_once` behind a `dyn FnOnce`, as in every
         // `thread::spawn`) is a trait method without a body. `body()` checks the instance.
-        let Some(body) = inst.body().map(|b| live_body(self.cx.tcx, &b)) else {
+        let full = inst.body();
+        // (what only its branches on constants lead to: `folded`)
+        let live = full
+            .as_ref()
+            .map(|b| live_blocks(self.cx.tcx, b))
+            .unwrap_or_default();
+        if let Some(b) = &full
+            && live.iter().any(|l| !l)
+        {
+            let dead = kept(b, &live, false);
+            let found = self.callees_of(inst, &dead);
+            self.folded.extend(found);
+        }
+        let Some(body) = full.map(|b| kept(&b, &live, true)) else {
             // a declaration (`extern` block's): what runs is the function a crate of the build
             // defines under its symbol name (the allocator functions of a dependency's
             // `#[global_allocator]`, a `#[no_mangle]` function declared `extern "C"` elsewhere)

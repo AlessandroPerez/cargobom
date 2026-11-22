@@ -1135,6 +1135,13 @@ pub struct Reach {
     /// against the linker; their sites are not reachable.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub uncalled: Vec<String>,
+    /// The symbols of the instances that only code behind a branch on a constant reaches
+    /// (`match T::KIND { Kind::Timed => f(|x| ..), _ => None }` in the instance of a `T` whose
+    /// `KIND` is another): never run, and left out of the walk, as an optimised build leaves
+    /// them out of the binary; a build without optimisation, as the check against the linker
+    /// makes, compiles them. For that check; their sites are not reachable.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub folded: Vec<String>,
     /// Of those, a library's generic functions its users may call, which no instance walks
     /// (only a caller has their type arguments): reached, but not walked.
     #[serde(default)]

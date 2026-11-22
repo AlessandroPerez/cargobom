@@ -805,6 +805,9 @@ struct Walker<'a, 'tcx> {
     boundary: Vec<(Instance, rcbom_facts::BoundaryEdge)>,
     /// The functions of the crypto set found held as values (`value_edges`).
     value_edges: Vec<rcbom_facts::BoundaryEdge>,
+    /// The instances the dead blocks of the walked bodies name (those only a branch on a
+    /// constant leads to): where `Reach::folded` starts.
+    folded: Vec<Instance>,
     /// The functions of the crypto set another crate's static or constant holds where code
     /// naming it can read them (`held::readable`), by item.
     held: HashMap<rustc_span::def_id::DefId, std::rc::Rc<Vec<held::Held<'tcx>>>>,

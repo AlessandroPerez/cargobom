@@ -19,6 +19,9 @@
 //! - `modelled`: a crate the walk does not enter (an algorithm or trait crate of the knowledge
 //!   base) and the crates implementing them;
 //! - `constructor`: an enum variant's or tuple struct's constructor as a function;
+//! - `uncalled object`, `behind a constant`: what only the methods of a trait object nothing
+//!   calls through reach, and what only code behind a branch on a constant reaches
+//!   (`Reach::uncalled`, `Reach::folded`): compiled into this binary, and never run;
 //! - `other`: a crate that is neither the program's nor holds a crypto call: code there that
 //!   reached the program's or crypto code would show as a gap itself;
 //! - `gap`: anything else, in the program's crates, the crypto crates the knowledge base
@@ -49,7 +52,7 @@ impl Report {
         // (what a vtable nothing calls through keeps in the binary: named where there is any)
         let classes: Vec<String> = CLASSES
             .iter()
-            .filter(|c| **c != UNCALLED || self.classes.contains_key(*c))
+            .filter(|c| !matches!(**c, UNCALLED | FOLDED) || self.classes.contains_key(*c))
             .map(|c| format!("{c} {}", self.classes.get(c).copied().unwrap_or(0)))
             .collect();
         format!(
@@ -65,12 +68,17 @@ impl Report {
 /// Linked, not walked, and no gap: reached only from the methods of trait objects the walk saw
 /// made and never used (`Reach::uncalled`).
 const UNCALLED: &str = "uncalled object";
-const CLASSES: [&str; 7] = [
+/// Linked, not walked, and no gap: reached only from code behind a branch on a constant, which
+/// never runs and which this build, made without optimisation, compiles all the same
+/// (`Reach::folded`).
+const FOLDED: &str = "behind a constant";
+const CLASSES: [&str; 8] = [
     "entry",
     "std",
     "modelled",
     "constructor",
     UNCALLED,
+    FOLDED,
     "other",
     "gap",
 ];
@@ -115,6 +123,12 @@ pub(crate) fn run(
             .filter(|s| s.starts_with("_R"))
             .map(|s| demangle(s))
             .collect();
+        let folded: HashSet<String> = w
+            .folded
+            .iter()
+            .filter(|s| s.starts_with("_R"))
+            .map(|s| demangle(s))
+            .collect();
         let data = std::fs::read(exe).with_context(|| exe.display().to_string())?;
         let linked = linked_symbols(&data)?;
         let mut r = Report {
@@ -130,6 +144,7 @@ pub(crate) fn run(
             }
             let class = match crates.class(sym, d) {
                 "gap" if uncalled.contains(d) => UNCALLED,
+                "gap" if folded.contains(d) => FOLDED,
                 c => c,
             };
             *r.classes.entry(class).or_default() += 1;

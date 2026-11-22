@@ -662,6 +662,28 @@ pub(super) fn live_body(
     tcx: TyCtxt<'_>,
     body: &rustc_public::mir::Body,
 ) -> rustc_public::mir::Body {
+    kept(body, &live_blocks(tcx, body), true)
+}
+
+/// The blocks of `body` that are live (`live`), or those that are not: the others emptied.
+pub(super) fn kept(
+    body: &rustc_public::mir::Body,
+    live: &[bool],
+    alive: bool,
+) -> rustc_public::mir::Body {
+    let mut out = body.clone();
+    for (b, l) in live.iter().enumerate() {
+        if *l != alive {
+            out.blocks[b].statements.clear();
+            out.blocks[b].terminator.kind = TerminatorKind::Unreachable;
+        }
+    }
+    out
+}
+
+/// Which blocks of a body an execution can reach: not those only a branch on a constant leads
+/// to.
+pub(super) fn live_blocks(tcx: TyCtxt<'_>, body: &rustc_public::mir::Body) -> Vec<bool> {
     let n = body.blocks.len();
     let mut live = vec![false; n];
     let mut work = vec![0usize];
@@ -685,14 +707,7 @@ pub(super) fn live_body(
             _ => work.extend(block.terminator.successors()),
         }
     }
-    let mut out = body.clone();
-    for (b, l) in live.iter().enumerate() {
-        if !l {
-            out.blocks[b].statements.clear();
-            out.blocks[b].terminator.kind = TerminatorKind::Unreachable;
-        }
-    }
-    out
+    live
 }
 /// The value a block switches on, when it is a constant: given directly, or assigned to the
 /// switched local earlier in the block (`_3 = const false; switchInt(move _3)`).

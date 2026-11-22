@@ -1,0 +1,14 @@
+# Code behind a branch on a constant: `match T::KIND` in the instance of a `T` whose `KIND` is
+# another variant. It never runs; the walk leaves it out, and an optimised build leaves it out
+# of the binary. The walk check's build is made without optimisation, where the compiler does
+# not fold a match on a constant enum, and compiles the closure and the function only that arm
+# reaches: both were linked and not walked, a gap (the twenty-six instances of arrow-array's
+# `as_time::<T>` closure under noetl 6.4.1). The walk records what only such branches reach, and
+# the check names it (`behind a constant`); the SHA-512 there is present, not reachable.
+[package]
+name = "driver-50"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"
