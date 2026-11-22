@@ -5,7 +5,7 @@
   occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:10:13 | pqcrypto_mlkem::mlkem768::decapsulate | [reachable] [call] in a196::main; use: decapsulate; owner at src/main.rs:7:3-7:7 within 7:0-16:1; line: `let k2 = mlkem768::decapsulate(&ct, &sk);`; code: `mlkem768::decapsulate`
   occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:8:19 | pqcrypto_mlkem::mlkem768::keypair | [reachable] [call] in a196::main; use: keygen; owner at src/main.rs:7:3-7:7 within 7:0-16:1; line: `let (pk, sk) = mlkem768::keypair();`; code: `mlkem768::keypair`
   occ ML-KEM-768 | crypto:algorithm:ML-KEM-768 | src/main.rs:9:19 | pqcrypto_mlkem::mlkem768::encapsulate | [reachable] [call] in a196::main; use: encapsulate; owner at src/main.rs:7:3-7:7 within 7:0-16:1; line: `let (k1, ct) = mlkem768::encapsulate(&pk);`; code: `mlkem768::encapsulate`
-  occ OS-RNG | crypto:algorithm:OS-RNG | pqcrypto-internals-0.2.11/src/lib.rs:21:4 | getrandom::fill | [present] [call] in pqcrypto_internals::PQCRYPTO_RUST_randombytes; use: generate; owner at pqcrypto-internals-0.2.11/src/lib.rs:19:25-19:50 within 19:0-23:1; line: `getrandom::fill(buf).expect("RNG Failed");`; code: `getrandom::fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | pqcrypto-internals-0.2.11/src/lib.rs:21:4 | getrandom::fill | [reachable] [call] in pqcrypto_internals::PQCRYPTO_RUST_randombytes; use: generate; owner at pqcrypto-internals-0.2.11/src/lib.rs:19:25-19:50 within 19:0-23:1; line: `getrandom::fill(buf).expect("RNG Failed");`; code: `getrandom::fill`
   occ getrandom | pkg:cargo/getrandom@0.3.4 | Cargo.lock:44:0 | getrandom | [manifest] locked getrandom 0.3.4; reached via a196 -> pqcrypto-mlkem -> pqcrypto-internals -> getrandom
   occ pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | pqcrypto-internals-0.2.11/Cargo.toml:17:0 | links | [manifest] native library `pqcrypto_internals`; code behind the FFI boundary is not analysed
   occ pqcrypto-mlkem | pkg:cargo/pqcrypto-mlkem@0.1.1 | Cargo.lock:101:0 | pqcrypto-mlkem | [manifest] locked pqcrypto-mlkem 0.1.1; reached via a196 -> pqcrypto-mlkem
@@ -29,11 +29,11 @@
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=1
-  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=present
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
   prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:scope=required
-  prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:usage=present
+  prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:usage=reachable
   prop pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | rcbom:ffi-boundary=true
   prop pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | rcbom:native-links=pqcrypto_internals
   prop pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | rcbom:scope=required
@@ -71,11 +71,11 @@ provides pkg:cargo/pqcrypto-mlkem@0.1.1 -> crypto:algorithm:ML-KEM-768
 root {"bom-ref": "pkg:cargo/a196@0.1.0", "name": "a196", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a196@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin a196
-run rcbom:run:boundary-check=12 calls into crypto packages: 7 cited, 0 cited by the check as unknown, 5 excused (encoding 4, format 1)
+run rcbom:run:boundary-check=14 calls into crypto packages: 8 cited, 0 cited by the check as unknown, 6 excused (encoding 4, format 2)
 run rcbom:run:features=
 run rcbom:run:packages=13
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=26
+run rcbom:run:reachable-instances=36
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25

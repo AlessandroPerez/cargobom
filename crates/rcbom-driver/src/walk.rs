@@ -96,6 +96,36 @@ pub(super) fn roots(
             }
         }
     }
+    // and, where the build links code that is not Rust's (a library a crate's build script
+    // compiles and links statically), what its dependencies define under a symbol name of
+    // their own (`#[no_mangle]`, `#[export_name]`): that code calls it by that name, and no
+    // Rust code does (the C library secp256k1-sys builds reports an error through
+    // `rustsecp256k1_v0_10_0_default_illegal_callback_fn`, which that crate defines; PQClean's
+    // C under pqcrypto draws its randomness from `PQCRYPTO_RUST_randombytes`). Without such
+    // code only a declaration reaches one (`defined_as`), and one nothing declares is not run
+    let native = std::iter::once(rustc_span::def_id::LOCAL_CRATE)
+        .chain(tcx.crates(()).iter().copied())
+        .filter(|c| !cx.sysroot().contains(c))
+        .any(|c| {
+            tcx.native_libraries(c)
+                .iter()
+                .any(|l| l.kind.is_statically_included())
+        });
+    let mut named: Vec<rustc_span::def_id::DefId> = cx
+        .linked()
+        .named
+        .values()
+        .copied()
+        .filter(|d| native && !d.is_local())
+        .collect();
+    named.sort_by_key(|d| def_hash(tcx, *d));
+    for did in named {
+        if let Ok(i) = Instance::try_from(rustc_public::CrateItem(rustc_internal::stable(did)))
+            && !fns.contains(&i)
+        {
+            fns.push(i);
+        }
+    }
     let mut statics = Vec::new();
     for did in tcx.hir_body_owners().map(|d| d.to_def_id()) {
         if !matches!(tcx.def_kind(did), rustc_hir::def::DefKind::Static { .. })

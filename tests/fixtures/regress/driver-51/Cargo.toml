@@ -1,0 +1,20 @@
+# A function a dependency defines under a symbol name of its own, called by code that is not
+# Rust's: the C library secp256k1-sys builds reports an error through
+# `rustsecp256k1_v0_10_0_default_illegal_callback_fn`, which the crate defines in Rust, and no
+# Rust code calls it. The walk did not start there, so what such a function calls was linked
+# and not walked (`secp256k1_sys::strlen` under mostro-cli 0.17.1, a gap), and its code was
+# not reachable (the randomness PQClean's C draws through pqcrypto's
+# `PQCRYPTO_RUST_randombytes` was present only). Here `native` compiles one C function that
+# calls back; where a build links such code, the walk starts at every function its crates
+# define under a name of their own. (Without such code one nothing declares stays unreached:
+# `regress/driver-37`.)
+[package]
+name = "driver-51"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["native"]
+
+[dependencies]
+native = { path = "native" }

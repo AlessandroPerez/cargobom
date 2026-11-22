@@ -1,0 +1,328 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via native -> sha2 -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via native -> sha2 -> digest -> crypto-common",
+            "line": 40,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/digest@0.10.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via native -> sha2 -> digest",
+            "line": 50,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "digest"
+          }
+        ]
+      },
+      "name": "digest",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.10.7",
+      "type": "library",
+      "version": "0.10.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/native@0.1.0",
+      "name": "native",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/native@0.1.0",
+      "type": "library",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha2@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by native (dependencies)",
+            "line": 8,
+            "location": "native/Cargo.toml",
+            "offset": 0,
+            "symbol": "sha2"
+          },
+          {
+            "additionalContext": "[manifest] locked sha2 0.10.9; reached via native -> sha2",
+            "line": 97,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha2"
+          }
+        ]
+      },
+      "name": "sha2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha2@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin driver-51, lib native] in native::summed; use: digest; owner at native/src/lib.rs:16:3-16:9 within 16:0-19:1; line: `let d = sha2::Sha384::digest(code.to_le_bytes());`; code: `sha2::Sha384::digest`",
+            "line": 17,
+            "location": "native/src/lib.rs",
+            "offset": 12,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin driver-51"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "lib native"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/native@0.1.0"
+      ],
+      "ref": "pkg:cargo/driver-51@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/native@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/driver-51@0.1.0",
+      "name": "driver-51",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/driver-51@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "14"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "79"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin driver-51"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "lib native"
+      },
+      {
+        "name": "rcbom:run:walk-check",
+        "value": "bin driver-51: linked 790, walked 49; not walked 756: entry 6, std 693, modelled 57, constructor 0, other 0, gap 0"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "1 calls into crypto packages: 1 cited, 0 cited by the check as unknown, 0 excused ()"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:b5268c79-0da3-8304-814e-916d66598e89",
+  "specVersion": "1.7",
+  "version": 1
+}

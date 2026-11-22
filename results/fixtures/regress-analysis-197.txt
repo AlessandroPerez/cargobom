@@ -6,7 +6,7 @@
   occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:10:14 | pqcrypto_mldsa::mldsa87::detached_sign | [reachable] [call] in a197::main; use: sign; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let sig = mldsa87::detached_sign(msg, &sk);`; code: `mldsa87::detached_sign`
   occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:11:13 | pqcrypto_mldsa::mldsa87::verify_detached_signature | [reachable] [call] in a197::main; use: verify; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let ok = mldsa87::verify_detached_signature(&sig, msg, &pk).is_ok();`; code: `mldsa87::verify_detached_signature`
   occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:9:19 | pqcrypto_mldsa::mldsa87::keypair | [reachable] [call] in a197::main; use: keygen; owner at src/main.rs:7:3-7:7 within 7:0-20:1; line: `let (pk, sk) = mldsa87::keypair();`; code: `mldsa87::keypair`
-  occ OS-RNG | crypto:algorithm:OS-RNG | pqcrypto-internals-0.2.11/src/lib.rs:21:4 | getrandom::fill | [present] [call] in pqcrypto_internals::PQCRYPTO_RUST_randombytes; use: generate; owner at pqcrypto-internals-0.2.11/src/lib.rs:19:25-19:50 within 19:0-23:1; line: `getrandom::fill(buf).expect("RNG Failed");`; code: `getrandom::fill`
+  occ OS-RNG | crypto:algorithm:OS-RNG | pqcrypto-internals-0.2.11/src/lib.rs:21:4 | getrandom::fill | [reachable] [call] in pqcrypto_internals::PQCRYPTO_RUST_randombytes; use: generate; owner at pqcrypto-internals-0.2.11/src/lib.rs:19:25-19:50 within 19:0-23:1; line: `getrandom::fill(buf).expect("RNG Failed");`; code: `getrandom::fill`
   occ getrandom | pkg:cargo/getrandom@0.3.4 | Cargo.lock:45:0 | getrandom | [manifest] locked getrandom 0.3.4; reached via a197 -> pqcrypto-mldsa -> pqcrypto-internals -> getrandom
   occ pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | pqcrypto-internals-0.2.11/Cargo.toml:17:0 | links | [manifest] native library `pqcrypto_internals`; code behind the FFI boundary is not analysed
   occ pqcrypto-mldsa | pkg:cargo/pqcrypto-mldsa@0.1.2 | Cargo.lock:108:0 | pqcrypto-mldsa | [manifest] locked pqcrypto-mldsa 0.1.2; reached via a197 -> pqcrypto-mldsa
@@ -32,11 +32,11 @@
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:functions:source=observed
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:kb:version=0.2.0
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:occurrences=1
-  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=present
+  prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:reachability=reachable
   prop OS-RNG | crypto:algorithm:OS-RNG | rcbom:registry-name=unmatched
   prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:scope=required
-  prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:usage=present
+  prop getrandom | pkg:cargo/getrandom@0.3.4 | rcbom:usage=reachable
   prop pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | rcbom:ffi-boundary=true
   prop pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | rcbom:native-links=pqcrypto_internals
   prop pqcrypto-internals | pkg:cargo/pqcrypto-internals@0.2.11 | rcbom:scope=required
@@ -82,11 +82,11 @@ provides pkg:cargo/pqcrypto-mldsa@0.1.2 -> crypto:algorithm:ML-DSA-87
 root {"bom-ref": "pkg:cargo/a197@0.1.0", "name": "a197", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/a197@0.1.0", "type": "application", "version": "0.1.0"}
 run rcbom:kb:version=0.2.0
 run rcbom:run:artifact=bin a197
-run rcbom:run:boundary-check=12 calls into crypto packages: 8 cited, 0 cited by the check as unknown, 4 excused (accessor 2, encoding 1, format 1)
+run rcbom:run:boundary-check=14 calls into crypto packages: 9 cited, 0 cited by the check as unknown, 5 excused (accessor 2, encoding 1, format 2)
 run rcbom:run:features=
 run rcbom:run:packages=15
 run rcbom:run:profile=release
-run rcbom:run:reachable-instances=41
+run rcbom:run:reachable-instances=50
 run rcbom:run:sandbox=none (draft: run only on trusted code)
 run rcbom:run:target=x86_64-unknown-linux-gnu
 run rcbom:run:toolchain=nightly-2026-09-25
