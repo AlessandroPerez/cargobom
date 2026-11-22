@@ -1,0 +1,680 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/getrandom@0.2.17",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked getrandom 0.2.17; reached via verify-56 -> ring -> getrandom",
+            "line": 28,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "getrandom"
+          }
+        ]
+      },
+      "name": "getrandom",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "present"
+        }
+      ],
+      "purl": "pkg:cargo/getrandom@0.2.17",
+      "type": "library",
+      "version": "0.2.17"
+    },
+    {
+      "bom-ref": "pkg:cargo/ring@0.17.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by verify-56 (dependencies)",
+            "line": 15,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] locked ring 0.17.14; reached via verify-56 -> ring",
+            "line": 45,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "ring"
+          },
+          {
+            "additionalContext": "[manifest] native library `ring_core_0_17_14_`; code behind the FFI boundary is not analysed",
+            "line": 18,
+            "location": "ring-0.17.14/Cargo.toml",
+            "offset": 0,
+            "symbol": "links"
+          }
+        ]
+      },
+      "name": "ring",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:native-links",
+          "value": "ring_core_0_17_14_"
+        },
+        {
+          "name": "rcbom:ffi-boundary",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/ring@0.17.14",
+      "type": "library",
+      "version": "0.17.14"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-256-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "verify"
+          ],
+          "ellipticCurve": "nist/P-256",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in verify_56::verify_with::<..>; new: setup, not a use; algorithm one of 4 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_ASN1; member: caller, passed by `verify_56::verify`; public-key: hard-coded (3 bytes, literal at line 46) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of verify_56::verify); owner at src/main.rs:10:3-10:14 within 10:0-19:1; instantiated by verify_56::verify at src/main.rs:33:12 as `verify_with` (call, to 33:23 as `verify_with` line #1769c5c6, caller at src/main.rs:21:7-21:13 within 21:0-36:1); `verify_56::verify_with::<..>` instantiated by verify_56::verify at src/main.rs:30:12 as `verify_with` (call, to 30:23 as `verify_with` line #4f76e957, caller at src/main.rs:21:7-21:13 within 21:0-36:1); owner `verify_56::verify_with::<ring::rsa::RsaParameters>` at src/main.rs:10:3-10:14 within 10:0-19:1; `verify_56::verify_with::<ring::rsa::RsaParameters>` instantiated by verify_56::verify at src/main.rs:24:12 as `verify_with` (call, to 24:23 as `verify_with` line #76221a44, caller at src/main.rs:21:7-21:13 within 21:0-36:1); line: `signature::UnparsedPublicKey::new(algorithm, key)`; code: `signature::UnparsedPublicKey::new`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in verify_56::verify_with::<..>; use: verify; algorithm one of 4 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_ASN1; member: caller, passed by `verify_56::verify`; owner at src/main.rs:10:3-10:14 within 10:0-19:1; instantiated by verify_56::verify at src/main.rs:33:12 as `verify_with` (call, to 33:23 as `verify_with` line #1769c5c6, caller at src/main.rs:21:7-21:13 within 21:0-36:1); `verify_56::verify_with::<..>` instantiated by verify_56::verify at src/main.rs:30:12 as `verify_with` (call, to 30:23 as `verify_with` line #4f76e957, caller at src/main.rs:21:7-21:13 within 21:0-36:1); owner `verify_56::verify_with::<ring::rsa::RsaParameters>` at src/main.rs:10:3-10:14 within 10:0-19:1; `verify_56::verify_with::<ring::rsa::RsaParameters>` instantiated by verify_56::verify at src/main.rs:24:12 as `verify_with` (call, to 24:23 as `verify_with` line #76221a44, caller at src/main.rs:21:7-21:13 within 21:0-36:1); line: `.verify(msg, sig)`; code: `verify`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
+          },
+          {
+            "additionalContext": "[reachable] [static] in verify_56::verify; owner at src/main.rs:21:7-21:13 within 21:0-36:1; line: `verify_with(key, msg, sig, &signature::ECDSA_P256_SHA256_ASN1)`; code: `signature::ECDSA_P256_SHA256_ASN1`",
+            "line": 27,
+            "location": "src/main.rs",
+            "offset": 40,
+            "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_ASN1"
+          }
+        ]
+      },
+      "name": "ECDSA-P-256-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:public-key",
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:ECDSA-P-384-SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "ECDSA",
+          "cryptoFunctions": [
+            "verify"
+          ],
+          "ellipticCurve": "nist/P-384",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in verify_56::verify_with::<..>; new: setup, not a use; algorithm one of 4 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1; member: caller, passed by `verify_56::verify`; public-key: hard-coded (3 bytes, literal at line 46) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of verify_56::verify); owner at src/main.rs:10:3-10:14 within 10:0-19:1; instantiated by verify_56::verify at src/main.rs:33:12 as `verify_with` (call, to 33:23 as `verify_with` line #1769c5c6, caller at src/main.rs:21:7-21:13 within 21:0-36:1); `verify_56::verify_with::<..>` instantiated by verify_56::verify at src/main.rs:30:12 as `verify_with` (call, to 30:23 as `verify_with` line #4f76e957, caller at src/main.rs:21:7-21:13 within 21:0-36:1); owner `verify_56::verify_with::<ring::rsa::RsaParameters>` at src/main.rs:10:3-10:14 within 10:0-19:1; `verify_56::verify_with::<ring::rsa::RsaParameters>` instantiated by verify_56::verify at src/main.rs:24:12 as `verify_with` (call, to 24:23 as `verify_with` line #76221a44, caller at src/main.rs:21:7-21:13 within 21:0-36:1); line: `signature::UnparsedPublicKey::new(algorithm, key)`; code: `signature::UnparsedPublicKey::new`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in verify_56::verify_with::<..>; use: verify; algorithm one of 4 that may reach the call from other functions: ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1; member: caller, passed by `verify_56::verify`; owner at src/main.rs:10:3-10:14 within 10:0-19:1; instantiated by verify_56::verify at src/main.rs:33:12 as `verify_with` (call, to 33:23 as `verify_with` line #1769c5c6, caller at src/main.rs:21:7-21:13 within 21:0-36:1); `verify_56::verify_with::<..>` instantiated by verify_56::verify at src/main.rs:30:12 as `verify_with` (call, to 30:23 as `verify_with` line #4f76e957, caller at src/main.rs:21:7-21:13 within 21:0-36:1); owner `verify_56::verify_with::<ring::rsa::RsaParameters>` at src/main.rs:10:3-10:14 within 10:0-19:1; `verify_56::verify_with::<ring::rsa::RsaParameters>` instantiated by verify_56::verify at src/main.rs:24:12 as `verify_with` (call, to 24:23 as `verify_with` line #76221a44, caller at src/main.rs:21:7-21:13 within 21:0-36:1); line: `.verify(msg, sig)`; code: `verify`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
+          },
+          {
+            "additionalContext": "[reachable] [static] in verify_56::verify; owner at src/main.rs:21:7-21:13 within 21:0-36:1; line: `verify_with(key, msg, sig, &signature::ECDSA_P384_SHA384_ASN1)`; code: `signature::ECDSA_P384_SHA384_ASN1`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 40,
+            "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1"
+          }
+        ]
+      },
+      "name": "ECDSA-P-384-SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:public-key",
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:Ed25519",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "EdDSA",
+          "cryptoFunctions": [
+            "verify"
+          ],
+          "ellipticCurve": "other/Ed25519",
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in verify_56::verify_with::<..>; new: setup, not a use; algorithm one of 4 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; member: caller, passed by `verify_56::verify`; public-key: hard-coded (3 bytes, literal at line 46) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of verify_56::verify); owner at src/main.rs:10:3-10:14 within 10:0-19:1; instantiated by verify_56::verify at src/main.rs:33:12 as `verify_with` (call, to 33:23 as `verify_with` line #1769c5c6, caller at src/main.rs:21:7-21:13 within 21:0-36:1); `verify_56::verify_with::<..>` instantiated by verify_56::verify at src/main.rs:30:12 as `verify_with` (call, to 30:23 as `verify_with` line #4f76e957, caller at src/main.rs:21:7-21:13 within 21:0-36:1); owner `verify_56::verify_with::<ring::rsa::RsaParameters>` at src/main.rs:10:3-10:14 within 10:0-19:1; `verify_56::verify_with::<ring::rsa::RsaParameters>` instantiated by verify_56::verify at src/main.rs:24:12 as `verify_with` (call, to 24:23 as `verify_with` line #76221a44, caller at src/main.rs:21:7-21:13 within 21:0-36:1); line: `signature::UnparsedPublicKey::new(algorithm, key)`; code: `signature::UnparsedPublicKey::new`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in verify_56::verify_with::<..>; use: verify; algorithm one of 4 that may reach the call from other functions: ring::ec::curve25519::ed25519::verification::ED25519; member: caller, passed by `verify_56::verify`; owner at src/main.rs:10:3-10:14 within 10:0-19:1; instantiated by verify_56::verify at src/main.rs:33:12 as `verify_with` (call, to 33:23 as `verify_with` line #1769c5c6, caller at src/main.rs:21:7-21:13 within 21:0-36:1); `verify_56::verify_with::<..>` instantiated by verify_56::verify at src/main.rs:30:12 as `verify_with` (call, to 30:23 as `verify_with` line #4f76e957, caller at src/main.rs:21:7-21:13 within 21:0-36:1); owner `verify_56::verify_with::<ring::rsa::RsaParameters>` at src/main.rs:10:3-10:14 within 10:0-19:1; `verify_56::verify_with::<ring::rsa::RsaParameters>` instantiated by verify_56::verify at src/main.rs:24:12 as `verify_with` (call, to 24:23 as `verify_with` line #76221a44, caller at src/main.rs:21:7-21:13 within 21:0-36:1); line: `.verify(msg, sig)`; code: `verify`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
+          },
+          {
+            "additionalContext": "[reachable] [static] in verify_56::verify; owner at src/main.rs:21:7-21:13 within 21:0-36:1; line: `verify_with(key, msg, sig, &signature::ED25519)`; code: `signature::ED25519`",
+            "line": 33,
+            "location": "src/main.rs",
+            "offset": 40,
+            "symbol": "ring::ec::curve25519::ed25519::verification::ED25519"
+          }
+        ]
+      },
+      "name": "Ed25519",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:public-key",
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "RSASSA-PKCS1",
+          "cryptoFunctions": [
+            "verify"
+          ],
+          "primitive": "signature"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in verify_56::verify_with::<..>; new: setup, not a use; algorithm one of 4 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: caller, passed by `verify_56::verify`; public-key: hard-coded (3 bytes, literal at line 46) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of verify_56::verify); owner at src/main.rs:10:3-10:14 within 10:0-19:1; instantiated by verify_56::verify at src/main.rs:33:12 as `verify_with` (call, to 33:23 as `verify_with` line #1769c5c6, caller at src/main.rs:21:7-21:13 within 21:0-36:1); `verify_56::verify_with::<..>` instantiated by verify_56::verify at src/main.rs:30:12 as `verify_with` (call, to 30:23 as `verify_with` line #4f76e957, caller at src/main.rs:21:7-21:13 within 21:0-36:1); owner `verify_56::verify_with::<ring::rsa::RsaParameters>` at src/main.rs:10:3-10:14 within 10:0-19:1; `verify_56::verify_with::<ring::rsa::RsaParameters>` instantiated by verify_56::verify at src/main.rs:24:12 as `verify_with` (call, to 24:23 as `verify_with` line #76221a44, caller at src/main.rs:21:7-21:13 within 21:0-36:1); line: `signature::UnparsedPublicKey::new(algorithm, key)`; code: `signature::UnparsedPublicKey::new`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in verify_56::verify_with::<..>; use: verify; algorithm one of 4 that may reach the call from other functions: ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256; member: caller, passed by `verify_56::verify`; owner at src/main.rs:10:3-10:14 within 10:0-19:1; instantiated by verify_56::verify at src/main.rs:33:12 as `verify_with` (call, to 33:23 as `verify_with` line #1769c5c6, caller at src/main.rs:21:7-21:13 within 21:0-36:1); `verify_56::verify_with::<..>` instantiated by verify_56::verify at src/main.rs:30:12 as `verify_with` (call, to 30:23 as `verify_with` line #4f76e957, caller at src/main.rs:21:7-21:13 within 21:0-36:1); owner `verify_56::verify_with::<ring::rsa::RsaParameters>` at src/main.rs:10:3-10:14 within 10:0-19:1; `verify_56::verify_with::<ring::rsa::RsaParameters>` instantiated by verify_56::verify at src/main.rs:24:12 as `verify_with` (call, to 24:23 as `verify_with` line #76221a44, caller at src/main.rs:21:7-21:13 within 21:0-36:1); line: `.verify(msg, sig)`; code: `verify`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
+          },
+          {
+            "additionalContext": "[reachable] [static] in verify_56::verify; owner at src/main.rs:21:7-21:13 within 21:0-36:1; line: `verify_with(key, msg, sig, &signature::RSA_PKCS1_2048_8192_SHA256)`; code: `signature::RSA_PKCS1_2048_8192_SHA256`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 40,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256"
+          }
+        ]
+      },
+      "name": "RSA-PKCS1-1.5-SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:provenance:public-key",
+          "value": "hard-coded,parameter"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in verify_56::verify; part of RSA-PKCS1-1.5-SHA-256 (ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256 -> ring::digest::SHA256); owner at src/main.rs:21:7-21:13 within 21:0-36:1; line: `verify_with(key, msg, sig, &signature::RSA_PKCS1_2048_8192_SHA256)`; code: `signature::RSA_PKCS1_2048_8192_SHA256`",
+            "line": 24,
+            "location": "src/main.rs",
+            "offset": 40,
+            "symbol": "ring::rsa::verification::RSA_PKCS1_2048_8192_SHA256"
+          },
+          {
+            "additionalContext": "[reachable] [component] in verify_56::verify; part of ECDSA-P-256-SHA-256 (ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_ASN1 -> ring::digest::SHA256); owner at src/main.rs:21:7-21:13 within 21:0-36:1; line: `verify_with(key, msg, sig, &signature::ECDSA_P256_SHA256_ASN1)`; code: `signature::ECDSA_P256_SHA256_ASN1`",
+            "line": 27,
+            "location": "src/main.rs",
+            "offset": 40,
+            "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P256_SHA256_ASN1"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in verify_56::verify; part of ECDSA-P-384-SHA-384 (ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1 -> ring::digest::SHA384); owner at src/main.rs:21:7-21:13 within 21:0-36:1; line: `verify_with(key, msg, sig, &signature::ECDSA_P384_SHA384_ASN1)`; code: `signature::ECDSA_P384_SHA384_ASN1`",
+            "line": 30,
+            "location": "src/main.rs",
+            "offset": 40,
+            "symbol": "ring::ec::suite_b::ecdsa::verification::ECDSA_P384_SHA384_ASN1"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [component] in verify_56::verify_with::<..>; part of Ed25519; owner at src/main.rs:10:3-10:14 within 10:0-19:1; instantiated by verify_56::verify at src/main.rs:33:12 as `verify_with` (call, to 33:23 as `verify_with` line #1769c5c6, caller at src/main.rs:21:7-21:13 within 21:0-36:1); `verify_56::verify_with::<..>` instantiated by verify_56::verify at src/main.rs:30:12 as `verify_with` (call, to 30:23 as `verify_with` line #4f76e957, caller at src/main.rs:21:7-21:13 within 21:0-36:1); owner `verify_56::verify_with::<ring::rsa::RsaParameters>` at src/main.rs:10:3-10:14 within 10:0-19:1; `verify_56::verify_with::<ring::rsa::RsaParameters>` instantiated by verify_56::verify at src/main.rs:24:12 as `verify_with` (call, to 24:23 as `verify_with` line #76221a44, caller at src/main.rs:21:7-21:13 within 21:0-36:1); line: `.verify(msg, sig)`; code: `verify`",
+            "line": 17,
+            "location": "src/main.rs",
+            "offset": 9,
+            "symbol": "ring::signature::UnparsedPublicKey::<B>::verify"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "knowledge-base"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:only-as-component",
+          "value": "true"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/getrandom@0.2.17"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/getrandom@0.2.17"
+      ],
+      "provides": [
+        "crypto:algorithm:ECDSA-P-256-SHA-256",
+        "crypto:algorithm:ECDSA-P-384-SHA-384",
+        "crypto:algorithm:Ed25519",
+        "crypto:algorithm:RSA-PKCS1-1.5-SHA-256",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "pkg:cargo/ring@0.17.14"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/ring@0.17.14"
+      ],
+      "ref": "pkg:cargo/verify-56@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-256-SHA-256"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-384"
+      ],
+      "ref": "crypto:algorithm:ECDSA-P-384-SHA-384"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "crypto:algorithm:Ed25519"
+    },
+    {
+      "dependsOn": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "crypto:algorithm:RSA-PKCS1-1.5-SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/verify-56@0.1.0",
+      "name": "verify-56",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/verify-56@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "126"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin verify-56"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "2 calls into crypto packages: 2 cited, 0 cited by the check as unknown, 0 excused ()"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:21dfdd8c-e6a7-8052-bedb-06d6314b3942",
+  "specVersion": "1.7",
+  "version": 1
+}

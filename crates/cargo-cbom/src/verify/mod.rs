@@ -615,6 +615,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         graph,
         inst: Vec::new(),
         alg_arg: None,
+        by_value: false,
     };
     let mut bad = 0;
     let mut ranged = 0;
@@ -981,6 +982,9 @@ struct Files<'a> {
     inst: Vec<(String, String)>,
     /// the argument of the occurrence's call that carries the algorithm (`alg_arg`)
     alg_arg: Option<usize>,
+    /// The occurrence being checked has its algorithm from a value that reaches the call from
+    /// other functions (or is a part of one that has): no instance's arguments choose it.
+    by_value: bool,
 }
 
 /// The parts of an occurrence's context: the leading `[..]` tags, the details, and the source

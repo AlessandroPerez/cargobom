@@ -311,6 +311,29 @@ impl Files<'_> {
             let item = item.unwrap_or(head);
             owner_plain &= self.check_item_at(&w, item, (&path, line, Some(offset)), None)?;
         }
+        // (an algorithm a value brings to the call from other functions is whichever of them
+        // reaches it, in every instance of the function: the arguments of the call that makes
+        // an instance do not choose it. So for a part of such an algorithm, cited at the
+        // same position: the SHA-512 of the Ed25519 that is one of nine descriptors passed to
+        // `verify_with::<A>`, three instances)
+        self.by_value = {
+            let flows = |c: &str| {
+                c.contains(" reach the call from other functions") || c.contains("; member: ")
+            };
+            let whole = re!(r"\] \[component\] .*?; part of ([^;(]+?)(?: \(|;|$)")
+                .captures(&o.context)
+                .map(|m| m[1].trim().to_string());
+            flows(&o.context)
+                || whole.is_some_and(|w| {
+                    self.at_pos
+                        .get(&(o.location.clone(), line, offset))
+                        .is_some_and(|v| {
+                            v.iter().any(|&j| {
+                                self.occs[j].component == w && flows(&self.occs[j].context)
+                            })
+                        })
+                })
+        };
         // the positions the details name: where a generic instance was instantiated, where a
         // macro's code was written
         self.check_details(
@@ -1536,6 +1559,7 @@ impl Files<'_> {
             // asset's primitive (constructors, and the components cited with them), this asset
             // is among them (not the next line's `HmacSha512`)
             if let (Some(_), Some(c0)) = (&caller, col)
+                && !self.by_value
                 && callee
                     .as_deref()
                     .is_some_and(|p| p.trim_end().ends_with("::<..>"))

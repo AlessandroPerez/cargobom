@@ -1,0 +1,15 @@
+# A generic function with an instance for each kind of descriptor, called once for each
+# descriptor: every descriptor reaches the call inside it by its value, whichever the instance,
+# and a descriptor's part (the SHA-512 of Ed25519) is cited there with the chains of all the
+# instances. The verifier read the arguments of the call that makes an instance as choosing the
+# algorithm, as a constructor among them would (`A::hash(HmacSha256::new(k), d)`), and rejected
+# the part where another call names another descriptor's hash (shin 0.17.0: the SHA-512 of
+# Ed25519 under the call passing `ECDSA_P384_SHA384_ASN1`). An algorithm a value brings from
+# other functions, or a part of one, is not held to what one instance's call sets up.
+[package]
+name = "verify-56"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ring = "=0.17.14"
