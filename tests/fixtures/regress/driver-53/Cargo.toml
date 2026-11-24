@@ -1,0 +1,15 @@
+# Code on one long line: a table a build writes into a file, every entry a call, the file one
+# line (libsecp256k1's precomputed points: 49,152 calls on a line of 4.7 MB, under
+# waffles-solana-sdk). Every site carried the text of its line and every position was looked up
+# through the compiler's display column, which reads the line up to it: the driver held a
+# megabyte more for each call, 13 GB after two minutes, and the machine stopped the run. What a
+# site records is bounded: a line longer than 4096 bytes is not carried, and positions are read
+# from the file's line table. Here `src/table.rs` is one line of 150 SHA-256 calls: each is
+# cited at its column with the text there, without its line, and the verifier holds it to both.
+[package]
+name = "driver-53"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"

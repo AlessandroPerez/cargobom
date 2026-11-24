@@ -1426,6 +1426,37 @@ mod tests {
     }
 
     #[test]
+    fn a_long_line_is_carried_around_the_position() {
+        // as the generator writes it (`rcbom_facts::site_line`, by the byte of the position)
+        let half = "let a = f(1); ".repeat(400);
+        let line = format!("{half}é = g(\"é\"); {half}");
+        assert!(line.len() > WHOLE_LINE);
+        for col in [
+            0,
+            7,
+            200,
+            5599,
+            5600,
+            5601,
+            5607,
+            9000,
+            line.chars().count(),
+        ] {
+            let byte = line.char_indices().nth(col).map_or(line.len(), |c| c.0);
+            assert_eq!(
+                carried_line(&line, col),
+                rcbom_facts::site_line(&line, byte)
+            );
+        }
+        assert_ne!(carried_line(&line, 200), carried_line(&line, 201));
+        assert!(carried_line(&line, 5600).is_some_and(|l| l.len() < 400));
+        let short = "    let a = f(1);  ";
+        assert_eq!(carried_line(short, 4).as_deref(), Some("let a = f(1);"));
+        assert_eq!(carried_line(short, 4), rcbom_facts::site_line(short, 4));
+        assert_eq!(carried_line("   ", 0), None);
+    }
+
+    #[test]
     fn an_item_holds_the_file_it_includes() {
         let src = Source::new(
             "fn table() -> T {\n    include!(\"table.rs\")\n}\n// include!(\"note.rs\")\nfn made() -> T {\n    include!(concat!(env!(\"OUT_DIR\"), \"/gen.rs\"))\n}\nfn text() -> &'static str {\n    \"include!(\\\"lit.rs\\\")\"\n}\n",

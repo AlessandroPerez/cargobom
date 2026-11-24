@@ -43,6 +43,38 @@ pub(super) fn first_crate(symbol: &str) -> &str {
         .unwrap_or("");
     first.split(" as ").last().unwrap_or(first)
 }
+/// The longest source line an occurrence carries whole, in bytes.
+pub(super) const WHOLE_LINE: usize = 4096;
+
+/// What an occurrence carries of its source line (`line: `..``): the line without the blanks
+/// around it; of a line longer than `WHOLE_LINE` bytes (a generated table on one line), the 160
+/// bytes to each side of the position, to a whole character, with `…` where the line goes on.
+/// The generator writes it from the compiler's span; another position of a long line has
+/// another. None for a blank line.
+pub(super) fn carried_line(line: &str, col: usize) -> Option<String> {
+    const SIDE: usize = 160;
+    if line.len() <= WHOLE_LINE {
+        let line = line.trim();
+        return (!line.is_empty()).then(|| line.to_string());
+    }
+    let at = line.char_indices().nth(col).map_or(line.len(), |(i, _)| i);
+    let mut lo = at.saturating_sub(SIDE);
+    while !line.is_char_boundary(lo) {
+        lo -= 1;
+    }
+    let mut hi = (at + SIDE).min(line.len());
+    while !line.is_char_boundary(hi) {
+        hi += 1;
+    }
+    let cut = |c: bool| if c { "…" } else { "" };
+    Some(format!(
+        "{}{}{}",
+        cut(lo > 0),
+        &line[lo..hi],
+        cut(hi < line.len())
+    ))
+}
+
 /// The trait of a qualified path, read from after its `<`: `aead::Buffer` of `alloc::vec::
 /// Vec<u8> as aead::Buffer>::extend_from_slice`. None for one that names no trait (`<T>::f`).
 pub(super) fn qualified_trait(q: &str) -> Option<&str> {

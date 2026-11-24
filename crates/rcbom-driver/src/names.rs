@@ -202,6 +202,10 @@ pub(crate) fn span_text(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<Strin
 }
 /// The source line of a span's position (`locate`: the outermost macro call site for code
 /// from a macro), trimmed.
+/// Of a line too long to carry, the text around the position (`rcbom_facts::site_line`): a
+/// generated table may be one line of megabytes holding a call every hundred bytes
+/// (libsecp256k1's precomputed points, 49,152 calls on a line of 4.7 MB), and each site would
+/// carry the line.
 pub(crate) fn line_text(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
     let at = if span.from_expansion() {
         span.source_callsite()
@@ -209,11 +213,67 @@ pub(crate) fn line_text(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<Strin
         span
     };
     let sm = tcx.sess.source_map();
-    let line = sm
-        .span_to_snippet(sm.span_extend_to_line(at.shrink_to_lo()))
-        .ok()?;
-    let line = line.trim();
-    (!line.is_empty()).then(|| line.to_string())
+    let whole = line_span(sm, at.lo())?;
+    let offset = (at.lo() - whole.lo()).0 as usize;
+    // (a `\r` before the line end is not of the line)
+    if (whole.hi() - whole.lo()).0 as usize <= rcbom_facts::MAX_LINE_TEXT + 1 {
+        return rcbom_facts::site_line(&sm.span_to_snippet(whole).ok()?, offset);
+    }
+    // a longer line is read once for the sites on it, which come one after the other
+    thread_local! {
+        static LONG: std::cell::RefCell<Option<(rustc_span::BytePos, std::rc::Rc<str>)>> =
+            const { std::cell::RefCell::new(None) };
+    }
+    let line = LONG.with(|held| {
+        let mut held = held.borrow_mut();
+        if held.as_ref().is_none_or(|(lo, _)| *lo != whole.lo()) {
+            *held = Some((whole.lo(), sm.span_to_snippet(whole).ok()?.into()));
+        }
+        held.as_ref().map(|(_, line)| line.clone())
+    })?;
+    rcbom_facts::site_line(&line, offset)
+}
+/// The source line holding `pos`, without its line end, as a span: its bounds are read from the
+/// file's line table, and no text is (the source map's own `span_extend_to_line` copies the
+/// file from the position on to find them).
+fn line_span(
+    sm: &rustc_span::source_map::SourceMap,
+    pos: rustc_span::BytePos,
+) -> Option<rustc_span::Span> {
+    let file = sm.lookup_source_file(pos);
+    let bounds = file.line_bounds(file.lookup_line(file.relative_position(pos))?);
+    let ends = bounds.end > bounds.start
+        && sm
+            .span_to_snippet(rustc_span::Span::with_root_ctxt(
+                bounds.end - rustc_span::BytePos(1),
+                bounds.end,
+            ))
+            .is_ok_and(|c| c == "\n");
+    let end = if ends {
+        bounds.end - rustc_span::BytePos(1)
+    } else {
+        bounds.end
+    };
+    Some(rustc_span::Span::with_root_ctxt(bounds.start, end))
+}
+/// The line and the column (from 1, in characters) of a position, from the file's line table:
+/// what `SourceMap::span_to_location_info` gives, which also computes a display width by
+/// reading the line up to the position, every time.
+fn line_col(sm: &rustc_span::source_map::SourceMap, pos: rustc_span::BytePos) -> (usize, usize) {
+    use rustc_span::Pos;
+    let file = sm.lookup_source_file(pos);
+    let at = file.relative_position(pos);
+    let line = file.lookup_line(at);
+    let start = line.map_or(rustc_span::RelativeBytePos::from_u32(0), |l| {
+        file.lines()[l]
+    });
+    // (a character of several bytes counts once: the bytes between, less the extra ones)
+    let wide = &file.multibyte_chars;
+    let between =
+        &wide[wide.partition_point(|m| m.pos < start)..wide.partition_point(|m| m.pos < at)];
+    let extra: usize = between.iter().map(|m| usize::from(m.bytes) - 1).sum();
+    let col = at.to_usize() - start.to_usize() - extra + 1;
+    (line.map_or(0, |l| l + 1), col)
 }
 /// For a function a derive generated (its definition is in the derive's expansion), a span of
 /// that expansion to cite its code at: the derive's (`locate` then tags it `[derive ..]`).
@@ -312,10 +372,8 @@ pub(crate) fn span_mark(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<Strin
         return None;
     }
     let sm = tcx.sess.source_map();
-    let line = sm
-        .span_to_snippet(sm.span_extend_to_line(span.shrink_to_lo()))
-        .ok()?;
-    let (_, _, col, _, _) = sm.span_to_location_info(span);
+    let line = sm.span_to_snippet(line_span(sm, span.lo())?).ok()?;
+    let (_, col) = line_col(sm, span.lo());
     Some(rcbom_facts::line_mark(&line, col.saturating_sub(1)))
 }
 /// Every expansion a span is in, innermost first, as the compiler records them.
@@ -495,9 +553,12 @@ pub(super) fn raw_loc(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Loc {
         };
     }
     let sm = tcx.sess.source_map();
-    let (_, line, col, end_line, end_col) = sm.span_to_location_info(span);
+    let (line, col) = line_col(sm, span.lo());
+    let (end_line, end_col) = line_col(sm, span.hi());
+    // (the file's name by the file itself: `span_to_filename` looks the position's column up)
     let mut file = sm
-        .span_to_filename(span)
+        .lookup_source_file(span.lo())
+        .name
         .prefer_local_unconditionally()
         .to_string();
     // The standard library's sources by rustc's own name for them (`/rustc/<commit>/library/..`,

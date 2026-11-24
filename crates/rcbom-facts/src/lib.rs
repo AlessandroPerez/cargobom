@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 45;
+pub const FACTS_VERSION: u32 = 46;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -899,7 +899,8 @@ pub struct Site {
     /// The source line holding the position (for code from a macro, the line of the outermost
     /// call), without its leading and trailing whitespace. Two sites on neighbouring lines can
     /// have the same `text` at the same column (`Ec(kp) => kp.public_key()` above
-    /// `Ed(kp) => kp.public_key()`); their lines tell them apart.
+    /// `Ed(kp) => kp.public_key()`); their lines tell them apart. Of a line too long to carry,
+    /// the text around the position (`site_line`).
     #[serde(default)]
     pub line_text: Option<String>,
     pub expansion: Option<Expansion>,
@@ -1090,6 +1091,42 @@ pub struct ViaStep {
     /// The fingerprint of `span`'s start in its line (`line_mark`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mark: Option<String>,
+}
+
+/// The longest source line a site carries whole (`Site::line_text`), in bytes: what a site
+/// records is bounded, whatever the file. Code is written in lines far shorter; a line longer
+/// than this is generated data (a table of megabytes on one line, a call every hundred bytes).
+pub const MAX_LINE_TEXT: usize = 4096;
+/// What a site carries of a longer line: this many bytes to each side of its position.
+pub const LINE_WINDOW: usize = 160;
+
+/// What a site carries of its source line (`Site::line_text`), and what the verifier holds the
+/// line it reads to. `line` is the line without its line end, `at` the byte of it the site's
+/// position is at. It is the line without the blanks around it; of a line longer than
+/// `MAX_LINE_TEXT` bytes, the text `LINE_WINDOW` bytes to each side of the position (to a whole
+/// character), with `…` at a side where the line goes on. None for a blank line.
+pub fn site_line(line: &str, at: usize) -> Option<String> {
+    let line = line.strip_suffix('\r').unwrap_or(line);
+    if line.len() <= MAX_LINE_TEXT {
+        let line = line.trim();
+        return (!line.is_empty()).then(|| line.to_string());
+    }
+    let at = at.min(line.len());
+    let mut lo = at.saturating_sub(LINE_WINDOW);
+    while !line.is_char_boundary(lo) {
+        lo -= 1;
+    }
+    let mut hi = (at + LINE_WINDOW).min(line.len());
+    while !line.is_char_boundary(hi) {
+        hi += 1;
+    }
+    let cut = |c: bool| if c { "…" } else { "" };
+    Some(format!(
+        "{}{}{}",
+        cut(lo > 0),
+        &line[lo..hi],
+        cut(hi < line.len())
+    ))
 }
 
 /// A short fingerprint of a position in its source line, for a detail to hold where the line
@@ -1395,7 +1432,34 @@ pub struct PtaArg {
 
 #[cfg(test)]
 mod tests {
-    use super::fragment_path;
+    use super::{LINE_WINDOW, MAX_LINE_TEXT, fragment_path, site_line};
+
+    #[test]
+    fn a_long_line_is_carried_around_the_position() {
+        assert_eq!(
+            site_line("  let a = f(x);  \r", 10).as_deref(),
+            Some("let a = f(x);")
+        );
+        assert_eq!(site_line("   \r", 0), None);
+        // 0123456789 repeated, a two-byte character in the middle
+        let half = "0123456789".repeat(MAX_LINE_TEXT / 10);
+        let line = format!("{half}é{half}");
+        let at = half.len() + 2 + 300;
+        let shown = site_line(&line, at).unwrap();
+        assert_eq!(shown.len(), 2 * LINE_WINDOW + 2 * "…".len());
+        assert!(shown.starts_with('…') && shown.ends_with('…'));
+        assert_eq!(
+            &shown["…".len()..][LINE_WINDOW..LINE_WINDOW + 4],
+            &line[at..at + 4]
+        );
+        // at an end of the line nothing is cut there; a cut inside a character takes it whole
+        assert!(!site_line(&line, 5).unwrap().starts_with('…'));
+        assert!(!site_line(&line, line.len()).unwrap().ends_with('…'));
+        let inside = site_line(&line, half.len() + 1 + LINE_WINDOW).unwrap();
+        assert!(inside.starts_with("…é"));
+        // another position of the same line is another text
+        assert_ne!(site_line(&line, at), site_line(&line, at + 1));
+    }
 
     #[test]
     fn a_path_from_a_fragment_is_at_its_own_writing() {

@@ -264,6 +264,14 @@ impl Files<'_> {
                 (g.len() == args.len()).then(|| g.into_iter().zip(args).collect())
             })
             .unwrap_or_default();
+        // (what a message quotes of the line: of one too long to carry, as the generator, the
+        // text around the position)
+        let carried = carried_line(&text, offset);
+        let text = if text.len() > WHOLE_LINE {
+            carried.clone().unwrap_or_default()
+        } else {
+            text
+        };
         // code positions are in code, not in a comment or a literal
         if src.class[line - 1].get(offset) != Some(&Class::Code) {
             return Err(format!("position inside a comment or literal in {text:?}"));
@@ -274,7 +282,7 @@ impl Files<'_> {
         let Some(l) = ctx.line else {
             return Err("no source line recorded".into());
         };
-        if text.trim() != l {
+        if carried.as_deref() != Some(l) {
             return Err(format!("expected the line `{l}`, found {text:?}"));
         }
         if let Some(code) = ctx.code
