@@ -205,7 +205,8 @@
 //!   function writes) are checked against the call's code only where the call reads no field.
 //!   A `dyn` member is checked to be at a call on an object of its trait (where the receivers'
 //!   types are known), not on the object the coerced value reaches: moved to a call on another
-//!   object of the same trait, it is accepted.
+//!   object of the same trait, it is accepted. At a path called with no argument (`<dyn Tr>::
+//!   f()`) it is a mismatch: such a call has no receiver and no value an object could be.
 //! - Witness functions are checked in the build's packages, not the standard library's, and by
 //!   what their bodies name and their signatures can carry, not by whether the call's value
 //!   comes through them.
@@ -1422,6 +1423,32 @@ mod tests {
             first_crate("<dyn digest::DynDigest as Clone>::clone"),
             "digest"
         );
+    }
+
+    #[test]
+    fn a_path_called_with_no_argument_has_no_object() {
+        let src = Source::new(
+            "fn f(h: &mut dyn Enc) {\n    let a = <dyn Enc>::invalid();\n    let b = <dyn Enc>::wrap(h);\n    h.reset();\n    let c = made ::<u8> ( );\n    (h.run)();\n    let d = Enc::name;\n}\n",
+            true,
+            false,
+        );
+        let at = |needle: &str| {
+            let (l, c) = src
+                .lines
+                .iter()
+                .enumerate()
+                .find_map(|(l, text)| text.find(needle).map(|c| (l + 1, c)))
+                .unwrap();
+            src.idx((l, c))
+        };
+        assert!(call_of_no_value(&src, at("<dyn Enc>::invalid")));
+        assert!(call_of_no_value(&src, at("made")));
+        // an argument may be the object; a method's receiver is
+        assert!(!call_of_no_value(&src, at("<dyn Enc>::wrap")));
+        assert!(!call_of_no_value(&src, at("reset")));
+        // not a path and its arguments: a call through a field, a function named as a value
+        assert!(!call_of_no_value(&src, at("(h.run)")));
+        assert!(!call_of_no_value(&src, at("Enc::name")));
     }
 
     #[test]

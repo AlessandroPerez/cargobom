@@ -916,13 +916,11 @@ pub(super) fn variant_field(
         .get(idx)
         .map(|f| f.trim().trim_start_matches("pub").trim().to_string())
 }
-/// The traits of the trait objects the call at `p` calls methods on (`digest(g.alg(), d)` with
-/// `g: Box<dyn Gen>`: `Gen`), in its arguments and receiver: None where it calls none, or one on
-/// a value whose type the code does not say (a type parameter's, a call's not followed).
-pub(super) fn call_dyn_receivers(src: &Source, p: usize) -> Option<Vec<String>> {
-    let s = &src.code;
+/// The parentheses of the call written from `p` (`<dyn Tr>::f(..)`, `a::b::<T>(..)`, a method's
+/// name and its arguments): the indexes of its `(` and `)`.
+fn written_call(s: &[char], p: usize) -> Option<(usize, usize)> {
     let mut j = p;
-    let end = loop {
+    loop {
         j = skip_blank(s, j);
         if word_start(s, j) {
             j += word_of(s, j).chars().count();
@@ -932,11 +930,27 @@ pub(super) fn call_dyn_receivers(src: &Source, p: usize) -> Option<Vec<String>> 
             let cls = vec![Class::Code; s.len() - j];
             j += skip_angle(&s[j..], &cls, 0)?;
         } else if s.get(j) == Some(&'(') {
-            break close_of_at(s, j)?;
+            return Some((j, close_of_at(s, j)?));
         } else {
             return None;
         }
-    };
+    }
+}
+/// Whether the call at `p` is a path called with no argument (`<dyn MessageEncrypter>::
+/// invalid()`): it has no receiver, and no value a trait object could be. Not a method's call
+/// (`x.f()`, whose receiver is before it), nor what is not written as a path and its arguments.
+pub(super) fn call_of_no_value(src: &Source, p: usize) -> bool {
+    let s = &src.code;
+    !before_blank(s, p).is_some_and(|d| s[d] == '.')
+        && written_call(s, p)
+            .is_some_and(|(open, close)| open > p && skip_blank(s, open + 1) == close)
+}
+/// The traits of the trait objects the call at `p` calls methods on (`digest(g.alg(), d)` with
+/// `g: Box<dyn Gen>`: `Gen`), in its arguments and receiver: None where it calls none, or one on
+/// a value whose type the code does not say (a type parameter's, a call's not followed).
+pub(super) fn call_dyn_receivers(src: &Source, p: usize) -> Option<Vec<String>> {
+    let s = &src.code;
+    let (_, end) = written_call(s, p)?;
     let start = before_blank(s, p)
         .filter(|&d| s[d] == '.')
         .and_then(|dot| receiver_at(s, dot).map(|(r, _, _)| r))

@@ -803,6 +803,14 @@ impl Files<'_> {
                 && let Some(at) = call_at
                 && !ctx.details.contains("that may reach the call from other functions")
             {
+                // (an object is the call's receiver or among what its arguments read: a path
+                // called with no argument has neither, `<dyn MessageEncrypter>::invalid()`)
+                if call_of_no_value(&src, src.idx(at)) {
+                    return Err(format!(
+                        "the call has no receiver and no argument: no `{}` is at it",
+                        m[2].trim()
+                    ));
+                }
                 // (a member no descriptor names is the type made the object: the knowledge
                 // base names that type as this asset, `receiver: one of 2 types the build makes
                 // a `dyn DynDigest` of` with a `Sha256`)
