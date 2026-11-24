@@ -13,6 +13,13 @@ reports:
   key material comes from
   (hard-coded, environment, RNG, a parameter, derived), with findings such as
   `hard-coded-key`;
+- how each algorithm stands against a quantum computer, where NIST says it:
+  `nistQuantumSecurityLevel` is the security category of NIST IR 8547 (October 2026), 1 to 5,
+  or 0 where none is met (RSA, ECDSA, EdDSA, ECDH and X25519, which Shor's algorithm breaks;
+  SHA-1 and the 224-bit hashes), with the table it comes from. An algorithm the report's tables
+  do not name (HMAC, HKDF, ChaCha20-Poly1305, Argon2, MD5) has no level, which is not level 0.
+  The run lists the level-0 algorithms on one line: where a move to post-quantum cryptography
+  starts;
 - what it cannot tell: an operation whose algorithm is not determined is reported as `unknown`,
   with the reason, never dropped; when several algorithms may reach one call, each says how
   (`one of N`, `possible`, `selector: configuration` for a run-time choice).
@@ -58,7 +65,8 @@ cargo cbom
   and a witness. Key-material arguments are classified by the knowledge base's sources.
 - **The knowledge base** (`crates/rcbom-kb/data/seed.toml`) is data: crates and their roles, types, statics and
   functions that are algorithms, operations, uses, argument roles, provenance sources,
-  boundary models, and the calls that are no operation (`[[aside]]`).
+  boundary models, the calls that are no operation (`[[aside]]`), and the NIST security
+  category of each algorithm that NIST IR 8547 gives one (`[[quantum]]`).
 - **The boundary check** accounts for every call the walked code makes into a crypto package,
   by the function it resolves to (and for those the standard library makes on its behalf, and
   those of a library's generic functions): each is cited by an occurrence of that call, or needs
@@ -721,6 +729,14 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   derivation and XOF output. A library's generic API that sibling binaries instantiate gets no
   "callers choose" unknown for the library itself.
 - *Parameters.* `rcbom:param:*` properties are not scored against the labels' `params`.
+- *Quantum security level.* `nistQuantumSecurityLevel` is what the tables of NIST IR 8547 state
+  for the algorithm's name, and nothing is derived beyond them. It is not weighed against what
+  the name does not say: the random generator behind ML-DSA-44 (category 1, not 2, with one of
+  less than 192 bits), the output length asked of a SHAKE, how a hash is used (the level is its
+  collision category; the preimage category is in `rcbom:quantum-level:source`). An algorithm
+  built on one that has a level (HMAC-SHA-256, HKDF, AES-CMAC) has none of its own, nor has one
+  outside NIST's standards (ChaCha20-Poly1305, BLAKE3, Argon2), and X25519 is level 0 as the
+  elliptic-curve Diffie-Hellman it is, though the report's table names the NIST scheme.
 - *The verifier* is independent of the analysis, not of the compiler. Where code is (the item
   around a position, the macros that write it, what a step of an instantiation chain is,
   where a value becomes a trait object) it takes from the compiler's record in the CBOM and
