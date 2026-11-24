@@ -122,6 +122,7 @@ pub(crate) fn resolve(
                             method,
                             self_ty,
                             args,
+                            takes_self,
                             ..
                         } = &v.target
                         else {
@@ -139,6 +140,7 @@ pub(crate) fn resolve(
                                 arg_lens: arg_lens.clone(),
                                 through: Some(at.clone()),
                                 value: false,
+                                takes_self: *takes_self,
                             },
                             ..s.clone()
                         });

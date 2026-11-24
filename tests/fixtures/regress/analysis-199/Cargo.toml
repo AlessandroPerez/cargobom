@@ -1,0 +1,16 @@
+# A function of a trait object type that takes no receiver: rustls's `<dyn MessageEncrypter>::
+# invalid()`, which its record layer calls to start with. A call whose function belongs to a
+# trait object was read as a call on one, its receiver one of the types the build coerces to
+# the object: under rustls-pure, whose own `Crypter<AesGcm<Aes128, ..>>` is such a type, the
+# call was cited for AES-128-GCM, AES-256-GCM and ChaCha20-Poly1305, six positions that use
+# none of them (and that the verifier rejected, not reading the path). No object is at such a
+# call; the facts say whether a function takes `self`, and only one that does has a receiver.
+# The program's own call on the object, `enc.encrypt(..)`, is one and stays cited.
+[package]
+name = "analysis-199"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aes-gcm = "0.10"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std"] }

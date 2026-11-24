@@ -1388,6 +1388,26 @@ mod tests {
     }
 
     #[test]
+    fn the_crate_a_symbol_starts_in() {
+        assert_eq!(first_crate("sha2::Sha256::new"), "sha2");
+        assert_eq!(first_crate("<t14::S384 as t14::Scheme>::ALG"), "t14");
+        assert_eq!(
+            first_crate("<&mut aes::Aes128 as cipher::BlockEncrypt>::f"),
+            "aes"
+        );
+        assert_eq!(
+            first_crate("<D as digest::digest::Digest>::update"),
+            "digest"
+        );
+        let object = "<(dyn rustls::crypto::cipher::MessageEncrypter + 'static)>::invalid";
+        assert_eq!(first_crate(object), "rustls");
+        assert_eq!(
+            first_crate("<dyn digest::DynDigest as Clone>::clone"),
+            "digest"
+        );
+    }
+
+    #[test]
     fn a_path_as_it_may_be_written() {
         let m = written_path("mac::free_fn", r"\s*!");
         assert!(m.is_match("mac::free_fn!(a)"));

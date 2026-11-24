@@ -542,6 +542,7 @@ pub(super) fn site_matches(
             method,
             self_ty,
             args,
+            takes_self,
             ..
         } => {
             let symbol = callee.path.clone();
@@ -626,10 +627,13 @@ pub(super) fn site_matches(
             // DynDigest>`): the receiver is one of the types the build makes such an object
             // of, and each one the knowledge base names is a member, cited with its coercion.
             // Where it names them all, they are all the call may run; else an operation of
-            // unknown algorithm stands beside them.
+            // unknown algorithm stands beside them. Not so a function of the trait object type
+            // that takes no receiver (rustls's `<dyn MessageEncrypter>::invalid()`): no object
+            // is at the call, and what it returns is its own.
             let mut dyn_gap: Option<String> = None;
             if into_kb
                 && !skip_self
+                && *takes_self
                 && let Some(tr) = self_ty.as_ref().and_then(dyn_trait)
             {
                 let types = ctx.flow.coerced_to(tr);

@@ -394,17 +394,7 @@ impl Files<'_> {
         // would switch the checks below off
         let sym = strip_generics(&o.symbol);
         let sym_crate = sym.split("::").next().unwrap_or("").to_string();
-        // (a qualified path's, `<t14::S384 as t14::Scheme>::ALG`, is its type's)
-        let first = o
-            .symbol
-            .trim_start_matches('<')
-            .trim_start_matches('&')
-            .trim_start_matches("mut ")
-            .split("::")
-            .next()
-            .unwrap_or("");
-        // (of a type parameter's, `<D as digest::digest::Digest>::update`, its trait's)
-        let first = first.split(" as ").last().unwrap_or(first);
+        let first = first_crate(&o.symbol);
         // (and of a standard-library type's implementation of another crate's trait, `<alloc::
         // vec::Vec<u8> as aead::Buffer>::extend_from_slice`, its trait's: only the trait's
         // crate can implement it for that type)

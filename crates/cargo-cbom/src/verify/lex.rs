@@ -27,6 +27,22 @@ pub(super) fn strip_generics(s: &str) -> String {
         .filter_map(|(c, k)| k.then_some(*c))
         .collect()
 }
+/// The crate a symbol's path starts in: of a qualified path (`<t14::S384 as t14::Scheme>::ALG`)
+/// its type's, behind a reference; of a type parameter's (`<D as digest::digest::Digest>::
+/// update`) its trait's; of a trait object type's (`<(dyn rustls::crypto::cipher::
+/// MessageEncrypter + 'static)>::invalid`) its trait's.
+pub(super) fn first_crate(symbol: &str) -> &str {
+    let first = symbol
+        .trim_start_matches('<')
+        .trim_start_matches('&')
+        .trim_start_matches("mut ")
+        .trim_start_matches('(')
+        .trim_start_matches("dyn ")
+        .split("::")
+        .next()
+        .unwrap_or("");
+    first.split(" as ").last().unwrap_or(first)
+}
 /// The trait of a qualified path, read from after its `<`: `aead::Buffer` of `alloc::vec::
 /// Vec<u8> as aead::Buffer>::extend_from_slice`. None for one that names no trait (`<T>::f`).
 pub(super) fn qualified_trait(q: &str) -> Option<&str> {

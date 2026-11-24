@@ -386,6 +386,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
                 arg_lens,
                 through,
                 value: call.is_none(),
+                takes_self: tcx.opt_associated_item(did).is_some_and(|a| a.is_method()),
             },
         );
     }

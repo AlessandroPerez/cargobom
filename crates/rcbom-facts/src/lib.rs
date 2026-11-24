@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 44;
+pub const FACTS_VERSION: u32 = 45;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -539,6 +539,11 @@ pub enum Target {
         /// `iter.map(Sha256::digest)`), not called: it runs wherever the value is called.
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         value: bool,
+        /// The function takes `self`: called, its first value argument is its receiver, a value
+        /// of `self_ty` or a pointer to one. Not so a function of the type that takes none
+        /// (`Sha256::new()`; `<dyn MessageEncrypter>::invalid()`, at which no trait object is).
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        takes_self: bool,
     },
     /// A call through a function pointer whose function is not named in this body (`(h.f)(..)`,
     /// a parameter, a returned pointer): the site is the call's callee expression; `origin` is
