@@ -195,9 +195,9 @@ honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HM
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (371 outputs, the suite's included): 22,044 positions verified (21 of them with a fact the text does not show, all in the fixture built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 205,164 positions and spans of the compiler's record shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,267 calls (4,038 cited, 19 cited by the check by name, 27 cited by the check as unknown, 8,183 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
-| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 363 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
+| evidence | every cited position, `verify --self-test` | fixtures (372 outputs, the suite's included): 22,200 positions verified (21 of them with a fact the text does not show, all in the fixture built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 206,244 positions and spans of the compiler's record shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,418 calls (4,189 cited, 19 cited by the check by name, 27 cited by the check as unknown, 8,183 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 364 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
@@ -539,7 +539,7 @@ counted apart (`NOT SHOWN`, "verified with a fact the text does not show"), and 
 counts a shift that passes only so apart as well. The cases are in the fixture built by
 construction (`regress/verify-55`): 286 positions verified, 21 of them with a fact the text
 does not show, every shifted position and span rejected (2 of 3,125 shifted details only where
-the text does not show the fact). No position of the other 370 fixture outputs or of the
+the text does not show the fact). No position of the other 371 fixture outputs or of the
 labelled sets has such a fact.
 
 The ninth batch ran on the build with all of this: twenty-seven of thirty-two. Its CBOMs hold
@@ -566,9 +566,17 @@ in the CBOM made before its fix, no shift accepted).
 A tenth batch was started on 24 November, on the build with the ninth batch's fixes:
 forty-three packages by the same rule
 (the dependents of the post-quantum crates ranked next, every ninety-fifth of the unseen
-dependents of the classical ones). It was stopped for lack of memory at its thirtieth package,
-two minutes into the build of waffles-solana-sdk 1.16.0's dependencies with no process of the
-tool large, and is not counted; the fourteen after it were not run. Of the twenty-nine before
+dependents of the classical ones). It stopped for lack of memory at its thirtieth package, and
+the cause was the tool's: under waffles-solana-sdk 1.16.0 the driver held 13 GB after a minute
+and a half on libsecp256k1 0.6.0, whose build writes its precomputed points into a file of one
+line, 4.7 MB holding 49,152 calls. Every site carried the text of its line, and every position
+was looked up through the compiler's display column, which reads the line up to the position.
+What a site carries is bounded now (`regress/driver-53`): of a line longer than 4,096 bytes,
+the 160 bytes to each side of its position, which the verifier cuts from the source the same
+way; positions are read from the file's line table; and the verifier takes a position in a
+file an item includes (`include!("table.rs")` inside a function) as inside that item. The
+crate is scanned in twenty seconds. The batch is not counted, and the fourteen packages after
+that one were not run on that build. Of the twenty-nine before
 it, three do not compile on the pinned nightly, with or without the tool (superposition_core
 0.120.1's rustix 0.37, geph4-protocol 0.18.0's proc-macro2 1.0.56, courses 1.0.0's tera), and
 twenty-four of the other twenty-six passed: turbo-surf-deno-crypto 0.273.5, tf-types 0.1.8,
@@ -579,8 +587,10 @@ encypher-c2pa 1.10.0, truthlinked-core 0.1.3, coins-bip39 0.17.2, cosmrs 0.22.0,
 activitypub_federation 0.5.12, aube-util 2.11.0 and aichat 0.30.0. The twenty-six CBOMs hold
 7,485 verified positions, 3 more within a range and 12 rejected ones; all 116,215 shifted
 positions and spans were rejected, and their thirteen binaries have no walk gap. They name
-ML-DSA in thirteen packages, ML-KEM in fourteen, SLH-DSA in four, FN-DSA and X-Wing in one
-each. The verifier rejected six positions in each of the other two, of two causes, each a
+ML-DSA in twelve packages, ML-KEM in twelve and SLH-DSA in four; qssh's FN-DSA (the fn-dsa
+crates, which the knowledge base does not model) and libcgc's X-Wing (x-wing 0.0.1-pre.1, a
+version before those it covers) are operations of unknown algorithm of their packages. The
+verifier rejected six positions in each of the other two, of two causes, each a
 probe now. In rustls-pure 0.15.5 the six should not have been in the CBOM: rustls's record
 layer starts with `<dyn MessageEncrypter>::invalid()`, a function of the trait object's type
 that takes no `self`, and it was read as a call on an object and cited for the three AEADs the
@@ -757,7 +767,9 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
 - *Positions.* A call is cited where its path starts (`Sha256::digest` at `S`); a path split
   over lines is cited at its first line, where R1 (the callee's line) puts the label one lower.
   A path a procedural macro rebuilds from a macro's fragment (`$ty::new()` inside `paste!`) is
-  cited at the writing of the fragment it starts at, not at the fragment's first.
+  cited at the writing of the fragment it starts at, not at the fragment's first. An
+  occurrence carries its source line whole up to 4,096 bytes; of a longer one (generated code
+  on one line) the 160 bytes to each side of its position.
 - *Trait objects.* A call on a trait object of a crypto trait (`hasher.update(..)` on a
   `Box<dyn DynDigest>`) is one of the types the build makes such an object of, anywhere the
   walk reaches (a function of the object's type that takes no `self`, rustls's
