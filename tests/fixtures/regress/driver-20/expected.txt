@@ -64,6 +64,7 @@
   prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:param:tag_bytes=16
   prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:provenance:key=hard-coded
   prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:provenance:nonce=parameter
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-128 (the block cipher's key, whatever the mode)
   prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:reachability=reachable
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
@@ -74,6 +75,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=parameter
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop BLAKE3 | crypto:candidate:blake3@1.8.5:BLAKE3 | rcbom:confidence=low
   prop BLAKE3 | crypto:candidate:blake3@1.8.5:BLAKE3 | rcbom:detection:method=manifest
@@ -100,12 +102,14 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=1
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=1
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-384, collision category (preimage: 5)
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
   prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
   prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
@@ -196,15 +200,15 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=present
-asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "128", "primitive": "ae"}, "assetType": "algorithm"}
-asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "nistQuantumSecurityLevel": 1, "parameterSetIdentifier": "128", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "nistQuantumSecurityLevel": 5, "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset BLAKE3 | crypto:candidate:blake3@1.8.5:BLAKE3 | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "primitive": "hash"}, "assetType": "algorithm"}
 asset ChaCha20-Poly1305 | crypto:candidate:chacha20poly1305@0.10.1:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "primitive": "ae"}, "assetType": "algorithm"}
 asset HKDF | crypto:candidate:hkdf@0.12.4:HKDF | {"algorithmProperties": {"algorithmFamily": "HKDF", "primitive": "kdf"}, "assetType": "algorithm"}
 asset HMAC | crypto:candidate:hmac@0.12.1:HMAC | {"algorithmProperties": {"algorithmFamily": "HMAC", "primitive": "mac"}, "assetType": "algorithm"}
 asset PBKDF2 | crypto:candidate:pbkdf2@0.12.2:PBKDF2 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "primitive": "kdf"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 4, "primitive": "hash"}, "assetType": "algorithm"}
 component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
 component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4
 component library aes-gcm 0.10.3 | pkg:cargo/aes-gcm@0.10.3 | purl pkg:cargo/aes-gcm@0.10.3

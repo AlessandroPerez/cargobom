@@ -43,30 +43,35 @@
   prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:functions:source=observed
   prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:kb:version=0.2.0
   prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:occurrences=5
+  prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:quantum-level:source=quantum-vulnerable: RSA, broken by Shor's algorithm (NIST IR 8547, Tables 2 and 4)
   prop RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | rcbom:reachability=reachable
   prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:confidence=high
   prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:detection:method=type-resolved
   prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:functions:source=observed
   prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:kb:version=0.2.0
   prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:occurrences=1
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-224 and SHA-512/224, collision category below 1 (preimage: 3)
   prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=4
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=1
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-384, collision category (preimage: 5)
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=4
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-512, collision and preimage category
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:crypto-role=support
   prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:kb-coverage=unmodelled
@@ -140,11 +145,11 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=present
-asset RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["verify"], "primitive": "signature"}, "assetType": "algorithm"}
-asset SHA-224 | crypto:algorithm:SHA-224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset RSA-PKCS1-1.5 | crypto:algorithm:RSA-PKCS1-1.5 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["verify"], "nistQuantumSecurityLevel": 0, "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-224 | crypto:algorithm:SHA-224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 0, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 4, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 5, "primitive": "hash"}, "assetType": "algorithm"}
 component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library const-oid 0.9.6 | pkg:cargo/const-oid@0.9.6 | purl pkg:cargo/const-oid@0.9.6

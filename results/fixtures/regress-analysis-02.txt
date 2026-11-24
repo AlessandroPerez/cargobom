@@ -52,6 +52,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=7
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=derived
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
@@ -59,6 +60,7 @@
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=3
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=computed,parameter
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:quantum-level:source=quantum-vulnerable: EdDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:confidence=high
   prop HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | rcbom:detection:method=type-resolved
@@ -93,12 +95,14 @@
   prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:kb:version=0.2.0
   prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:occurrences=3
   prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:provenance:public-key=absent,parameter
+  prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:quantum-level:source=quantum-vulnerable: RSA, broken by Shor's algorithm (NIST IR 8547, Tables 2 and 4)
   prop RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=7
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
@@ -106,6 +110,7 @@
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=1
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:only-as-component=true
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-384, collision category (preimage: 5)
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
@@ -113,12 +118,14 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=2
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-512, collision and preimage category
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:confidence=high
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:detection:method=type-resolved
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:functions:source=observed
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:kb:version=0.2.0
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:occurrences=2
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:reachability=reachable
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:crypto-role=algorithm
   prop getrandom | pkg:cargo/getrandom@0.2.17 | rcbom:scope=required
@@ -128,16 +135,16 @@
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:native-links=ring_core_0_17_14_
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:scope=required
   prop ring | pkg:cargo/ring@0.17.14 | rcbom:usage=reachable
-asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
-asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["keygen", "sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "nistQuantumSecurityLevel": 5, "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["keygen", "sign"], "ellipticCurve": "other/Ed25519", "nistQuantumSecurityLevel": 0, "primitive": "signature"}, "assetType": "algorithm"}
 asset HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HKDF", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256-100000-32 | crypto:algorithm:PBKDF2-SHA-256-100000-32 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
-asset RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["verify"], "primitive": "signature"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset RSA-PKCS1-1.5-SHA-384 | crypto:algorithm:RSA-PKCS1-1.5-SHA-384 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PKCS1", "cryptoFunctions": ["verify"], "nistQuantumSecurityLevel": 0, "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 4, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 5, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
 component library getrandom 0.2.17 | pkg:cargo/getrandom@0.2.17 | purl pkg:cargo/getrandom@0.2.17
 component library ring 0.17.14 | pkg:cargo/ring@0.17.14 | purl pkg:cargo/ring@0.17.14
 dep crypto:algorithm:Ed25519 -> crypto:algorithm:SHA-512

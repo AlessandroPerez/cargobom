@@ -46,6 +46,7 @@
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:kb:version=0.2.0
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:occurrences=2
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:provenance:key=hard-coded
+  prop AES-128 | crypto:algorithm:AES-128 | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-128 (the block cipher's key, whatever the mode)
   prop AES-128 | crypto:algorithm:AES-128 | rcbom:reachability=reachable
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:confidence=high
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:detection:method=type-resolved
@@ -56,6 +57,7 @@
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:occurrences=4
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:iv=hard-coded
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:key=hard-coded
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-128 (the block cipher's key, whatever the mode)
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:reachability=reachable
   prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:confidence=high
   prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:detection:method=type-resolved
@@ -68,6 +70,7 @@
   prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:param:tag_bytes=16
   prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:provenance:key=hard-coded
   prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-128 (the block cipher's key, whatever the mode)
   prop AES-128-GCM | crypto:algorithm:AES-128-GCM | rcbom:reachability=reachable
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:confidence=high
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:detection:method=type-resolved
@@ -78,6 +81,7 @@
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:occurrences=2
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:provenance:iv=hard-coded
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:provenance:key=hard-coded
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:reachability=reachable
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
@@ -90,6 +94,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=hard-coded
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:confidence=high
   prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:detection:method=type-resolved
@@ -169,11 +174,11 @@
   prop rand_core | pkg:cargo/rand_core@0.10.1 | rcbom:scope=required
   prop universal-hash | pkg:cargo/universal-hash@0.6.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.6.1 | rcbom:scope=required
-asset AES-128 | crypto:algorithm:AES-128 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
-asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "cbc", "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
-asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "128", "primitive": "ae"}, "assetType": "algorithm"}
-asset AES-256-CTR | crypto:algorithm:AES-256-CTR | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "ctr", "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
-asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-128 | crypto:algorithm:AES-128 | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "nistQuantumSecurityLevel": 1, "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "cbc", "nistQuantumSecurityLevel": 1, "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128-GCM | crypto:algorithm:AES-128-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "nistQuantumSecurityLevel": 1, "parameterSetIdentifier": "128", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-256-CTR | crypto:algorithm:AES-256-CTR | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "ctr", "nistQuantumSecurityLevel": 5, "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "gcm", "nistQuantumSecurityLevel": 5, "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
 asset XChaCha20-Poly1305 | crypto:algorithm:XChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
 component library aead 0.6.1 | pkg:cargo/aead@0.6.1 | purl pkg:cargo/aead@0.6.1

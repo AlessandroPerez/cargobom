@@ -51,6 +51,7 @@
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:kb:version=0.2.0
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:occurrences=4
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:provenance:rng=rng
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:quantum-level:source=quantum-vulnerable: elliptic-curve Diffie-Hellman, broken by Shor's algorithm (NIST IR 8547, Table 4)
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:reachability=reachable
   prop MD5 | crypto:algorithm:MD5 | rcbom:confidence=high
   prop MD5 | crypto:algorithm:MD5 | rcbom:detection:method=type-resolved
@@ -64,12 +65,14 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=3
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=1
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA3-256, collision category (preimage: 5)
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
   prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:crypto-role=support
   prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:kb-coverage=unmodelled
@@ -174,10 +177,10 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
-asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "primitive": "key-agree"}, "assetType": "algorithm"}
+asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "nistQuantumSecurityLevel": 0, "primitive": "key-agree"}, "assetType": "algorithm"}
 asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
 component library base16ct 0.2.0 | pkg:cargo/base16ct@0.2.0 | purl pkg:cargo/base16ct@0.2.0
 component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4

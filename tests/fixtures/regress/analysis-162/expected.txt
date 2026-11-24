@@ -26,6 +26,7 @@
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=3
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=hard-coded
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:quantum-level:source=quantum-vulnerable: EdDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
   prop MD5 | crypto:algorithm:MD5 | rcbom:confidence=high
   prop MD5 | crypto:algorithm:MD5 | rcbom:detection:method=type-resolved
@@ -40,6 +41,7 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=2
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-512, collision and preimage category
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:crypto-role=support
   prop block-buffer | pkg:cargo/block-buffer@0.12.1 | rcbom:kb-coverage=unmodelled
@@ -76,9 +78,9 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
-asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "other/Ed25519", "nistQuantumSecurityLevel": 0, "primitive": "signature"}, "assetType": "algorithm"}
 asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 5, "primitive": "hash"}, "assetType": "algorithm"}
 component library block-buffer 0.12.1 | pkg:cargo/block-buffer@0.12.1 | purl pkg:cargo/block-buffer@0.12.1
 component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
 component library curve25519-dalek 5.0.0 | pkg:cargo/curve25519-dalek@5.0.0 | purl pkg:cargo/curve25519-dalek@5.0.0

@@ -38,6 +38,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=7
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=hard-coded,parameter
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=hard-coded,parameter
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:confidence=high
   prop ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | rcbom:detection:method=type-resolved
@@ -54,6 +55,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=4
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
@@ -85,9 +87,9 @@
   prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:kb:version=0.2.0
   prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:occurrences=2
   prop unknown | crypto:algorithm:unknown:unknown:sha1_smol | rcbom:reachability=reachable
-asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "gcm", "nistQuantumSecurityLevel": 5, "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset ChaCha20-Poly1305 | crypto:algorithm:ChaCha20-Poly1305 | {"algorithmProperties": {"algorithmFamily": "ChaCha20", "cryptoFunctions": ["decrypt", "encrypt"], "primitive": "ae"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:sha1_smol | {"algorithmProperties": {"cryptoFunctions": ["digest", "unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7

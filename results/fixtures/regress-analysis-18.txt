@@ -29,6 +29,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=environment
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=environment
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop SHA-2 | crypto:candidate:sha2@0.10.9:SHA-2 | rcbom:confidence=low
   prop SHA-2 | crypto:candidate:sha2@0.10.9:SHA-2 | rcbom:detection:method=manifest
@@ -80,7 +81,7 @@
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:crypto-role=trait
   prop universal-hash | pkg:cargo/universal-hash@0.5.1 | rcbom:scope=required
-asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "nistQuantumSecurityLevel": 5, "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset SHA-2 | crypto:candidate:sha2@0.10.9:SHA-2 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "primitive": "hash"}, "assetType": "algorithm"}
 component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
 component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4

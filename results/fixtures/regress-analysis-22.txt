@@ -24,18 +24,21 @@
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:functions:source=observed
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=2
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:quantum-level:source=quantum-vulnerable: ECDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=observed
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=2
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:quantum-level:source=quantum-vulnerable: EdDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
   prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:confidence=high
   prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:detection:method=type-resolved
   prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:functions:source=observed
   prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:kb:version=0.2.0
   prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:occurrences=3
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:quantum-level:source=NIST IR 8547, Table 3: ML-DSA-44 (category 1 if its random bits come from a generator of less than 192 bits of security)
   prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:reachability=reachable
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:confidence=high
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:detection:method=type-resolved
@@ -45,6 +48,7 @@
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:param:mgf=MGF1-SHA-256
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:param:salt_bytes=32
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:provenance:public-key=environment
+  prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:quantum-level:source=quantum-vulnerable: RSA, broken by Shor's algorithm (NIST IR 8547, Tables 2 and 4)
   prop RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
@@ -52,12 +56,14 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-384, collision category (preimage: 5)
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
@@ -65,6 +71,7 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=1
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-512, collision and preimage category
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:crypto-role=algorithm
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.18.1 | rcbom:ffi-boundary=true
@@ -81,13 +88,13 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=present
-asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "nist/P-256", "primitive": "signature"}, "assetType": "algorithm"}
-asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
-asset ML-DSA-44 | crypto:algorithm:ML-DSA-44 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign"], "parameterSetIdentifier": "44", "primitive": "signature"}, "assetType": "algorithm"}
-asset RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["verify"], "primitive": "signature"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "nist/P-256", "nistQuantumSecurityLevel": 0, "primitive": "signature"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["verify"], "ellipticCurve": "other/Ed25519", "nistQuantumSecurityLevel": 0, "primitive": "signature"}, "assetType": "algorithm"}
+asset ML-DSA-44 | crypto:algorithm:ML-DSA-44 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign"], "nistQuantumSecurityLevel": 2, "parameterSetIdentifier": "44", "primitive": "signature"}, "assetType": "algorithm"}
+asset RSA-PSS-SHA-256 | crypto:algorithm:RSA-PSS-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSASSA-PSS", "cryptoFunctions": ["verify"], "nistQuantumSecurityLevel": 0, "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 4, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 5, "primitive": "hash"}, "assetType": "algorithm"}
 component library aws-lc-rs 1.18.1 | pkg:cargo/aws-lc-rs@1.18.1 | purl pkg:cargo/aws-lc-rs@1.18.1
 component library aws-lc-sys 0.45.0 | pkg:cargo/aws-lc-sys@0.45.0 | purl pkg:cargo/aws-lc-sys@0.45.0
 component library zeroize 1.9.1 | pkg:cargo/zeroize@1.9.1 | purl pkg:cargo/zeroize@1.9.1

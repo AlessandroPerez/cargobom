@@ -294,6 +294,7 @@
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:occurrences=4
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:iv=hard-coded
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:key=environment,parameter
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-128 (the block cipher's key, whatever the mode)
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:reachability=reachable
   prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:artifact=bin verify-55
   prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
@@ -319,6 +320,7 @@
   prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:functions:source=observed
   prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:kb:version=0.2.0
   prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:occurrences=34
+  prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-224 and SHA-512/224, collision category below 1 (preimage: 3)
   prop SHA-224 | crypto:algorithm:SHA-224 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:artifact=bin other-tool
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:artifact=bin verify-55
@@ -329,6 +331,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=89
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:artifact=bin verify-55
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:artifact=lib dep
@@ -337,6 +340,7 @@
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=49
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-384, collision category (preimage: 5)
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:artifact=bin verify-55
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:artifact=lib dep
@@ -345,6 +349,7 @@
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=49
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-512, collision and preimage category
   prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
   prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:artifact=bin verify-55
   prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:artifact=lib dep
@@ -353,6 +358,7 @@
   prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:functions:source=observed
   prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:kb:version=0.2.0
   prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:occurrences=3
+  prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-224 and SHA-512/224, collision category below 1 (preimage: 3)
   prop SHA-512/224 | crypto:algorithm:SHA-512/224 | rcbom:reachability=reachable
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:artifact=bin verify-55
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:artifact=lib dep
@@ -362,6 +368,7 @@
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:functions:source=observed
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:kb:version=0.2.0
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:occurrences=12
+  prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-512/256 | crypto:algorithm:SHA-512/256 | rcbom:reachability=reachable
   prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
   prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
@@ -429,15 +436,15 @@
   prop unknown | crypto:algorithm:unknown:unknown:aead | rcbom:kb:version=0.2.0
   prop unknown | crypto:algorithm:unknown:unknown:aead | rcbom:occurrences=4
   prop unknown | crypto:algorithm:unknown:unknown:aead | rcbom:reachability=reachable
-asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "cbc", "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "cbc", "nistQuantumSecurityLevel": 1, "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
-asset SHA-224 | crypto:algorithm:SHA-224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-512/224 | crypto:algorithm:SHA-512/224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-224 | crypto:algorithm:SHA-224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 0, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 4, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 5, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512/224 | crypto:algorithm:SHA-512/224 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 0, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512/256 | crypto:algorithm:SHA-512/256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:aead | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
 component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2
 component library aes 0.8.4 | pkg:cargo/aes@0.8.4 | purl pkg:cargo/aes@0.8.4

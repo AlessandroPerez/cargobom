@@ -18,12 +18,14 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:occurrences=3
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=hard-coded,parameter
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:confidence=high
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:detection:method=type-resolved
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:functions:source=observed
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:kb:version=0.2.0
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:occurrences=2
+  prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-384, collision category (preimage: 5)
   prop SHA-384 | crypto:algorithm:SHA-384 | rcbom:reachability=reachable
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.17.3 | rcbom:crypto-role=algorithm
   prop aws-lc-rs | pkg:cargo/aws-lc-rs@1.17.3 | rcbom:ffi-boundary=true
@@ -40,8 +42,8 @@
   prop zeroize | pkg:cargo/zeroize@1.9.0 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.0 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.0 | rcbom:usage=reachable
-asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
-asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "nistQuantumSecurityLevel": 5, "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset SHA-384 | crypto:algorithm:SHA-384 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 4, "primitive": "hash"}, "assetType": "algorithm"}
 component library aws-lc-rs 1.17.3 | pkg:cargo/aws-lc-rs@1.17.3 | purl pkg:cargo/aws-lc-rs@1.17.3
 component library aws-lc-sys 0.43.0 | pkg:cargo/aws-lc-sys@0.43.0 | purl pkg:cargo/aws-lc-sys@0.43.0
 component library zeroize 1.9.0 | pkg:cargo/zeroize@1.9.0 | purl pkg:cargo/zeroize@1.9.0

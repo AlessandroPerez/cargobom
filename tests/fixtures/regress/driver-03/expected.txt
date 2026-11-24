@@ -41,6 +41,7 @@
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=1
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=hard-coded,parameter
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:quantum-level:source=quantum-vulnerable: EdDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)
   prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:algorithm-family=RSA
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:confidence=high
@@ -49,6 +50,7 @@
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:kb:version=0.2.0
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:occurrences=1
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:provenance:rng=rng
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:quantum-level:source=quantum-vulnerable: RSA, broken by Shor's algorithm (NIST IR 8547, Tables 2 and 4)
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:reachability=reachable
   prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:crypto-role=support
   prop base64ct | pkg:cargo/base64ct@1.8.3 | rcbom:kb-coverage=unmodelled
@@ -132,6 +134,7 @@
   prop x25519 | crypto:algorithm:x25519 | rcbom:occurrences=6
   prop x25519 | crypto:algorithm:x25519 | rcbom:provenance:key=hard-coded
   prop x25519 | crypto:algorithm:x25519 | rcbom:provenance:rng=rng
+  prop x25519 | crypto:algorithm:x25519 | rcbom:quantum-level:source=quantum-vulnerable: elliptic-curve Diffie-Hellman, broken by Shor's algorithm (NIST IR 8547, Table 4)
   prop x25519 | crypto:algorithm:x25519 | rcbom:reachability=reachable
   prop x25519-dalek | pkg:cargo/x25519-dalek@2.0.1 | rcbom:crypto-role=algorithm
   prop x25519-dalek | pkg:cargo/x25519-dalek@2.0.1 | rcbom:scope=required
@@ -140,9 +143,9 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
-asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign"], "ellipticCurve": "other/Ed25519", "primitive": "signature"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign"], "ellipticCurve": "other/Ed25519", "nistQuantumSecurityLevel": 0, "primitive": "signature"}, "assetType": "algorithm"}
 asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
-asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
+asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "nistQuantumSecurityLevel": 0, "primitive": "key-agree"}, "assetType": "algorithm"}
 component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library const-oid 0.9.6 | pkg:cargo/const-oid@0.9.6 | purl pkg:cargo/const-oid@0.9.6

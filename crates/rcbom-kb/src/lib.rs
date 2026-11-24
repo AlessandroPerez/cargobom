@@ -53,6 +53,8 @@ struct Raw {
     parts: Vec<PartEntry>,
     #[serde(rename = "aside", default)]
     asides: Vec<AsideRaw>,
+    #[serde(rename = "quantum", default)]
+    quantum: Vec<QuantumRaw>,
     #[serde(default)]
     unmodelled: UnmodelledRaw,
     #[serde(default)]
@@ -139,6 +141,28 @@ pub struct AsideEntry {
     pub implements: Vec<String>,
     pub krate: Vec<String>,
     pub pattern: Option<Regex>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct QuantumRaw {
+    family: Vec<String>,
+    #[serde(default)]
+    name: Option<String>,
+    category: u8,
+    because: String,
+}
+
+/// The NIST security strength category of an algorithm (`[[quantum]]`): of the assets of the
+/// `families` whose name `pattern` matches (every name, without one). `category` is what
+/// CycloneDX's `nistQuantumSecurityLevel` holds: 1 to 5, or 0 where no category is met.
+/// `because` cites where the category is stated.
+#[derive(Debug)]
+pub struct QuantumEntry {
+    pub families: Vec<String>,
+    pub pattern: Option<Regex>,
+    pub category: u8,
+    pub because: String,
 }
 
 /// Layer 1 for packages without `[[crate]]` entries: which are cryptographic anyway.
@@ -653,6 +677,8 @@ pub struct Kb {
     pub parts: Vec<PartEntry>,
     /// Calls into a crypto package that are no operation and set up no asset (`[[aside]]`).
     pub asides: Vec<AsideEntry>,
+    /// The NIST security strength categories the knowledge base states (`[[quantum]]`).
+    pub quantum: Vec<QuantumEntry>,
     /// Packages without `[[crate]]` entries that are cryptographic although their metadata does
     /// not say so (age-core), and crypto-adjacent helpers whose metadata says cryptography.
     pub unmodelled_crypto: Vec<String>,
@@ -978,6 +1004,30 @@ impl Kb {
                             .map(Regex::new)
                             .transpose()
                             .with_context(|| format!("[[aside]] {:?}", a.path))?,
+                    })
+                })
+                .collect::<Result<_>>()?,
+            quantum: raw
+                .quantum
+                .into_iter()
+                .map(|q| {
+                    if q.category > 5 {
+                        bail!(
+                            "[[quantum]] {:?}: category {} is none of 0 to 5",
+                            q.family,
+                            q.category
+                        );
+                    }
+                    Ok(QuantumEntry {
+                        families: q.family,
+                        pattern: q
+                            .name
+                            .as_deref()
+                            .map(Regex::new)
+                            .transpose()
+                            .with_context(|| format!("[[quantum]] {:?}", q.name))?,
+                        category: q.category,
+                        because: q.because,
                     })
                 })
                 .collect::<Result<_>>()?,
@@ -1402,6 +1452,16 @@ impl Kb {
         trait_path.is_some_and(|t| self.step_traits.iter().any(|x| x == t))
     }
 
+    /// The NIST security strength category the knowledge base states for an algorithm of
+    /// `family` named `name` (`[[quantum]]`), with where it is stated. None where it states
+    /// none: that is not category 0.
+    pub fn quantum_category(&self, family: &str, name: &str) -> Option<&QuantumEntry> {
+        self.quantum.iter().find(|q| {
+            q.families.iter().any(|f| f == family)
+                && q.pattern.as_ref().is_none_or(|p| p.is_match(name))
+        })
+    }
+
     /// The `[[aside]]` a call is: of a method of one of its traits, of a function of a type
     /// implementing one of its `implements` (`implemented`: the traits of those the call's own
     /// type implements), or of its crate at a path it names (`path`: inside the crate, generic
@@ -1500,6 +1560,45 @@ impl Kb {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_category_only_where_one_is_stated() {
+        let kb = Kb::seed().unwrap();
+        let c = |family: &str, name: &str| kb.quantum_category(family, name).map(|q| q.category);
+        // the reference primitives, and the block cipher under a mode
+        assert_eq!(c("AES", "AES-128"), Some(1));
+        assert_eq!(c("AES", "AES-192-CBC"), Some(3));
+        assert_eq!(c("AES", "AES-256-GCM"), Some(5));
+        assert_eq!(c("AES", "AES-256-GCM-SIV"), Some(5));
+        assert_eq!(c("SHA-2", "SHA-256"), Some(2));
+        assert_eq!(c("SHA-2", "SHA-512/256"), Some(2));
+        assert_eq!(c("SHA-3", "SHA3-384"), Some(4));
+        assert_eq!(c("SHA-2", "SHA-512"), Some(5));
+        // below category 1, and quantum-vulnerable: 0
+        assert_eq!(c("SHA-1", "SHA-1"), Some(0));
+        assert_eq!(c("SHA-2", "SHA-224"), Some(0));
+        assert_eq!(c("RSASSA-PSS", "RSA-PSS-SHA-256"), Some(0));
+        assert_eq!(c("ECDSA", "ECDSA-P-384-SHA-384"), Some(0));
+        assert_eq!(c("EdDSA", "Ed25519"), Some(0));
+        assert_eq!(c("ECDH", "x25519"), Some(0));
+        // the post-quantum parameter sets
+        assert_eq!(c("ML-KEM", "ML-KEM-768"), Some(3));
+        assert_eq!(c("ML-DSA", "ML-DSA-44"), Some(2));
+        assert_eq!(c("ML-DSA", "HashML-DSA-87"), Some(5));
+        assert_eq!(c("SLH-DSA", "SLH-DSA-SHAKE-128f"), Some(1));
+        assert_eq!(c("SLH-DSA", "SLH-DSA-SHA2-256s"), Some(5));
+        // none stated: no level, which is not level 0
+        assert_eq!(c("AES", "AES-GCM"), None);
+        assert_eq!(c("ML-KEM", "ML-KEM"), None);
+        assert_eq!(c("HMAC", "HMAC-SHA-256"), None);
+        assert_eq!(c("HKDF", "HKDF-SHA-256"), None);
+        assert_eq!(c("ChaCha20", "ChaCha20-Poly1305"), None);
+        assert_eq!(c("MD5", "MD5"), None);
+        assert_eq!(c("X-Wing", "X-Wing"), None);
+        assert_eq!(c("SHA-3", "cSHAKE256"), None);
+        // (a name under another family's rule is not that family's)
+        assert_eq!(c("HMAC", "SHA-256"), None);
+    }
 
     #[test]
     fn a_pre_release_is_its_release() {

@@ -152,6 +152,7 @@
             "encrypt"
           ],
           "mode": "gcm",
+          "nistQuantumSecurityLevel": 1,
           "parameterSetIdentifier": "128",
           "primitive": "ae"
         },
@@ -219,6 +220,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 6: AES-128 (the block cipher's key, whatever the mode)"
+        },
+        {
           "name": "rcbom:provenance:key",
           "value": "environment,parameter"
         },
@@ -245,6 +250,7 @@
           "cryptoFunctions": [
             "encrypt"
           ],
+          "nistQuantumSecurityLevel": 1,
           "parameterSetIdentifier": "128",
           "primitive": "block-cipher"
         },
@@ -298,6 +304,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 6: AES-128 (the block cipher's key, whatever the mode)"
+        },
+        {
           "name": "rcbom:provenance:iv",
           "value": "hard-coded"
         },
@@ -325,6 +335,7 @@
             "verify"
           ],
           "ellipticCurve": "nist/P-256",
+          "nistQuantumSecurityLevel": 0,
           "primitive": "signature"
         },
         "assetType": "algorithm"
@@ -384,6 +395,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "quantum-vulnerable: ECDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)"
+        },
+        {
           "name": "rcbom:provenance:public-key",
           "value": "environment,parameter"
         },
@@ -404,6 +419,7 @@
             "verify"
           ],
           "ellipticCurve": "other/Ed25519",
+          "nistQuantumSecurityLevel": 0,
           "primitive": "signature"
         },
         "assetType": "algorithm"
@@ -475,6 +491,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "quantum-vulnerable: EdDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)"
         },
         {
           "name": "rcbom:provenance:key",
@@ -631,6 +651,7 @@
             "encapsulate",
             "keygen"
           ],
+          "nistQuantumSecurityLevel": 5,
           "parameterSetIdentifier": "1024",
           "primitive": "kem"
         },
@@ -689,6 +710,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 5: ML-KEM-1024"
         },
         {
           "name": "rcbom:occurrences",
@@ -769,6 +794,7 @@
           "cryptoFunctions": [
             "digest"
           ],
+          "nistQuantumSecurityLevel": 2,
           "primitive": "hash"
         },
         "assetType": "algorithm"
@@ -821,6 +847,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)"
+        },
+        {
           "name": "rcbom:only-as-component",
           "value": "true"
         },
@@ -839,6 +869,7 @@
           "cryptoFunctions": [
             "digest"
           ],
+          "nistQuantumSecurityLevel": 2,
           "primitive": "hash"
         },
         "assetType": "algorithm"
@@ -884,6 +915,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "2"
         }
@@ -898,6 +933,7 @@
           "cryptoFunctions": [
             "digest"
           ],
+          "nistQuantumSecurityLevel": 5,
           "primitive": "hash"
         },
         "assetType": "algorithm"
@@ -948,6 +984,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-512, collision and preimage category"
         },
         {
           "name": "rcbom:only-as-component",
@@ -1118,7 +1158,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:d1a6b995-66fd-82c2-b3bf-8de4f9009fe9",
+  "serialNumber": "urn:uuid:36e9c7f9-2690-893c-9d3b-522fe02350fe",
   "specVersion": "1.7",
   "version": 1
 }

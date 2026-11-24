@@ -115,18 +115,21 @@
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=1
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA3-256, collision category (preimage: 5)
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
   prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:confidence=high
   prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:detection:method=type-resolved
   prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:functions:source=observed
   prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:kb:version=0.2.0
   prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:occurrences=1
+  prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA3-512, collision and preimage category
   prop SHA3-512 | crypto:algorithm:SHA3-512 | rcbom:reachability=reachable
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:confidence=high
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:detection:method=type-resolved
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:functions:source=observed
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:kb:version=0.2.0
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:occurrences=4
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHAKE256 with an output long enough, collision and preimage category
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:reachability=reachable
   prop argon2 | pkg:cargo/argon2@0.6.0 | rcbom:crypto-role=algorithm
   prop argon2 | pkg:cargo/argon2@0.6.0 | rcbom:scope=required
@@ -222,6 +225,7 @@
   prop x25519 | crypto:algorithm:x25519 | rcbom:occurrences=4
   prop x25519 | crypto:algorithm:x25519 | rcbom:provenance:key=hard-coded
   prop x25519 | crypto:algorithm:x25519 | rcbom:provenance:rng=rng
+  prop x25519 | crypto:algorithm:x25519 | rcbom:quantum-level:source=quantum-vulnerable: elliptic-curve Diffie-Hellman, broken by Shor's algorithm (NIST IR 8547, Table 4)
   prop x25519 | crypto:algorithm:x25519 | rcbom:reachability=reachable
   prop x25519-dalek | pkg:cargo/x25519-dalek@3.0.0 | rcbom:crypto-role=algorithm
   prop x25519-dalek | pkg:cargo/x25519-dalek@3.0.0 | rcbom:scope=required
@@ -237,11 +241,11 @@ asset BLAKE2b-256 | crypto:algorithm:BLAKE2b-256 | {"algorithmProperties": {"alg
 asset BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset BLAKE2s-256 | crypto:algorithm:BLAKE2s-256 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset OS-RNG | crypto:algorithm:OS-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
-asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA3-512 | crypto:algorithm:SHA3-512 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHAKE256 | crypto:algorithm:SHAKE256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "xof"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-512 | crypto:algorithm:SHA3-512 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 5, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHAKE256 | crypto:algorithm:SHAKE256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 5, "primitive": "xof"}, "assetType": "algorithm"}
 asset bcrypt-pbkdf | crypto:algorithm:bcrypt-pbkdf | {"algorithmProperties": {"algorithmFamily": "bcrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
-asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
+asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "ellipticCurve": "other/Curve25519", "nistQuantumSecurityLevel": 0, "primitive": "key-agree"}, "assetType": "algorithm"}
 component library argon2 0.6.0 | pkg:cargo/argon2@0.6.0 | purl pkg:cargo/argon2@0.6.0
 component library base64ct 1.8.3 | pkg:cargo/base64ct@1.8.3 | purl pkg:cargo/base64ct@1.8.3
 component library bcrypt-pbkdf 0.11.0 | pkg:cargo/bcrypt-pbkdf@0.11.0 | purl pkg:cargo/bcrypt-pbkdf@0.11.0

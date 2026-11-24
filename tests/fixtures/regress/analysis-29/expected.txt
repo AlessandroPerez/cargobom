@@ -53,18 +53,21 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=1
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:functions:source=observed
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=1
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA3-256, collision category (preimage: 5)
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:confidence=high
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:detection:method=type-resolved
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:functions:source=observed
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:kb:version=0.2.0
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:occurrences=4
+  prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHAKE256 with an output long enough, collision and preimage category
   prop SHAKE256 | crypto:algorithm:SHAKE256 | rcbom:reachability=reachable
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
@@ -111,9 +114,9 @@
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
 asset HMAC-MD5 | crypto:algorithm:HMAC-MD5 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
-asset SHAKE256 | crypto:algorithm:SHAKE256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "xof"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHAKE256 | crypto:algorithm:SHAKE256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 5, "primitive": "xof"}, "assetType": "algorithm"}
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library block-buffer 0.12.1 | pkg:cargo/block-buffer@0.12.1 | purl pkg:cargo/block-buffer@0.12.1
 component library const-oid 0.10.2 | pkg:cargo/const-oid@0.10.2 | purl pkg:cargo/const-oid@0.10.2

@@ -71,6 +71,7 @@
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:kb:version=0.2.0
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:occurrences=3
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:provenance:rng=rng
+  prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:quantum-level:source=quantum-vulnerable: elliptic-curve Diffie-Hellman, broken by Shor's algorithm (NIST IR 8547, Table 4)
   prop ECDH-P-256 | crypto:algorithm:ECDH-P-256 | rcbom:reachability=reachable
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:confidence=high
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:detection:method=type-resolved
@@ -78,12 +79,14 @@
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:kb:version=0.2.0
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:occurrences=2
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:provenance:rng=rng
+  prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:quantum-level:source=quantum-vulnerable: ECDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)
   prop ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=1
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:crypto-role=support
   prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:kb-coverage=unmodelled
@@ -227,9 +230,9 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
 asset BLAKE2b-512 | crypto:algorithm:BLAKE2b-512 | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset BLAKE2b-512-HMAC | crypto:algorithm:BLAKE2b-512-HMAC | {"algorithmProperties": {"algorithmFamily": "BLAKE2", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
-asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "primitive": "key-agree"}, "assetType": "algorithm"}
-asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign"], "primitive": "signature"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset ECDH-P-256 | crypto:algorithm:ECDH-P-256 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keyderive", "keygen"], "nistQuantumSecurityLevel": 0, "primitive": "key-agree"}, "assetType": "algorithm"}
+asset ECDSA-P-256-SHA-256 | crypto:algorithm:ECDSA-P-256-SHA-256 | {"algorithmProperties": {"algorithmFamily": "ECDSA", "cryptoFunctions": ["keygen", "sign"], "nistQuantumSecurityLevel": 0, "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:block-cipher:blowfish | {"algorithmProperties": {"cryptoFunctions": ["encrypt"], "primitive": "block-cipher"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:stream-cipher:salsa20 | {"algorithmProperties": {"cryptoFunctions": ["decrypt", "encrypt"], "primitive": "stream-cipher"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:blowfish | {"algorithmProperties": {"cryptoFunctions": [], "primitive": "unknown"}, "assetType": "algorithm"}

@@ -39,6 +39,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=4
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop blake3 | pkg:cargo/blake3@1.8.7 | rcbom:crypto-role=algorithm
   prop blake3 | pkg:cargo/blake3@1.8.7 | rcbom:scope=required
@@ -67,7 +68,7 @@
   prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
 asset BLAKE3-256 | crypto:algorithm:BLAKE3-256 | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
 component library blake3 1.8.7 | pkg:cargo/blake3@1.8.7 | purl pkg:cargo/blake3@1.8.7
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library constant_time_eq 0.4.2 | pkg:cargo/constant_time_eq@0.4.2 | purl pkg:cargo/constant_time_eq@0.4.2

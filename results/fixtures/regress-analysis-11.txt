@@ -91,6 +91,7 @@
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:occurrences=2
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:iv=environment,parameter
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:provenance:key=environment,parameter
+  prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-128 (the block cipher's key, whatever the mode)
   prop AES-128-CBC | crypto:algorithm:AES-128-CBC | rcbom:reachability=reachable
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:confidence=high
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:detection:method=type-resolved
@@ -99,6 +100,7 @@
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:occurrences=2
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:provenance:iv=environment,parameter
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:provenance:key=environment,parameter
+  prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)
   prop AES-256-CTR | crypto:algorithm:AES-256-CTR | rcbom:reachability=reachable
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:confidence=high
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:detection:method=type-resolved
@@ -110,6 +112,7 @@
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:param:tag_bytes=16
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:key=derived,environment,parameter,partly hard-coded
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:provenance:nonce=computed,environment,hard-coded,parameter,partly hard-coded
+  prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:quantum-level:source=NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)
   prop AES-256-GCM | crypto:algorithm:AES-256-GCM | rcbom:reachability=reachable
   prop BLAKE3 | crypto:algorithm:BLAKE3:hash | rcbom:confidence=high
   prop BLAKE3 | crypto:algorithm:BLAKE3:hash | rcbom:detection:method=type-resolved
@@ -174,6 +177,7 @@
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:kb:version=0.2.0
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:occurrences=2
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:provenance:rng=hard-coded,rng
+  prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:quantum-level:source=quantum-vulnerable: RSA, broken by Shor's algorithm (NIST IR 8547, Tables 2 and 4)
   prop RSA-2048 | crypto:material:private-key:RSA-2048 | rcbom:reachability=reachable
   prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:confidence=high
   prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:detection:method=type-resolved
@@ -182,6 +186,7 @@
   prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:occurrences=2
   prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:param:mgf_hash=SHA-256
   prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:provenance:rng=rng
+  prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:quantum-level:source=quantum-vulnerable: RSA, broken by Shor's algorithm (NIST IR 8547, Tables 2 and 4)
   prop RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | rcbom:reachability=reachable
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
@@ -189,6 +194,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=3
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop aead | pkg:cargo/aead@0.5.2 | rcbom:crypto-role=trait
   prop aead | pkg:cargo/aead@0.5.2 | rcbom:scope=required
@@ -337,9 +343,9 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=reachable
-asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "cbc", "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
-asset AES-256-CTR | crypto:algorithm:AES-256-CTR | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "ctr", "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
-asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
+asset AES-128-CBC | crypto:algorithm:AES-128-CBC | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "cbc", "nistQuantumSecurityLevel": 1, "parameterSetIdentifier": "128", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-256-CTR | crypto:algorithm:AES-256-CTR | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["decrypt", "encrypt"], "mode": "ctr", "nistQuantumSecurityLevel": 5, "parameterSetIdentifier": "256", "primitive": "block-cipher"}, "assetType": "algorithm"}
+asset AES-256-GCM | crypto:algorithm:AES-256-GCM | {"algorithmProperties": {"algorithmFamily": "AES", "cryptoFunctions": ["encrypt"], "mode": "gcm", "nistQuantumSecurityLevel": 5, "parameterSetIdentifier": "256", "primitive": "ae"}, "assetType": "algorithm"}
 asset BLAKE3 | crypto:algorithm:BLAKE3:hash | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
 asset BLAKE3 | crypto:algorithm:BLAKE3:mac | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset BLAKE3-256 | crypto:algorithm:BLAKE3-256 | {"algorithmProperties": {"algorithmFamily": "BLAKE3", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
@@ -347,8 +353,8 @@ asset HKDF-SHA-256 | crypto:algorithm:HKDF-SHA-256 | {"algorithmProperties": {"a
 asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
 asset PBKDF2-SHA-256 | crypto:algorithm:PBKDF2-SHA-256 | {"algorithmProperties": {"algorithmFamily": "PBKDF2", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset RSA-2048 | crypto:material:private-key:RSA-2048 | {"assetType": "related-crypto-material", "relatedCryptoMaterialProperties": {"size": 2048, "type": "private-key"}}
-asset RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSAES-OAEP", "cryptoFunctions": ["encrypt"], "primitive": "pke"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset RSA-OAEP-SHA-256 | crypto:algorithm:RSA-OAEP-SHA-256 | {"algorithmProperties": {"algorithmFamily": "RSAES-OAEP", "cryptoFunctions": ["encrypt"], "nistQuantumSecurityLevel": 0, "primitive": "pke"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
 asset scrypt | crypto:algorithm:scrypt | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 asset scrypt-32768-8-1-64 | crypto:algorithm:scrypt-32768-8-1-64 | {"algorithmProperties": {"algorithmFamily": "scrypt", "cryptoFunctions": ["keyderive"], "primitive": "kdf"}, "assetType": "algorithm"}
 component library aead 0.5.2 | pkg:cargo/aead@0.5.2 | purl pkg:cargo/aead@0.5.2

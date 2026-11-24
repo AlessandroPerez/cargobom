@@ -190,6 +190,20 @@ fn asset_refs(an: &Analysis) -> BTreeMap<String, String> {
         .collect()
 }
 
+/// The NIST security strength category the knowledge base states for an algorithm
+/// (`[[quantum]]`), as CycloneDX's `nistQuantumSecurityLevel`, and where it is stated, as a
+/// property. Neither for an algorithm it states none for: no level is not level 0.
+fn quantum_level(
+    kb: &Kb,
+    family: &str,
+    name: &str,
+    ap: &mut serde_json::Map<String, Value>,
+) -> Option<Value> {
+    let q = kb.quantum_category(family, name)?;
+    ap.insert("nistQuantumSecurityLevel".into(), json!(q.category));
+    Some(prop("rcbom:quantum-level:source", &q.because))
+}
+
 fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str, several_artifacts: bool) -> Value {
     let observed = a.observed_functions();
     let (functions, source): (Vec<String>, &str) = if observed.is_empty() {
@@ -213,6 +227,7 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str, several_artifacts: bool) -
         ap.insert("ellipticCurve".into(), json!(c));
     }
     ap.insert("cryptoFunctions".into(), json!(functions));
+    let quantum = quantum_level(kb, &a.algo.family, &a.name, &mut ap);
 
     let occurrences: Vec<Value> = a
         .occurrences
@@ -242,6 +257,7 @@ fn asset_component(kb: &Kb, a: &Asset, bom_ref: &str, several_artifacts: bool) -
         prop("rcbom:functions:source", source),
         prop("rcbom:kb:version", &kb.version),
     ];
+    props.extend(quantum);
     if !direct && !a.occurrences.is_empty() {
         props.push(prop("rcbom:only-as-component", "true"));
     }
@@ -546,11 +562,13 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
                 continue;
             }
             let mut ap = serde_json::Map::new();
+            let mut quantum = None;
             if let Some(t) = template {
                 ap.insert("primitive".into(), json!(t.primitive));
                 if rcbom_kb::in_family_enum(&t.family) {
                     ap.insert("algorithmFamily".into(), json!(t.family));
                 }
+                quantum = quantum_level(kb, &t.family, name, &mut ap);
             }
             let mut props = vec![
                 prop("rcbom:detection:method", "manifest"),
@@ -565,6 +583,7 @@ fn candidate_assets(kb: &Kb, man: &Manifest, an: &Analysis) -> Vec<Value> {
                 ),
                 prop("rcbom:kb:version", &kb.version),
             ];
+            props.extend(quantum);
             // as for the assets found: a name the registry has no pattern for is flagged
             // (`SHA-2`, the family name of the sha2 crate)
             if template.is_some() && !rcbom_kb::registry::valid(name) {

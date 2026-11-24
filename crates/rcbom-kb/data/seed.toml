@@ -3480,6 +3480,192 @@ steps = ["write", "write_all", "copy", "update", "chain_update", "consume", "new
 step_traits = ["core::io::write::Write", "alloc::io::read::Read", "std::io::Write", "std::io::Read"]
 relays = ["tokio-rustls", "hyper-rustls", "actix-tls", "rustls-pki-types", "rustls-pemfile", "rustls-native-certs", "tokio-native-tls", "hyper-tls"]
 
+# --- NIST security strength categories --------------------------------------------------------
+# What CycloneDX's `nistQuantumSecurityLevel` of an algorithm is: the security category that
+# NIST IR 8547 (Transition to Post-Quantum Cryptography Standards, October 2026) gives it, by
+# the asset's family and name. Only what the report's tables state. Its Table 1 defines the
+# categories by an attack on a reference primitive: 1, key search on AES-128; 2, collision
+# search on SHA-256; 3, key search on AES-192; 4, collision search on SHA-384; 5, key search on
+# AES-256. 0 is the field's "none of the categories are met": the public-key algorithms the
+# report lists as quantum-vulnerable (Shor's algorithm), and the hash functions whose
+# collision category it gives as below 1.
+#
+# An asset no entry names has no level, and that is not level 0: of the approved symmetric
+# primitives of 128 bits or more the report says only that they meet at least category 1 (its
+# section 4.1.3), and of the others (HMAC, HKDF, PBKDF2, Argon2, ChaCha20-Poly1305, BLAKE2,
+# BLAKE3, MD5, DES) it gives no category. Nor has one whose name leaves its parameter open (an
+# AES key of a length the analysis did not find). A hybrid (X-Wing) has none either: the
+# report says such a scheme is meant to stay secure while one of its parts is, and gives it no
+# category; its parts are assets of their own.
+
+# Quantum-vulnerable public-key algorithms (Tables 2 and 4): digital signatures by RSA, ECDSA
+# and EdDSA; key establishment by RSA and by finite-field and elliptic-curve Diffie-Hellman
+# (X25519 is the second on Curve25519).
+[[quantum]]
+family = ["RSA", "RSAES-OAEP", "RSAES-PKCS1", "RSASSA-PKCS1", "RSASSA-PSS"]
+category = 0
+because = "quantum-vulnerable: RSA, broken by Shor's algorithm (NIST IR 8547, Tables 2 and 4)"
+
+[[quantum]]
+family = ["ECDSA"]
+category = 0
+because = "quantum-vulnerable: ECDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)"
+
+[[quantum]]
+family = ["EdDSA"]
+category = 0
+because = "quantum-vulnerable: EdDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)"
+
+[[quantum]]
+family = ["ECDH"]
+category = 0
+because = "quantum-vulnerable: elliptic-curve Diffie-Hellman, broken by Shor's algorithm (NIST IR 8547, Table 4)"
+
+# Post-quantum key establishment (Table 5) and digital signatures (Table 3), by parameter set.
+# (The pre-hash variants sign with the same parameter sets; FIPS 204 and 205 ask of their
+# digest at least the parameter set's strength.)
+[[quantum]]
+family = ["ML-KEM"]
+name = '^ML-KEM-512$'
+category = 1
+because = "NIST IR 8547, Table 5: ML-KEM-512"
+
+[[quantum]]
+family = ["ML-KEM"]
+name = '^ML-KEM-768$'
+category = 3
+because = "NIST IR 8547, Table 5: ML-KEM-768"
+
+[[quantum]]
+family = ["ML-KEM"]
+name = '^ML-KEM-1024$'
+category = 5
+because = "NIST IR 8547, Table 5: ML-KEM-1024"
+
+[[quantum]]
+family = ["ML-DSA"]
+name = '^(Hash)?ML-DSA-44$'
+category = 2
+because = "NIST IR 8547, Table 3: ML-DSA-44 (category 1 if its random bits come from a generator of less than 192 bits of security)"
+
+[[quantum]]
+family = ["ML-DSA"]
+name = '^(Hash)?ML-DSA-65$'
+category = 3
+because = "NIST IR 8547, Table 3: ML-DSA-65"
+
+[[quantum]]
+family = ["ML-DSA"]
+name = '^(Hash)?ML-DSA-87$'
+category = 5
+because = "NIST IR 8547, Table 3: ML-DSA-87"
+
+[[quantum]]
+family = ["SLH-DSA"]
+name = '^(Hash)?SLH-DSA-(SHA2|SHAKE)-128[sf]$'
+category = 1
+because = "NIST IR 8547, Table 3: SLH-DSA, the 128-bit parameter sets"
+
+[[quantum]]
+family = ["SLH-DSA"]
+name = '^(Hash)?SLH-DSA-(SHA2|SHAKE)-192[sf]$'
+category = 3
+because = "NIST IR 8547, Table 3: SLH-DSA, the 192-bit parameter sets"
+
+[[quantum]]
+family = ["SLH-DSA"]
+name = '^(Hash)?SLH-DSA-(SHA2|SHAKE)-256[sf]$'
+category = 5
+because = "NIST IR 8547, Table 3: SLH-DSA, the 256-bit parameter sets"
+
+# The block cipher (Table 6), by its key: the category's own reference attack, whatever the
+# mode the asset names with it.
+[[quantum]]
+family = ["AES"]
+name = '^AES-128(-|$)'
+category = 1
+because = "NIST IR 8547, Table 6: AES-128 (the block cipher's key, whatever the mode)"
+
+[[quantum]]
+family = ["AES"]
+name = '^AES-192(-|$)'
+category = 3
+because = "NIST IR 8547, Table 6: AES-192 (the block cipher's key, whatever the mode)"
+
+[[quantum]]
+family = ["AES"]
+name = '^AES-256(-|$)'
+category = 5
+because = "NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)"
+
+# Hash functions and XOFs (Table 8), by their collision category: the lower of the two the
+# table gives, and what holds however the hash is used. (The preimage category is said beside.)
+[[quantum]]
+family = ["SHA-1"]
+name = '^SHA-1$'
+category = 0
+because = "NIST IR 8547, Table 8: SHA-1, collision category below 1 (preimage: 1)"
+
+[[quantum]]
+family = ["SHA-2"]
+name = '^SHA-(224|512/224)$'
+category = 0
+because = "NIST IR 8547, Table 8: SHA-224 and SHA-512/224, collision category below 1 (preimage: 3)"
+
+[[quantum]]
+family = ["SHA-2"]
+name = '^SHA-(256|512/256)$'
+category = 2
+because = "NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)"
+
+[[quantum]]
+family = ["SHA-2"]
+name = '^SHA-384$'
+category = 4
+because = "NIST IR 8547, Table 8: SHA-384, collision category (preimage: 5)"
+
+[[quantum]]
+family = ["SHA-2"]
+name = '^SHA-512$'
+category = 5
+because = "NIST IR 8547, Table 8: SHA-512, collision and preimage category"
+
+[[quantum]]
+family = ["SHA-3"]
+name = '^SHA3-224$'
+category = 0
+because = "NIST IR 8547, Table 8: SHA3-224, collision category below 1 (preimage: 3)"
+
+[[quantum]]
+family = ["SHA-3"]
+name = '^SHA3-256$'
+category = 2
+because = "NIST IR 8547, Table 8: SHA3-256, collision category (preimage: 5)"
+
+[[quantum]]
+family = ["SHA-3"]
+name = '^SHA3-384$'
+category = 4
+because = "NIST IR 8547, Table 8: SHA3-384, collision category (preimage: 5)"
+
+[[quantum]]
+family = ["SHA-3"]
+name = '^SHA3-512$'
+category = 5
+because = "NIST IR 8547, Table 8: SHA3-512, collision and preimage category"
+
+[[quantum]]
+family = ["SHA-3"]
+name = '^SHAKE128$'
+category = 2
+because = "NIST IR 8547, Table 8: SHAKE128 with an output long enough, collision and preimage category"
+
+[[quantum]]
+family = ["SHA-3"]
+name = '^SHAKE256$'
+category = 5
+because = "NIST IR 8547, Table 8: SHAKE256 with an output long enough, collision and preimage category"
+
 # --- Calls that are no operation ---------------------------------------------------------------
 # The boundary check (`rcbom:run:boundary-check`) lists every call of the walked code into a
 # crypto package, by the function it resolves to: each is cited by an occurrence, or needs none

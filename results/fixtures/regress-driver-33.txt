@@ -44,6 +44,7 @@
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
   prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
   prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:crypto-role=support
   prop base16ct | pkg:cargo/base16ct@0.2.0 | rcbom:kb-coverage=unmodelled
@@ -154,7 +155,7 @@
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.1 | rcbom:usage=present
 asset HMAC | crypto:candidate:hmac@0.12.1:HMAC | {"algorithmProperties": {"algorithmFamily": "HMAC", "primitive": "mac"}, "assetType": "algorithm"}
-asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:curve25519-dalek | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
 asset unknown | crypto:algorithm:unknown:unknown:primeorder | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
 component library base16ct 0.2.0 | pkg:cargo/base16ct@0.2.0 | purl pkg:cargo/base16ct@0.2.0

@@ -212,7 +212,7 @@ fn generate(a: &GenArgs) -> Result<()> {
         Some(p) => std::fs::write(p, text)?,
         None => print!("{text}"),
     }
-    summary(&an);
+    summary(&kb, &an);
     walkcheck::print(&walk_check);
     if an.layer2 {
         // (a call into a crypto package the CBOM cites nowhere, for no reason it states)
@@ -231,7 +231,7 @@ fn generate(a: &GenArgs) -> Result<()> {
     Ok(())
 }
 
-fn summary(an: &rcbom_analysis::Analysis) {
+fn summary(kb: &rcbom_kb::Kb, an: &rcbom_analysis::Analysis) {
     eprintln!("cbom: {} assets (valid CycloneDX 1.7)", an.assets.len());
     for a in an.assets.values() {
         eprintln!(
@@ -247,6 +247,34 @@ fn summary(an: &rcbom_analysis::Analysis) {
                 .into_iter()
                 .collect::<Vec<_>>()
                 .join(",")
+        );
+    }
+    // where a move to post-quantum cryptography starts: the algorithms that meet none of
+    // NIST's security categories (`[[quantum]]`: broken by a quantum computer, or a hash
+    // whose collision category is below 1), those that can run first
+    let mut none: Vec<(bool, &str)> = an
+        .assets
+        .values()
+        .filter(|a| a.algo.material.is_none())
+        .filter(|a| {
+            kb.quantum_category(&a.algo.family, &a.name)
+                .is_some_and(|q| q.category == 0)
+        })
+        .map(|a| (!a.reachable(), a.name.as_str()))
+        .collect();
+    none.sort();
+    none.dedup();
+    if !none.is_empty() {
+        eprintln!(
+            "cbom: NIST quantum security level 0 (no category met): {}",
+            none.iter()
+                .map(|(present, n)| if *present {
+                    format!("{n} (present)")
+                } else {
+                    n.to_string()
+                })
+                .collect::<Vec<_>>()
+                .join(", ")
         );
     }
     for n in &an.notes {

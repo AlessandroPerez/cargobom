@@ -428,6 +428,9 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         functions: HashMap::new(),
         cited_in: HashSet::new(),
     };
+    // (an algorithm's `nistQuantumSecurityLevel` is the category the knowledge base states for
+    // its family and name, and there is none where it states none)
+    let mut levels: Vec<String> = Vec::new();
     // the components, and the root package (`metadata.component`)
     let root = doc["metadata"]["component"].clone();
     for c in doc["components"]
@@ -460,11 +463,29 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                             .then(|| p["value"].as_str())
                             .flatten()
                     });
-                if let Some(f) = c["cryptoProperties"]["algorithmProperties"]["algorithmFamily"]
+                let family = c["cryptoProperties"]["algorithmProperties"]["algorithmFamily"]
                     .as_str()
-                    .or(prop)
-                {
+                    .or(prop);
+                if let Some(f) = family {
                     graph.family.insert(r.to_string(), f.to_string());
+                }
+                if c["cryptoProperties"]["assetType"] == "algorithm" {
+                    let name = c["name"].as_str().unwrap_or("");
+                    let said =
+                        c["cryptoProperties"]["algorithmProperties"]["nistQuantumSecurityLevel"]
+                            .as_u64();
+                    let stated = kb
+                        .quantum_category(family.unwrap_or(""), name)
+                        .map(|q| u64::from(q.category));
+                    if said != stated {
+                        let show = |v: Option<u64>| v.map_or("none".to_string(), |n| n.to_string());
+                        levels.push(format!(
+                            "LEVEL {name} {r}: nistQuantumSecurityLevel is {}, the knowledge \
+                             base states {} for it",
+                            show(said),
+                            show(stated)
+                        ));
+                    }
                 }
                 if let Some(p) = c["cryptoProperties"]["algorithmProperties"]["primitive"].as_str()
                 {
@@ -673,7 +694,10 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             String::new()
         }
     );
-    let bad = bad + without_line;
+    for l in &levels {
+        println!("{l}");
+    }
+    let bad = bad + without_line + levels.len();
     if self_test {
         for (dl, dc, what) in [
             (1i64, 0i64, "line +1"),
@@ -864,7 +888,15 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         }
     }
     if bad > 0 {
-        anyhow::bail!("{bad} positions do not match the source");
+        if levels.is_empty() {
+            anyhow::bail!("{bad} positions do not match the source");
+        }
+        anyhow::bail!(
+            "{bad} claims do not match: {} security levels the knowledge base states otherwise, \
+             {} positions",
+            levels.len(),
+            bad - levels.len()
+        );
     }
     Ok(())
 }

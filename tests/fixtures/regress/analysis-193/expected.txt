@@ -33,12 +33,14 @@
   prop SLH-DSA-SHA2-256s | crypto:algorithm:SLH-DSA-SHA2-256s | rcbom:functions:source=observed
   prop SLH-DSA-SHA2-256s | crypto:algorithm:SLH-DSA-SHA2-256s | rcbom:kb:version=0.2.0
   prop SLH-DSA-SHA2-256s | crypto:algorithm:SLH-DSA-SHA2-256s | rcbom:occurrences=4
+  prop SLH-DSA-SHA2-256s | crypto:algorithm:SLH-DSA-SHA2-256s | rcbom:quantum-level:source=NIST IR 8547, Table 3: SLH-DSA, the 256-bit parameter sets
   prop SLH-DSA-SHA2-256s | crypto:algorithm:SLH-DSA-SHA2-256s | rcbom:reachability=reachable
   prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:confidence=high
   prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:detection:method=type-resolved
   prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:functions:source=observed
   prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:kb:version=0.2.0
   prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:occurrences=4
+  prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:quantum-level:source=NIST IR 8547, Table 3: SLH-DSA, the 128-bit parameter sets
   prop SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | rcbom:reachability=reachable
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
   prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
@@ -105,8 +107,8 @@
   prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:kb-coverage=unmodelled
   prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:scope=required
   prop zeroize | pkg:cargo/zeroize@1.9.2 | rcbom:usage=present
-asset SLH-DSA-SHA2-256s | crypto:algorithm:SLH-DSA-SHA2-256s | {"algorithmProperties": {"algorithmFamily": "SLH-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
-asset SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | {"algorithmProperties": {"algorithmFamily": "SLH-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "primitive": "signature"}, "assetType": "algorithm"}
+asset SLH-DSA-SHA2-256s | crypto:algorithm:SLH-DSA-SHA2-256s | {"algorithmProperties": {"algorithmFamily": "SLH-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "nistQuantumSecurityLevel": 5, "primitive": "signature"}, "assetType": "algorithm"}
+asset SLH-DSA-SHAKE-128f | crypto:algorithm:SLH-DSA-SHAKE-128f | {"algorithmProperties": {"algorithmFamily": "SLH-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "nistQuantumSecurityLevel": 1, "primitive": "signature"}, "assetType": "algorithm"}
 component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
 component library const-oid 0.9.6 | pkg:cargo/const-oid@0.9.6 | purl pkg:cargo/const-oid@0.9.6
 component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7

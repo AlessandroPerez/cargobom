@@ -47,6 +47,7 @@
   prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:kb:version=0.2.0
   prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:occurrences=6
   prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:only-as-component=true
+  prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:quantum-level:source=NIST IR 8547, Table 5: ML-KEM-768
   prop ML-KEM-768 | crypto:algorithm:ML-KEM-768 | rcbom:reachability=reachable
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:confidence=high
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:detection:method=type-resolved
@@ -54,6 +55,7 @@
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:kb:version=0.2.0
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:occurrences=6
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:only-as-component=true
+  prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA3-256, collision category (preimage: 5)
   prop SHA3-256 | crypto:algorithm:SHA3-256 | rcbom:reachability=reachable
   prop X-Wing | crypto:algorithm:X-Wing | rcbom:algorithm-family=X-Wing
   prop X-Wing | crypto:algorithm:X-Wing | rcbom:confidence=high
@@ -121,14 +123,15 @@
   prop x25519 | crypto:algorithm:x25519 | rcbom:kb:version=0.2.0
   prop x25519 | crypto:algorithm:x25519 | rcbom:occurrences=6
   prop x25519 | crypto:algorithm:x25519 | rcbom:only-as-component=true
+  prop x25519 | crypto:algorithm:x25519 | rcbom:quantum-level:source=quantum-vulnerable: elliptic-curve Diffie-Hellman, broken by Shor's algorithm (NIST IR 8547, Table 4)
   prop x25519 | crypto:algorithm:x25519 | rcbom:reachability=reachable
   prop x25519-dalek | pkg:cargo/x25519-dalek@3.0.0 | rcbom:crypto-role=algorithm
   prop x25519-dalek | pkg:cargo/x25519-dalek@3.0.0 | rcbom:scope=required
   prop x25519-dalek | pkg:cargo/x25519-dalek@3.0.0 | rcbom:usage=reachable
-asset ML-KEM-768 | crypto:algorithm:ML-KEM-768 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["keygen", "encapsulate", "decapsulate"], "primitive": "kem"}, "assetType": "algorithm"}
-asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+asset ML-KEM-768 | crypto:algorithm:ML-KEM-768 | {"algorithmProperties": {"algorithmFamily": "ML-KEM", "cryptoFunctions": ["keygen", "encapsulate", "decapsulate"], "nistQuantumSecurityLevel": 3, "primitive": "kem"}, "assetType": "algorithm"}
+asset SHA3-256 | crypto:algorithm:SHA3-256 | {"algorithmProperties": {"algorithmFamily": "SHA-3", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
 asset X-Wing | crypto:algorithm:X-Wing | {"algorithmProperties": {"cryptoFunctions": ["decapsulate", "encapsulate", "keygen"], "primitive": "kem"}, "assetType": "algorithm"}
-asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keygen", "keyderive"], "ellipticCurve": "other/Curve25519", "primitive": "key-agree"}, "assetType": "algorithm"}
+asset x25519 | crypto:algorithm:x25519 | {"algorithmProperties": {"algorithmFamily": "ECDH", "cryptoFunctions": ["keygen", "keyderive"], "ellipticCurve": "other/Curve25519", "nistQuantumSecurityLevel": 0, "primitive": "key-agree"}, "assetType": "algorithm"}
 component library cmov 0.5.4 | pkg:cargo/cmov@0.5.4 | purl pkg:cargo/cmov@0.5.4
 component library crypto-common 0.2.2 | pkg:cargo/crypto-common@0.2.2 | purl pkg:cargo/crypto-common@0.2.2
 component library ctutils 0.4.8 | pkg:cargo/ctutils@0.4.8 | purl pkg:cargo/ctutils@0.4.8

@@ -96,6 +96,7 @@
             "decrypt"
           ],
           "mode": "gcm",
+          "nistQuantumSecurityLevel": 5,
           "parameterSetIdentifier": "256",
           "primitive": "ae"
         },
@@ -161,6 +162,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 6: AES-256 (the block cipher's key, whatever the mode)"
         },
         {
           "name": "rcbom:provenance:key",
@@ -264,6 +269,7 @@
             "keygen"
           ],
           "ellipticCurve": "nist/P-256",
+          "nistQuantumSecurityLevel": 0,
           "primitive": "key-agree"
         },
         "assetType": "algorithm"
@@ -323,6 +329,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "quantum-vulnerable: elliptic-curve Diffie-Hellman, broken by Shor's algorithm (NIST IR 8547, Table 4)"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "4"
         }
@@ -338,6 +348,7 @@
             "verify"
           ],
           "ellipticCurve": "nist/P-256",
+          "nistQuantumSecurityLevel": 0,
           "primitive": "signature"
         },
         "assetType": "algorithm"
@@ -397,6 +408,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "quantum-vulnerable: ECDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)"
+        },
+        {
           "name": "rcbom:provenance:public-key",
           "value": "environment,parameter"
         },
@@ -416,6 +431,7 @@
             "sign"
           ],
           "ellipticCurve": "nist/P-384",
+          "nistQuantumSecurityLevel": 0,
           "primitive": "signature"
         },
         "assetType": "algorithm"
@@ -468,6 +484,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "quantum-vulnerable: ECDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)"
+        },
+        {
           "name": "rcbom:provenance:key",
           "value": "environment,parameter"
         },
@@ -488,6 +508,7 @@
             "sign"
           ],
           "ellipticCurve": "other/Ed25519",
+          "nistQuantumSecurityLevel": 0,
           "primitive": "signature"
         },
         "assetType": "algorithm"
@@ -538,6 +559,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "quantum-vulnerable: EdDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)"
         },
         {
           "name": "rcbom:provenance:key",
@@ -1017,6 +1042,7 @@
           "cryptoFunctions": [
             "sign"
           ],
+          "nistQuantumSecurityLevel": 0,
           "primitive": "signature"
         },
         "assetType": "algorithm"
@@ -1060,6 +1086,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "quantum-vulnerable: RSA, broken by Shor's algorithm (NIST IR 8547, Tables 2 and 4)"
         },
         {
           "name": "rcbom:param:mgf",
@@ -1118,6 +1148,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "quantum-vulnerable: RSA, broken by Shor's algorithm (NIST IR 8547, Tables 2 and 4)"
+        },
+        {
           "name": "rcbom:provenance:key",
           "value": "environment,parameter"
         },
@@ -1140,6 +1174,7 @@
           "cryptoFunctions": [
             "digest"
           ],
+          "nistQuantumSecurityLevel": 0,
           "primitive": "hash"
         },
         "assetType": "algorithm"
@@ -1192,6 +1227,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-1, collision category below 1 (preimage: 1)"
+        },
+        {
           "name": "rcbom:param:output_bytes",
           "value": "20"
         },
@@ -1210,6 +1249,7 @@
           "cryptoFunctions": [
             "digest"
           ],
+          "nistQuantumSecurityLevel": 2,
           "primitive": "hash"
         },
         "assetType": "algorithm"
@@ -1276,6 +1316,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)"
+        },
+        {
           "name": "rcbom:only-as-component",
           "value": "true"
         },
@@ -1294,6 +1338,7 @@
           "cryptoFunctions": [
             "digest"
           ],
+          "nistQuantumSecurityLevel": 4,
           "primitive": "hash"
         },
         "assetType": "algorithm"
@@ -1353,6 +1398,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-384, collision category (preimage: 5)"
+        },
+        {
           "name": "rcbom:occurrences",
           "value": "4"
         }
@@ -1367,6 +1416,7 @@
           "cryptoFunctions": [
             "digest"
           ],
+          "nistQuantumSecurityLevel": 5,
           "primitive": "hash"
         },
         "assetType": "algorithm"
@@ -1433,6 +1483,10 @@
           "value": "0.2.0"
         },
         {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-512, collision and preimage category"
+        },
+        {
           "name": "rcbom:only-as-component",
           "value": "true"
         },
@@ -1453,6 +1507,7 @@
             "keygen"
           ],
           "ellipticCurve": "other/Curve25519",
+          "nistQuantumSecurityLevel": 0,
           "primitive": "key-agree"
         },
         "assetType": "algorithm"
@@ -1538,6 +1593,10 @@
         {
           "name": "rcbom:kb:version",
           "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "quantum-vulnerable: elliptic-curve Diffie-Hellman, broken by Shor's algorithm (NIST IR 8547, Table 4)"
         },
         {
           "name": "rcbom:occurrences",
@@ -1748,7 +1807,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:60d89c15-c565-8d0c-a08d-0ff9e9fedcd1",
+  "serialNumber": "urn:uuid:0c69a5bc-d621-8c41-bdf1-589779b04c69",
   "specVersion": "1.7",
   "version": 1
 }
