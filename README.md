@@ -585,11 +585,15 @@ probe now. In rustls-pure 0.15.5 the six should not have been in the CBOM: rustl
 layer starts with `<dyn MessageEncrypter>::invalid()`, a function of the trait object's type
 that takes no `self`, and it was read as a call on an object and cited for the three AEADs the
 package boxes as one (`regress/analysis-199`: the compiler's record says whether a function
-takes `self`, and only one that does has a receiver). In nordisk-pairing 0.5.32 six uses were
-right and their positions wrong: for `$ty::new()` inside `paste!`, which writes the path anew
-from the macro's fragment, the compiler's span runs from the first place the macro writes
-`$ty`, lines above the call, to the path's end (`regress/driver-52`: such a path is placed at
-the writing of the fragment it starts at). Both pass on the build with the fixes: 284 and 274
+takes `self`, and only one that does has a receiver). The verifier had rejected them for a
+reason of its own, not reading the path of a trait object's type; it reads one now, and holds
+such a member to what the text shows: a path called with no argument has neither a receiver
+nor a value an object could be, and a member through a trait object cited there is a
+mismatch. In nordisk-pairing 0.5.32 six uses were right and their positions wrong: for
+`$ty::new()` inside `paste!`, which writes the path anew from the macro's fragment, the
+compiler's span runs from the first place the macro writes `$ty`, lines above the call, to
+the path's end (`regress/driver-52`: such a path is placed at the writing of the fragment it
+starts at). Both pass on the build with the fixes: 284 and 274
 positions verified, every shifted one rejected. The run also showed the verifier slow where
 many positions lie in macros, a quarter of an hour for the self-test of turbo-surf-deno-crypto
 (839 positions, 31,375 shifts): it compiled the same patterns for every position and
