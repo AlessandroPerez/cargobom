@@ -1,0 +1,367 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via driver-54 -> sha3 -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via driver-54 -> sha3 -> digest -> crypto-common",
+            "line": 24,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/digest@0.10.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via driver-54 -> sha3 -> digest",
+            "line": 34,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "digest"
+          }
+        ]
+      },
+      "name": "digest",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.10.7",
+      "type": "library",
+      "version": "0.10.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/keccak@0.1.6",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked keccak 0.1.6; reached via driver-54 -> sha3 -> keccak",
+            "line": 61,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "keccak"
+          }
+        ]
+      },
+      "name": "keccak",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/keccak@0.1.6",
+      "type": "library",
+      "version": "0.1.6"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha3@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by driver-54 (dependencies)",
+            "line": 9,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "sha3"
+          },
+          {
+            "additionalContext": "[manifest] locked sha3 0.10.9; reached via driver-54 -> sha3",
+            "line": 76,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha3"
+          }
+        ]
+      },
+      "name": "sha3",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha3@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHAKE256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-3",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "nistQuantumSecurityLevel": 5,
+          "primitive": "xof"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in driver_54::Desc::<driver_54::Base>::sample; default: setup, not a use; owner at src/main.rs:33:7-33:13 within 33:4-48:5; instantiated by driver_54::main at src/main.rs:52:12 as `Desc::<Base>::sample` (call, to 52:32 as `Desc::<Base>::sample` line #8ac0f7db, caller at src/main.rs:51:3-51:7 within 51:0-54:1); line: `let mut hasher = Shake256::default();`; code: `Shake256::default`",
+            "line": 34,
+            "location": "src/main.rs",
+            "offset": 25,
+            "symbol": "core::default::Default::default"
+          },
+          {
+            "additionalContext": "[reachable] [call] in driver_54::Desc::<driver_54::Base>::sample; use: digest; owner at src/main.rs:33:7-33:13 within 33:4-48:5; instantiated by driver_54::main at src/main.rs:52:12 as `Desc::<Base>::sample` (call, to 52:32 as `Desc::<Base>::sample` line #8ac0f7db, caller at src/main.rs:51:3-51:7 within 51:0-54:1); line: `hasher.update(b\"encrypt everything, compute anything\");`; code: `update`",
+            "line": 36,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "digest::Update::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in driver_54::Desc::<driver_54::Base>::sample; use: digest; owner at src/main.rs:33:7-33:13 within 33:4-48:5; instantiated by driver_54::main at src/main.rs:52:12 as `Desc::<Base>::sample` (call, to 52:32 as `Desc::<Base>::sample` line #8ac0f7db, caller at src/main.rs:51:3-51:7 within 51:0-54:1); line: `let mut reader = hasher.finalize_xof();`; code: `finalize_xof`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 32,
+            "symbol": "digest::ExtendableOutput::finalize_xof"
+          },
+          {
+            "additionalContext": "[reachable] [call] in driver_54::Desc::<F>::sample::{closure#0}; use: digest; owner at src/main.rs:39:17-39:20 as `|_|` line #9a90549b within 39:17-39:66; owner `driver_54::Desc::<driver_54::Base>::sample::{closure#0}` at src/main.rs:39:17-39:20 as `|_|` line #9a90549b within 39:17-39:66; `driver_54::Desc::<driver_54::Base>::sample::{closure#0}` instantiated by driver_54::Desc::<driver_54::Base>::sample at src/main.rs:39:17 (built, to 39:66 as `|_| F::from_bytes(&reader.read_boxed(buffer_len))` line #9a90549b, caller at src/main.rs:33:7-33:13 within 33:4-48:5); instantiated by driver_54::main at src/main.rs:52:12 as `Desc::<Base>::sample` (call, to 52:32 as `Desc::<Base>::sample` line #8ac0f7db, caller at src/main.rs:51:3-51:7 within 51:0-54:1); line: `.map(|_| F::from_bytes(&reader.read_boxed(buffer_len)))`; code: `read_boxed`",
+            "line": 39,
+            "location": "src/main.rs",
+            "offset": 43,
+            "symbol": "digest::XofReader::read_boxed"
+          },
+          {
+            "additionalContext": "[reachable] [call] in driver_54::Desc::<F>::sample::{closure#1}; use: digest; owner at src/main.rs:44:21-44:24 as `|_|` line #8c1b3f90 within 44:21-44:70; owner `driver_54::Desc::<driver_54::Base>::sample::{closure#1}` at src/main.rs:44:21-44:24 as `|_|` line #8c1b3f90 within 44:21-44:70; `driver_54::Desc::<driver_54::Base>::sample::{closure#1}` instantiated by driver_54::Desc::<driver_54::Base>::sample at src/main.rs:44:21 (built, to 44:70 as `|_| F::from_bytes(&reader.read_boxed(buffer_len))` line #8c1b3f90, caller at src/main.rs:33:7-33:13 within 33:4-48:5); instantiated by driver_54::main at src/main.rs:52:12 as `Desc::<Base>::sample` (call, to 52:32 as `Desc::<Base>::sample` line #8ac0f7db, caller at src/main.rs:51:3-51:7 within 51:0-54:1); line: `.map(|_| F::from_bytes(&reader.read_boxed(buffer_len)));`; code: `read_boxed`",
+            "line": 44,
+            "location": "src/main.rs",
+            "offset": 47,
+            "symbol": "digest::XofReader::read_boxed"
+          }
+        ]
+      },
+      "name": "SHAKE256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHAKE256 with an output long enough, collision and preimage category"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "5"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/sha3@0.10.9"
+      ],
+      "ref": "pkg:cargo/driver-54@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/keccak@0.1.6"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7",
+        "pkg:cargo/keccak@0.1.6"
+      ],
+      "provides": [
+        "crypto:algorithm:SHAKE256"
+      ],
+      "ref": "pkg:cargo/sha3@0.10.9"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHAKE256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/driver-54@0.1.0",
+      "name": "driver-54",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/driver-54@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "9"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "140"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin driver-54"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "5 calls into crypto packages: 5 cited, 0 cited by the check as unknown, 0 excused ()"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:221019cf-5269-8606-b285-acbd4f3d567c",
+  "specVersion": "1.7",
+  "version": 1
+}

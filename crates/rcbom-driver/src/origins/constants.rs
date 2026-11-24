@@ -123,41 +123,31 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 );
                 // a named constant array or slice of an enum's variants (`const RSA_ALGS:
                 // &[Algorithm] = &[RS256, RS384]`): those variants
-                if let Some(v) = self.evaluate(uneval) {
-                    let c: rustc_public::ty::MirConst = rustc_internal::stable(
-                        rustc_middle::mir::Const::Val(v, rustc_internal::internal(self.tcx, ty)),
-                    );
-                    if let ConstantKind::Allocated(a) = c.kind()
-                        && let Some(o) = self.enum_elements(a, &ty)
-                    {
-                        return o;
-                    }
+                let valued = self.evaluate(uneval).and_then(|v| self.valued(v, &ty));
+                if let Some((c, ty)) = &valued
+                    && let ConstantKind::Allocated(a) = c.kind()
+                    && let Some(o) = self.enum_elements(a, ty)
+                {
+                    return o;
                 }
                 self.unevaluated(uneval, &ty, None, int_ty)
                     .unwrap_or_else(|| {
                         // a promoted literal (`&[0; 32]` in an item body): its data, as an
                         // instance body has it evaluated
-                        let evaluated = uneval.2.and_then(|_| self.evaluate(uneval)).map(|v| {
-                            let c: rustc_public::ty::MirConst =
-                                rustc_internal::stable(rustc_middle::mir::Const::Val(
-                                    v,
-                                    rustc_internal::internal(self.tcx, ty),
-                                ));
-                            c
-                        });
+                        let evaluated = valued.filter(|_| uneval.2.is_some());
                         // an array of an enum's variants (`&[Algorithm::HS256]`)
-                        if let Some(c) = &evaluated
+                        if let Some((c, ty)) = &evaluated
                             && let ConstantKind::Allocated(a) = c.kind()
-                            && let Some(o) = self.enum_elements(a, &ty)
+                            && let Some(o) = self.enum_elements(a, ty)
                         {
                             return o;
                         }
-                        let range = evaluated.as_ref().and_then(|c| match c.kind() {
-                            ConstantKind::Allocated(a) => index_range(self.tcx, a, &ty),
+                        let range = evaluated.as_ref().and_then(|(c, ty)| match c.kind() {
+                            ConstantKind::Allocated(a) => index_range(self.tcx, a, ty),
                             _ => None,
                         });
                         let (len, zero) = evaluated
-                            .and_then(|c| match c.kind() {
+                            .and_then(|(c, ty)| match c.kind() {
                                 ConstantKind::Allocated(a) => Some(literal_data(a, &ty)),
                                 _ => None,
                             })
@@ -289,6 +279,39 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         inner.followed = true;
         let o = inner.returned_part(&[]);
         names_fn(&o).then_some(o)
+    }
+
+    /// An evaluated constant's data, read by the layout of its type, and that type: in terms
+    /// of the instance when this is one. None for a type without a layout: in a generic item's
+    /// body a constant may have a parameter's type (`F::ZERO` with `F: Field`), which the
+    /// instance's arguments evaluate (`evaluate`) while the body still says `F`, and reading
+    /// the value by that type panics in the compiler.
+    fn valued(
+        &self,
+        v: rustc_middle::mir::ConstValue,
+        ty: &Ty,
+    ) -> Option<(rustc_public::ty::MirConst, Ty)> {
+        use rustc_middle::ty::TypeVisitableExt;
+        let tcx = self.tcx;
+        let env = rustc_middle::ty::TypingEnv::fully_monomorphized();
+        let t = rustc_internal::internal(tcx, *ty);
+        let t = match self.inst_args() {
+            Some(a) if t.has_non_region_param() => rustc_middle::ty::EarlyBinder::bind(tcx, t)
+                .instantiate(tcx, a)
+                .skip_norm_wip(),
+            _ => t,
+        };
+        if t.has_non_region_param() || t.has_escaping_bound_vars() || t.has_placeholders() {
+            return None;
+        }
+        let t = tcx
+            .try_normalize_erasing_regions(env, rustc_middle::ty::Unnormalized::new_wip(t))
+            .ok()?;
+        tcx.layout_of(env.as_query_input(t)).ok()?;
+        Some((
+            rustc_internal::stable(rustc_middle::mir::Const::Val(v, t)),
+            rustc_internal::stable(t),
+        ))
     }
 
     /// The value of an unevaluated constant, when its arguments are known (in terms of the
