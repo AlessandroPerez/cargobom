@@ -704,7 +704,7 @@ impl Files<'_> {
                     let carrying = r.open
                         && sig.params.iter().any(|(p, ty)| {
                             !neutral_type(ty)
-                                && Regex::new(&format!(
+                                && super::compiled(&format!(
                                     r"\b{}\b",
                                     regex::escape(p.trim_start_matches("mut ").trim())
                                 ))

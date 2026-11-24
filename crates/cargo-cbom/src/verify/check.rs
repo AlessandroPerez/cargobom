@@ -606,7 +606,7 @@ impl Files<'_> {
                                     .filter(|i| i.kind == ItemKind::Macro && i.name == m)
                                     .any(|i| {
                                         let (a, b) = s.span(i);
-                                        Regex::new(&format!(r"\b{}\b", regex::escape(&ident)))
+                                        super::compiled(&format!(r"\b{}\b", regex::escape(&ident)))
                                             .is_ok_and(|r| r.is_match(&s.text(a, b)))
                                     })
                             })
@@ -1662,7 +1662,7 @@ fn fits_template(template: &str, asset: &str) -> bool {
         }
     }
     re.push('$');
-    Regex::new(&re).is_ok_and(|r| r.is_match(asset))
+    super::compiled(&re).is_ok_and(|r| r.is_match(asset))
 }
 
 /// The calls of a method `name` next to the one at `i` in its chain: the one its receiver ends

@@ -695,7 +695,7 @@ impl Files<'_> {
             let head: String = rs.iter().take(400).collect();
             let name = st.name.rsplit("::").next().unwrap_or_default();
             let named = |prefix: &str, suffix: &str| {
-                Regex::new(&format!("^{prefix}"))
+                super::compiled(&format!("^{prefix}"))
                     .ok()
                     .and_then(|r| r.find(&head))
                     .is_some_and(|open| written_path(name, suffix).is_match(&head[open.end()..]))
@@ -710,7 +710,7 @@ impl Files<'_> {
                         && w.steps[i + 1..].iter().any(|outer| {
                             outer.call.as_ref().is_some_and(|c| {
                                 self.span_at(c, false).is_ok_and(|(_, s)| {
-                                    Regex::new(&format!(r"\b{}\b", regex::escape(name)))
+                                    super::compiled(&format!(r"\b{}\b", regex::escape(name)))
                                         .is_ok_and(|r| r.is_match(&text_of(&s, c.start, c.end)))
                                 })
                             })
@@ -945,7 +945,8 @@ impl Files<'_> {
                     .filter(|b| b.path.last() == Some(&ident) && b.name != "*")
                     .map(|b| regex::escape(&b.name)),
             );
-            if Regex::new(&format!(r"\b(?:{})\b", names.join("|"))).is_ok_and(|r| r.is_match(&code))
+            if super::compiled(&format!(r"\b(?:{})\b", names.join("|")))
+                .is_ok_and(|r| r.is_match(&code))
             {
                 return Ok(true);
             }

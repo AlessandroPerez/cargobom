@@ -644,6 +644,22 @@ pub(super) fn check_toml_in(
 /// above it that has a `[package]` sets `proc-macro = true` in its `[lib]`, or lists
 /// `"proc-macro"` among the `crate-type`s there.
 pub(super) fn in_proc_macro_package(file: &Path) -> bool {
+    // (asked for every position in a file: answered once for the files of a directory)
+    thread_local! {
+        static KNOWN: std::cell::RefCell<std::collections::HashMap<std::path::PathBuf, bool>> =
+            Default::default();
+    }
+    let Some(dir) = file.parent() else {
+        return false;
+    };
+    if let Some(known) = KNOWN.with(|k| k.borrow().get(dir).copied()) {
+        return known;
+    }
+    let found = proc_macro_package(file);
+    KNOWN.with(|k| k.borrow_mut().insert(dir.to_path_buf(), found));
+    found
+}
+fn proc_macro_package(file: &Path) -> bool {
     for dir in file.ancestors().skip(1) {
         let Ok(text) = std::fs::read_to_string(dir.join("Cargo.toml")) else {
             continue;

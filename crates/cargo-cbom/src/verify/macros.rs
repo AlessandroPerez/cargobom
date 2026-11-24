@@ -270,7 +270,7 @@ pub(super) fn macro_made(src: &Source, words: &[String]) -> Option<Rc<Source>> {
             continue;
         };
         let names = |w: &String| {
-            Regex::new(&format!(r"\b{}\b", regex::escape(w))).is_ok_and(|r| r.is_match(&call))
+            super::compiled(&format!(r"\b{}\b", regex::escape(w))).is_ok_and(|r| r.is_match(&call))
         };
         if !words.iter().any(names) {
             continue;

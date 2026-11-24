@@ -95,7 +95,7 @@ pub(super) fn expand_aliases(
             });
             if let Some((params, target)) = found {
                 let names: Vec<String> = params.iter().map(|p| regex::escape(p)).collect();
-                let replaced = match Regex::new(&format!(r"\b(?:{})\b", names.join("|"))) {
+                let replaced = match super::compiled(&format!(r"\b(?:{})\b", names.join("|"))) {
                     Ok(re) => re
                         .replace_all(&target, |c: &regex::Captures| {
                             params
@@ -258,7 +258,7 @@ pub(super) fn receiver_type(src: &Source, i: usize) -> Option<String> {
     let code: String = src.code.iter().collect();
     for _ in 0..4 {
         // (also one with parameters: `type RequestSendInner<'a> = request_native::RequestSend<'a>;`)
-        let Ok(re) = Regex::new(&format!(
+        let Ok(re) = super::compiled(&format!(
             r"\btype\s+{}\s*(?:<[^=;{{}}]*>)?\s*=\s*([^;<]+)",
             regex::escape(&ty)
         )) else {
@@ -868,7 +868,7 @@ pub(super) fn dyn_traits_src(src: &Source, t: &str) -> Vec<String> {
         );
         if !name.is_empty()
             && name.chars().all(is_ident)
-            && let Ok(re) = Regex::new(&format!(
+            && let Ok(re) = super::compiled(&format!(
                 r"\btype\s+{}\b[^=;]*=\s*([^;]+);",
                 regex::escape(&name)
             ))
@@ -908,7 +908,7 @@ pub(super) fn variant_field(
     });
     let close = close_of_at(&src.code, open)?;
     let text = src.text(open, close);
-    let var = Regex::new(&format!(r"[{{,]\s*{}\s*\(", regex::escape(variant))).ok()?;
+    let var = super::compiled(&format!(r"[{{,]\s*{}\s*\(", regex::escape(variant))).ok()?;
     let m = var.find(&text)?;
     let paren = open + text[..m.end()].chars().count() - 1;
     let end = close_of_at(&src.code, paren)?;

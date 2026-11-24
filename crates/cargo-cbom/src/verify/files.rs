@@ -122,7 +122,7 @@ impl Files<'_> {
                 .filter(|(s, i)| {
                     let t = text_of(s, i);
                     making.iter().any(|m| {
-                        Regex::new(&format!(r"\b{}\s*!", regex::escape(m)))
+                        super::compiled(&format!(r"\b{}\s*!", regex::escape(m)))
                             .is_ok_and(|r| r.is_match(&t))
                     })
                 })
@@ -184,12 +184,12 @@ impl Files<'_> {
                 if mods.is_empty() {
                     files = vec![base.join("lib.rs")];
                 }
-                let ty_re = Regex::new(&format!(
+                let ty_re = super::compiled(&format!(
                     r"\b(?:trait|struct|enum|union|type)\s+{}\b",
                     regex::escape(ty)
                 ))
                 .unwrap();
-                let fn_re = Regex::new(&format!(r"\bfn\s+{}\b", regex::escape(f))).unwrap();
+                let fn_re = super::compiled(&format!(r"\bfn\s+{}\b", regex::escape(f))).unwrap();
                 let texts: Vec<String> = files
                     .iter()
                     .filter_map(|f| std::fs::read_to_string(f).ok())

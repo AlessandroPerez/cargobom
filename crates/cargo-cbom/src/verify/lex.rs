@@ -984,13 +984,13 @@ pub(super) fn code_from(src: &Source, line: usize, offset: usize) -> String {
 /// A pattern for the path `name` as the grammar lets it be written where the text starts:
 /// from the root (`::pm::Sum`) or `$crate`, under any qualifiers, with blanks and line ends
 /// around its `::`, each segment a raw identifier or not (`mac::r#free_fn`); then `suffix`.
-pub(super) fn written_path(name: &str, suffix: &str) -> Regex {
+pub(super) fn written_path(name: &str, suffix: &str) -> std::rc::Rc<Regex> {
     let segments: Vec<String> = name
         .split("::")
         .filter(|g| !g.is_empty())
         .map(|g| format!("(?:r#)?{}", regex::escape(g.trim_start_matches("r#"))))
         .collect();
-    Regex::new(&format!(
+    super::compiled(&format!(
         r"^(?:\$crate\s*::\s*|::\s*)?(?:(?:r#)?\w+\s*::\s*)*{}{suffix}",
         segments.join(r"\s*::\s*")
     ))

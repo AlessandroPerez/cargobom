@@ -28,7 +28,7 @@ pub(super) fn returns_part(src: &Source, f: &Item, param: &str) -> Option<(Strin
     let definite = !(o..c).any(|m| kw(s, m, "return") || s[m] == '?');
     let p = regex::escape(param);
     // `x`, `&mut *x`, `&mut x.f.g`, `&mut self.alg`
-    if let Some(m) = Regex::new(&format!(
+    if let Some(m) = super::compiled(&format!(
         r"^(?:&\s*mut\s+\**\s*)?\(?\s*\**{p}\s*\)?((?:\s*\.\s*\w+)*)$"
     ))
     .ok()?
@@ -40,14 +40,14 @@ pub(super) fn returns_part(src: &Source, f: &Item, param: &str) -> Option<(Strin
         }
         return Some((String::new(), sub, definite));
     }
-    if Regex::new(&format!(r"^Some\s*\(\s*{p}\s*\)$"))
+    if super::compiled(&format!(r"^Some\s*\(\s*{p}\s*\)$"))
         .ok()?
         .is_match(tail)
     {
         return Some(("?".into(), String::new(), definite));
     }
     // `W { r: x, .. }`, `Self { r: x }`, `W { r: &mut self.alg }`, `W1 { r }`
-    if let Some(m) = Regex::new(&format!(
+    if let Some(m) = super::compiled(&format!(
         r"^(?:\w+::)*[A-Z]\w*\s*\{{(?:[^{{}}]*,)?\s*(\w+)\s*:\s*(&\s*mut\s+\**\s*)?{p}((?:\s*\.\s*\w+)*)\s*(?:,[^{{}}]*)?\}}$"
     ))
     .ok()?
@@ -59,7 +59,7 @@ pub(super) fn returns_part(src: &Source, f: &Item, param: &str) -> Option<(Strin
         }
         return Some((format!(".{}", &m[1]), sub, definite));
     }
-    if Regex::new(&format!(
+    if super::compiled(&format!(
         r"^(?:\w+::)*[A-Z]\w*\s*\{{(?:[^{{}}]*,)?\s*{p}\s*(?:,[^{{}}]*)?\}}$"
     ))
     .ok()?
@@ -70,7 +70,7 @@ pub(super) fn returns_part(src: &Source, f: &Item, param: &str) -> Option<(Strin
     // `(x, ..)`, `(&mut self.a, &mut self.b)`
     if tail.starts_with('(') && tail.ends_with(')') {
         let parts = split_top(&tail[1..tail.len() - 1]);
-        let elem = Regex::new(&format!(r"^(&\s*mut\s+\**\s*)?{p}((?:\s*\.\s*\w+)*)$")).ok()?;
+        let elem = super::compiled(&format!(r"^(&\s*mut\s+\**\s*)?{p}((?:\s*\.\s*\w+)*)$")).ok()?;
         if parts.len() > 1 {
             for (k, e) in parts.iter().enumerate() {
                 if let Some(m) = elem.captures(e.trim()) {
@@ -578,7 +578,8 @@ pub(super) fn mapper_drops_value(src: &Source, i: usize) -> bool {
     let names_any = |text: &str, ps: &[String]| {
         ps.iter().any(|p| {
             p != "_"
-                && Regex::new(&format!(r"\b{}\b", regex::escape(p))).is_ok_and(|r| r.is_match(text))
+                && super::compiled(&format!(r"\b{}\b", regex::escape(p)))
+                    .is_ok_and(|r| r.is_match(text))
         })
     };
     if s.get(m) == Some(&'|') {
@@ -846,7 +847,7 @@ pub(super) fn body_assigns(
     // what it writes through it is not the caller's place
     let body = src.text(b0, b1);
     if param != "self"
-        && Regex::new(&format!(
+        && super::compiled(&format!(
             r"(?:^|[;{{}}]\s*){p}\s*=[^=]|&\s*mut\s+{p}\b",
             p = regex::escape(param)
         ))
@@ -1792,7 +1793,7 @@ pub(super) fn writes_to(src: &Source, bd: &Bind) -> Vec<(usize, usize, usize)> {
         i += bd.name.len();
     }
     // `*f(.., &mut v, ..) = x;`: a store through the borrow a call returns, which may be `v`
-    let lent = Regex::new(&format!(r"&\s*mut\s+{}\b", regex::escape(&bd.name))).ok();
+    let lent = super::compiled(&format!(r"&\s*mut\s+{}\b", regex::escape(&bd.name))).ok();
     let mut i = from;
     while i < to.min(s.len()) {
         if s[i] != '*' || !before_blank(s, i).is_none_or(|p| matches!(s[p], ';' | '{' | '}')) {

@@ -280,6 +280,23 @@ macro_rules! re {
     }};
 }
 
+/// A pattern built at run time (a name between word boundaries, a path as it may be written),
+/// compiled once: the checks build the same few for every position, and compiling one costs
+/// more than every match made with it.
+fn compiled(pattern: &str) -> Result<Rc<Regex>, regex::Error> {
+    thread_local! {
+        static COMPILED: std::cell::RefCell<HashMap<String, Rc<Regex>>> = Default::default();
+    }
+    COMPILED.with(|c| {
+        if let Some(r) = c.borrow().get(pattern) {
+            return Ok(r.clone());
+        }
+        let r = Rc::new(Regex::new(pattern)?);
+        c.borrow_mut().insert(pattern.to_string(), r.clone());
+        Ok(r)
+    })
+}
+
 mod check;
 mod files;
 mod lex;

@@ -765,7 +765,7 @@ pub(super) fn pointer_bound(
                     i.kind == ItemKind::Static
                         && i.name != cur.1
                         && (i.start.0..=i.end.0).contains(&named)
-                        && Regex::new(&format!(r"\b{}\b", regex::escape(&i.name)))
+                        && super::compiled(&format!(r"\b{}\b", regex::escape(&i.name)))
                             .is_ok_and(|r| r.is_match(&text))
                 });
                 return if refers {
@@ -1180,7 +1180,7 @@ pub(super) fn container_stores(src: &Source, at: usize, var: &str) -> Vec<(usize
     let (a, b) = src.span(f);
     let text = src.text(a, b);
     // (of the variable, or of a field of it: `t.map.insert(..)`)
-    let Ok(r) = Regex::new(&format!(
+    let Ok(r) = super::compiled(&format!(
         r"(?:^|[^\w.])({})(?:\s*\.\s*\w+)*?\s*\.\s*(?:insert|push|push_back|push_front|extend|append|entry\s*\([^)]*\)\s*\.\s*or_insert(?:_with)?)\s*\(",
         regex::escape(var)
     )) else {
@@ -1201,7 +1201,7 @@ pub(super) fn container_stores(src: &Source, at: usize, var: &str) -> Vec<(usize
 /// pass a variable bound where it is named, or whose receiver is (`ho.run(&d)` with `let ho =
 /// Holder { f: digest::digest };` for `self`)?
 pub(super) fn param_passes(src: &Source, fun: &str, var: &str, named: usize) -> Result<(), String> {
-    let call = Regex::new(&format!(
+    let call = super::compiled(&format!(
         r"\b{}\b\s*(?:::\s*<[^>]*>\s*)?\(",
         regex::escape(fun)
     ))
@@ -1380,7 +1380,7 @@ pub(super) fn attribute_before(src: &Source, line: usize, offset: usize) -> Opti
 /// Whether, in an attribute's text up to a position, a `name(` is still open there.
 pub(super) fn open_in(attr: &str, name: &str) -> bool {
     let Some(i) = attr.rfind(&format!("{name}(")).or_else(|| {
-        Regex::new(&format!(r"{}\s+\(", regex::escape(name)))
+        super::compiled(&format!(r"{}\s+\(", regex::escape(name)))
             .unwrap()
             .find_iter(attr)
             .last()

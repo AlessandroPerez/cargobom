@@ -124,10 +124,17 @@ impl Manifest {
 
     /// Inverse of `location`.
     pub fn resolve(&self, location: &str) -> PathBuf {
-        for p in &self.packages {
-            let prefix = format!("{}-{}/", p.name, p.version);
-            if let Some(rest) = location.strip_prefix(&prefix) {
-                return p.manifest_dir.join(rest);
+        // (`<name>-<version>/<rest>`: the version is written out only for a package whose name
+        // the location starts with; this is asked for every position a verifier checks)
+        if let Some((head, rest)) = location.split_once('/') {
+            for p in &self.packages {
+                if head
+                    .strip_prefix(p.name.as_str())
+                    .and_then(|v| v.strip_prefix('-'))
+                    .is_some_and(|v| v == p.version.to_string())
+                {
+                    return p.manifest_dir.join(rest);
+                }
             }
         }
         if let Some(rest) = location.strip_prefix("target/") {
