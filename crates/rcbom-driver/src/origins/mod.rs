@@ -60,6 +60,18 @@ const MAX_WIDTH: usize = 16;
 const MAX_FIELDS: usize = 32;
 /// Nodes (operands) per origin tree; past them nothing more is read, places either.
 const MAX_NODES: usize = 400;
+/// Nodes of all the origin trees asked of one body together. Past them a tree is read up to
+/// `MIN_NODES`: a constant, a named item, a parameter, one call's result with its arguments
+/// are still found, and what lies further is cut (`Truncated`). In a compression function
+/// written out round by round each call's arguments are the calls before it, every tree grown
+/// to `MAX_NODES` (bitcoin_hashes 0.14's SHA-512 `process_block`: 448 calls and 67 MB of
+/// facts, 760 MB for the crate, which took the analysis of a program of seven lines 3.5 GB to
+/// read back). The largest of a body that is no such function in the fixtures holds a fourth
+/// of this (rustls's `handle_client_hello`, 45 calls).
+const MAX_BODY_NODES: usize = 32_768;
+/// Nodes per origin tree once the body's trees hold `MAX_BODY_NODES`: a selector over
+/// `MAX_WIDTH` values is still whole.
+const MIN_NODES: usize = MAX_WIDTH + 1;
 /// Places read per origin tree. A place read through a move, a borrow or a field costs no
 /// node and no depth, and the places under way are held only along the way to each (a loop is
 /// cut where it closes): in a function whose variables are each made of the others on several
@@ -230,6 +242,8 @@ pub(crate) struct Origins<'a, 'tcx> {
     nodes: Cell<usize>,
     /// The places the current query has read (`MAX_PLACES`).
     places: Cell<usize>,
+    /// The nodes of the trees the queries of this body have answered with (`MAX_BODY_NODES`).
+    spent: Cell<usize>,
     /// For an instance body (a generic function's instance, a closure in the walk): the item
     /// it was instantiated from and the instance's generic arguments. The instance body has its
     /// named constants evaluated away (`&ECDSA_P256_SHA256_ASN1` is a bare pointer there); the
@@ -301,6 +315,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             parent_captures: RefCell::new(HashMap::new()),
             nodes: Cell::new(0),
             places: Cell::new(0),
+            spent: Cell::new(0),
             item: None,
             item_consts: OnceCell::new(),
         }

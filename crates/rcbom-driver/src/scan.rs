@@ -1086,9 +1086,14 @@ impl Scanner<'_, '_> {
 /// The type parameters of this crate's generic functions that a where-clause bounds by a trait
 /// of the crate, each with the types the build implements that trait for
 /// (`rcbom_facts::ClosedBound`). A trait with an impl for a type that is not whole (`impl<T>
-/// Tr for T`, `for Vec<T>`) bounds nothing to a set. Of several such traits on one parameter,
-/// the one with the fewest types.
+/// Tr for T`, `for Vec<T>`) bounds nothing to a set, nor does one implemented for more than
+/// `MAX_BOUND_TYPES` types: hybrid-array's `ArraySize` is of every size typenum names, and
+/// the list under each of the crate's generic functions was 190 MB of facts in every build
+/// with it. Of several such traits on one parameter, the one with the fewest types.
 pub(crate) fn closed_bounds(tcx: TyCtxt<'_>) -> Vec<rcbom_facts::ClosedBound> {
+    /// The types a trait may be implemented for and still bound a parameter to a set: each
+    /// is a member an operation on the parameter may be of.
+    const MAX_BOUND_TYPES: usize = 64;
     use rustc_hir::def::DefKind;
     use rustc_middle::ty::{self, TypeVisitableExt};
     let read = catch_unwind(AssertUnwindSafe(|| {
@@ -1124,6 +1129,9 @@ pub(crate) fn closed_bounds(tcx: TyCtxt<'_>) -> Vec<rcbom_facts::ClosedBound> {
                         let tree = ty_tree(tcx, &rustc_internal::stable(t), 0);
                         if !types.contains(&tree) {
                             types.push(tree);
+                        }
+                        if types.len() > MAX_BOUND_TYPES {
+                            return None;
                         }
                     }
                     (!types.is_empty()).then_some(types)

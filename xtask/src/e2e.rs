@@ -4,6 +4,7 @@
 //! - a position that does not verify against the source, or a shifted position the self-test
 //!   does not reject (`cargo cbom verify --self-test`);
 //! - a panic the driver caught ("N items could not be analysed"; `RCBOM_DEBUG=1` prints them);
+//! - facts of one crate over `MAX_FACTS_MB`: a part of them that is not bounded;
 //! - a call of the walked code into a crypto package the CBOM neither cites nor excuses (the
 //!   boundary check's "not cited" lines);
 //! - code a binary links that the walk did not reach, where the fixture's `cbom-args` run the
@@ -83,6 +84,10 @@ struct Env {
 
 /// The run property of the walk check, as a line of the CBOM's text.
 const WALK_LINE: &str = "run rcbom:run:walk-check=";
+/// The facts of one crate, at most (the largest of the fixtures' are orion's and rustls's,
+/// under 110 MB; bitcoin_hashes' were 727 MB and hybrid-array's 165 MB before their parts were
+/// bounded).
+const MAX_FACTS_MB: u64 = 128;
 
 /// Do a fixture's `cbom-args` run the walk check?
 fn asks_walk(selection: &str) -> bool {
@@ -211,6 +216,31 @@ impl Env {
         if !caught.is_empty() {
             log.push_str(&caught.join("\n"));
             log.push_str("\nthe driver caught panics: each is a bug (RCBOM_DEBUG=1 prints them)\n");
+            return Ok(false);
+        }
+        // what the driver wrote of one crate stays within a bound: the analysis reads every
+        // crate's facts back, and a part of them that grows with something else than the
+        // code (a tree per call of all the calls before it, a list per function of every
+        // type of a trait) is memory a run does not have
+        let facts = match &self.cache {
+            Some(cache) => cache.join(name),
+            None => dir.join("target"),
+        }
+        .join("rcbom/facts");
+        let heavy: Vec<String> = std::fs::read_dir(&facts)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .filter_map(|e| {
+                let mb = e.metadata().ok()?.len() / (1 << 20);
+                (mb > MAX_FACTS_MB).then(|| format!("{}: {mb} MB", e.file_name().display()))
+            })
+            .collect();
+        if !heavy.is_empty() {
+            log.push_str(&heavy.join("\n"));
+            log.push_str(&format!(
+                "\nthe facts of one crate are over {MAX_FACTS_MB} MB: something in them is not bounded\n"
+            ));
             return Ok(false);
         }
         let uncited: Vec<&str> = cli_log

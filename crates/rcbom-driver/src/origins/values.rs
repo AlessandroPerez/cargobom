@@ -7,10 +7,8 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     /// Origin of `op` read at statement `idx` of block `bb` (the terminator if `idx` is the
     /// number of statements).
     pub(crate) fn operand_at(&self, op: &Operand, bb: usize, idx: usize) -> Origin {
-        self.nodes.set(0);
-        self.places.set(0);
-        self.operand(op, At { bb, idx }, 0, &mut HashSet::new())
-            .capped(MAX_ORIGIN_DEPTH)
+        self.begin();
+        self.answer(self.operand(op, At { bb, idx }, 0, &mut HashSet::new()))
     }
 
     pub(crate) fn body(&self) -> &'a Body {
@@ -26,10 +24,9 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         bb: usize,
         idx: usize,
     ) -> Origin {
-        self.nodes.set(0);
-        self.places.set(0);
+        self.begin();
         let at = At { bb, idx };
-        match op {
+        let o = match op {
             Operand::Copy(p) | Operand::Move(p) => {
                 let mut path = path_of_place(p);
                 path.extend_from_slice(rest);
@@ -47,8 +44,8 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
                 }
             }
             _ => self.operand(op, at, 0, &mut HashSet::new()),
-        }
-        .capped(MAX_ORIGIN_DEPTH)
+        };
+        self.answer(o)
     }
 
     /// Origin of the part `rest` of what `rv` computes at statement `idx` of block `bb`.
@@ -60,10 +57,8 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         bb: usize,
         idx: usize,
     ) -> Origin {
-        self.nodes.set(0);
-        self.places.set(0);
-        self.rvalue(rv, span, rest, At { bb, idx }, 0, &mut HashSet::new())
-            .capped(MAX_ORIGIN_DEPTH)
+        self.begin();
+        self.answer(self.rvalue(rv, span, rest, At { bb, idx }, 0, &mut HashSet::new()))
     }
 
     /// What the function returns, or the part `rest` of it: the return place at each `return`.
@@ -88,15 +83,12 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         let mut alts = Vec::new();
         for (bb, block) in self.body.blocks.iter().enumerate() {
             if matches!(block.terminator.kind, TerminatorKind::Return) {
-                self.nodes.set(0);
-                self.places.set(0);
+                self.begin();
                 let at = At {
                     bb,
                     idx: block.statements.len(),
                 };
-                let o = self
-                    .place(local, rest.to_vec(), at, 0, &mut HashSet::new())
-                    .capped(MAX_ORIGIN_DEPTH);
+                let o = self.answer(self.place(local, rest.to_vec(), at, 0, &mut HashSet::new()));
                 if !alts.contains(&o) {
                     alts.push(o);
                 }
@@ -264,14 +256,12 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         let Some(&bb) = self.flow().term_bb.get(&(term as *const Terminator)) else {
             return Origin::Unknown;
         };
-        self.nodes.set(0);
-        self.places.set(0);
+        self.begin();
         let at = At {
             bb,
             idx: self.body.blocks[bb].statements.len(),
         };
-        self.operand(op, at, 0, &mut HashSet::new())
-            .capped(MAX_ORIGIN_DEPTH)
+        self.answer(self.operand(op, at, 0, &mut HashSet::new()))
     }
 
     /// Definitions of `local` that reach the point `at`.
@@ -302,9 +292,32 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         live
     }
 
+    /// A query starts: its counts are its own.
+    fn begin(&self) {
+        self.nodes.set(0);
+        self.places.set(0);
+    }
+
+    /// A query's answer, as the facts hold it, counted towards the body's trees.
+    fn answer(&self, o: Origin) -> Origin {
+        let o = o.capped(MAX_ORIGIN_DEPTH);
+        self.spent
+            .set(self.spent.get().saturating_add(o.nodes(MAX_BODY_NODES)));
+        o
+    }
+
+    /// The nodes a query may read: fewer once the body's trees hold `MAX_BODY_NODES`.
+    fn node_limit(&self) -> usize {
+        if self.spent.get() >= MAX_BODY_NODES {
+            MIN_NODES
+        } else {
+            MAX_NODES
+        }
+    }
+
     pub(super) fn budget(&self) -> bool {
         self.nodes.set(self.nodes.get() + 1);
-        self.nodes.get() <= MAX_NODES
+        self.nodes.get() <= self.node_limit()
     }
 
     pub(super) fn operand(
@@ -338,7 +351,10 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         // reach operands only further down (a value before each write through a raw pointer,
         // `width(l, r)` in a loop) would recompute the same definitions without bound
         self.places.set(self.places.get() + 1);
-        if path.len() > MAX_PATH || self.nodes.get() > MAX_NODES || self.places.get() > MAX_PLACES {
+        if path.len() > MAX_PATH
+            || self.nodes.get() > self.node_limit()
+            || self.places.get() > MAX_PLACES
+        {
             return Origin::Truncated;
         }
         let key = (local, path.clone(), at);
