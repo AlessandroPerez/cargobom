@@ -381,7 +381,12 @@ role = "algorithm"
 #   { .., path = [i, j] }       the argument's own argument i, then that one's argument j
 #   { group = N, map = {..} }   capture group N of the entry's `module` regex: a parameter set
 #                               the crate names by module (`fips204::ml_dsa_65::KG`)
-#   { .., required = true }     the entry matches only when the parameter resolves
+#   { .., required = true }     the entry matches only when the parameter resolves: for a type
+#                               that is the entry's algorithm with such an argument only
+#                               (`cbc::Encryptor<C>` is AES-CBC for an AES cipher). A type that
+#                               is its family whatever the argument (`ml_dsa::SigningKey<P>`, in
+#                               a library generic over the parameter set) is not marked: it is
+#                               named by the family, the parameter left open
 # An argument read as a parameter (map, typenum) is part of the name, not a component.
 # `functions` are the asset's defaults when no call reveals the use. `[..]` in a name is written
 # only when its parameters differ from `defaults`.
@@ -1375,7 +1380,8 @@ functions = ["tag"]
 note = "keyed BLAKE2s (RFC 7693), not an HMAC"
 params = { bits = { arg = 0, typenum = true, scale = 8 } }
 
-# ML-KEM: the parameter set is the type argument (`Kem<MlKem768Params>`, `EncapsulationKey<..>`)
+# ML-KEM: the parameter set is the type argument (`Kem<MlKem768Params>`, `EncapsulationKey<..>`);
+# a key of a set the code does not fix (`DecapsulationKey<P>`) is ML-KEM still
 [[type]]
 crate = "ml_kem"
 name = "Kem"
@@ -1383,7 +1389,7 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["keygen", "encapsulate", "decapsulate"]
-params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024", MlKem512 = "512", MlKem768 = "768", MlKem1024 = "1024" }, required = true } }
+params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024", MlKem512 = "512", MlKem768 = "768", MlKem1024 = "1024" } } }
 
 [[type]]
 crate = "ml_kem"
@@ -1392,7 +1398,7 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["encapsulate"]
-params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024", MlKem512 = "512", MlKem768 = "768", MlKem1024 = "1024" }, required = true } }
+params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024", MlKem512 = "512", MlKem768 = "768", MlKem1024 = "1024" } } }
 
 [[type]]
 crate = "ml_kem"
@@ -1401,7 +1407,7 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["decapsulate"]
-params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024", MlKem512 = "512", MlKem768 = "768", MlKem1024 = "1024" }, required = true } }
+params = { level = { arg = 0, map = { MlKem512Params = "512", MlKem768Params = "768", MlKem1024Params = "1024", MlKem512 = "512", MlKem768 = "768", MlKem1024 = "1024" } } }
 
 # ml-kem 0.3 (over kem 0.3): the parameter set is a struct of its own, on which the keys are
 # made (`MlKem768::generate_keypair_from_rng(&mut rng)`, kem's `Kem` trait); the keys are
@@ -1445,7 +1451,7 @@ asset = "ML-DSA-{level}"
 family = "ML-DSA"
 primitive = "signature"
 functions = ["sign"]
-params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" }, required = true } }
+params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" } } }
 
 [[type]]
 crate = "ml_dsa"
@@ -1454,7 +1460,7 @@ asset = "ML-DSA-{level}"
 family = "ML-DSA"
 primitive = "signature"
 functions = ["sign"]
-params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" }, required = true } }
+params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" } } }
 
 [[type]]
 crate = "ml_dsa"
@@ -1463,7 +1469,7 @@ asset = "ML-DSA-{level}"
 family = "ML-DSA"
 primitive = "signature"
 functions = ["sign"]
-params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" }, required = true } }
+params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" } } }
 
 [[type]]
 crate = "ml_dsa"
@@ -1472,7 +1478,7 @@ asset = "ML-DSA-{level}"
 family = "ML-DSA"
 primitive = "signature"
 functions = ["verify"]
-params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" }, required = true } }
+params = { level = { arg = 0, map = { MlDsa44 = "44", MlDsa65 = "65", MlDsa87 = "87" } } }
 
 [[type]]
 crate = "ml_dsa"
@@ -1509,7 +1515,7 @@ asset = "SLH-DSA-{hash}-{bits}{speed}"
 family = "SLH-DSA"
 primitive = "signature"
 functions = ["sign"]
-params = { hash = { arg = 0, map = { Sha2L1 = "SHA2", Sha2L35 = "SHA2", Shake = "SHAKE" }, required = true }, bits = { arg = 0, path = [0], typenum = true, scale = 8, required = true }, speed = { arg = 0, path = [1], typenum = true, map = { "30" = "s", "34" = "f", "39" = "s", "42" = "f", "47" = "s", "49" = "f" }, required = true } }
+params = { hash = { arg = 0, map = { Sha2L1 = "SHA2", Sha2L35 = "SHA2", Shake = "SHAKE" } }, bits = { arg = 0, path = [0], typenum = true, scale = 8 }, speed = { arg = 0, path = [1], typenum = true, map = { "30" = "s", "34" = "f", "39" = "s", "42" = "f", "47" = "s", "49" = "f" } } }
 
 [[type]]
 crate = "slh_dsa"
@@ -1518,7 +1524,7 @@ asset = "SLH-DSA-{hash}-{bits}{speed}"
 family = "SLH-DSA"
 primitive = "signature"
 functions = ["verify"]
-params = { hash = { arg = 0, map = { Sha2L1 = "SHA2", Sha2L35 = "SHA2", Shake = "SHAKE" }, required = true }, bits = { arg = 0, path = [0], typenum = true, scale = 8, required = true }, speed = { arg = 0, path = [1], typenum = true, map = { "30" = "s", "34" = "f", "39" = "s", "42" = "f", "47" = "s", "49" = "f" }, required = true } }
+params = { hash = { arg = 0, map = { Sha2L1 = "SHA2", Sha2L35 = "SHA2", Shake = "SHAKE" } }, bits = { arg = 0, path = [0], typenum = true, scale = 8 }, speed = { arg = 0, path = [1], typenum = true, map = { "30" = "s", "34" = "f", "39" = "s", "42" = "f", "47" = "s", "49" = "f" } } }
 
 # X-Wing (draft-connolly-cfrg-xwing-kem): a hybrid KEM, ML-KEM-768 with X25519, their two
 # shared secrets combined by SHA3-256 (the `[[part]]` entries below). The registry has no name
@@ -1567,7 +1573,7 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["keygen"]
-params = { level = { group = 1, required = true } }
+params = { level = { group = 1 } }
 
 [[type]]
 crate = "fips203"
@@ -1576,7 +1582,7 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["encapsulate"]
-params = { level = { arg = 0, typenum = true, map = { "800" = "512", "1184" = "768", "1568" = "1024" }, required = true } }
+params = { level = { arg = 0, typenum = true, map = { "800" = "512", "1184" = "768", "1568" = "1024" } } }
 
 [[type]]
 crate = "fips203"
@@ -1585,7 +1591,7 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["decapsulate"]
-params = { level = { arg = 0, typenum = true, map = { "1632" = "512", "2400" = "768", "3168" = "1024" }, required = true } }
+params = { level = { arg = 0, typenum = true, map = { "1632" = "512", "2400" = "768", "3168" = "1024" } } }
 
 # fips204: as fips203, the keys being `types::PrivateKey<K, L>` and `types::PublicKey<K, L>`
 # with the matrix dimensions of the set (lib.rs: 4 x 4 for ML-DSA-44, 6 x 5 for ML-DSA-65,
@@ -1598,7 +1604,7 @@ asset = "ML-DSA-{level}"
 family = "ML-DSA"
 primitive = "signature"
 functions = ["keygen"]
-params = { level = { group = 1, required = true } }
+params = { level = { group = 1 } }
 
 [[type]]
 crate = "fips204"
@@ -1607,7 +1613,7 @@ asset = "ML-DSA-{level}"
 family = "ML-DSA"
 primitive = "signature"
 functions = ["sign"]
-params = { level = { arg = 0, typenum = true, map = { "4" = "44", "6" = "65", "8" = "87" }, required = true } }
+params = { level = { arg = 0, typenum = true, map = { "4" = "44", "6" = "65", "8" = "87" } } }
 
 [[type]]
 crate = "fips204"
@@ -1616,7 +1622,7 @@ asset = "ML-DSA-{level}"
 family = "ML-DSA"
 primitive = "signature"
 functions = ["verify"]
-params = { level = { arg = 0, typenum = true, map = { "4" = "44", "6" = "65", "8" = "87" }, required = true } }
+params = { level = { arg = 0, typenum = true, map = { "4" = "44", "6" = "65", "8" = "87" } } }
 
 # fips205: every module has its own `KG`, `PrivateKey` and `PublicKey`
 # (`slh_dsa_sha2_128s::PrivateKey`): the set is the module
@@ -1628,7 +1634,7 @@ asset = "SLH-DSA-{hash}-{bits}{speed}"
 family = "SLH-DSA"
 primitive = "signature"
 functions = ["keygen"]
-params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" }, required = true }, bits = { group = 2, required = true }, speed = { group = 3, required = true } }
+params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" } }, bits = { group = 2 }, speed = { group = 3 } }
 
 [[type]]
 crate = "fips205"
@@ -1638,7 +1644,7 @@ asset = "SLH-DSA-{hash}-{bits}{speed}"
 family = "SLH-DSA"
 primitive = "signature"
 functions = ["sign"]
-params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" }, required = true }, bits = { group = 2, required = true }, speed = { group = 3, required = true } }
+params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" } }, bits = { group = 2 }, speed = { group = 3 } }
 
 [[type]]
 crate = "fips205"
@@ -1648,7 +1654,7 @@ asset = "SLH-DSA-{hash}-{bits}{speed}"
 family = "SLH-DSA"
 primitive = "signature"
 functions = ["verify"]
-params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" }, required = true }, bits = { group = 2, required = true }, speed = { group = 3, required = true } }
+params = { hash = { group = 1, map = { sha2 = "SHA2", shake = "SHAKE" } }, bits = { group = 2 }, speed = { group = 3 } }
 
 # pqcrypto-mlkem (PQClean's C behind it): one module per parameter set, with its keys' types
 # (`mlkem768::PublicKey`, `mlkem768::SecretKey`) and free functions (the `[[fn]]` entries)
@@ -1660,7 +1666,7 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["encapsulate"]
-params = { level = { group = 1, required = true } }
+params = { level = { group = 1 } }
 
 [[type]]
 crate = "pqcrypto_mlkem"
@@ -1670,7 +1676,7 @@ asset = "ML-KEM-{level}"
 family = "ML-KEM"
 primitive = "kem"
 functions = ["decapsulate"]
-params = { level = { group = 1, required = true } }
+params = { level = { group = 1 } }
 
 # pqcrypto-mldsa: as pqcrypto-mlkem, ML-DSA's keys by the module of the parameter set
 [[type]]
@@ -1681,7 +1687,7 @@ asset = "ML-DSA-{level}"
 family = "ML-DSA"
 primitive = "signature"
 functions = ["verify"]
-params = { level = { group = 1, required = true } }
+params = { level = { group = 1 } }
 
 [[type]]
 crate = "pqcrypto_mldsa"
@@ -1691,7 +1697,7 @@ asset = "ML-DSA-{level}"
 family = "ML-DSA"
 primitive = "signature"
 functions = ["sign"]
-params = { level = { group = 1, required = true } }
+params = { level = { group = 1 } }
 
 # Elliptic curves of the RustCrypto elliptic-curve crates: the curve is the type argument
 # (`EphemeralSecret<NistP256>`, `SigningKey<NistP256>`); ECDSA's hash is the curve's
@@ -1703,7 +1709,7 @@ asset = "ECDH-{curve}"
 family = "ECDH"
 primitive = "key-agree"
 functions = ["keygen", "keyderive"]
-params = { curve = { arg = 0, map = { NistP256 = "P-256", NistP384 = "P-384", NistP521 = "P-521", Secp256k1 = "secp256k1" }, required = true } }
+params = { curve = { arg = 0, map = { NistP256 = "P-256", NistP384 = "P-384", NistP521 = "P-521", Secp256k1 = "secp256k1" } } }
 
 [[type]]
 crate = "ecdsa"
@@ -1712,7 +1718,7 @@ asset = "ECDSA-{curve}"
 family = "ECDSA"
 primitive = "signature"
 functions = ["keygen", "sign"]
-params = { curve = { arg = 0, map = { NistP256 = "P-256-SHA-256", NistP384 = "P-384-SHA-384", NistP521 = "P-521-SHA-512", Secp256k1 = "secp256k1-SHA-256" }, required = true } }
+params = { curve = { arg = 0, map = { NistP256 = "P-256-SHA-256", NistP384 = "P-384-SHA-384", NistP521 = "P-521-SHA-512", Secp256k1 = "secp256k1-SHA-256" } } }
 
 [[type]]
 crate = "ecdsa"
@@ -1721,7 +1727,7 @@ asset = "ECDSA-{curve}"
 family = "ECDSA"
 primitive = "signature"
 functions = ["verify"]
-params = { curve = { arg = 0, map = { NistP256 = "P-256-SHA-256", NistP384 = "P-384-SHA-384", NistP521 = "P-521-SHA-512", Secp256k1 = "secp256k1-SHA-256" }, required = true } }
+params = { curve = { arg = 0, map = { NistP256 = "P-256-SHA-256", NistP384 = "P-384-SHA-384", NistP521 = "P-521-SHA-512", Secp256k1 = "secp256k1-SHA-256" } } }
 
 # p521 0.13.3's ECDSA keys are structs of its own around `ecdsa::SigningKey<NistP521>` (p256's
 # and p384's are aliases of it): ECDSA with the curve's hash, SHA-512

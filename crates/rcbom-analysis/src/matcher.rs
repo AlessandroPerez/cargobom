@@ -1114,7 +1114,7 @@ mod tests {
         assert_eq!(name(kg).as_deref(), Some("ML-DSA-65"));
         let sk = adt("fips205", "fips205::slh_dsa_sha2_128s::PrivateKey", vec![]);
         assert_eq!(name(sk).as_deref(), Some("SLH-DSA-SHA2-128s"));
-        // ... and not one of another module: the parameter is required
+        // ... and not one of another module: the entry is of the modules its pattern names
         let other = adt("fips205", "fips205::types::PrivateKey", vec![]);
         assert_eq!(name(other), None);
         // the same key types by a const argument, and SLH-DSA's by type numbers
@@ -1207,6 +1207,50 @@ mod tests {
         // `Encryptor<Blowfish>` is not AES-CBC: the required key size does not resolve
         let blowfish = cbc(adt("blowfish", "blowfish::Blowfish", vec![]));
         assert!(match_types(&kb, &[blowfish], &all).is_empty());
+        // nor is the mode of a cipher its callers choose (`Encryptor<C>` in a generic library)
+        let any = cbc(TyTree::Param("C".into()));
+        assert!(match_types(&kb, &[any], &all).is_empty());
+    }
+
+    #[test]
+    fn a_type_that_is_its_family_alone_is_named_without_its_parameter() {
+        // `ml_dsa::SigningKey<P>` is ML-DSA whatever `P` is, `ecdsa::SigningKey<C>` ECDSA on
+        // any curve: a library generic over the parameter set names the family, the set open
+        let kb = Kb::seed().unwrap();
+        let of = |krate: &str, path: &str, arg: TyTree| {
+            let m = match_types(&kb, &[adt(krate, path, vec![arg])], &all);
+            (m[0].0.name.clone(), m[0].0.algo.open.clone())
+        };
+        let p = || TyTree::Param("P".into());
+        let open = |k: &str| vec![k.to_string()];
+        assert_eq!(
+            of("ml_dsa", "ml_dsa::SigningKey", p()),
+            ("ML-DSA".to_string(), open("level"))
+        );
+        assert_eq!(
+            of(
+                "ml_dsa",
+                "ml_dsa::SigningKey",
+                adt("ml_dsa", "ml_dsa::MlDsa65", vec![])
+            ),
+            ("ML-DSA-65".to_string(), vec![])
+        );
+        assert_eq!(
+            of("ml_kem", "ml_kem::kem::DecapsulationKey", p()),
+            ("ML-KEM".to_string(), open("level"))
+        );
+        assert_eq!(
+            of("ecdsa", "ecdsa::SigningKey", p()),
+            ("ECDSA".to_string(), open("curve"))
+        );
+        assert_eq!(
+            of(
+                "elliptic_curve",
+                "elliptic_curve::ecdh::EphemeralSecret",
+                p()
+            ),
+            ("ECDH".to_string(), open("curve"))
+        );
     }
 
     #[test]
