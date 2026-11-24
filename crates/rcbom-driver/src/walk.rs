@@ -1069,8 +1069,12 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         }
         for k in newly {
             for (callee, from, span, edge) in self.pending.remove(&k).unwrap_or_default() {
-                let (loc, expansion) = locate_stable(tcx, span);
-                let internal = rustc_internal::internal(tcx, span);
+                let internal = crate::names::named_span(
+                    tcx,
+                    rustc_internal::internal(tcx, span),
+                    rustc_internal::internal(tcx, callee.def.def_id()),
+                );
+                let (loc, expansion) = locate(tcx, internal);
                 let text = callee_span(tcx, internal)
                     .is_none()
                     .then(|| span_text(tcx, internal))
@@ -1099,10 +1103,14 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                 self.enqueue_usage(callee);
                 continue;
             }
-            let (loc, expansion) = locate_stable(self.cx.tcx, span);
+            let internal = crate::names::named_span(
+                self.cx.tcx,
+                rustc_internal::internal(self.cx.tcx, span),
+                rustc_internal::internal(self.cx.tcx, callee.def.def_id()),
+            );
+            let (loc, expansion) = locate(self.cx.tcx, internal);
             // the text of the function named at the call (`decrypt::aes_ctr::<Aes128Ctr>`: the
             // span is the callee's); none for a call through a value (the span is the call's)
-            let internal = rustc_internal::internal(self.cx.tcx, span);
             let text = callee_span(self.cx.tcx, internal)
                 .is_none()
                 .then(|| span_text(self.cx.tcx, internal))
@@ -1239,7 +1247,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
         // (as a site of the naming is placed: `Scanner::site_span`)
         let span = match derive_site(tcx, item) {
             Some(d) if !span.from_expansion() => d,
-            _ => span,
+            _ => crate::names::named_span(tcx, span, did),
         };
         let (loc, expansion) = locate(tcx, span);
         if loc.line == 0 {

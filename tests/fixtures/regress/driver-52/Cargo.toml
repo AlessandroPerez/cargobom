@@ -1,0 +1,16 @@
+# A path a macro writes from a fragment it is given, inside a `paste!` body: `$ty::new()`.
+# `paste!` hands the type's own token on, and the compiler joins it to the macro's `::new` by
+# the first place the macro writes `$ty`, the one place it records: the call's span ran from
+# `struct [<Hash_ $ty>];`, lines above, to `new`. The position in the macro's code was that
+# range, which the verifier rejected as not naming the function (rustls-rustcrypto's `impl_hash!`
+# and `impl_hmac!` under nordisk-pairing: six positions). The path is at the writing of the
+# fragment it starts with: `$ty::new` on its own line.
+[package]
+name = "driver-52"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+hmac = "0.12"
+paste = "1"
+sha2 = "0.10"

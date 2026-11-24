@@ -162,7 +162,11 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             {
                 operator(tcx, named).and_then(|op| operator_span(tcx, call_span, op))
             }
-            Operand::Constant(c) => Some(rustc_internal::internal(tcx, c.span)),
+            Operand::Constant(c) => Some(crate::names::named_span(
+                tcx,
+                rustc_internal::internal(tcx, c.span),
+                named,
+            )),
             _ => callee_span(tcx, call_span).or_else(|| {
                 self.origins
                     .callee_name_span(func, term)
@@ -340,6 +344,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
     ) {
         let tcx = self.cx.tcx;
         let did = rustc_internal::internal(tcx, def.def_id());
+        let span = crate::names::named_span(tcx, span, did);
         let callee = def_ref_internal(tcx, did);
         let method = strip_generics(&callee.path)
             .rsplit("::")

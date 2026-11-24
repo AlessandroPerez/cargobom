@@ -265,6 +265,28 @@ pub(crate) fn locate(tcx: TyCtxt<'_>, span: rustc_span::Span) -> (Loc, Option<Ex
         (raw_loc(tcx, span), None)
     }
 }
+/// The span of the path naming item `did`, where the compiler ran it from an earlier writing of
+/// a macro's fragment (`rcbom_facts::fragment_path`): from the fragment's writing the path
+/// starts with. Any other span as it is.
+pub(crate) fn named_span(
+    tcx: TyCtxt<'_>,
+    span: rustc_span::Span,
+    did: rustc_span::def_id::DefId,
+) -> rustc_span::Span {
+    if !span.from_expansion() {
+        return span;
+    }
+    let Some(name) = tcx.opt_item_name(did) else {
+        return span;
+    };
+    let Ok(text) = tcx.sess.source_map().span_to_snippet(span) else {
+        return span;
+    };
+    match rcbom_facts::fragment_path(&text, name.as_str()) {
+        Some(at) => span.with_lo(span.lo() + rustc_span::BytePos(at as u32)),
+        None => span,
+    }
+}
 /// Where a piece of code is, for a place no name in the text holds (a coercion): the code
 /// itself, or for a macro's code the invocation in the source that writes it (`locate`'s
 /// position), with how it starts there and the fingerprint of its line at its column.

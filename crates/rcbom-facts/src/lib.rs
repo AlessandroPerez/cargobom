@@ -1109,6 +1109,102 @@ pub fn line_mark(line: &str, col: usize) -> String {
     format!("{h:08x}")
 }
 
+/// Where in `text` the path naming `name` starts, for a span the compiler ran from an earlier
+/// writing of a macro's fragment to the path's end: `text` starts with a metavariable (`$ty`)
+/// and is not one path, and from a later writing of that metavariable on it is one, whose last
+/// name is `name` (`$ty>]; .. Box::new($ty::new` and `new`: at the last `$ty`). None for any
+/// other text, a path whole included.
+///
+/// The compiler makes such a span where a procedural macro hands a fragment's own tokens on
+/// (`paste!` does for `$ty::new()`): it joins the type's token, written at the invocation, to
+/// the macro's `::new` by the first place the macro writes `$ty`, the one place it records.
+pub fn fragment_path(text: &str, name: &str) -> Option<usize> {
+    let var_len = metavar(text)?;
+    let var = &text[..var_len];
+    if path_end(text).is_some() {
+        return None;
+    }
+    text.match_indices(var)
+        .filter(|(i, _)| *i > 0)
+        .filter(|(i, _)| {
+            let after = text[i + var_len..].chars().next();
+            !after.is_some_and(|c| c.is_alphanumeric() || c == '_')
+        })
+        .find(|(i, _)| path_end(&text[*i..]) == Some(name))
+        .map(|(i, _)| i)
+}
+
+/// The length of the metavariable `text` starts with (`$ty`).
+fn metavar(text: &str) -> Option<usize> {
+    let rest = text.strip_prefix('$')?;
+    let n = rest
+        .char_indices()
+        .find(|(_, c)| !(c.is_alphanumeric() || *c == '_'))
+        .map_or(rest.len(), |(i, _)| i);
+    (n > 0).then_some(1 + n)
+}
+
+/// For a text that is one path (names, metavariables and `<..>` groups joined by `::`), its
+/// last name; None for any other text.
+fn path_end(text: &str) -> Option<&str> {
+    let b = text.as_bytes();
+    let mut i = 0;
+    let mut last = None;
+    let skip_space = |mut i: usize| {
+        while i < b.len() && b[i].is_ascii_whitespace() {
+            i += 1;
+        }
+        i
+    };
+    loop {
+        i = skip_space(i);
+        match *b.get(i)? {
+            b'<' => {
+                let mut depth = 0usize;
+                loop {
+                    match *b.get(i)? {
+                        b';' | b'{' | b'}' => return None,
+                        b'<' => depth += 1,
+                        // (`->` of a function type is no closing bracket)
+                        b'>' if i > 0 && b[i - 1] == b'-' => {}
+                        b'>' => depth -= 1,
+                        _ => {}
+                    }
+                    i += 1;
+                    if depth == 0 {
+                        break;
+                    }
+                }
+            }
+            c => {
+                let start = i;
+                if c == b'$' {
+                    i += 1;
+                }
+                let from = i;
+                while i < b.len() && (b[i].is_ascii_alphanumeric() || b[i] == b'_' || b[i] >= 0x80)
+                {
+                    i += 1;
+                }
+                if i == from {
+                    return None;
+                }
+                if c != b'$' {
+                    last = Some(&text[start..i]);
+                }
+            }
+        }
+        i = skip_space(i);
+        if i == b.len() {
+            return last;
+        }
+        if !text[i..].starts_with("::") {
+            return None;
+        }
+        i += 2;
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Reach {
     /// The artifact walked: `bin <name>` for a binary (cargo's target name), `lib <package>` for
@@ -1295,4 +1391,32 @@ pub struct PtaArg {
     /// It is itself a pointer to that type (`&Algorithm`), not a value holding one.
     #[serde(default)]
     pub direct: bool,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::fragment_path;
+
+    #[test]
+    fn a_path_from_a_fragment_is_at_its_own_writing() {
+        // (as `paste!` leaves `$ty::new()`: the span starts at the macro's first `$ty`)
+        let t = "$ty>];\n\n    impl hash::Hash for [<Hash_ $ty>] {\n        fn start(&self) -> \
+                 Box<dyn hash::Context> {\n            Box::new([<HashContent_ $ty>]($ty::new";
+        let at = fragment_path(t, "new").unwrap();
+        assert_eq!(&t[at..], "$ty::new");
+        // a path whole, and a text whose end names another function, stay as they are
+        assert_eq!(fragment_path("$ty::new", "new"), None);
+        assert_eq!(fragment_path("$ty :: < $ty > :: new", "new"), None);
+        assert_eq!(fragment_path(t, "digest"), None);
+        assert_eq!(fragment_path("Sha256::new", "new"), None);
+        // the path may hold the fragment again: it starts where the rest is one path
+        let t = "$ty::A, <$ty as Tr<$ty>>::B, $ty::<$ty>::of";
+        assert_eq!(&t[fragment_path(t, "of").unwrap()..], "$ty::<$ty>::of");
+        // an expression of two paths is not the second one unless that is what is named
+        let t = "$a::X + $a::Y";
+        assert_eq!(fragment_path(t, "add"), None);
+        assert_eq!(&t[fragment_path(t, "Y").unwrap()..], "$a::Y");
+        // another metavariable of the same start is another
+        assert_eq!(fragment_path("$t; $ty::new", "new"), None);
+    }
 }

@@ -263,6 +263,7 @@ fn site(
         return None;
     }
     let def = def_ref_internal(tcx, target_did);
+    let span = crate::names::named_span(tcx, span, target_did);
     let text = crate::span_text(tcx, span);
     let line_text = crate::line_text(tcx, span);
     let (span, expansion) = locate(tcx, span);
