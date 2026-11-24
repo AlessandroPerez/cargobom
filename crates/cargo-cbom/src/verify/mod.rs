@@ -1426,6 +1426,34 @@ mod tests {
     }
 
     #[test]
+    fn an_item_holds_the_file_it_includes() {
+        let src = Source::new(
+            "fn table() -> T {\n    include!(\"table.rs\")\n}\n// include!(\"note.rs\")\nfn made() -> T {\n    include!(concat!(env!(\"OUT_DIR\"), \"/gen.rs\"))\n}\nfn text() -> &'static str {\n    \"include!(\\\"lit.rs\\\")\"\n}\n",
+            true,
+            false,
+        );
+        let here = Path::new("/p/src/main.rs");
+        let whole = ((1, 0), (10, 1));
+        let holds = |a, b, other: &str| witness::includes(&src, here, a, b, Path::new(other));
+        assert!(holds((1, 0), (3, 1), "/p/src/table.rs"));
+        assert!(holds((1, 0), (3, 1), "/p/src/./table.rs"));
+        assert!(!holds((1, 0), (3, 1), "/p/table.rs"));
+        assert!(!holds((1, 0), (3, 1), "/p/src/other.rs"));
+        // not in the item: the next one's; not code: a comment's, a literal's
+        assert!(!holds((5, 0), (7, 1), "/p/src/table.rs"));
+        assert!(!holds(whole.0, whole.1, "/p/src/note.rs"));
+        assert!(!holds(whole.0, whole.1, "/p/src/lit.rs"));
+        // a path built of parts: the file's ends as the last part does
+        assert!(holds((5, 0), (7, 1), "/p/target/build/p-1a2b/out/gen.rs"));
+        assert!(!holds(
+            (5, 0),
+            (7, 1),
+            "/p/target/build/p-1a2b/out/regen.rs"
+        ));
+        assert!(!holds((1, 0), (3, 1), "/p/target/build/p-1a2b/out/gen.rs"));
+    }
+
+    #[test]
     fn a_path_called_with_no_argument_has_no_object() {
         let src = Source::new(
             "fn f(h: &mut dyn Enc) {\n    let a = <dyn Enc>::invalid();\n    let b = <dyn Enc>::wrap(h);\n    h.reset();\n    let c = made ::<u8> ( );\n    (h.run)();\n    let d = Enc::name;\n}\n",

@@ -210,6 +210,47 @@ pub(super) fn line_mark(line: &str, col: usize) -> String {
     format!("{h:08x}")
 }
 
+/// Whether the code of `src`, the file at `path`, from `a` to `b` takes the file `other` in by
+/// an `include!`: one whose argument is a path to it from the file's directory
+/// (`include!("table.rs")`), or is built of parts and ends as the file's path does
+/// (`include!(concat!(env!("OUT_DIR"), "/const.rs"))`).
+pub(super) fn includes(
+    src: &Source,
+    path: &Path,
+    a: (usize, usize),
+    b: (usize, usize),
+    other: &Path,
+) -> bool {
+    let (from, to) = (src.idx(a), src.idx(b));
+    let code = src.text(from, to);
+    re!(r"\binclude\s*!\s*\(").find_iter(&code).any(|m| {
+        let open = from + code[..m.end()].chars().count() - 1;
+        let Some(close) = close_of_at(&src.code, open) else {
+            return false;
+        };
+        let arg = text_of(src, src.pos(open + 1), src.pos(close));
+        let arg = arg.trim().trim_end_matches(',').trim_end();
+        let parts: Vec<&str> = re!(r#""((?:[^"\\]|\\.)*)""#)
+            .captures_iter(arg)
+            .filter_map(|c| c.get(1))
+            .map(|g| g.as_str())
+            .collect();
+        let Some(last) = parts.last().filter(|l| !l.is_empty()) else {
+            return false;
+        };
+        if parts.len() == 1 && arg.starts_with('"') && arg.ends_with('"') {
+            let named = path
+                .parent()
+                .map(|d| rcbom_manifest::normalize(&d.join(last)));
+            return named.is_some_and(|n| n == rcbom_manifest::normalize(other));
+        }
+        other
+            .to_string_lossy()
+            .strip_suffix(last)
+            .is_some_and(|rest| last.starts_with('/') || rest.ends_with('/'))
+    })
+}
+
 /// `<span> as `text` line #mark (by .., by ..)`, and what follows it.
 fn written(s: &str) -> Option<(Written, &str)> {
     let (at, rest) = span(s)?;
@@ -1023,10 +1064,14 @@ impl Files<'_> {
                 return Err(format!("{at}: no fingerprint of the line of `{name}`"));
             };
             reads_as(&src, &w.at, w.at.start, w.text.as_deref(), Some(mark))?;
+            let (a, b) = w.within.unwrap_or((w.at.start, (usize::MAX, 0)));
             if path != held.0 {
+                // (code another file holds for it: an `include!` inside it)
+                if includes(&src, &path, a, b, held.0) {
+                    return Ok(true);
+                }
                 return Err(format!("{at}: `{name}` is not in the file of the position"));
             }
-            let (a, b) = w.within.unwrap_or((w.at.start, (usize::MAX, 0)));
             if !library && !attributed && !inside(a, b) {
                 return Err(format!(
                     "{at} (to {}:{}) does not hold {}:{}",
@@ -1050,6 +1095,12 @@ impl Files<'_> {
             return Ok(true);
         }
         if path != held.0 {
+            // (code another file holds for the item: `fn table() { include!("table.rs") }`)
+            if let Some((a, b)) = w.within
+                && includes(&src, &path, a, b, held.0)
+            {
+                return Ok(true);
+            }
             return Err(format!("{at}: `{name}` is not in the file of the position"));
         }
         if attributed {
