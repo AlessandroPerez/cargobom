@@ -1799,4 +1799,65 @@ mod tests {
         assert!(names(&f).is_empty());
         assert_eq!(unknowns(&f), 1);
     }
+
+    #[test]
+    fn the_calls_written_beside_the_facts_are_read_when_asked_for() {
+        // two records of `app::log`'s callers and one of another function's, as the driver
+        // writes them: one after the other, each at the bytes its reference says
+        let call = |callee: &str, caller: &str, arg: usize| rcbom_facts::LocalCall {
+            callee: callee.into(),
+            caller: caller.into(),
+            args: vec![param(arg)],
+        };
+        let records = [
+            call("app::log", "app::main", 0),
+            call("app::other", "app::main", 1),
+            call("app::log", "app::run", 2),
+            // (the same record of a second summary: one call)
+            call("app::log", "app::main", 0),
+        ];
+        let file = std::env::temp_dir().join(format!(
+            "rcbom-arg-calls-{}.{}",
+            std::process::id(),
+            rcbom_facts::ARG_CALLS_EXT
+        ));
+        let mut bytes = Vec::new();
+        let mut refs = Vec::new();
+        for r in &records {
+            let b = serde_json::to_vec(r).unwrap();
+            refs.push(rcbom_facts::ArgCallRef {
+                callee: r.callee.clone(),
+                caller: r.caller.clone(),
+                at: bytes.len() as u64,
+                len: b.len() as u32,
+            });
+            bytes.extend(b);
+        }
+        std::fs::write(&file, bytes).unwrap();
+        let ix = index(Links {
+            // (and one in the facts themselves, as a build before the file wrote them)
+            arg_calls: vec![call("app::log", "app::old", 3)],
+            arg_call_refs: refs,
+            arg_calls_file: Some(file.clone()),
+            ..Default::default()
+        });
+        let callers =
+            |f: &str| -> Vec<(String, Vec<Origin>)> { ix.callers_of(f).iter().cloned().collect() };
+        assert_eq!(
+            callers("app::log"),
+            [
+                ("app::old".to_string(), vec![param(3)]),
+                ("app::main".to_string(), vec![param(0)]),
+                ("app::run".to_string(), vec![param(2)]),
+            ]
+        );
+        assert_eq!(
+            callers("app::other"),
+            [("app::main".to_string(), vec![param(1)])]
+        );
+        assert!(callers("app::none").is_empty());
+        // (asked again: as read the first time)
+        assert_eq!(callers("app::log").len(), 3);
+        std::fs::remove_file(&file).unwrap();
+    }
 }

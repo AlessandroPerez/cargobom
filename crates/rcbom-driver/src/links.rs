@@ -1140,11 +1140,69 @@ pub(crate) fn body_links(
     }
 }
 
+/// The calls between the program's own functions that carry no algorithm (`Links::
+/// arg_calls`), written to the file beside the crate's facts as each body is summarised, and
+/// not held: they are most of a program's links, with every argument's origins.
+pub(crate) struct ArgCalls {
+    path: std::path::PathBuf,
+    file: Option<std::io::BufWriter<std::fs::File>>,
+    at: u64,
+    refs: Vec<rcbom_facts::ArgCallRef>,
+}
+
+impl ArgCalls {
+    pub(crate) fn new(path: std::path::PathBuf) -> Self {
+        ArgCalls {
+            path,
+            file: None,
+            at: 0,
+            refs: Vec::new(),
+        }
+    }
+
+    /// Takes the records of one summary out of it (each once: the reader drops the same record
+    /// of two summaries, as `Links::merge` did).
+    pub(crate) fn take(&mut self, links: &mut Links) {
+        use std::io::Write;
+        let mut calls = std::mem::take(&mut links.arg_calls);
+        let mut kept: Vec<rcbom_facts::LocalCall> = Vec::new();
+        for c in calls.drain(..) {
+            if !kept.contains(&c) {
+                kept.push(c);
+            }
+        }
+        for c in kept {
+            let bytes = serde_json::to_vec(&c).unwrap();
+            let path = &self.path;
+            let file = self.file.get_or_insert_with(|| {
+                std::io::BufWriter::new(std::fs::File::create(path).unwrap())
+            });
+            file.write_all(&bytes).unwrap();
+            self.refs.push(rcbom_facts::ArgCallRef {
+                callee: c.callee,
+                caller: c.caller,
+                at: self.at,
+                len: u32::try_from(bytes.len()).unwrap(),
+            });
+            self.at += bytes.len() as u64;
+        }
+    }
+
+    /// Where the records are, the file written.
+    pub(crate) fn finish(mut self) -> Vec<rcbom_facts::ArgCallRef> {
+        use std::io::Write;
+        if let Some(mut f) = self.file.take() {
+            f.flush().unwrap();
+        }
+        self.refs
+    }
+}
+
 /// The summaries of the instances of generic functions the crate's summaries name
 /// (`origins::body_name`), and of those theirs name, up to a bound: what each returns, writes
 /// through its `&mut` parameters and passes to the functions it calls, under the instance's
 /// name. The stores into fields and statics are the generic body's.
-pub(crate) fn instance_links(cx: &Cx<'_>, out: &mut Links) {
+pub(crate) fn instance_links(cx: &Cx<'_>, out: &mut Links, arg_calls: &mut ArgCalls) {
     const MAX_INSTANCES: usize = 4096;
     let mut done = HashSet::new();
     // the generic items (and closures in them) whose instances were summarised, and those one
@@ -1188,8 +1246,9 @@ pub(crate) fn instance_links(cx: &Cx<'_>, out: &mut Links) {
                 l
             }));
             match r {
-                Ok(l) => {
+                Ok(mut l) => {
                     summarised.insert(did);
+                    arg_calls.take(&mut l);
                     out.merge(l)
                 }
                 Err(_) => {

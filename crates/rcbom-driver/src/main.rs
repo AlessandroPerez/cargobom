@@ -329,6 +329,16 @@ fn analyze(tcx: TyCtxt<'_>) {
         },
     };
 
+    // (the facts are named after cargo's unit, so `cargo cbom` can keep only this build's)
+    let out = PathBuf::from(std::env::var("RCBOM_OUT").unwrap());
+    std::fs::create_dir_all(&out).unwrap();
+    let path = out.join(if krate.unit.is_empty() {
+        format!("{}-{}.json", krate.name, krate.stable_id)
+    } else {
+        format!("{}{}.json", krate.name, krate.unit)
+    });
+    let mut arg_calls = links::ArgCalls::new(path.with_extension(rcbom_facts::ARG_CALLS_EXT));
+
     let mut sites = Vec::new();
     // RCBOM_DEBUG: how long each phase, and any slow item, takes
     let debug = std::env::var_os("RCBOM_DEBUG").is_some();
@@ -396,6 +406,7 @@ fn analyze(tcx: TyCtxt<'_>) {
                 let mut l = rcbom_facts::Links::default();
                 links::body_links(&cx, &body, did, false, None, &mut l);
                 links::promoted_links(&cx, did, &mut l);
+                arg_calls.take(&mut l);
                 cx.links.merge(l);
             }
             out
@@ -456,6 +467,7 @@ fn analyze(tcx: TyCtxt<'_>) {
                 let mut l = rcbom_facts::Links::default();
                 links::body_links(&cx, &body, did, true, None, &mut l);
                 links::promoted_links(&cx, did, &mut l);
+                arg_calls.take(&mut l);
                 cx.links.merge(l);
             }
             out.extend(statics::fn_data_sites(
@@ -477,6 +489,13 @@ fn analyze(tcx: TyCtxt<'_>) {
         }
     }
     phase("per-item scan", timer);
+    if debug {
+        eprintln!(
+            "rcbom-driver: {}: after the scan: {}",
+            local.name,
+            sizes(&sites, &cx.links)
+        );
+    }
     let timer = std::time::Instant::now();
 
     // Roots: `main` of a binary; for a library the user asked to analyse (a workspace member),
@@ -564,13 +583,22 @@ fn analyze(tcx: TyCtxt<'_>) {
         r
     });
     phase("walk", timer);
+    if debug {
+        eprintln!(
+            "rcbom-driver: {}: after the walk: {}",
+            local.name,
+            sizes(&sites, &cx.links)
+        );
+    }
 
     // Identical facts from the per-item scan and the walk collapse to one.
     let mut seen = HashSet::new();
     sites.retain(|s| seen.insert(s.clone()));
 
     let mut crate_links = std::mem::take(&mut cx.links);
-    links::instance_links(&cx, &mut crate_links);
+    links::instance_links(&cx, &mut crate_links, &mut arg_calls);
+    arg_calls.take(&mut crate_links);
+    crate_links.arg_call_refs = arg_calls.finish();
     crate_links.closed_calls = closed_calls(tcx);
     crate_links.closed_bounds = closed_bounds(tcx);
     if catch_unwind(AssertUnwindSafe(|| {
@@ -643,15 +671,12 @@ fn analyze(tcx: TyCtxt<'_>) {
         variants,
         implementors,
     };
-    let out = PathBuf::from(std::env::var("RCBOM_OUT").unwrap());
-    std::fs::create_dir_all(&out).unwrap();
-    // named after cargo's unit, so `cargo cbom` can keep only this build's units
-    let path = out.join(if facts.krate.unit.is_empty() {
-        format!("{}-{}.json", facts.krate.name, facts.krate.stable_id)
-    } else {
-        format!("{}{}.json", facts.krate.name, facts.krate.unit)
-    });
-    std::fs::write(&path, serde_json::to_vec(&facts).unwrap()).unwrap();
+    {
+        use std::io::Write;
+        let mut w = std::io::BufWriter::new(std::fs::File::create(&path).unwrap());
+        serde_json::to_writer(&mut w, &facts).unwrap();
+        w.flush().unwrap();
+    }
     cx.errors += statics::CTFE_PANICS.swap(0, std::sync::atomic::Ordering::Relaxed);
     if cx.errors > 0 {
         eprintln!(
@@ -663,6 +688,50 @@ fn analyze(tcx: TyCtxt<'_>) {
 
 /// Solves the points-to analysis: its answers for the facts (per call into a stop crate, what
 /// each argument may point to), and its statistics beside them (`<crate>-pta.json`).
+/// `RCBOM_DEBUG`: what the facts gathered so far hold, by the megabytes each part is written
+/// in.
+fn sizes(sites: &[rcbom_facts::Site], links: &rcbom_facts::Links) -> String {
+    struct Count(u64);
+    impl std::io::Write for Count {
+        fn write(&mut self, b: &[u8]) -> std::io::Result<usize> {
+            self.0 += b.len() as u64;
+            Ok(b.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+    macro_rules! mb {
+        ($v:expr) => {{
+            let mut c = Count(0);
+            let _ = serde_json::to_writer(&mut c, $v);
+            c.0 >> 20
+        }};
+    }
+    format!(
+        "{} sites {} MB; links (an origin is {} bytes held): {} fields {} MB, {} returns {} \
+         MB, {} calls {} MB, {} writes {} MB, {} statics {} MB, {} closed calls {} MB, {} \
+         closed bounds {} MB",
+        sites.len(),
+        mb!(sites),
+        std::mem::size_of::<rcbom_facts::Origin>(),
+        links.fields.len(),
+        mb!(&links.fields),
+        links.returns.len(),
+        mb!(&links.returns),
+        links.calls.len(),
+        mb!(&links.calls),
+        links.writes.len(),
+        mb!(&links.writes),
+        links.statics.len(),
+        mb!(&links.statics),
+        links.closed_calls.len(),
+        mb!(&links.closed_calls),
+        links.closed_bounds.len(),
+        mb!(&links.closed_bounds),
+    )
+}
+
 fn pta_dump(tcx: TyCtxt<'_>, p: pta::Pta) -> rcbom_facts::PointsTo {
     let t0 = std::time::Instant::now();
     let (queries, answers, stats) = p.solve();

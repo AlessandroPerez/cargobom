@@ -188,8 +188,12 @@ pub fn load_facts(
             continue;
         }
         if p.extension().is_some_and(|x| x == "json") {
-            let f: CrateFacts = serde_json::from_slice(&std::fs::read(&p)?)
+            let mut f: CrateFacts = serde_json::from_slice(&std::fs::read(&p)?)
                 .map_err(|e| anyhow::anyhow!("{}: {e}", p.display()))?;
+            // (the calls the driver wrote beside the facts are read when asked for)
+            if !f.links.arg_call_refs.is_empty() {
+                f.links.arg_calls_file = Some(p.with_extension(rcbom_facts::ARG_CALLS_EXT));
+            }
             if f.facts_version != FACTS_VERSION {
                 bail!(
                     "{}: facts version {} (expected {FACTS_VERSION}); rebuild the driver",

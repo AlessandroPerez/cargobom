@@ -16,6 +16,25 @@ use std::collections::{HashMap, HashSet};
 
 use rcbom_facts::{CrateFacts, NOT_FOLLOWED, Origin};
 
+/// The callers of a function, each with the arguments it passes.
+type Callers = Vec<(String, Vec<Origin>)>;
+
+/// The calls of one function (`LinkIndex::callers_of`).
+pub struct CallersOf<'a> {
+    carrying: &'a [(String, Vec<Origin>)],
+    others: &'a [(String, Vec<Origin>)],
+    beside: std::rc::Rc<Callers>,
+}
+
+impl CallersOf<'_> {
+    pub fn iter(&self) -> impl Iterator<Item = &(String, Vec<Origin>)> {
+        self.carrying
+            .iter()
+            .chain(self.others)
+            .chain(self.beside.iter())
+    }
+}
+
 #[derive(Default)]
 pub struct LinkIndex {
     /// By struct and field path.
@@ -27,6 +46,12 @@ pub struct LinkIndex {
     /// Calls between the program's functions whose arguments carry no algorithm
     /// (`Links::arg_calls`), by callee: only for `callers_of`.
     arg_calls: HashMap<String, Vec<(String, Vec<Origin>)>>,
+    /// Those the driver wrote beside the facts (`Links::arg_call_refs`), by callee: the file
+    /// (an index of `arg_files`) and where the record is in it. Read when a callee is asked
+    /// about, and kept (`arg_read`).
+    arg_refs: HashMap<String, Vec<(usize, u64, u32)>>,
+    arg_files: Vec<std::path::PathBuf>,
+    arg_read: RefCell<HashMap<String, std::rc::Rc<Callers>>>,
     /// By def id: (contents change at run time, values put there).
     statics: HashMap<String, (bool, Vec<Origin>)>,
     /// By function, parameter and the fields of a borrow it holds (none: the parameter
@@ -369,6 +394,16 @@ impl LinkIndex {
                     v.push(call);
                 }
             }
+            if let Some(file) = &f.links.arg_calls_file {
+                let i = ix.arg_files.len();
+                ix.arg_files.push(file.clone());
+                for r in &f.links.arg_call_refs {
+                    ix.arg_refs
+                        .entry(r.callee.clone())
+                        .or_default()
+                        .push((i, r.at, r.len));
+                }
+            }
             ix.truncated.extend(f.links.truncated.iter().cloned());
             ix.summarised.extend(
                 f.links
@@ -376,6 +411,7 @@ impl LinkIndex {
                     .iter()
                     .chain(&f.links.arg_calls)
                     .map(|c| c.caller.clone())
+                    .chain(f.links.arg_call_refs.iter().map(|r| r.caller.clone()))
                     .chain(f.links.fields.iter().map(|s| s.func.clone()))
                     .chain(f.links.returns.iter().map(|r| r.func.clone()))
                     .chain(f.links.writes.iter().map(|w| w.func.clone()))
@@ -951,12 +987,45 @@ impl LinkIndex {
 
     /// The program's calls of `func`: each caller with the arguments it passes, those that
     /// can carry an algorithm or not.
-    pub fn callers_of(&self, func: &str) -> impl Iterator<Item = &(String, Vec<Origin>)> {
-        self.calls
-            .get(func)
-            .into_iter()
-            .chain(self.arg_calls.get(func))
-            .flatten()
+    pub fn callers_of(&self, func: &str) -> CallersOf<'_> {
+        CallersOf {
+            carrying: self.calls.get(func).map_or(&[], Vec::as_slice),
+            others: self.arg_calls.get(func).map_or(&[], Vec::as_slice),
+            beside: self.arg_callers(func),
+        }
+    }
+
+    /// The calls of `func` among those the driver wrote beside the facts, read from there the
+    /// first time they are asked for; a record two summaries hold is one call.
+    fn arg_callers(&self, func: &str) -> std::rc::Rc<Callers> {
+        if let Some(read) = self.arg_read.borrow().get(func) {
+            return read.clone();
+        }
+        use std::io::{Read, Seek, SeekFrom};
+        let mut calls: Callers = Vec::new();
+        for &(file, at, len) in self.arg_refs.get(func).into_iter().flatten() {
+            let path = &self.arg_files[file];
+            let mut bytes = vec![0u8; len as usize];
+            let record: rcbom_facts::LocalCall = std::fs::File::open(path)
+                .and_then(|mut f| {
+                    f.seek(SeekFrom::Start(at))?;
+                    f.read_exact(&mut bytes)
+                })
+                .map_err(|e| e.to_string())
+                .and_then(|()| serde_json::from_slice(&bytes).map_err(|e| e.to_string()))
+                .unwrap_or_else(|e| panic!("{}: the record at byte {at}: {e}", path.display()));
+            let call = (record.caller, record.args);
+            if !calls.contains(&call)
+                && !self.arg_calls.get(func).is_some_and(|v| v.contains(&call))
+            {
+                calls.push(call);
+            }
+        }
+        let read = std::rc::Rc::new(calls);
+        self.arg_read
+            .borrow_mut()
+            .insert(func.to_string(), read.clone());
+        read
     }
 
     /// The functions an entry point reaches (by defining path).

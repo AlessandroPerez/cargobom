@@ -563,7 +563,7 @@ fn input_dep(
             if !seen.insert((f.clone(), index.to_string())) {
                 return false;
             }
-            ctx.flow.callers_of(&f).any(|(caller, args)| {
+            ctx.flow.callers_of(&f).iter().any(|(caller, args)| {
                 args.get(*index)
                     .is_some_and(|a| input_dep(ctx, a, caller, depth + 1, seen, returned))
             })

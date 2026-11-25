@@ -246,7 +246,7 @@ fn of_param(
     if func.is_empty() {
         return;
     }
-    for (caller, args) in links.callers_of(func) {
+    for (caller, args) in links.callers_of(func).iter() {
         let Some(a) = args.get(index) else {
             continue;
         };

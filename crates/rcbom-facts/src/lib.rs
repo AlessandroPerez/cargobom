@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 47;
+pub const FACTS_VERSION: u32 = 48;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -152,6 +152,16 @@ pub struct Links {
     /// origins, read only to tell whether a value depends on the program's input.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub arg_calls: Vec<LocalCall>,
+    /// The records of `arg_calls` the driver wrote beside this file and not in it
+    /// (`<unit>.argcalls`: each a `LocalCall` in JSON, one after the other): where each one is,
+    /// with the two functions it names. They are most of what a program's links hold, and the
+    /// analysis reads those of the few functions it asks about (rhwp 0.9.1, of 957,000 lines:
+    /// 49,133 records in 937 MB, which took the driver 4 GB to hold).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub arg_call_refs: Vec<ArgCallRef>,
+    /// The file `arg_call_refs` point into, as the reader of this file found it.
+    #[serde(skip)]
+    pub arg_calls_file: Option<std::path::PathBuf>,
     /// The functions (and instances) taking a `&mut` (or a value holding one) whose summaries
     /// record no write through it: the value left as it was (`fn up(&mut self) {}`), not a
     /// function the driver did not see.
@@ -286,6 +296,7 @@ impl Links {
                 self.arg_calls.push(c);
             }
         }
+        self.arg_call_refs.extend(other.arg_call_refs);
         for w in other.writes {
             if !self.writes.contains(&w) {
                 self.writes.push(w);
@@ -374,6 +385,18 @@ pub struct Returned {
     pub func: String,
     pub path: Vec<usize>,
     pub value: Origin,
+}
+
+/// The extension of the file a crate's `Links::arg_call_refs` point into, beside its facts.
+pub const ARG_CALLS_EXT: &str = "argcalls";
+
+/// A record of `Links::arg_calls` in the file beside the facts: `len` bytes from byte `at`.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ArgCallRef {
+    pub callee: String,
+    pub caller: String,
+    pub at: u64,
+    pub len: u32,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
