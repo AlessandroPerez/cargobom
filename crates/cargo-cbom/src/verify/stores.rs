@@ -1759,6 +1759,40 @@ pub(super) fn closure_store(s: &[char], i: usize) -> bool {
     }
     p.is_some_and(|p| s[p] == '|')
 }
+/// The statements of a function's body (`body`) that assign to its parameter `param` or to a
+/// place of it (`p = ..;`, `p.f = ..;`, `*p = ..;`): where each starts, where the value assigned
+/// starts, and its end. As `writes_to` has a variable's, the assignments alone.
+pub(super) fn param_writes(
+    src: &Source,
+    body: (usize, usize),
+    param: &str,
+) -> Vec<(usize, usize, usize)> {
+    let s = &src.code;
+    let mut out = Vec::new();
+    let (from, to) = body;
+    let mut i = from;
+    while i < to.min(s.len()) {
+        if !kw(s, i, param) {
+            i += 1;
+            continue;
+        }
+        let mut p = before_blank(s, i);
+        if p.is_some_and(|p| s[p] == '*') {
+            p = before_blank(s, p.unwrap_or(0));
+        }
+        let starts = p.is_none_or(|p| matches!(s[p], ';' | '{' | '}'));
+        if starts && matches!(lookup(src, i, param), Some(Found::Param(_))) {
+            let e = scan_to(s, i, to, |k| s[k] == ';');
+            if assigned_place(src, (i, e)).is_some() {
+                out.push((i, scan_to(s, i, e, |k| s[k] == '=') + 1, e));
+                i = e.max(i + 1);
+                continue;
+            }
+        }
+        i += param.len().max(1);
+    }
+    out
+}
 /// The statements of its scope that store into a variable: those that start with it
 /// (`v = ..;`, `v.f = ..;`, `*v = ..;`, `m.insert(k, ..);`, `m.entry(k).or_insert(..);`), or
 /// a closure's body without braces (`|_| v = ..`, run when the closure is: `closure_store`), the

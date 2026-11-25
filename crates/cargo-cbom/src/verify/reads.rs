@@ -698,7 +698,53 @@ pub(super) fn names_read(
                     }
                 }
             }
-            Some(Found::Param(_)) => r.open |= own,
+            Some(Found::Param(_)) => {
+                // a place of the parameter that the function itself assigns before the read
+                // (`cfg.alg = &SHA512;`, then `digest(cfg.alg, d)`) holds that value, as a
+                // variable's does; assigned on every way to the read and not touched since, it
+                // holds no value from elsewhere
+                let mut replaced = false;
+                if own
+                    && depth > 0
+                    && let Some(f) = src.enclosing(src.pos(start), &[ItemKind::Fn])
+                {
+                    let sc = src.fn_scope(f);
+                    let place = read_place(s, start).0;
+                    for (at, from, end) in param_writes(src, sc.body, &w) {
+                        if at >= start || (at <= start && start < end) {
+                            continue;
+                        }
+                        let Some(a) = assigned_place(src, (at, end)) else {
+                            continue;
+                        };
+                        // the place read or what holds it; or a part of it
+                        let whole = place == a
+                            || place.starts_with(&format!("{a}."))
+                            || place.starts_with(&format!("{a}["));
+                        let part = a.starts_with(&format!("{place}."))
+                            || a.starts_with(&format!("{place}["));
+                        if !(whole || part) {
+                            continue;
+                        }
+                        if seen.insert((from, end, String::new())) {
+                            names_read(src, kb, from, end, depth - 1, seen, r, own);
+                        }
+                        // (and nothing else done with the parameter between the two: lent to a
+                        // call after the assignment, `cx.see(&mut cfg)`, it may hold what that
+                        // writes)
+                        let used = (end..start).any(|k| {
+                            kw(s, k, &w) && matches!(lookup(src, k, &w), Some(Found::Param(_)))
+                        });
+                        replaced |= whole
+                            && !used
+                            && !(r.smashed && a.contains('['))
+                            && sc.every_way(s, at, start);
+                    }
+                }
+                if !replaced {
+                    r.open |= own;
+                }
+            }
             Some(Found::Item(k)) => {
                 let sp = src.span(&src.items[k]);
                 if depth > 0 && seen.insert((sp.0, sp.1, String::new())) {
