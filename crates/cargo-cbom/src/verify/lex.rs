@@ -394,6 +394,22 @@ pub(super) fn token_start(src: &Source, line: usize, col: usize) -> bool {
     }
     prev != [':', ':']
 }
+/// Whether a documentation comment starts at `col` of `line` (1-based): `///`, `//!`, `/**`,
+/// `/*!`, and not the plain comments `////` and `/***` start, nor the empty `/**/`. To the
+/// compiler it is an attribute of the item it is on, a token like the others.
+pub(super) fn doc_comment_at(src: &Source, line: usize, col: usize) -> bool {
+    let l = line.wrapping_sub(1);
+    if src.class.get(l).and_then(|c| c.get(col)) != Some(&Class::Comment) {
+        return false;
+    }
+    let at: Vec<char> = src.lines[l].chars().skip(col).take(4).collect();
+    match at.as_slice() {
+        ['/', '/', '/', rest @ ..] => rest.first() != Some(&'/'),
+        ['/', '/', '!', ..] | ['/', '*', '!', ..] => true,
+        ['/', '*', '*', rest @ ..] => !matches!(rest.first(), Some('*' | '/')),
+        _ => false,
+    }
+}
 /// A context's parts, split at the `; ` outside brackets (`in <[u8; 32] as From>::from; ..`).
 pub(super) fn parts(details: &str) -> Vec<&str> {
     let b = details.as_bytes();

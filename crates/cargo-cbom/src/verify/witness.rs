@@ -636,7 +636,9 @@ impl Files<'_> {
     }
 
     /// A span's file read, the span in it: from a token's edge to a token's edge, in code
-    /// (`literal`: or in a literal, a format string's part).
+    /// (`literal`: or in a literal, a format string's part). A documentation comment is a
+    /// token too, an attribute of the item it is on: a span may start at one, and what holds
+    /// the span says whether code can be there (only code a procedural macro writes).
     fn span_at(&mut self, s: &Span, literal: bool) -> Result<(PathBuf, Rc<Source>), String> {
         let path = self.resolve(&s.file)?;
         let src = self
@@ -657,7 +659,10 @@ impl Files<'_> {
         let class = |l: usize, c: usize| src.class.get(l - 1).and_then(|k| k.get(c)).copied();
         if s.start.1 < first.len() {
             let k = class(s.start.0, s.start.1);
-            if !(k == Some(Class::Code) || literal && k.is_some()) {
+            if !(k == Some(Class::Code)
+                || literal && k.is_some()
+                || doc_comment_at(&src, s.start.0, s.start.1))
+            {
                 return Err(format!("{at}: not in code"));
             }
             if first[s.start.1].is_whitespace()
@@ -906,6 +911,14 @@ impl Files<'_> {
                 ));
             }
         }
+        // (macros that are declared write their tokens where they read: none of their code
+        // is at a documentation comment)
+        if plain && doc_comment_at(&raw_src, w.at.start.0, w.at.start.1) {
+            return Err(format!(
+                "{}:{}:{}: not in code",
+                w.at.file, w.at.start.0, w.at.start.1
+            ));
+        }
         Ok(plain)
     }
 
@@ -1057,6 +1070,10 @@ impl Files<'_> {
             ));
         }
         let (path, src) = self.span_at(&w.at, false)?;
+        // (an item no macro writes is where it reads)
+        if doc_comment_at(&src, w.at.start.0, w.at.start.1) {
+            return Err(format!("{at}: not in code"));
+        }
         let library = w.at.file.starts_with("/rustc/");
         // (the item whole, where the compiler has it: it holds where it is named)
         if let Some((a, b)) = w.within
@@ -1174,7 +1191,8 @@ impl Files<'_> {
     }
 
     /// A step of an instantiation chain as the compiler records it: at `at`, in `caller`,
-    /// reaching the code held at `inner`.
+    /// reaching the code held at `inner`. Whether the caller is written as it reads: no
+    /// procedural or built-in macro writes it.
     pub(super) fn check_via(
         &mut self,
         part: &str,
@@ -1182,7 +1200,7 @@ impl Files<'_> {
         caller: &str,
         at: (&str, &Path, usize, usize),
         inner: (&Path, usize, Option<usize>),
-    ) -> Result<(), String> {
+    ) -> Result<bool, String> {
         let (file, path, line, col) = at;
         let err = |e: String| format!("`{part}`: {e}");
         let here = Span {
@@ -1233,11 +1251,12 @@ impl Files<'_> {
             let end = item_after(&src, src.idx((line, col)))?;
             Some(((line, 0), src.pos(end + 1)))
         });
-        if let Some(w) = &via.caller {
-            self.check_item_at(w, caller, (path, line, Some(col)), on)
-                .map_err(err)?;
+        match &via.caller {
+            Some(w) => self
+                .check_item_at(w, caller, (path, line, Some(col)), on)
+                .map_err(err),
+            None => Ok(true),
         }
-        Ok(())
     }
 }
 

@@ -1,0 +1,427 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via verify-59 -> sha2 -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via verify-59 -> sha2 -> digest -> crypto-common",
+            "line": 30,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/digest@0.10.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via verify-59 -> sha2 -> digest",
+            "line": 40,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "digest"
+          }
+        ]
+      },
+      "name": "digest",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.10.7",
+      "type": "library",
+      "version": "0.10.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/pm@0.1.0",
+      "name": "pm",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/pm@0.1.0",
+      "type": "library",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha2@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by verify-59 (dependencies)",
+            "line": 17,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "sha2"
+          },
+          {
+            "additionalContext": "[manifest] locked sha2 0.10.9; reached via verify-59 -> sha2",
+            "line": 118,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha2"
+          }
+        ]
+      },
+      "name": "sha2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha2@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "nistQuantumSecurityLevel": 2,
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in <verify_59::Fields as serde_core::ser::SerializeStruct>::serialize_field::<..>; use: digest; owner at src/main.rs:35:7-35:22 within 35:4-43:5; instantiated by verify_59::_::<impl serde_core::ser::Serialize for verify_59::Request>::serialize::<..> at src/main.rs:188:4 (call, to 190:18 as `/// Random bytes that make the request one of a kind.` line #b02771f1, caller at src/main.rs:186:9-186:18 as `Serialize` line #57a487b3 (by derive Serialize at src/main.rs:186:9-186:18 line #57a487b3 defined serde_derive-1.0.229/src/lib.rs:114-114)); instantiated by verify_59::main at src/main.rs:202:30 as `serialize` (call, to 202:39 as `serialize` line #e9c77c09, caller at src/main.rs:196:3-196:7 within 196:0-204:1); `<verify_59::Fields as serde_core::ser::SerializeStruct>::serialize_field::<..>` instantiated by verify_59::_::<impl serde_core::ser::Serialize for verify_59::Request>::serialize::<..> at src/main.rs:191:4 (call, to 192:18 as `/// Who sends it.` line #a1d7c770, caller at src/main.rs:186:9-186:18 as `Serialize` line #57a487b3 (by derive Serialize at src/main.rs:186:9-186:18 line #57a487b3 defined serde_derive-1.0.229/src/lib.rs:114-114)); `<verify_59::Fields as serde_core::ser::SerializeStruct>::serialize_field::<..>` instantiated by verify_59::_::<impl serde_core::ser::Serialize for verify_59::Request>::serialize::<..> at src/main.rs:193:4 as `expiry: u64` (call, to 193:15 as `expiry: u64` line #b9c88935, caller at src/main.rs:186:9-186:18 as `Serialize` line #57a487b3 (by derive Serialize at src/main.rs:186:9-186:18 line #57a487b3 defined serde_derive-1.0.229/src/lib.rs:114-114)); line: `self.0.push((Sha256::digest(key.as_bytes()).into(), hash));`; code: `Sha256::digest`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 21,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <verify_59::Fields as serde_core::ser::SerializeStruct>::end; new: setup, not a use; owner at src/main.rs:45:7-45:10 within 45:4-53:5; line: `let mut all = Sha256::new();`; code: `Sha256::new`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "digest::digest::Digest::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <verify_59::Fields as serde_core::ser::SerializeStruct>::end; use: digest; owner at src/main.rs:45:7-45:10 within 45:4-53:5; line: `all.update(key);`; code: `update`",
+            "line": 49,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <verify_59::Fields as serde_core::ser::SerializeStruct>::end; use: digest; owner at src/main.rs:45:7-45:10 within 45:4-53:5; line: `all.update(value);`; code: `update`",
+            "line": 50,
+            "location": "src/main.rs",
+            "offset": 16,
+            "symbol": "digest::digest::Digest::update"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <verify_59::Fields as serde_core::ser::SerializeStruct>::end; use: digest; owner at src/main.rs:45:7-45:10 within 45:4-53:5; line: `Ok(all.finalize().into())`; code: `finalize`",
+            "line": 52,
+            "location": "src/main.rs",
+            "offset": 15,
+            "symbol": "digest::digest::Digest::finalize"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <verify_59::Hasher as serde_core::ser::Serializer>::serialize_str; use: digest; owner at src/main.rs:67:7-67:20 within 67:4-69:5; line: `Ok(Sha256::digest(v.as_bytes()).into())`; code: `Sha256::digest`",
+            "line": 68,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <verify_59::Hasher as serde_core::ser::Serializer>::serialize_bytes; use: digest; owner at src/main.rs:70:7-70:22 within 70:4-72:5; line: `Ok(Sha256::digest(v).into())`; code: `Sha256::digest`",
+            "line": 71,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in <verify_59::Hasher as serde_core::ser::Serializer>::serialize_u64; use: digest; owner at src/main.rs:73:7-73:20 within 73:4-75:5; line: `Ok(Sha256::digest(v.to_be_bytes()).into())`; code: `Sha256::digest`",
+            "line": 74,
+            "location": "src/main.rs",
+            "offset": 11,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "8"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "nistQuantumSecurityLevel": 5,
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [derive pm::Tagged] in verify_59::Request::tag; use: digest; owner at src/main.rs:186:20-186:30 as `pm::Tagged` line #4e2822cf (by derive pm::Tagged at src/main.rs:186:20-186:30 line #4e2822cf defined pm/src/lib.rs:24-24); expanded from src/main.rs:186:20-186:30 as `pm::Tagged` line #4e2822cf (by derive pm::Tagged at src/main.rs:186:20-186:30 line #4e2822cf defined pm/src/lib.rs:24-24); line: `#[derive(Serialize, pm::Tagged)]`",
+            "line": 186,
+            "location": "src/main.rs",
+            "offset": 20,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-512, collision and preimage category"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/pm@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/pm@0.1.0",
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/verify-59@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/verify-59@0.1.0",
+      "name": "verify-59",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/verify-59@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "18"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "238"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin verify-59"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "9 calls into crypto packages: 9 cited, 0 cited by the check as unknown, 0 excused ()"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:3728c783-834d-868c-b237-d090b09c7b04",
+  "specVersion": "1.7",
+  "version": 1
+}

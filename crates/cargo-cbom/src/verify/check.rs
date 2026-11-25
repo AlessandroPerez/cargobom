@@ -1505,8 +1505,14 @@ impl Files<'_> {
                         .collect()
                 })
                 .unwrap_or_default();
-            if cols.is_empty() {
-                return Err(format!("`{part}`: no code at line {line} of {file}"));
+            // (a documentation comment is a token of the item it is on, an attribute: a
+            // procedural macro may put the code it writes for the item there. serde's derive
+            // gives the call that serializes a field the span of the field whole, which
+            // starts at its `///`. Held below to a caller such a macro writes.)
+            let on_doc = cols.is_empty() && col.is_some_and(|c| doc_comment_at(&src, line, c));
+            let no_code = || format!("`{part}`: no code at line {line} of {file}");
+            if cols.is_empty() && !on_doc {
+                return Err(no_code());
             }
             if let (Some(t), Some(c0)) = (&call_text, col) {
                 let at: String = src.lines[line - 1].chars().skip(c0).collect();
@@ -1629,13 +1635,16 @@ impl Files<'_> {
             }
             // as the compiler records the step: its code at the position, in the caller
             if let (Some(via), Some(c), Some(c0)) = (&via, &caller, col) {
-                self.check_via(
+                let as_read = self.check_via(
                     whole,
                     via,
                     c,
                     (&file, &path, line, c0),
                     (&inner.0, inner.1, inner.2),
                 )?;
+                if on_doc && as_read {
+                    return Err(no_code());
+                }
                 callee = Some(c.clone());
                 inner = (path.clone(), line, col);
                 continue;
