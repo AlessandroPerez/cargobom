@@ -115,8 +115,9 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         };
         let did = self.def?;
         let parent = self.tcx.parent(did);
-        let body = rustc_public::CrateItem(rustc_internal::stable(parent)).body()?;
-        let mut outer = Origins::new(self.tcx, &body, Some(parent));
+        let shared = shared_body(parent)?;
+        let body = &shared.body;
+        let mut outer = Origins::of_shared(self.tcx, &shared, parent);
         // a closure of a generic function's instance: the parent's constants with that
         // instance's arguments (`let alg = T::ALG;` captured in `each::<P512>`)
         if let Some(a) = self.inst_args() {

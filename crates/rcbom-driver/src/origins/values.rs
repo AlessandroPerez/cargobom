@@ -1216,14 +1216,14 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         if self.followed || depth >= MAX_DEPTH {
             return Origin::Truncated;
         }
-        let def = rustc_internal::stable(did);
-        let Some(body) = rustc_public::CrateItem(def).body() else {
+        let Some(shared) = shared_body(did) else {
             return Origin::Unknown;
         };
+        let body = &shared.body;
         // what it returns, its own parameters `Unknown`; and, for a closure taking some, with
         // them as the input the analysis gives it where a combinator says (`fed`)
         let returned = |inputs: bool| {
-            let mut inner = Origins::new(self.tcx, &body, Some(did));
+            let mut inner = Origins::of_shared(self.tcx, &shared, did);
             inner.followed = true;
             inner.inputs = inputs;
             inner.captures = captures.clone();
@@ -1349,8 +1349,9 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             return None;
         }
         let parent = self.tcx.parent(did);
-        let body = rustc_public::CrateItem(rustc_internal::stable(parent)).body()?;
-        let mut outer = Origins::new(self.tcx, &body, Some(parent));
+        let shared = shared_body(parent)?;
+        let body = &shared.body;
+        let mut outer = Origins::of_shared(self.tcx, &shared, parent);
         // a closure of a generic function's instance: the parent's constants with that
         // instance's arguments (`let alg = T::ALG;` captured in `each::<P512>`)
         if let Some(a) = self.inst_args() {

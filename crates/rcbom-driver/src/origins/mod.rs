@@ -229,6 +229,8 @@ pub(crate) struct Origins<'a, 'tcx> {
     /// bodies the scanner visits have no call that needs one, and the largest (minisign's
     /// unrolled `Blake2b::compress`, thousands of overflow-check blocks) would cost minutes.
     flow: OnceCell<Flow>,
+    /// The definitions of a body other queries share (`SharedBody`), in place of `flow`.
+    shared_flow: Option<&'a OnceCell<Flow>>,
     /// Followed from a caller (a closure passed as an argument): its own parameters are not
     /// the caller's.
     followed: bool,
@@ -309,6 +311,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             def,
             kind,
             flow: OnceCell::new(),
+            shared_flow: None,
             followed: false,
             inputs: false,
             captures: None,
@@ -319,6 +322,14 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             item: None,
             item_consts: OnceCell::new(),
         }
+    }
+
+    /// The origins of a body other queries share: its definitions are computed once for all
+    /// of them.
+    pub(super) fn of_shared(tcx: TyCtxt<'tcx>, shared: &'a SharedBody, def: DefId) -> Self {
+        let mut o = Origins::new(tcx, &shared.body, Some(def));
+        o.shared_flow = Some(&shared.flow);
+        o
     }
 
     /// The origins of an instance body, whose constants are looked up in the MIR of `item` at
@@ -374,7 +385,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     }
 
     fn flow(&self) -> &Flow {
-        self.flow.get_or_init(|| {
+        self.shared_flow.unwrap_or(&self.flow).get_or_init(|| {
             Flow::new(
                 self.tcx,
                 self.body,
@@ -383,6 +394,54 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             )
         })
     }
+}
+
+/// A body the queries of another body read: the function a closure is written in, where its
+/// captures are looked up, and a closure followed to what it returns. It is converted from the
+/// compiler's once and its definitions are computed once, while it is among the last
+/// `SHARED_BODIES` asked for. Each look-up had done both anew, one for every capture read and
+/// every closure met: in rhwp 0.9.1 (957,000 lines) a closure inside a function of thousands
+/// of lines took twenty seconds to scan, and the crate twelve minutes.
+pub(super) struct SharedBody {
+    pub(super) body: Body,
+    flow: OnceCell<Flow>,
+}
+
+/// The bodies kept for the queries of others: a closure, the function it is in and what that
+/// one is in, and one more.
+const SHARED_BODIES: usize = 4;
+
+thread_local! {
+    static SHARED: RefCell<Vec<(DefId, std::rc::Rc<SharedBody>)>> =
+        const { RefCell::new(Vec::new()) };
+}
+
+/// The item body of `did` for the queries of another body, the last asked for last.
+pub(super) fn shared_body(did: DefId) -> Option<std::rc::Rc<SharedBody>> {
+    let kept = SHARED.with(|s| {
+        let mut s = s.borrow_mut();
+        let i = s.iter().position(|(d, _)| *d == did)?;
+        let e = s.remove(i);
+        let b = e.1.clone();
+        s.push(e);
+        Some(b)
+    });
+    if kept.is_some() {
+        return kept;
+    }
+    let body = rustc_public::CrateItem(rustc_internal::stable(did)).body()?;
+    let b = std::rc::Rc::new(SharedBody {
+        body,
+        flow: OnceCell::new(),
+    });
+    SHARED.with(|s| {
+        let mut s = s.borrow_mut();
+        if s.len() >= SHARED_BODIES {
+            s.remove(0);
+        }
+        s.push((did, b.clone()));
+    });
+    Some(b)
 }
 
 type Key = (Local, Path, At);
@@ -573,7 +632,7 @@ const CELL_READS: &[&str] = &[
 ];
 
 /// Which pointers a search for a cell looks through.
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 enum Through {
     None,
     Owned,

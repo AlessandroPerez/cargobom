@@ -307,10 +307,32 @@ pub(super) fn cell_in<'tcx>(
     depth: usize,
     through: Through,
 ) -> bool {
-    use rustc_middle::ty::TyKind as K;
     if depth > 10 {
         return false;
     }
+    // (the answer for a type at a depth is asked once: a type is one interned value for the
+    // compilation, named here by its address. Without it a type whose fields lead back to
+    // itself through `Vec`s, a document's tree, is walked along every path of ten steps, for
+    // every local of every body: most of the twelve minutes of rhwp 0.9.1's scan)
+    thread_local! {
+        static ASKED: std::cell::RefCell<std::collections::HashMap<(usize, usize, Through), bool>> =
+            std::cell::RefCell::new(std::collections::HashMap::new());
+    }
+    let key = (t.kind() as *const _ as usize, depth, through);
+    if let Some(known) = ASKED.with(|a| a.borrow().get(&key).copied()) {
+        return known;
+    }
+    let found = cell_in_type(tcx, t, depth, through);
+    ASKED.with(|a| a.borrow_mut().insert(key, found));
+    found
+}
+fn cell_in_type<'tcx>(
+    tcx: TyCtxt<'tcx>,
+    t: rustc_middle::ty::Ty<'tcx>,
+    depth: usize,
+    through: Through,
+) -> bool {
+    use rustc_middle::ty::TyKind as K;
     match t.kind() {
         K::Adt(def, args) if def.is_unsafe_cell() => not_plain(tcx, args.type_at(0), 0),
         // (`Vec<T>` names its elements only in a marker)
