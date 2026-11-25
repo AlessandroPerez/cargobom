@@ -1,0 +1,19 @@
+# A step of a chain at a literal: `#[serde(with = "digested")]` on a field. serde's derive writes
+# a wrapper whose `serialize` calls `digested::serialize`, and gives that call the span of the
+# literal in the attribute, the path it parsed from it. `digested::serialize` is generic over the
+# serializer, so the SHA-512 in it is instantiated by that call: a step of its chain at
+# `"digested"`, where the verifier, reading a literal as no code, found none (`not in code`; the
+# Ed25519 keys of rcan 0.4.0 under iroh-services 2.0.0, serialized `with =
+# "verifying_key_serde"`). A literal is a token, as a documentation comment is (verify-59): a step
+# may be at one where a procedural macro writes the caller, and nowhere else. So with
+# `serialize_with = "digested::serialize"`.
+[package]
+name = "verify-67"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+sha2 = "0.10"
+
+[workspace]

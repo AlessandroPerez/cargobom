@@ -1289,7 +1289,20 @@ impl Files<'_> {
             start: (line, col),
             end: via.to,
         };
-        let (_, src) = self.span_at(&here, false).map_err(err)?;
+        // (a literal is a token, as a documentation comment is: a procedural macro may put the
+        // code it writes there. serde's derive gives the call of a `#[serde(with = "module")]`
+        // function the span of the literal. Held below to a caller such a macro writes.)
+        let mut on_literal = false;
+        let (_, src) = match self.span_at(&here, false) {
+            Ok(r) => r,
+            Err(e) => {
+                on_literal = true;
+                self.span_at(&here, true)
+                    .ok()
+                    .filter(|(_, src)| literal_at(src, line, col))
+                    .ok_or_else(|| err(e))?
+            }
+        };
         reads_as(
             &src,
             &here,
@@ -1334,6 +1347,9 @@ impl Files<'_> {
                 .map_err(err)?,
             None => true,
         };
+        if on_literal && as_read {
+            return Err(err(format!("{file}:{line}:{col}: not in code")));
+        }
         // where a macro writes its code: in the expansions the step is cited at (read as the
         // caller is written: by a procedural macro, at whatever token that macro chose)
         let lent = self.by_macro;
