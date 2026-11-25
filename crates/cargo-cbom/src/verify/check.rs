@@ -646,10 +646,26 @@ impl Files<'_> {
                     });
                     // or a macro whose expansion binds it is invoked there (`bind!(m)` with `let
                     // $n: HashFn = digest::digest;`): its body names it, in the file or in
-                    // another of the package
+                    // another of the package; or the invocation does, whose macro writes the
+                    // name it is handed where a function is held (`table!(compute)` with
+                    // `$f:ident`: the compiler has the name at the macro's `$f`), by the
+                    // function's name or by one the file imports it as
                     let by_macro = !names
                         && macro_call_at(&src2, (l2, c2))
-                        && invocation_text(&src2, (l2, c2)).is_some_and(|(m, _)| {
+                        && invocation_text(&src2, (l2, c2)).is_some_and(|(m, handed)| {
+                            let mut names = vec![regex::escape(&ident)];
+                            names.extend(
+                                src2.binds
+                                    .iter()
+                                    .filter(|b| b.path.last() == Some(&ident) && b.name != "*")
+                                    .map(|b| regex::escape(&b.name)),
+                            );
+                            let tokens = handed.split_once('!').map_or("", |(_, t)| t);
+                            if super::compiled(&format!(r"\b(?:{})\b", names.join("|")))
+                                .is_ok_and(|r| r.is_match(tokens))
+                            {
+                                return true;
+                            }
                             let mut files = vec![p2.clone()];
                             if let Some(p) = self.man.owner_of(&p2) {
                                 files.extend(manifest::package_files(&p.manifest_dir));

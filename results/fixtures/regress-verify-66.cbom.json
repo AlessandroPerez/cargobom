@@ -1,0 +1,195 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/md5@0.7.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by verify-66 (dependencies)",
+            "line": 14,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "md5"
+          },
+          {
+            "additionalContext": "[manifest] locked md5 0.7.0; reached via verify-66 -> md5",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "md5"
+          }
+        ]
+      },
+      "name": "md5",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/md5@0.7.0",
+      "type": "library",
+      "version": "0.7.0"
+    },
+    {
+      "bom-ref": "crypto:algorithm:MD5",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "MD5",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in verify_66::main; use: digest; owner at src/main.rs:17:3-17:7 within 17:0-22:1; called through a function pointer to `md5::compute` named at src/main.rs:18:49 as `val!(compute)` line #f193b160; line: `println!(\"{:x?}\", f(b\"v\"));`; code: `f`",
+            "line": 19,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "md5::compute"
+          },
+          {
+            "additionalContext": "[reachable] [call] in verify_66::main; use: digest; owner at src/main.rs:17:3-17:7 within 17:0-22:1; called through a function pointer to `md5::compute` named at src/main.rs:20:12 as `pick!(hash_it)` line #80808c24; line: `println!(\"{:x?}\", g(b\"w\"));`; code: `g`",
+            "line": 21,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "md5::compute"
+          }
+        ]
+      },
+      "name": "MD5",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:output_bytes",
+          "value": "16"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:MD5"
+      ],
+      "ref": "pkg:cargo/md5@0.7.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/md5@0.7.0"
+      ],
+      "ref": "pkg:cargo/verify-66@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:MD5"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/verify-66@0.1.0",
+      "name": "verify-66",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/verify-66@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "2"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "7"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin verify-66"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "2 calls into crypto packages: 0 cited, 0 cited by the check as unknown, 2 excused (format 2)"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:cc6213ce-bda9-809c-a011-b2199621f74f",
+  "specVersion": "1.7",
+  "version": 1
+}

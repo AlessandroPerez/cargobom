@@ -1,0 +1,16 @@
+# A function handed to a declared macro by its name and held as a pointer: `val!(compute)`, of
+# `macro_rules! val { ($f:ident) => { $f } }`. The compiler has the name at the macro's `$f`, in
+# the expansion, and the call through the pointer cites where the function was named at the
+# invocation. The verifier held that position to name the function, or to invoke a macro whose
+# code names it (`the function pointer's position .. does not name compute`): this macro's code
+# names what it is handed. The invocation names it, by its name or by one the file imports it as
+# (`pick!(hash_it)`, of `use md5::compute as hash_it`).
+[package]
+name = "verify-66"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+md5 = "0.7"
+
+[workspace]

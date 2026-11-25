@@ -1,0 +1,36 @@
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:19:22 | md5::compute | [reachable] [call] in verify_66::main; use: digest; owner at src/main.rs:17:3-17:7 within 17:0-22:1; called through a function pointer to `md5::compute` named at src/main.rs:18:49 as `val!(compute)` line #f193b160; line: `println!("{:x?}", f(b"v"));`; code: `f`
+  occ MD5 | crypto:algorithm:MD5 | src/main.rs:21:22 | md5::compute | [reachable] [call] in verify_66::main; use: digest; owner at src/main.rs:17:3-17:7 within 17:0-22:1; called through a function pointer to `md5::compute` named at src/main.rs:20:12 as `pick!(hash_it)` line #80808c24; line: `println!("{:x?}", g(b"w"));`; code: `g`
+  occ md5 | pkg:cargo/md5@0.7.0 | Cargo.lock:6:0 | md5 | [manifest] locked md5 0.7.0; reached via verify-66 -> md5
+  occ md5 | pkg:cargo/md5@0.7.0 | Cargo.toml:14:0 | md5 | [manifest] declared by verify-66 (dependencies)
+  prop MD5 | crypto:algorithm:MD5 | rcbom:confidence=high
+  prop MD5 | crypto:algorithm:MD5 | rcbom:detection:method=type-resolved
+  prop MD5 | crypto:algorithm:MD5 | rcbom:functions:source=observed
+  prop MD5 | crypto:algorithm:MD5 | rcbom:kb:version=0.2.0
+  prop MD5 | crypto:algorithm:MD5 | rcbom:occurrences=2
+  prop MD5 | crypto:algorithm:MD5 | rcbom:param:output_bytes=16
+  prop MD5 | crypto:algorithm:MD5 | rcbom:reachability=reachable
+  prop md5 | pkg:cargo/md5@0.7.0 | rcbom:crypto-role=algorithm
+  prop md5 | pkg:cargo/md5@0.7.0 | rcbom:scope=required
+  prop md5 | pkg:cargo/md5@0.7.0 | rcbom:usage=reachable
+asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library md5 0.7.0 | pkg:cargo/md5@0.7.0 | purl pkg:cargo/md5@0.7.0
+dep pkg:cargo/verify-66@0.1.0 -> pkg:cargo/md5@0.7.0
+dependency crypto:algorithm:MD5
+dependency pkg:cargo/md5@0.7.0
+dependency pkg:cargo/verify-66@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/md5@0.7.0 -> crypto:algorithm:MD5
+root {"bom-ref": "pkg:cargo/verify-66@0.1.0", "name": "verify-66", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/verify-66@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin verify-66
+run rcbom:run:boundary-check=2 calls into crypto packages: 0 cited, 0 cited by the check as unknown, 2 excused (format 2)
+run rcbom:run:features=
+run rcbom:run:packages=2
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=7
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}
