@@ -182,7 +182,7 @@ RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows be
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
-then the tool was run on 453 crates.io packages it had never been run on, in thirteen batches
+then the tool was run on 495 crates.io packages it had never been run on, in fourteen batches
 (Unseen packages, below): what those runs found is fixed in this build, but for one finding
 (two versions of one crate in a build: Limitations), and changed
 three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
@@ -195,9 +195,9 @@ honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HM
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (383 outputs, the suite's included): 22,451 positions verified (26 of them with a fact the text does not show, all in the three fixtures built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 208,162 positions and spans of the compiler's record shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,486 calls (4,243 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,195 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
-| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 372 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
+| evidence | every cited position, `verify --self-test` | fixtures (389 outputs, the suite's included): 22,514 positions verified (35 of them with a fact the text does not show, all in the five fixtures built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 208,721 positions and spans of the compiler's record shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,517 calls (4,268 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,201 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 378 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
@@ -231,11 +231,11 @@ Where it is not exact, the CBOM says so instead of guessing:
 published. They have no labels: what a run shows is whether it completes, whether the verifier
 confirms every position and rejects every shifted one, whether the walk check finds a gap and
 the boundary check leaves a call out. A batch passes when every package does on its first run.
-None of the thirteen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27
-of 34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35). Each finding is
-fixed in this build and has a fixture, but for one (two versions of one crate in a build:
-Limitations), and the packages are development material from then on (`in-too-deep.md` 8 says
-what such a run can and cannot show).
+None of the fourteen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27
+of 34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37). Each
+finding is fixed in this build and has a fixture, but for one (two versions of one crate in a
+build: Limitations), and the packages are development material from then on (`in-too-deep.md`
+8 says what such a run can and cannot show).
 - *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
   nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
   branca 0.10.2, miniserve 0.35.0, jwt-compact 0.8.0, totp-rs 6.0.0, biscuit 0.8.0 and pgp 0.21.0
@@ -537,10 +537,11 @@ does not lead to is the compiler's word: the position is verified, and the fact 
 counted apart (`NOT SHOWN`, "verified with a fact the text does not show"), and the self-test
 counts a shift that passes only so apart as well. The cases are in the fixture built by
 construction (`regress/verify-55`): 286 positions verified, 21 of them with a fact the text
-does not show, every shifted position and span rejected. Two later fixtures hold the one other
-kind, a call a procedural macro puts at a token that is not the call (`regress/verify-62` and
-`regress/verify-63`, five positions; the thirteenth batch below). No position of the other 380
-fixture outputs or of the labelled sets has such a fact.
+does not show, every shifted position and span rejected. Four later fixtures hold the one other
+kind, a call a procedural macro puts at a token that is not the call (`regress/verify-62`,
+`verify-63`, `verify-64` and `verify-68`, fourteen positions; the thirteenth and fourteenth
+batches below). No position of the other 384 fixture outputs or of the labelled sets has such a
+fact.
 
 The ninth batch ran on the build with all of this: twenty-seven of thirty-two. Its CBOMs hold
 14,616 verified positions, 8 more within a range and the 5 rejected ones; all 124,602 shifted
@@ -798,6 +799,71 @@ every step of a value's search, whether a function is an instance of such an ite
 trait method has such an implementation, read all of their names each time. Both are sets made
 once, and the package takes three and a half minutes with the same CBOM.
 
+A fourteenth batch ran on 25 November, on the build with the thirteenth batch's fix: forty-two
+packages by the same rule (a forty-third it draws, pqrascv-hardware, has no released version).
+Five do not build here, with or without the tool: ckman-core 0.2.3 needs the PC/SC library of
+pcsc-sys, thrussh-keys 0.45.0 the libsodium its libsodium-sys finds, php-ext-pqcrypto 0.3.3 a
+PHP for ext-php-rs and blockle-node 0.8.0 a clang for the C code of rs-x11-hash, and safe_core
+0.43.1 requires a crossbeam-channel whose versions are yanked. Thirty-five of the thirty-seven
+that build passed on the first run: dcp-ai 2.14.0, mldsa44 0.4.1, tekflash-core 0.0.12,
+libsoliton 0.1.4, mldsa87 0.4.1, rtao-upstream-core 0.490.1, majik-signature 1.3.2,
+tidecoin-consensus-core 0.2.0, majik-file 1.1.0, empoorio-sdk 0.2.0, kinetic-kid 0.2.0,
+ml-signify 0.4.0, kinetic-verify 0.2.0, qv-core 4.3.10, pq-jwt 0.2.2, kinetic-types 0.2.0,
+thruput-test-vectors 0.64.0, entropa-core 0.1.3, kv-index 2.1.0, txtx-addon-kit 0.4.16,
+longport-httpcli 5.0.0, ethsign-crypto 0.3.0, wnfs-common 0.3.0, greentic-runner-host 1.2.2,
+wg_netmanager 0.5.1, ferveo-gear-tdec 0.8.0, stack_test_epic_keychain 3.0.3, nakatoshi 0.3.1,
+tor-client-lib 0.3.2, no-way 0.4.1, equs-one-core 0.2.3, atlas-seed-phrase 3.0.1, underskrift
+0.1.4, oxicrypto-kdf 0.3.0 and logshare 0.1.1. The thirty-six CBOMs as first made hold 12,556
+verified positions and 1 more within a range, with 9 rejected; all 112,693 shifted positions
+and spans were rejected, and the five binaries have no walk gap. They name ML-DSA in eighteen
+packages, ML-KEM in nine and SLH-DSA in two. Of the two that did not pass, raddy-http 0.8.0 is
+the limit of two versions of one crate (Limitations): its build holds rcgen 0.13.2, on ring,
+and rcgen 0.14.10, on aws-lc-rs, and the P-521 signing of the second is attributed to the
+first's functions as well. The verifier rejects those nine positions (the path names ring,
+which provides no P-521); and for four positions of the second it looks for a function only
+that version declares in the text of the first, finds none and counts the fact as not shown,
+the batch's only positions so, none of them a procedural macro's. The other, iroh-services
+2.0.0, did not build with the driver, and built, failed the verifier: two causes, neither seen
+before. The compiler stopped in the driver (`Instance::mono: .. Option::Some::{constructor#0}
+has type parameters`). What only code behind a branch on a constant reaches is followed apart
+from the walk, and there an instance the compiler gives no body for was asked which function
+the build defines under its symbol, as a declaration of an `extern` block is. `Some` passed as
+a function (`.map(Some)`) is a constructor: it has no body to give either, and, of a generic
+type, no symbol without its type arguments. Only a declaration of an `extern` block stands for
+a function defined elsewhere, and the question is asked of nothing else (`regress/driver-57`).
+Built, the package had two positions rejected, both of Ed25519 keys of rcan 0.4.0 that a field
+serializes `#[serde(with = "verifying_key_serde")]`. serde's derive writes a wrapper whose
+`serialize` calls the module's, and gives that call the span of the literal it parsed the path
+from; the module's function is generic over the serializer, so that call instantiates it: a
+step of the chain at a string literal, where the verifier, reading a literal as no code, found
+none. It is the twelfth batch's documentation comment with another token: a literal is one, and
+a step may be at one where a procedural macro writes the caller, and nowhere else
+(`regress/verify-67`). iroh-services passes: 706 positions verified, all 5,855 shifted ones
+rejected, none not shown. While the batch ran, the family the last three batches' failures are
+of was looked at by construction again, and three more cases were found that no package had
+shown. A procedural function-like macro that a declared macro invokes, `macro_rules! via {
+($e:expr) => { pm::hashed!($e) } }`: the call the procedural macro writes at the token it was
+handed is at `$e` in the declared macro's code, or at the token in the source that macro handed
+on, and the procedural macro's invocation is nowhere around it. The driver's record says, of a
+site in the invocation of a declared macro whose code leads to a procedural one, that
+invocation and each it leads to (`in the input of macro via! at .., which invokes macro
+pm::hashed! at ..`; facts 51), and the verifier reads each (`regress/verify-64`). The declared
+macro may be another crate's, as `tokio::select!` is, and the procedural macro's invocation is
+then in that crate's file (`regress/verify-68`). An invocation is named only where the source
+reads as one: the template macro that derive-deftly's `define_derive_deftly!` writes invokes
+`derive_deftly_engine!`, the compiler has that invocation where `define_derive_deftly!` is
+invoked, and naming it there had the full run reject two positions of `regress/verify-60`
+before any of this was committed. A token a declared macro hands on a second time, with no
+procedural macro at all: `first!(compute)`, whose code is `last!($f)`, whose own is `$f(data)`,
+`$f:tt` in both. The compiler gives such a token the place of the second macro's `$f` and no
+expansion, the same span for every invocation, and the call was cited at a position inside the
+macro's definition, in the function that invokes the macro. The compiler's table of
+metavariable spans says the span is such a place, and the code around it, the call it is the
+callee of, is in the expansion that wrote it there (`regress/verify-65`; what is left where
+nothing is around it is under Limitations). And a function handed to a declared macro as an
+identifier and held as a pointer, `val!(compute)` with `$f:ident`, whose naming the verifier
+looked for in the macro's code and not in the invocation (`regress/verify-66`).
+
 After the third batch every earlier package that builds here was re-run, versions pinned, on
 the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
 complete; 18,275 positions verified and 93 within a range, none mismatched; all 98,256
@@ -1007,13 +1073,25 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   called down a chain on results of calls of the same name is verified within that range.
   Three fixture positions it cannot confirm are listed in `verify-known` files, each checked
   by hand.
-- *Two versions of one crate.* Values are followed across functions by their paths, and a
-  path names a crate by its name: where a build holds two versions of a crate (apple-codesign
-  0.29.0 holds rustls-webpki 0.101.7 and 0.102.8, both `webpki`), what one version's
-  functions pass and return is attributed to the other's too. The members found are then too
-  many, never too few, and a witness function can be named in the wrong version: the
-  verifier rejects those positions (22 in apple-codesign). The driver records which crates
-  each unit is compiled against; the analysis does not use it yet.
+- *Two versions of one crate.* Values are followed across functions by their paths, and a path
+  names a crate by its name: where a build holds two versions of a crate (apple-codesign 0.29.0
+  holds rustls-webpki 0.101.7 and 0.102.8, both `webpki`; raddy-http 0.8.0 holds rcgen 0.13.2
+  and 0.14.10), what one version's functions pass and return is attributed to the other's too.
+  The members found are then too many, never too few, and a witness function can be named in
+  the wrong version: the verifier rejects those positions (22 in apple-codesign, 9 in
+  raddy-http), and where it looks for a function only one version declares in the text of the
+  other, it finds none and counts the fact as not shown (4 in raddy-http). The driver records
+  which crates each unit is compiled against; the analysis does not use it yet.
+- *A token handed on twice.* A declared macro that hands a token on as it is (`$f:tt`) to
+  another that does so again leaves the compiler with the place of the second macro's `$f` for
+  it and no expansion, the same span for every invocation. The driver takes the expansion from
+  the code around the token (the call it is the callee of, the statement it is in), or, with
+  nothing around it, from the compiler's table of metavariable spans where the macro's
+  expansions all come from one invocation (`regress/verify-65`). A token that is all of its
+  statement, or a call a procedural macro puts whole at such a token, in a macro invoked from
+  several places, stays at a position in the macro's definition: the compiler records nothing
+  that tells the invocations apart, and the verifier rejects the position. No package of the
+  batches has one.
 - *Toolchain.* The driver needs its pinned nightly. Layer 2 compiles the project, so the
   project's build scripts and procedural macros run. A published package whose `Cargo.lock`
   locks versions the nightly no longer builds (bore-cli 0.6.0's proc-macro2 1.0.56, cargo-vet
