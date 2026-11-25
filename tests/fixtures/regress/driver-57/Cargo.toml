@@ -1,0 +1,16 @@
+# A constructor passed as a function, in code behind a branch on a constant: `.map(Some)` in the
+# arm of `match T::KIND` no instance of the program takes. The walk follows what only such
+# branches reach, and for an instance the compiler gives no body for it asked which function the
+# build defines under the instance's symbol, as it does for a declaration of an `extern` block:
+# a constructor has no body to give either, and that of a generic type (`Option::<u8>::Some`)
+# has no symbol without its type arguments. The compiler stopped (`Instance::mono: .. has type
+# parameters`), and the package did not build with the driver (iroh-services 2.0.0, of the
+# fourteenth batch). Only a declaration of an `extern` block stands for a function defined
+# elsewhere; the question is asked of nothing else.
+[package]
+name = "driver-57"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"

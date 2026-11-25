@@ -277,12 +277,17 @@ impl Cx<'_> {
     /// The function a declaration without a body stands for (`extern "C" { fn f(); }`, the
     /// standard library's `__rust_dealloc`): the one a crate of the build defines under the
     /// declaration's symbol name, as the linker resolves it. None where no Rust code defines it
-    /// (a C function, the default allocator).
+    /// (a C function, the default allocator), and for an item that is no such declaration (one
+    /// the compiler has no body to give for: a constructor, `Some` passed as a function): it
+    /// has a symbol only with its type arguments, and stands for itself.
     pub(crate) fn defined_as(
         &self,
         decl: rustc_span::def_id::DefId,
     ) -> Option<rustc_span::def_id::DefId> {
         let tcx = self.tcx;
+        if !tcx.is_foreign_item(decl) {
+            return None;
+        }
         let name = tcx
             .symbol_name(rustc_middle::ty::Instance::mono(tcx, decl))
             .name;

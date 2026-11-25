@@ -446,7 +446,6 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                     let did = rustc_internal::internal(tcx, inst.def.def_id());
                     self.cx
                         .defined_as(did)
-                        .filter(|_| tcx.is_foreign_item(did))
                         .and_then(|def| {
                             Instance::try_from(rustc_public::CrateItem(rustc_internal::stable(def)))
                                 .ok()
@@ -797,8 +796,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             // a declaration (`extern` block's): what runs is the function a crate of the build
             // defines under its symbol name (the allocator functions of a dependency's
             // `#[global_allocator]`, a `#[no_mangle]` function declared `extern "C"` elsewhere)
-            if self.cx.tcx.is_foreign_item(did)
-                && let Some(def) = self.cx.defined_as(did)
+            if let Some(def) = self.cx.defined_as(did)
                 && let Ok(i) =
                     Instance::try_from(rustc_public::CrateItem(rustc_internal::stable(def)))
             {
