@@ -266,28 +266,65 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
 
     /// Definitions of `local` that reach the point `at`.
     pub(super) fn reaching_at(&self, local: Local, at: At) -> Vec<usize> {
-        let Some(mine) = self.flow().by_local.get(&local) else {
+        let flow = self.flow();
+        let Some(mine) = flow.by_local.get(&local) else {
             return Vec::new();
         };
-        let mut live: Vec<usize> = mine
-            .iter()
-            .copied()
-            .filter(|&i| self.flow().entry[at.bb].contains(i))
-            .collect();
-        // definitions earlier in the same block
-        let mut here: Vec<usize> = mine
-            .iter()
-            .copied()
-            .filter(|&i| {
-                let d = &self.flow().defs[i];
-                d.at.bb == at.bb && d.at.idx < at.idx && !matches!(d.kind, DefKind::Entry)
-            })
-            .collect();
-        here.sort_by_key(|&i| self.flow().defs[i].at.idx);
-        for i in here {
-            let d = &self.flow().defs[i];
-            live.retain(|&e| !kills(d, &self.flow().defs[e]));
-            live.push(i);
+        let at_entry = || -> Vec<usize> {
+            mine.iter()
+                .copied()
+                .filter(|&i| flow.entry[at.bb].contains(i))
+                .collect()
+        };
+        // (of a local with many definitions, those of the block are looked up)
+        let many = (mine.len() >= MANY).then(|| flow.many(local, mine));
+        let mut live: Vec<usize> = match &many {
+            Some(m) => {
+                let known = m.entry.borrow().get(&at.bb).cloned();
+                match known {
+                    Some(l) => l.to_vec(),
+                    None => {
+                        let l = at_entry();
+                        if l.len() <= MANY {
+                            m.entry.borrow_mut().insert(at.bb, l.as_slice().into());
+                        }
+                        l
+                    }
+                }
+            }
+            None => at_entry(),
+        };
+        // definitions earlier in the same block (one made at several points, at each of them
+        // there: they are in order)
+        let mut here: Vec<(usize, usize)> = Vec::new();
+        let mut earlier = |i: usize| {
+            let d = &flow.defs[i];
+            if !matches!(d.kind, DefKind::Entry) {
+                let points = d.points();
+                let from = points.partition_point(|p| p.bb < at.bb);
+                here.extend(
+                    points[from..]
+                        .iter()
+                        .take_while(|p| p.bb == at.bb && p.idx < at.idx)
+                        .map(|p| (p.idx, i)),
+                );
+            }
+        };
+        match &many {
+            Some(m) => {
+                let within = m.within.get(&at.bb).into_iter().flatten();
+                within.chain(&m.several).copied().for_each(&mut earlier);
+            }
+            None => mine.iter().copied().for_each(&mut earlier),
+        }
+        here.sort_by_key(|&(idx, _)| idx);
+        for (_, i) in here {
+            let d = &flow.defs[i];
+            live.retain(|&e| !kills(d, &flow.defs[e]));
+            // (a definition made at several points is one definition)
+            if d.points.is_none() || !live.contains(&i) {
+                live.push(i);
+            }
         }
         live
     }
@@ -365,6 +402,8 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             return Origin::Loop;
         }
         let defs = self.reaching_at(local, at);
+        // (those that may overwrite another for this read: `shadowed`)
+        let over = self.overwriting(&defs, &path);
         // definitions of the place, or of a whole it is part of: it is one of these
         let mut alts: Vec<Origin> = Vec::new();
         // writes to a part of it (`key[31] = 1`, `cfg.key = ..`): it is also made of these
@@ -373,7 +412,7 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             let d = &self.flow().defs[i];
             let part = !is_prefix(&d.path, &path) && is_prefix(&path, &d.path);
             let (list, rest) = if is_prefix(&d.path, &path) {
-                if self.shadowed(i, &defs, &path, at) {
+                if self.shadowed(i, &over, at) {
                     continue;
                 }
                 // `Pick::B(y)` read from a `Pick::A(x)` built here: never this definition's
@@ -613,42 +652,96 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
     ) -> bool {
         let e = &self.flow().defs[j];
         defs.iter()
-            .map(|&i| &self.flow().defs[i])
-            .filter(|d| is_prefix(&d.path, path))
-            .all(|d| self.always_through(d, e.at, at))
+            .filter(|&&i| is_prefix(&self.flow().defs[i].path, path))
+            .all(|&i| {
+                self.starts(i, at)
+                    .into_iter()
+                    .all(|from| self.always_through(from, e.at, at))
+            })
     }
 
-    /// Is definition `i`, of a whole that contains `path`, overwritten for `path` before the
-    /// read at `at`: does a definition of a more specific place covering `path` (`c.key =
-    /// [8; 32]` after `c = Cfg { key: env_key(), .. }`) lie on every way from `i` to `at`?
-    pub(super) fn shadowed(&self, i: usize, defs: &[usize], path: &[Step], at: At) -> bool {
+    /// Where the values of definition `i`, which reaches the read at `at`, start on their way
+    /// there: after its point (an argument is defined before the first statement), after each
+    /// of its points that reach the read for a definition made at several.
+    fn starts(&self, i: usize, at: At) -> Vec<At> {
         let d = &self.flow().defs[i];
-        defs.iter().any(|&j| {
-            let e = &self.flow().defs[j];
-            if j == i || e.path.len() <= d.path.len() {
-                return false;
-            }
-            // a call filling the part (`rng.fill_bytes(&mut cfg.key)`) replaces what an
-            // initialization (`Cfg { key: [0; 32], .. }`) or the entry value had there; a call
-            // writing all a pointer points to replaces it for reads through that pointer
-            // (`nonce.copy_from_slice(..)`, `nonce` a half of a buffer `split_at_mut` gave)
-            let fills = || match &e.kind {
-                DefKind::OutParam { func, .. } => {
-                    (e.sole
-                        && (d.init
-                            || matches!(d.kind, DefKind::Entry)
-                            || self.part_init(d, &e.path[d.path.len()..])))
-                        || (e.path.len() == d.path.len() + 1
-                            && e.path.last() == Some(&Step::Deref)
-                            && fills_whole(self.body, func))
-                }
-                _ => false,
-            };
-            (e.strong || fills())
-                && is_prefix(&d.path, &e.path)
-                && is_prefix(&e.path, path)
-                && self.always_through(d, e.at, at)
-        })
+        if matches!(d.kind, DefKind::Entry) {
+            return vec![At { bb: 0, idx: 0 }];
+        }
+        let points = self.flow().made_at(self.body, i, at);
+        debug_assert!(
+            !points.is_empty(),
+            "a reaching definition with no point reaching"
+        );
+        points
+            .into_iter()
+            .map(|p| At {
+                bb: p.bb,
+                idx: p.idx + 1,
+            })
+            .collect()
+    }
+
+    /// The definitions among `defs`, those that reach a read of `path`, that may overwrite
+    /// another's value for it (`shadowed`): of a place `path` is in or is, an assignment or a
+    /// call that may fill it. With the length of their paths, the shortest first: each is
+    /// asked of the definitions of shorter paths alone, and where a place is written in each of
+    /// 3,000 loops one after the other, as many definitions of it reach a read after them, none
+    /// of a longer path than another.
+    pub(super) fn overwriting(&self, defs: &[usize], path: &[Step]) -> Vec<(usize, usize)> {
+        let mut over: Vec<(usize, usize)> = defs
+            .iter()
+            .copied()
+            .filter_map(|j| {
+                let e = &self.flow().defs[j];
+                ((e.strong || matches!(e.kind, DefKind::OutParam { .. }))
+                    && is_prefix(&e.path, path))
+                .then_some((e.path.len(), j))
+            })
+            .collect();
+        over.sort_by_key(|&(len, _)| len);
+        over
+    }
+
+    /// Is definition `i`, of a whole that contains the path read, overwritten for it before the
+    /// read at `at`: does a definition of a more specific place covering the path (`c.key =
+    /// [8; 32]` after `c = Cfg { key: env_key(), .. }`), one of `over` (`overwriting`), lie on
+    /// every way from `i` to `at`?
+    pub(super) fn shadowed(&self, i: usize, over: &[(usize, usize)], at: At) -> bool {
+        let d = &self.flow().defs[i];
+        let longer = over.partition_point(|&(len, _)| len <= d.path.len());
+        // the definitions that overwrite it for the path, where they lie on its way
+        let over: Vec<usize> = over[longer..]
+            .iter()
+            .map(|&(_, j)| j)
+            .filter(|&j| {
+                let e = &self.flow().defs[j];
+                // a call filling the part (`rng.fill_bytes(&mut cfg.key)`) replaces what an
+                // initialization (`Cfg { key: [0; 32], .. }`) or the entry value had there; a
+                // call writing all a pointer points to replaces it for reads through that
+                // pointer (`nonce.copy_from_slice(..)`, `nonce` a half of a buffer
+                // `split_at_mut` gave)
+                let fills = || match &e.kind {
+                    DefKind::OutParam { func, .. } => {
+                        (e.sole
+                            && (d.init
+                                || matches!(d.kind, DefKind::Entry)
+                                || self.part_init(d, &e.path[d.path.len()..])))
+                            || (e.path.len() == d.path.len() + 1
+                                && e.path.last() == Some(&Step::Deref)
+                                && fills_whole(self.body, func))
+                    }
+                    _ => false,
+                };
+                j != i && (e.strong || fills()) && is_prefix(&d.path, &e.path)
+            })
+            .collect();
+        // (of a definition made at several points, each that reaches the read is overwritten)
+        !over.is_empty()
+            && self.starts(i, at).into_iter().all(|from| {
+                over.iter()
+                    .any(|&j| self.always_through(from, self.flow().defs[j].at, at))
+            })
     }
 
     /// Is the part `rest` of what definition `d` builds an initialization: the field of a
@@ -681,39 +774,74 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
         }
     }
 
-    /// Does every way from definition `d` to the point `to` pass through the point `via`?
-    pub(super) fn always_through(&self, d: &Def, via: At, to: At) -> bool {
-        let blocks = &self.body.blocks;
-        // the positions after `d` (an argument is defined before the first statement)
-        let start = if matches!(d.kind, DefKind::Entry) {
-            At { bb: 0, idx: 0 }
-        } else {
-            At {
-                bb: d.at.bb,
-                idx: d.at.idx + 1,
+    /// Does every way from the point `start` (after a definition: `starts`) to the point `to`
+    /// pass through the point `via`?
+    pub(super) fn always_through(&self, start: At, via: At, to: At) -> bool {
+        let succs = self.flow().succs.get_or_init(|| {
+            self.body
+                .blocks
+                .iter()
+                .map(|b| b.terminator.successors())
+                .collect()
+        });
+        // from the body's start (an argument's value, which every write through a `&mut`
+        // parameter is asked of at every read after it): `via` is before the read in its
+        // block, or its block is on every way to the read's. Not searched: a body of 30,000
+        // blocks asks it of thousands of reads
+        if start == (At { bb: 0, idx: 0 }) {
+            let doms = self.flow().doms.get_or_init(|| Doms::new(succs));
+            let through = !doms.reached(to.bb)
+                || if via.bb == to.bb {
+                    via.idx < to.idx
+                } else {
+                    doms.dominates(via.bb, to.bb)
+                };
+            // (not in a body where the search is what takes the time)
+            if check_flow() && succs.len() <= 4096 {
+                assert_eq!(
+                    through,
+                    self.searched_through(succs, start, via, to),
+                    "from the start through {via:?} to {to:?}"
+                );
+            }
+            return through;
+        }
+        self.searched_through(succs, start, via, to)
+    }
+
+    /// `always_through` by a search of the ways from `start`.
+    fn searched_through(&self, succs: &[Vec<usize>], start: At, via: At, to: At) -> bool {
+        // a block from the point `p` on: the read is met (false), `via` before it (true), or
+        // neither and the way goes on
+        let met = |p: At| {
+            let read = p.bb == to.bb && to.idx >= p.idx;
+            let passed = p.bb == via.bb && via.idx >= p.idx;
+            match (read, passed) {
+                (true, true) => Some(via.idx < to.idx),
+                (true, false) => Some(false),
+                (false, true) => Some(true),
+                (false, false) => None,
             }
         };
-        let mut work = vec![start];
-        let mut seen: HashSet<(usize, usize)> = HashSet::new();
-        while let Some(p) = work.pop() {
-            if !seen.insert((p.bb, p.idx)) {
+        // (the blocks entered at their first statement)
+        let mut seen = vec![false; succs.len()];
+        let mut work: Vec<usize> = Vec::new();
+        match met(start) {
+            Some(false) => return false, // reached the read without passing `via`
+            Some(true) => {}
+            None => work.extend(succs[start.bb].iter().copied()),
+        }
+        if start.idx == 0 {
+            seen[start.bb] = true;
+        }
+        while let Some(b) = work.pop() {
+            if std::mem::replace(&mut seen[b], true) {
                 continue;
             }
-            let len = blocks[p.bb].statements.len();
-            let mut blocked = false;
-            for idx in p.idx..=len {
-                if p.bb == to.bb && idx == to.idx {
-                    return false; // reached the read without passing `via`
-                }
-                if p.bb == via.bb && idx == via.idx {
-                    blocked = true;
-                    break;
-                }
-            }
-            if !blocked {
-                for s in blocks[p.bb].terminator.successors() {
-                    work.push(At { bb: s, idx: 0 });
-                }
+            match met(At { bb: b, idx: 0 }) {
+                Some(false) => return false,
+                Some(true) => {}
+                None => work.extend(succs[b].iter().copied()),
             }
         }
         true
@@ -1399,4 +1527,13 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             o.params_of(&owner)
         })
     }
+}
+
+/// `RCBOM_CHECK_FLOW`: an answer read off a body's dominators is also searched for, and the two
+/// compared (a check of the driver, for its tests).
+fn check_flow() -> bool {
+    thread_local! {
+        static ON: bool = std::env::var_os("RCBOM_CHECK_FLOW").is_some();
+    }
+    ON.with(|on| *on)
 }

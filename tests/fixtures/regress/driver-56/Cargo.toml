@@ -1,0 +1,25 @@
+# A function with thousands of calls whose writes the driver does not follow (a value of an
+# associated type handed over, which may hold a `&mut`) and thousands of places lent by `&mut`:
+# cranelift-codegen's generated `constructor_simplify` (nab 0.13.3 builds it), 30,712 blocks.
+# Each such write defined each such place, a definition for every pair, 6.3 million there, and
+# a set of them for each block: the driver held 13 GB a minute into the crate and the run was
+# stopped for memory. Here 12,500 such writes and 3,129 places, 39 million pairs. A place has
+# one such definition, made at every write that defines it (`Def::points`), the places the same
+# writes define sharing the list; what a definition ends is held once for the definitions that
+# end alike; the sets are computed in sweeps over the reverse postorder; an argument's value is
+# asked of a write through it by the blocks' dominators, not by a search of the body; and the
+# definitions of a local that has many are found by block.
+#
+# What is read does not change: `early` may have been written by any of the calls (its
+# algorithms, beside others not followed), `late` is set after them all (SHA-384 alone), a
+# field set after the last such call is that value (`set_last`: SHA-512 alone), and one set
+# before one of them is not (`set_first`).
+[package]
+name = "d56"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+ring = "=0.17.14"

@@ -149,7 +149,7 @@ fn path_of_place(p: &Place) -> Path {
 }
 
 /// A program point: statement `idx` of block `bb`; `idx == statements.len()` is the terminator.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 struct At {
     bb: usize,
     idx: usize,
@@ -208,6 +208,30 @@ struct Def {
     /// The definition certainly lands on this place (not one of several a pointer may target):
     /// only then does an out-parameter call replace the place's initialization.
     sole: bool,
+    /// Every point where this definition is made, in order, when it is made at more than its
+    /// own (`at` is the first): a write whose targets were cut or not followed (`DefKind::Cut`,
+    /// `DefKind::Lost`) defines every place the body lends, the same at each such write. One
+    /// definition for each of them at each write was their product: 6.3 million in a function
+    /// of 2,000 such calls and 3,117 places lent (cranelift-codegen's generated
+    /// `constructor_simplify`), and a set of them for each of its 30,712 blocks. The places a
+    /// write of one type defines share the list (`Shared`).
+    points: Option<std::rc::Rc<[At]>>,
+}
+
+impl Def {
+    /// The points where the definition is made, in order.
+    fn points(&self) -> &[At] {
+        match &self.points {
+            Some(p) => p,
+            None => std::slice::from_ref(&self.at),
+        }
+    }
+}
+
+/// The definitions made at the same points (`Def::points`): they follow one another.
+struct Shared {
+    defs: std::ops::Range<usize>,
+    points: std::rc::Rc<[At]>,
 }
 
 /// What kind of body this is, for its first local.
@@ -276,6 +300,30 @@ struct Flow {
     /// Locals whose cells may change through an alias the definitions do not follow
     /// (`open_cells`): a read of their cell is also the unknown.
     open_cells: HashSet<Local>,
+    /// The blocks each block is a successor of, when asked for (`Flow::made_at`).
+    preds: OnceCell<Vec<Vec<usize>>>,
+    /// The successors of each block, when asked for (`Origins::always_through`).
+    succs: OnceCell<Vec<Vec<usize>>>,
+    /// The blocks' dominators, when asked for (`Origins::always_through`).
+    doms: OnceCell<Doms>,
+    /// The definitions of the locals that have many, found by block (`Many`).
+    many: RefCell<HashMap<Local, std::rc::Rc<Many>>>,
+}
+
+/// As many definitions of one local as are looked up by block and not looked through.
+const MANY: usize = 64;
+
+/// The definitions of a local that has `MANY` or more, by block: a `&mut` parameter handed to
+/// each of 12,000 calls has as many definitions of what it points to, and every read of it
+/// looked through them all for the few that reach it.
+struct Many {
+    /// Those made at one point, by its block, in the local's order of them.
+    within: HashMap<usize, Vec<usize>>,
+    /// Those made at several points (`Def::points`).
+    several: Vec<usize>,
+    /// Those that reach a block's entry, in the local's order of them, once asked for (a list
+    /// of up to `MANY`: more are looked for at each read).
+    entry: RefCell<HashMap<usize, std::rc::Rc<[usize]>>>,
 }
 
 /// The arguments of the body a closure is written in (`parent`), from the closure's own (`a`):
@@ -470,6 +518,9 @@ struct Pointees<'a> {
     /// Locals the body lends by `&mut` (`o.insert(..)` on `&mut o`): what a value built in one
     /// holds may change through the loan.
     lent_locals: HashSet<Local>,
+    /// How many times the body lends each local, or a part of it, by `&mut`: counted when
+    /// first asked (`held`).
+    lends: OnceCell<HashMap<Local, usize>>,
     /// Pointers whose own place a loan may change (`repointed`).
     repointed: HashSet<Local>,
     /// Locals whose value holds a `&mut` (`W { r: &mut x }`, a closure capturing one, a type

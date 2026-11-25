@@ -1101,21 +1101,27 @@ impl Pointees<'_> {
         let once = defs.is_some_and(|d| d.len() == 1);
         // a value with a part stored later (`h.r = &mut b`) or lent by `&mut` to another call
         // (`repoint(&mut h, ..)`): what it holds at the call is not only what it was built with
-        let lends = |l: Local| {
-            self.body
-                .blocks
-                .iter()
-                .flat_map(|b| &b.statements)
-                .filter(|st| {
-                    matches!(&st.kind, StatementKind::Assign(
-                        _,
-                        Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
-                        | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q),
-                    ) if q.local == l
-                        && !q.projection.iter().any(|e| matches!(e, ProjectionElem::Deref)))
-                })
-                .count()
-        };
+        // (counted once for the body: asked of each value handed to each call, a body of
+        // 12,000 calls read all its statements for each)
+        let lent = self.lends.get_or_init(|| {
+            let mut n: HashMap<Local, usize> = HashMap::new();
+            for st in self.body.blocks.iter().flat_map(|b| &b.statements) {
+                if let StatementKind::Assign(
+                    _,
+                    Rvalue::Ref(_, rustc_public::mir::BorrowKind::Mut { .. }, q)
+                    | Rvalue::AddressOf(rustc_public::mir::RawPtrKind::Mut, q),
+                ) = &st.kind
+                    && !q
+                        .projection
+                        .iter()
+                        .any(|e| matches!(e, ProjectionElem::Deref))
+                {
+                    *n.entry(q.local).or_default() += 1;
+                }
+            }
+            n
+        });
+        let lends = |l: Local| lent.get(&l).copied().unwrap_or(0);
         let changed = chain.iter().any(|l| self.partly.contains(l))
             || lends(local) > usize::from(by_borrow)
             || chain[1..].iter().any(|&l| lends(l) > 0);

@@ -28,6 +28,7 @@ impl Flow {
                 strong: true,
                 init: false,
                 sole: true,
+                points: None,
             });
         }
         let mut term_bb = HashMap::new();
@@ -136,6 +137,7 @@ impl Flow {
             // (all of it or a part of it, `&mut s.f`; not a place reached through a pointer, nor a
             // closure's capture of a variable it only writes through, `s.n = 1` on `s: &mut S` in
             // an edition 2015 closure, which cannot change the variable itself)
+            lends: OnceCell::new(),
             lent_locals: body
                 .blocks
                 .iter()
@@ -653,17 +655,65 @@ impl Flow {
         // a write through a pointer whose targets were cut, or not followed: any place the
         // body lends by `&mut` (or a `&mut` parameter points to) that can hold what was written
         // may hold it
-        for (a, ty) in cut_at {
-            for (l, p) in &lent {
-                if let Some(whole) = fits(*l, p, ty) {
-                    extra.push((*l, at_part(p, whole), a, DefKind::Cut, false, false));
-                }
-            }
+        // (one definition of a place, made at each of the writes: a definition for each write
+        // and place is their product. The places the writes of the same types define share
+        // the list of them)
+        struct Group {
+            local: Local,
+            path: Path,
+            lost: bool,
+            /// The first write that defines the place, and the place's position among those
+            /// lent: the order such definitions would be made in, one for each write and place.
+            order: (usize, usize),
+            set: usize,
         }
-        for (a, ty) in lost_at {
-            for (l, p) in &lent {
-                if let Some(whole) = fits(*l, p, ty) {
-                    extra.push((*l, at_part(p, whole), a, DefKind::Lost, false, false));
+        let mut groups: Vec<Group> = Vec::new();
+        let mut sets: Vec<std::rc::Rc<[At]>> = Vec::new();
+        for (writes, lost) in [(cut_at, false), (lost_at, true)] {
+            // the writes of each type written, with the first of them
+            let mut types: Vec<(Option<rustc_middle::ty::Ty<'tcx>>, usize, Vec<At>)> = Vec::new();
+            let mut type_at: HashMap<Option<rustc_middle::ty::Ty<'tcx>>, usize> = HashMap::new();
+            for (n, (a, ty)) in writes.into_iter().enumerate() {
+                let k = *type_at.entry(ty).or_insert_with(|| {
+                    types.push((ty, n, Vec::new()));
+                    types.len() - 1
+                });
+                types[k].2.push(a);
+            }
+            // the points of the writes of some of the types, once for the places they define
+            let mut set_of: HashMap<Vec<usize>, usize> = HashMap::new();
+            for (li, (l, p)) in lent.iter().enumerate() {
+                // (the place itself, a part of it not known)
+                let mut both: [(usize, Vec<usize>); 2] =
+                    [(usize::MAX, Vec::new()), (usize::MAX, Vec::new())];
+                for (k, (ty, first, _)) in types.iter().enumerate() {
+                    if let Some(whole) = fits(*l, p, *ty) {
+                        let (f, v) = &mut both[usize::from(!whole)];
+                        *f = (*f).min(*first);
+                        v.push(k);
+                    }
+                }
+                for (whole, (first, of)) in [true, false].into_iter().zip(both) {
+                    if of.is_empty() {
+                        continue;
+                    }
+                    let set = *set_of.entry(of).or_insert_with_key(|of| {
+                        let mut points: Vec<At> = of
+                            .iter()
+                            .flat_map(|&k| types[k].2.iter().copied())
+                            .collect();
+                        points.sort();
+                        points.dedup();
+                        sets.push(points.into());
+                        sets.len() - 1
+                    });
+                    groups.push(Group {
+                        local: *l,
+                        path: at_part(p, whole),
+                        lost,
+                        order: (first, li),
+                        set,
+                    });
                 }
             }
         }
@@ -736,6 +786,7 @@ impl Flow {
                 strong,
                 init,
                 sole: true,
+                points: None,
             });
         }
         for (local, path, at, kind, single, receiver) in extra {
@@ -755,19 +806,182 @@ impl Flow {
                 strong,
                 init,
                 sole,
+                points: None,
             });
         }
         for (i, d) in defs.iter().enumerate() {
             by_local.entry(d.local).or_default().push(i);
         }
-        let entry = reaching(body, &defs, &by_local, nargs);
+        // (weak definitions: they end none, and a write of the whole place ends them. Those of
+        // one list of points one after the other, and among a place's definitions in the order
+        // they would be made in, a cut write's before a write's not followed)
+        let mut shared: Vec<Shared> = Vec::new();
+        let mut order: Vec<((bool, usize, usize), Local, usize)> = Vec::new();
+        for (s, points) in sets.iter().enumerate() {
+            let from = defs.len();
+            for g in groups.iter().filter(|g| g.set == s) {
+                order.push(((g.lost, g.order.0, g.order.1), g.local, defs.len()));
+                defs.push(Def {
+                    local: g.local,
+                    path: g.path.clone(),
+                    at: points[0],
+                    kind: if g.lost { DefKind::Lost } else { DefKind::Cut },
+                    strong: false,
+                    init: false,
+                    sole: false,
+                    points: Some(points.clone()),
+                });
+            }
+            shared.push(Shared {
+                defs: from..defs.len(),
+                points: points.clone(),
+            });
+        }
+        order.sort();
+        for (_, local, i) in order {
+            by_local.entry(local).or_default().push(i);
+        }
+        // (a body whose reaching sets are large, or any of 64 blocks when asked for)
+        if (std::env::var_os("RCBOM_DEBUG").is_some() && body.blocks.len() * defs.len() > 1 << 30)
+            || (std::env::var_os("RCBOM_DEBUG_FLOW").is_some() && body.blocks.len() >= 64)
+        {
+            let noted = |lost: bool| {
+                let of = defs.iter().filter(|d| match d.kind {
+                    DefKind::Lost => lost,
+                    DefKind::Cut => !lost,
+                    _ => false,
+                });
+                (
+                    of.clone().count(),
+                    of.map(|d| d.points().len()).sum::<usize>(),
+                )
+            };
+            eprintln!(
+                "rcbom-driver: flow of {:?}: {} blocks, {} locals, {} definitions (the most of \
+                 a local {}); writes not followed: {:?} definitions and points, cut: {:?}; {} \
+                 places lent",
+                body.span,
+                body.blocks.len(),
+                body.locals().len(),
+                defs.len(),
+                by_local.values().map(Vec::len).max().unwrap_or(0),
+                noted(true),
+                noted(false),
+                lent.len()
+            );
+        }
+        let entry = reaching(body, &defs, &by_local, &shared, nargs);
         Flow {
             defs,
             by_local,
             entry,
             term_bb,
             open_cells,
+            preds: OnceCell::new(),
+            succs: OnceCell::new(),
+            doms: OnceCell::new(),
+            many: RefCell::new(HashMap::new()),
         }
+    }
+
+    /// The definitions of `local`, which has `MANY` or more (`mine`), by block.
+    pub(super) fn many(&self, local: Local, mine: &[usize]) -> std::rc::Rc<Many> {
+        if let Some(m) = self.many.borrow().get(&local) {
+            return m.clone();
+        }
+        let mut within: HashMap<usize, Vec<usize>> = HashMap::new();
+        let mut several = Vec::new();
+        for &i in mine {
+            let d = &self.defs[i];
+            if d.points.is_some() {
+                several.push(i);
+            } else if !matches!(d.kind, DefKind::Entry) {
+                within.entry(d.at.bb).or_default().push(i);
+            }
+        }
+        let m = std::rc::Rc::new(Many {
+            within,
+            several,
+            entry: RefCell::new(HashMap::new()),
+        });
+        self.many.borrow_mut().insert(local, m.clone());
+        m
+    }
+
+    /// The points of definition `i`, which reaches the read at `at`, whose definition reaches
+    /// it: its one point, or of a definition made at several (`Def::points`) those the reaching
+    /// definitions would hold were each point a definition of its own. Found from the read
+    /// back: a block is passed where no definition of the place in it ends this one, and a
+    /// point counts where none after it in its block does.
+    pub(super) fn made_at(&self, body: &Body, i: usize, at: At) -> Vec<At> {
+        let d = &self.defs[i];
+        if d.points.is_none() {
+            return vec![d.at];
+        }
+        // where a definition ends this one, by block
+        let mut ends: HashMap<usize, Vec<usize>> = HashMap::new();
+        for &e in self.by_local.get(&d.local).into_iter().flatten() {
+            let k = &self.defs[e];
+            if e != i && !matches!(k.kind, DefKind::Entry) && kills(k, d) {
+                for p in k.points() {
+                    ends.entry(p.bb).or_default().push(p.idx);
+                }
+            }
+        }
+        // (its points in a block: they are in order)
+        let all = d.points();
+        let points = |bb: usize| {
+            let from = all.partition_point(|p| p.bb < bb);
+            all[from..]
+                .iter()
+                .take_while(move |p| p.bb == bb)
+                .map(|p| p.idx)
+        };
+        let preds = self.preds.get_or_init(|| {
+            let mut v = vec![Vec::new(); body.blocks.len()];
+            for (b, block) in body.blocks.iter().enumerate() {
+                for s in block.terminator.successors() {
+                    if !v[s].contains(&b) {
+                        v[s].push(b);
+                    }
+                }
+            }
+            v
+        });
+        let mut out = Vec::new();
+        // (a definition that ends it at a point's own position is before it: the definitions of
+        // a statement or a call are in the order made, these last)
+        let within = |bb: usize, before: Option<usize>, out: &mut Vec<At>| {
+            let last_end = ends
+                .get(&bb)
+                .into_iter()
+                .flatten()
+                .copied()
+                .filter(|&k| before.is_none_or(|b| k < b))
+                .max();
+            for idx in points(bb) {
+                if before.is_none_or(|b| idx < b) && last_end.is_none_or(|k| idx >= k) {
+                    out.push(At { bb, idx });
+                }
+            }
+            last_end.is_none()
+        };
+        let mut seen = vec![false; body.blocks.len()];
+        let mut work: Vec<usize> = Vec::new();
+        if within(at.bb, Some(at.idx), &mut out) {
+            work.extend(preds[at.bb].iter().copied());
+        }
+        while let Some(b) = work.pop() {
+            if std::mem::replace(&mut seen[b], true) {
+                continue;
+            }
+            if within(b, None, &mut out) {
+                work.extend(preds[b].iter().copied());
+            }
+        }
+        out.sort();
+        out.dedup();
+        out
     }
 }
 pub(super) fn clone_kind(k: &DefKind) -> DefKind {
@@ -1064,18 +1278,30 @@ pub(super) fn reaching(
     body: &Body,
     defs: &[Def],
     by_local: &HashMap<Local, Vec<usize>>,
+    noted: &[Shared],
     nargs: usize,
 ) -> Vec<BitSet> {
     let n = body.blocks.len();
     let mut in_sets = vec![BitSet::new(defs.len()); n];
+    // (the definitions made at one point each; those made at several are `noted`)
     let mut block_defs: Vec<Vec<usize>> = vec![Vec::new(); n];
     for (i, d) in defs.iter().enumerate() {
-        if !matches!(d.kind, DefKind::Entry) {
+        if !matches!(d.kind, DefKind::Entry) && d.points.is_none() {
             block_defs[d.at.bb].push(i);
         }
     }
     for v in &mut block_defs {
         v.sort_by_key(|&i| defs[i].at.idx);
+    }
+    // the last point in each block of each list of points
+    let mut block_noted: Vec<Vec<(usize, usize)>> = vec![Vec::new(); n];
+    for (s, of) in noted.iter().enumerate() {
+        for p in of.points.iter() {
+            match block_noted[p.bb].last_mut() {
+                Some((last, idx)) if *last == s => *idx = p.idx,
+                _ => block_noted[p.bb].push((s, p.idx)),
+            }
+        }
     }
     if n > 0 {
         for (i, d) in defs.iter().enumerate().take(nargs) {
@@ -1087,16 +1313,42 @@ pub(super) fn reaching(
     // `kill` holds every definition one of them kills; `gen` those of its own definitions that
     // no later one in the block kills (a definition killed only by an earlier one is defined
     // again after it).
+    // (what a definition ends is the same for every definition of its place that ends alike,
+    // `kills` asking no more of it, itself included, which it defines again: held once, as
+    // the words of a set. A `&mut` parameter handed to each of 12,000 calls is ended by each
+    // of them, a list of 12,000 for each)
+    let mut ended: Vec<Vec<(usize, u64)>> = Vec::new();
+    let mut ended_by: HashMap<(Local, &[Step], bool), usize> = HashMap::new();
     let mut kill: Vec<Vec<usize>> = vec![Vec::new(); n];
     let mut gen_: Vec<Vec<usize>> = vec![Vec::new(); n];
+    // (of the definitions made at several points, those of a list with a point in the block,
+    // but for the ones a definition after its last point there ends: a definition at the
+    // point's own position is before it, the definitions of a statement or a call being in the
+    // order made and these last)
+    let mut gen_noted: Vec<Vec<(usize, Vec<usize>)>> = vec![Vec::new(); n];
     for b in 0..n {
         let here = &block_defs[b];
+        // (only a definition that can end one is asked which: `kills`)
+        let ending = |d: &Def| d.strong || matches!(d.kind, DefKind::OutParam { .. });
         for (j, &i) in here.iter().enumerate() {
             let d = &defs[i];
-            for &e in by_local.get(&d.local).into_iter().flatten() {
-                if e != i && kills(d, &defs[e]) {
-                    kill[b].push(e);
-                }
+            if d.strong || (matches!(d.kind, DefKind::OutParam { .. }) && d.sole) {
+                let set = *ended_by
+                    .entry((d.local, d.path.as_slice(), d.strong))
+                    .or_insert_with(|| {
+                        let mut words: Vec<(usize, u64)> = Vec::new();
+                        for &e in by_local.get(&d.local).into_iter().flatten() {
+                            if kills(d, &defs[e]) {
+                                match words.last_mut() {
+                                    Some((w, m)) if *w == e / 64 => *m |= 1 << (e % 64),
+                                    _ => words.push((e / 64, 1 << (e % 64))),
+                                }
+                            }
+                        }
+                        ended.push(words);
+                        ended.len() - 1
+                    });
+                kill[b].push(set);
             }
             let later_kill = here[j + 1..]
                 .iter()
@@ -1104,6 +1356,21 @@ pub(super) fn reaching(
             if !later_kill {
                 gen_[b].push(i);
             }
+        }
+        for &(s, last) in &block_noted[b] {
+            let of = &noted[s].defs;
+            let mut but = Vec::new();
+            for &k in here
+                .iter()
+                .filter(|&&k| defs[k].at.idx > last && ending(&defs[k]))
+            {
+                for &e in by_local.get(&defs[k].local).into_iter().flatten() {
+                    if of.contains(&e) && kills(&defs[k], &defs[e]) {
+                        but.push(e);
+                    }
+                }
+            }
+            gen_noted[b].push((s, but));
         }
         kill[b].sort_unstable();
         kill[b].dedup();
@@ -1113,28 +1380,180 @@ pub(super) fn reaching(
         .iter()
         .map(|b| b.terminator.successors())
         .collect();
-    // forward problem: blocks in order (MIR numbers them roughly in execution order), first in
-    // first out
-    let mut work: std::collections::VecDeque<usize> = (0..n).collect();
-    let mut queued = vec![true; n];
-    while let Some(b) = work.pop_front() {
-        queued[b] = false;
-        let mut out = in_sets[b].clone();
-        for &e in &kill[b] {
-            out.remove(e);
-        }
-        for &g in &gen_[b] {
-            out.insert(g);
-        }
-        for &s in &succs[b] {
-            if in_sets[s].union_with(&out) && !queued[s] {
-                queued[s] = true;
-                work.push_back(s);
+    // forward problem: the blocks whose sets changed, in sweeps over the reverse postorder (a
+    // block after those that lead to it; the blocks the first does not reach after the
+    // others, in their order), until a sweep changes none. The sets come out the same in any
+    // order, and a sweep carries what it finds as far as the body's forward edges lead: as
+    // many sweeps as loops are nested, and two. Taken one at a time, first in first out or the
+    // first in the order, each of 3,125 loops one after the other sent what goes round it down
+    // all the blocks after it: 44 million visits of 28,135 blocks.
+    let mut order = postorder(&succs);
+    order.reverse();
+    let mut reached = vec![false; n];
+    for &b in &order {
+        reached[b] = true;
+    }
+    order.extend((0..n).filter(|&b| !reached[b]));
+    let mut todo = vec![true; n];
+    let mut changed = true;
+    while changed {
+        changed = false;
+        for &b in &order {
+            if !std::mem::replace(&mut todo[b], false) {
+                continue;
+            }
+            let mut out = in_sets[b].clone();
+            for &set in &kill[b] {
+                out.remove_words(&ended[set]);
+            }
+            for &g in &gen_[b] {
+                out.insert(g);
+            }
+            for (s, but) in &gen_noted[b] {
+                out.insert_all(noted[*s].defs.clone());
+                for &e in but {
+                    out.remove(e);
+                }
+            }
+            for &s in &succs[b] {
+                if in_sets[s].union_with(&out) {
+                    todo[s] = true;
+                    changed = true;
+                }
             }
         }
     }
     in_sets
 }
+
+/// The blocks the first one reaches, each after those it leads to (a postorder of the walk
+/// from the first block).
+fn postorder(succs: &[Vec<usize>]) -> Vec<usize> {
+    let n = succs.len();
+    let mut post: Vec<usize> = Vec::with_capacity(n);
+    if n == 0 {
+        return post;
+    }
+    let mut seen = vec![false; n];
+    let mut stack: Vec<(usize, usize)> = vec![(0, 0)];
+    seen[0] = true;
+    while let Some((b, k)) = stack.last_mut() {
+        match succs[*b].get(*k) {
+            Some(&s) => {
+                *k += 1;
+                if !std::mem::replace(&mut seen[s], true) {
+                    stack.push((s, 0));
+                }
+            }
+            None => {
+                post.push(*b);
+                stack.pop();
+            }
+        }
+    }
+    post
+}
+/// Which blocks of a body lie on every way from its first block to which: the dominator tree
+/// (Cooper, Harvey and Kennedy's iteration over the reverse postorder), as where each block's
+/// subtree starts and ends in a walk of the tree.
+pub(super) struct Doms {
+    /// `None` for a block the first does not reach.
+    tree: Vec<Option<(usize, usize)>>,
+}
+
+impl Doms {
+    pub(super) fn new(succs: &[Vec<usize>]) -> Self {
+        let n = succs.len();
+        if n == 0 {
+            return Doms { tree: Vec::new() };
+        }
+        let post = postorder(succs);
+        let mut rank = vec![usize::MAX; n];
+        for (i, &b) in post.iter().rev().enumerate() {
+            rank[b] = i;
+        }
+        let mut preds: Vec<Vec<usize>> = vec![Vec::new(); n];
+        for &b in &post {
+            for &s in &succs[b] {
+                preds[s].push(b);
+            }
+        }
+        let mut idom = vec![usize::MAX; n];
+        idom[0] = 0;
+        let mut changed = true;
+        while changed {
+            changed = false;
+            for &b in post.iter().rev().skip(1) {
+                let mut new = usize::MAX;
+                for &p in &preds[b] {
+                    if idom[p] == usize::MAX {
+                        continue;
+                    }
+                    if new == usize::MAX {
+                        new = p;
+                        continue;
+                    }
+                    // the nearest block above both
+                    let (mut x, mut y) = (p, new);
+                    while x != y {
+                        while rank[x] > rank[y] {
+                            x = idom[x];
+                        }
+                        while rank[y] > rank[x] {
+                            y = idom[y];
+                        }
+                    }
+                    new = x;
+                }
+                if new != idom[b] {
+                    idom[b] = new;
+                    changed = true;
+                }
+            }
+        }
+        let mut under: Vec<Vec<usize>> = vec![Vec::new(); n];
+        for &b in &post {
+            if b != 0 {
+                under[idom[b]].push(b);
+            }
+        }
+        let mut tree = vec![None; n];
+        let mut clock = 0;
+        let mut stack: Vec<(usize, usize)> = vec![(0, 0)];
+        tree[0] = Some((0, 0));
+        while let Some((b, k)) = stack.last_mut() {
+            match under[*b].get(*k) {
+                Some(&c) => {
+                    *k += 1;
+                    clock += 1;
+                    tree[c] = Some((clock, clock));
+                    stack.push((c, 0));
+                }
+                None => {
+                    if let Some(t) = &mut tree[*b] {
+                        t.1 = clock;
+                    }
+                    stack.pop();
+                }
+            }
+        }
+        Doms { tree }
+    }
+
+    /// Does the first block reach `b`?
+    pub(super) fn reached(&self, b: usize) -> bool {
+        self.tree[b].is_some()
+    }
+
+    /// Does every way from the first block to `b` pass through `a` (`a` itself included)?
+    pub(super) fn dominates(&self, a: usize, b: usize) -> bool {
+        match (self.tree[a], self.tree[b]) {
+            (Some((from, to)), Some((at, _))) => from <= at && at <= to,
+            _ => false,
+        }
+    }
+}
+
 impl BitSet {
     pub(super) fn new(n: usize) -> Self {
         BitSet(vec![0; n.div_ceil(64)])
@@ -1144,6 +1563,26 @@ impl BitSet {
     }
     pub(super) fn remove(&mut self, i: usize) {
         self.0[i / 64] &= !(1 << (i % 64));
+    }
+    /// Takes out the indexes given as words of a set (the word's index, its bits).
+    pub(super) fn remove_words(&mut self, words: &[(usize, u64)]) {
+        for &(w, m) in words {
+            self.0[w] &= !m;
+        }
+    }
+    /// Adds every index of `of`.
+    pub(super) fn insert_all(&mut self, of: std::ops::Range<usize>) {
+        let (mut i, end) = (of.start, of.end);
+        while i < end {
+            // (a whole word where the range covers it)
+            if i.is_multiple_of(64) && i + 64 <= end {
+                self.0[i / 64] = u64::MAX;
+                i += 64;
+            } else {
+                self.insert(i);
+                i += 1;
+            }
+        }
     }
     pub(super) fn contains(&self, i: usize) -> bool {
         self.0[i / 64] & (1 << (i % 64)) != 0
