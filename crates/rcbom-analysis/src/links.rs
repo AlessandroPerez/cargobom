@@ -71,6 +71,12 @@ pub struct LinkIndex {
     dyn_open: HashSet<String>,
     /// The instances whose summaries the driver's bound left unrecorded (`Links::truncated`).
     truncated: HashSet<String>,
+    /// Of `truncated`: the generic items they are instances of (`instance_base`), and the trait
+    /// methods they implement (`implemented_method`). Both are asked at every step of a value's
+    /// search, and reading every name of `truncated` again for each took the analysis of
+    /// provekit-whir 0.2.0 (18,660 such instances, of arkworks' field types) twenty minutes.
+    cut_bases: HashSet<String>,
+    cut_methods: HashSet<String>,
     /// The functions (and instances) the facts show the driver summarised: those some record
     /// names as its maker (a call it makes, a value it stores or returns, what it writes), or
     /// lists as summarised with nothing else recorded (`Links::summarised`). The
@@ -492,6 +498,12 @@ impl LinkIndex {
                 }
             }
         }
+        ix.cut_bases = ix.truncated.iter().map(|t| instance_base(t)).collect();
+        ix.cut_methods = ix
+            .truncated
+            .iter()
+            .filter_map(|t| implemented_method(t))
+            .collect();
         ix.fields = lists(fields);
         ix.returns = lists(returns);
         ix.calls = lists(calls);
@@ -1046,16 +1058,14 @@ impl LinkIndex {
     fn superseded(&self, func: &str) -> bool {
         self.instanced.contains(func)
             && instance_base(func) == func
-            && !self.truncated.iter().any(|t| instance_base(t) == func)
+            && !self.cut_bases.contains(func)
     }
 
     /// Is a summary the driver's bound left unrecorded (`Links::truncated`) one of an
     /// implementation of trait method `callee` (`<app::W<app::A> as app::Pick>::alg` for
     /// `app::Pick::alg`)? Then a call whose body is not known may run it.
     fn cut_implementation(&self, callee: &str) -> bool {
-        self.truncated
-            .iter()
-            .any(|t| implemented_method(t).is_some_and(|m| m == callee))
+        self.cut_methods.contains(callee)
     }
 
     /// Is `caller` a function no entry point reaches (once the reached functions are known)?
