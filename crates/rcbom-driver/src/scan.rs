@@ -277,11 +277,17 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         // not monomorphic (`<A as KeyInit>::new_from_slice`, `Hkdf::<<Kdf as Kdf>::Hash>`):
         // the walk sees the instances; in a library's generic function its users can call,
         // which only they instantiate, a call into a KB crate is kept with its types as
-        // parameters (`Sha256::digest::<impl AsRef<[u8]>>`, `v.shuffle::<R>(rng)`)
-        if iargs.has_non_region_param() || iargs.has_aliases() {
-            return self.lib_generic && self.cx.kb_crate(did.krate);
-        }
+        // parameters (`Sha256::digest::<impl AsRef<[u8]>>`, `v.shuffle::<R>(rng)`), and so
+        // is the standard library's constructor or conversion of a crypto type whose
+        // arguments are the caller's (`SigningKey::<P>::try_from(bytes)`), as it is in an
+        // instance
         let krate = tcx.crate_name(did.krate).to_string();
+        if iargs.has_non_region_param() || iargs.has_aliases() {
+            return self.lib_generic
+                && (self.cx.kb_crate(did.krate)
+                    || (self.cx.is_std(&krate)
+                        && self.std_makes(did, &arg_trees(tcx, &args.0, 0))));
+        }
         if self.cx.kb_crate(did.krate) {
             return true;
         }
@@ -290,34 +296,41 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             return false;
         }
         if self.cx.is_std(&krate) {
-            // `Result::unwrap`, `Vec::push`, `Clone::clone`, drop glue: the standard library
-            // handling a crypto value is not a use of it. Constructors and conversions the
-            // crypto type implements are: `<Argon2 as Default>::default()`,
-            // `StaticSecret::from([7u8; 32])`, `SigningKey::try_from(bytes)`, `bytes.into()`;
-            // so is data written into it through its `io::Write` impl (`h.write_all(data)`,
-            // `io::copy(&mut file, &mut h)` hashing a file), or through its `Hasher` impl, and
-            // what `finish` reads from it (siphasher's types are fed and read that way)
-            let Some(tr) = tcx.trait_of_assoc(did) else {
-                return path_of(tcx, did).ends_with("io::copy::copy")
-                    && matches!(trees.get(1), Some(TyTree::Adt { krate, .. }) if self.cx.kb_ref(krate));
-            };
-            let name = tcx.get_diagnostic_name(tr).map(|s| s.to_string());
-            let constructed = match name.as_deref() {
-                Some("Default" | "From" | "TryFrom" | "FromStr" | "IoWrite") => trees.first(),
-                // `Into<T>`: `Self` is the source, `T` the crypto type
-                Some("Into" | "TryInto") => trees.get(1),
-                _ if path_of(tcx, tr) == "core::hash::Hasher" => trees.first(),
-                _ => None,
-            };
-            return matches!(
-                constructed,
-                Some(TyTree::Adt { krate, .. }) if self.cx.kb_ref(krate)
-            );
+            return self.std_makes(did, &trees);
         }
         // another crate's generic function with a crypto type as argument: a crypto fact only
         // if that parameter is bounded by a trait of a KB crate (`fn seal<A: Aead>`), not a
         // container (`Mutex::new(cipher)`)
         kb_bounded(tcx, did, iargs, &|c| self.cx.kb_crate(c))
+    }
+
+    /// Is a function of the standard library, called with the types `trees`, one that makes or
+    /// feeds a value of a crypto type?
+    fn std_makes(&self, did: rustc_span::def_id::DefId, trees: &[TyTree]) -> bool {
+        let tcx = self.cx.tcx;
+        // `Result::unwrap`, `Vec::push`, `Clone::clone`, drop glue: the standard library
+        // handling a crypto value is not a use of it. Constructors and conversions the
+        // crypto type implements are: `<Argon2 as Default>::default()`,
+        // `StaticSecret::from([7u8; 32])`, `SigningKey::try_from(bytes)`, `bytes.into()`;
+        // so is data written into it through its `io::Write` impl (`h.write_all(data)`,
+        // `io::copy(&mut file, &mut h)` hashing a file), or through its `Hasher` impl, and
+        // what `finish` reads from it (siphasher's types are fed and read that way)
+        let Some(tr) = tcx.trait_of_assoc(did) else {
+            return path_of(tcx, did).ends_with("io::copy::copy")
+                && matches!(trees.get(1), Some(TyTree::Adt { krate, .. }) if self.cx.kb_ref(krate));
+        };
+        let name = tcx.get_diagnostic_name(tr).map(|s| s.to_string());
+        let constructed = match name.as_deref() {
+            Some("Default" | "From" | "TryFrom" | "FromStr" | "IoWrite") => trees.first(),
+            // `Into<T>`: `Self` is the source, `T` the crypto type
+            Some("Into" | "TryInto") => trees.get(1),
+            _ if path_of(tcx, tr) == "core::hash::Hasher" => trees.first(),
+            _ => None,
+        };
+        matches!(
+            constructed,
+            Some(TyTree::Adt { krate, .. }) if self.cx.kb_ref(krate)
+        )
     }
 
     #[allow(clippy::too_many_arguments)]

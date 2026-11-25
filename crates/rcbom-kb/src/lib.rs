@@ -1786,6 +1786,28 @@ mod tests {
     }
 
     #[test]
+    fn a_signature_read_from_bytes_is_an_encoding_by_any_of_its_readers() {
+        let kb = Kb::seed().unwrap();
+        let name = |krate: &str, path: &str| kb.aside(krate, path, None, &[]).map(|a| &*a.name);
+        // the type's own function, and the standard library's conversion it implements
+        // (`<Signature<P> as TryFrom<&[u8]>>::try_from`, by the type's path)
+        for (krate, path) in [
+            ("ml_dsa", "Signature::decode"),
+            ("ml_dsa", "Signature::try_from"),
+            ("slh_dsa", "signature_encoding::Signature::try_from"),
+            ("ecdsa", "Signature::from_slice"),
+            ("ecdsa", "Signature::try_from"),
+            ("rsa", "pkcs1v15::signature::Signature::try_from"),
+            ("rsa", "pss::signature::Signature::try_from"),
+        ] {
+            assert_eq!(name(krate, path), Some("encoding"), "{krate} {path}");
+        }
+        // not a key's: read from its bytes it is its algorithm's setup, cited
+        assert_eq!(name("slh_dsa", "signing_key::SigningKey::try_from"), None);
+        assert_eq!(name("ecdsa", "verifying::VerifyingKey::try_from"), None);
+    }
+
+    #[test]
     fn rejects_a_fn_use_outside_the_cyclonedx_enum() {
         assert!(SEED.contains("use = \"keygen\""));
         let bad = SEED.replacen("use = \"keygen\"", "use = \"keygeneration\"", 1);

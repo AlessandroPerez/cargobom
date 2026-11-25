@@ -3718,7 +3718,7 @@ why = "a key's or a signature's encoding, decoding or parts (SEC1 points, field 
 [[aside]]
 name = "encoding"
 crate = ["ecdsa"]
-path = "^(Signature::(to_der|from_der|from_scalars|to_bytes|from_bytes|from_slice|to_vec|split_bytes|split_scalars|r|s)|der::Signature::(as_bytes|to_bytes|to_vec))$"
+path = "^(Signature::(to_der|from_der|from_scalars|to_bytes|from_bytes|from_slice|try_from|to_vec|split_bytes|split_scalars|r|s)|der::Signature::(as_bytes|to_bytes|to_vec))$"
 why = "a signature's encoding or decoding (the signature is cited where it is made or verified)"
 
 [[aside]]
@@ -3742,8 +3742,8 @@ why = "an Ed25519 signature's bytes written or read (the signature is cited wher
 [[aside]]
 name = "encoding"
 crate = ["ml-dsa", "slh-dsa"]
-path = "^(signature_encoding::)?Signature::(encode|decode|c_tilde|to_bytes|to_vec)$"
-why = "an ML-DSA or SLH-DSA signature's bytes written or read (the signature is cited where it is made or verified)"
+path = "^(signature_encoding::)?Signature::(encode|decode|c_tilde|to_bytes|to_vec|try_from)$"
+why = "an ML-DSA or SLH-DSA signature's bytes written or read, `Signature::<P>::try_from(bytes)` too (the signature is cited where it is made or verified)"
 
 [[aside]]
 name = "encoding"
@@ -3783,8 +3783,8 @@ why = "an RSA public key read from its DER encoding, or its modulus and exponent
 [[aside]]
 name = "encoding"
 crate = ["rsa"]
-path = "^pkcs1v15::signature::Signature::try_from$"
-why = "a signature decoded from its bytes (cited where it is verified)"
+path = "^(pkcs1v15|pss)::signature::Signature::try_from$"
+why = "a PKCS#1 v1.5 or PSS signature decoded from its bytes (cited where it is verified)"
 
 [[aside]]
 name = "encoding"
