@@ -154,27 +154,33 @@ fn generate(a: &GenArgs) -> Result<()> {
     let man = rcbom_manifest::load(&a.manifest_path, &sel, &kb)?;
 
     let dir = man.target_directory.join("rcbom");
+    // (the walk check builds the binaries once more, unoptimised, before the facts are read:
+    // the two are not held at once. Where that build fails, for want of memory or at the
+    // link, the analysis is done all the same: the CBOM is written without the check, says so,
+    // and the run fails after it)
+    let mut bins = None;
     let facts = if a.manifest_only {
         Vec::new()
     } else {
         let facts_dir = dir.join("facts");
         let units = run_driver(a, &sel, &man, &dir, &facts_dir, &kb.driver_semantics())?;
+        if a.check_walk && rcbom_analysis::walked_binary(&facts_dir, &units)? {
+            bins = Some(walkcheck::binaries(a, &sel, &dir).map_err(|e| format!("{e:#}")));
+        }
         load_facts(&facts_dir, &units)?
     };
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
     let mut an = analyze(&kb, &man, &facts);
     an.layer2 = !a.manifest_only;
-    // (the walk check builds the binaries once more, unoptimised. Where that build fails, for
-    // want of memory or at the link, the analysis is done all the same: the CBOM is written
-    // without the check, says so, and the run fails after it)
-    let (walk_check, walk_failed) = if a.check_walk && !a.manifest_only {
-        match walkcheck::run(a, &sel, &man, &facts, &dir) {
+    let (walk_check, walk_failed) = match bins {
+        Some(Ok(bins)) => match walkcheck::run(&sel, &man, &facts, &bins) {
             Ok(r) => (r, None),
             Err(e) => (Vec::new(), Some(format!("{e:#}"))),
-        }
-    } else {
-        (Vec::new(), None)
+        },
+        Some(Err(e)) => (Vec::new(), Some(e)),
+        None => (Vec::new(), None),
     };
+    drop(facts);
     let run = RunInfo {
         tool_version: env!("CARGO_PKG_VERSION").into(),
         toolchain: if a.manifest_only {

@@ -387,6 +387,19 @@ pub struct Returned {
     pub value: Origin,
 }
 
+/// What a facts file says its crate's walk is of (`Reach::artifact`), for a reader that does
+/// not hold the rest of the file.
+#[derive(Deserialize)]
+pub struct WalkOf {
+    #[serde(default)]
+    pub reach: Option<WalkArtifact>,
+}
+
+#[derive(Deserialize)]
+pub struct WalkArtifact {
+    pub artifact: String,
+}
+
 /// The extension of the file a crate's `Links::arg_call_refs` point into, beside its facts.
 pub const ARG_CALLS_EXT: &str = "argcalls";
 

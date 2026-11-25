@@ -83,12 +83,25 @@ const CLASSES: [&str; 8] = [
     "gap",
 ];
 
-pub(crate) fn run(
+/// The binaries built for the check, by name: made before the facts are read, which a program
+/// of a million lines fills gigabytes with while its compiler needs as many (rhwp 0.9.1).
+pub(crate) fn binaries(
     a: &crate::GenArgs,
+    sel: &rcbom_manifest::Selection,
+    dir: &Path,
+) -> Result<HashMap<String, PathBuf>> {
+    eprintln!(
+        "cbom: walk check (cargo +{} build, opt-level 0)",
+        crate::TOOLCHAIN
+    );
+    build(a, sel, &dir.join("link"))
+}
+
+pub(crate) fn run(
     sel: &rcbom_manifest::Selection,
     man: &rcbom_manifest::Manifest,
     facts: &[CrateFacts],
-    dir: &Path,
+    bins: &HashMap<String, PathBuf>,
 ) -> Result<Vec<Report>> {
     let walks: Vec<&rcbom_facts::Reach> = facts
         .iter()
@@ -98,11 +111,6 @@ pub(crate) fn run(
     if walks.is_empty() {
         return Ok(Vec::new());
     }
-    eprintln!(
-        "cbom: walk check (cargo +{} build, opt-level 0)",
-        crate::TOOLCHAIN
-    );
-    let bins = build(a, sel, &dir.join("link"))?;
     let crates = Crates::of(man, facts, &sel.target)?;
     let mut out = Vec::new();
     for w in walks {

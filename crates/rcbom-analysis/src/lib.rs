@@ -214,6 +214,24 @@ pub fn load_facts(
     Ok(out)
 }
 
+/// Is a binary's walk among the facts of the units `units` in `dir`? Read without holding
+/// them: only what each file says it walked.
+pub fn walked_binary(dir: &Path, units: &std::collections::BTreeSet<String>) -> Result<bool> {
+    for e in std::fs::read_dir(dir)? {
+        let p = e?.path();
+        let stem = p.file_stem().map(|s| s.to_string_lossy().to_string());
+        if p.extension().is_some_and(|x| x == "json") && stem.is_some_and(|s| units.contains(&s)) {
+            let f: rcbom_facts::WalkOf =
+                serde_json::from_reader(std::io::BufReader::new(std::fs::File::open(&p)?))
+                    .map_err(|e| anyhow::anyhow!("{}: {e}", p.display()))?;
+            if f.reach.is_some_and(|r| r.artifact.starts_with("bin ")) {
+                return Ok(true);
+            }
+        }
+    }
+    Ok(false)
+}
+
 struct Ctx<'a> {
     kb: &'a Kb,
     /// (crate name, stable id) -> (package, version)
