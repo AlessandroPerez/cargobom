@@ -1,0 +1,21 @@
+# A macro that another macro's invocation defines: derive-deftly's `define_derive_deftly!` writes
+# a `macro_rules!` for the template it is given, and `#[derive(Deftly)]` invokes that macro (the
+# key types of tor-key-forge 0.37.0 and the tunnels of tor-circmgr 0.37.0, in anyhide 0.16.0).
+# The compiler has the template's macro defined at the `define_derive_deftly!` invocation. The
+# verifier held a macro's definition to read `macro_rules!`, `macro`, or to be a function of a
+# procedural-macro crate, and called every use written in such a template a mismatch. A macro
+# may be defined where another is invoked; its text is then held to nothing, as a procedural
+# macro's. Where a `macro_rules!` writes the struct and its attributes (`wrapper!`, as
+# tor-key-forge's `define_ed25519_keypair!`), the compiler has the template invoked at the name
+# inside `#[derive_deftly(..)]`, with no expansion of `Deftly` between: an invocation cited inside
+# an attribute is whatever reads the attribute's, and its text is not held to read `name!`.
+[package]
+name = "verify-60"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+derive-deftly = "1"
+sha2 = "0.10"
+
+[workspace]

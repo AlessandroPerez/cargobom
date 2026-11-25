@@ -560,14 +560,16 @@ fn item_after(src: &Source, from: usize) -> Option<usize> {
     None
 }
 
-/// The last line of the macro defined on `line` (`macro_rules! m { .. }`, `macro m(..) { .. }`):
-/// where its brackets close.
-fn macro_end(src: &Source, line: usize) -> Option<usize> {
+/// The last line of the macro defined on `line` (`macro_rules! m { .. }`, `macro m(..) { .. }`,
+/// or the invocation that writes it, `define! { .. }`): where its brackets close.
+fn macro_end(src: &Source, line: usize, written: bool) -> Option<usize> {
     let code = &src.code;
     let from = src.idx((line, 0));
     let text: String = code[from..src.idx((line + 1, 0))].iter().collect();
-    let m = re!(r"\bmacro_rules\s*!\s*\w+|\bmacro\s+\w+").find(&text)?;
-    let declarative = m.as_str().starts_with("macro_rules");
+    let declared = re!(r"\bmacro_rules\s*!\s*\w+|\bmacro\s+\w+").find(&text);
+    let m = declared.or_else(|| invocation().find(&text).filter(|_| written))?;
+    // (`macro m(..) { .. }`: its parameters, then its body)
+    let two = declared.is_some() && !m.as_str().starts_with("macro_rules");
     let mut i = from + text[..m.end()].chars().count();
     let mut end = None;
     for _ in 0..2 {
@@ -579,12 +581,16 @@ fn macro_end(src: &Source, line: usize) -> Option<usize> {
         let close = close_of_at(code, i)?;
         end = Some(close);
         i = close + 1;
-        // (`macro m(..) { .. }`: its parameters, then its body)
-        if declarative || !round {
+        if !two || !round {
             break;
         }
     }
     end.map(|e| src.pos(e).0)
+}
+
+/// A macro invoked: its path and `!`, before the bracket its input opens with.
+fn invocation() -> &'static Regex {
+    re!(r"(?:\$crate\s*::\s*|::\s*)?\b\w+(?:\s*::\s*\w+)*\s*!")
 }
 
 /// What a step of an expansion holds of the source: its definition's lines, its invocation, the
@@ -773,7 +779,17 @@ impl Files<'_> {
                             })
                         });
                     if !named("", r"\s*!") && !handed {
-                        unread.push((i, format!("{here}: no invocation of `{}!`", st.name)));
+                        // (cited inside an attribute: what reads the attribute, a procedural
+                        // macro, writes the invocation at the span of what the attribute
+                        // holds. derive-deftly's `Deftly` invokes the template named in
+                        // `#[derive_deftly(Name)]` at that name, and where a `macro_rules!`
+                        // writes the attribute the compiler has no expansion of `Deftly`
+                        // between the two. The text there is the attribute's.)
+                        if attribute_before(&csrc, start.0, start.1).is_some() {
+                            plain = false;
+                        } else {
+                            unread.push((i, format!("{here}: no invocation of `{}!`", st.name)));
+                        }
                     }
                 }
                 StepKind::Derive => {
@@ -855,7 +871,18 @@ impl Files<'_> {
                     // line): then the package's manifest says what the crate is
                     let function = re!(r"\bfn\b").is_match(&code)
                         || super::manifest::in_proc_macro_package(&dpath);
-                    if !(declared || function) {
+                    // a macro another macro writes is defined, for the compiler, where that
+                    // one is invoked (derive-deftly's `define_derive_deftly! { Name: .. }`
+                    // writes the `macro_rules!` of its template): the line invokes a macro,
+                    // and what the invocation holds is not read as the macro's code
+                    let written = !declared
+                        && invocation().find(&code).is_some_and(|m| {
+                            matches!(
+                                code[m.end()..].trim_start().chars().next(),
+                                Some('(' | '[' | '{')
+                            )
+                        });
+                    if !(declared || function || written) {
                         return Err(format!("{file}:{l0}: no macro is defined there"));
                     }
                     if !declared || built_in {
@@ -864,7 +891,8 @@ impl Files<'_> {
                     procedural.push(!declared || built_in);
                     // (the compiler records where a macro of another crate starts: it runs
                     // to its closing bracket)
-                    let end = macro_end(&dsrc, *l0).map_or(*l1, |e| e.max(*l1));
+                    let end =
+                        macro_end(&dsrc, *l0, written && !function).map_or(*l1, |e| e.max(*l1));
                     holder.def = Some((dpath, *l0, end));
                 }
                 // (a rewrite's calls are the compiler's: `next` of a `for`, `poll` of an
