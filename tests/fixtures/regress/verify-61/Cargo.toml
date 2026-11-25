@@ -1,0 +1,15 @@
+# A macro that a derive or an attribute writes (`#[derive(Stamp)]` writes `macro_rules! stamp`,
+# `#[sealed]` writes `macro_rules! seal`): the compiler has it defined at the derive's name or at
+# the attribute, as it has one that a function-like macro writes at that macro's invocation
+# (verify-60). The verifier held a macro's definition to read `macro_rules!`, `macro`, a
+# procedural macro's function, or an invocation.
+[package]
+name = "verify-61"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+pm = { path = "pm" }
+sha2 = "0.10"
+
+[workspace]

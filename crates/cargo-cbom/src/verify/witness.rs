@@ -873,15 +873,19 @@ impl Files<'_> {
                         || super::manifest::in_proc_macro_package(&dpath);
                     // a macro another macro writes is defined, for the compiler, where that
                     // one is invoked (derive-deftly's `define_derive_deftly! { Name: .. }`
-                    // writes the `macro_rules!` of its template): the line invokes a macro,
-                    // and what the invocation holds is not read as the macro's code
+                    // writes the `macro_rules!` of its template), or at the derive or the
+                    // attribute that writes it: the line invokes a macro or is in an
+                    // attribute, and what is there is not read as the macro's code
                     let written = !declared
-                        && invocation().find(&code).is_some_and(|m| {
+                        && (invocation().find(&code).is_some_and(|m| {
                             matches!(
                                 code[m.end()..].trim_start().chars().next(),
                                 Some('(' | '[' | '{')
                             )
-                        });
+                        }) || code
+                            .chars()
+                            .position(|c| !c.is_whitespace())
+                            .is_some_and(|c| attribute_before(&dsrc, *l0, c + 2).is_some()));
                     if !(declared || function || written) {
                         return Err(format!("{file}:{l0}: no macro is defined there"));
                     }
