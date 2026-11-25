@@ -183,7 +183,12 @@
 //! (the record of the item says so), and in the invocation of a procedural function-like
 //! macro (`in the input of macro m! at ..`, the record of the position, checked as any
 //! expansion and held to a macro the source does not declare), a position that does not read
-//! its callee is verified with the call not shown. Anywhere else it is a mismatch.
+//! its callee is verified with the call not shown. Anywhere else it is a mismatch. The
+//! invocation that holds the position may be a declared macro's whose code invokes the
+//! procedural one (`in the input of macro via! at .., which invokes macro m! at ..`: each
+//! invocation after the first in the code or the invocation of one before it, the last the
+//! procedural macro's), and what it holds may be where a macro's code is written (`expanded
+//! from ..`), the invocation then being in that code.
 //!
 //! Not checked, by design (the walk, the value search and the knowledge base decide them, which
 //! a reader of the text cannot redo): the reachability tier (`[reachable]`, `[present]`,
@@ -667,6 +672,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         alg_arg: None,
         by_value: false,
         by_macro: false,
+        handed: Vec::new(),
     };
     let mut bad = 0;
     let mut ranged = 0;
@@ -1052,6 +1058,9 @@ struct Files<'a> {
     /// A procedural macro, or one built into the compiler, is among what writes the code last
     /// read by `check_written` (set there, cleared by who asks).
     by_macro: bool,
+    /// The invocations that hold what a procedural function-like macro may have been handed,
+    /// of the occurrence being checked (its `in the input of ..` details, each checked).
+    handed: Vec<witness::Extent>,
 }
 
 /// A position a detail cites: file, line, column.

@@ -690,9 +690,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &mut [CrateFacts]) -> Analysis {
                         if let Some(e) = &site.expansion {
                             d.push(crate::witness::expanded(e, &named));
                         }
-                        if let Some(s) = &site.input_of {
-                            d.push(crate::witness::input_of(s, &named));
-                        }
+                        d.extend(crate::witness::input_of(&site.input_of, &named));
                         d
                     },
                     package: pkg.clone(),
@@ -879,9 +877,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &mut [CrateFacts]) -> Analysis {
                 if let Some(e) = &site.expansion {
                     detail.push(crate::witness::expanded(e, &named));
                 }
-                if let Some(s) = &site.input_of {
-                    detail.push(crate::witness::input_of(s, &named));
-                }
+                detail.extend(crate::witness::input_of(&site.input_of, &named));
                 // a call through a function pointer: the operation is at the call, the function
                 // was named elsewhere (`let h = digest;`)
                 // (with the start of the text there and its line's fingerprint, as the compiler

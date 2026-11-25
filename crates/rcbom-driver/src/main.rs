@@ -661,25 +661,22 @@ fn analyze(tcx: TyCtxt<'_>) {
     } else {
         Default::default()
     };
-    // a site the source writes inside the invocation of a procedural function-like macro
-    // says which invocation: the code may be the macro's, at a token it was handed
-    // (asked of the compiler only for a crate that has a site at all)
+    // a site written inside the invocation of a procedural function-like macro, or of a
+    // declared macro whose code invokes one, says which invocation: the code may be the
+    // procedural macro's, at a token it was handed (asked of the compiler only for a crate
+    // that has a site at all)
     let cited = !sites.is_empty() || reach.as_ref().is_some_and(|r| !r.boundary.is_empty());
-    let calls = if cited {
-        procedural_calls(tcx)
-    } else {
-        Vec::new()
-    };
-    if !calls.is_empty() {
-        for s in sites.iter_mut().filter(|s| s.expansion.is_none()) {
-            s.input_of = input_of(&calls, &s.span);
+    let inputs = cited.then(|| names::procedural_inputs(tcx));
+    if let Some(inputs) = inputs.filter(|i| !i.is_empty()) {
+        let held = |span: &rcbom_facts::Loc, e: &Option<rcbom_facts::Expansion>| match e {
+            Some(e) => inputs.input_of(&e.def_site, &e.steps),
+            None => inputs.input_of(span, &[]),
+        };
+        for s in sites.iter_mut() {
+            s.input_of = held(&s.span, &s.expansion);
         }
-        for e in reach
-            .iter_mut()
-            .flat_map(|r| r.boundary.iter_mut())
-            .filter(|e| e.expansion.is_none())
-        {
-            e.input_of = input_of(&calls, &e.span);
+        for e in reach.iter_mut().flat_map(|r| r.boundary.iter_mut()) {
+            e.input_of = held(&e.span, &e.expansion);
         }
     }
     let facts = CrateFacts {

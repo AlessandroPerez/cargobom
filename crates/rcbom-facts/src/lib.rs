@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 50;
+pub const FACTS_VERSION: u32 = 51;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -1083,13 +1083,21 @@ pub struct Site {
     /// Where the source names the owner.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub owner_at: Option<ItemAt>,
-    /// For a site the source writes (no `expansion`) inside the invocation of a procedural
-    /// function-like macro (`pm::hashed!("text")`): that invocation, as the compiler records
-    /// the expansion. What such a macro is handed is in its invocation, and the code it writes
-    /// has the span it gives it: a token it was handed, whether or not that token is the code
-    /// (the literal, for a call the macro writes to hash it).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub input_of: Option<ExpansionStep>,
+    /// For a site written inside the invocation of a procedural function-like macro
+    /// (`pm::hashed!("text")`): that invocation, as the compiler records the expansion. What
+    /// such a macro is handed is in its invocation, and the code it writes has the span it
+    /// gives it: a token it was handed, whether or not that token is the code (the literal,
+    /// for a call the macro writes to hash it).
+    ///
+    /// Written there: in the source, or in a macro's code (`expansion`: then the invocation is
+    /// in that code too, in the same expansions). And where the invocation that holds the site
+    /// is a declared macro's whose code invokes the procedural one (`via!("text")`, of
+    /// `macro_rules! via { ($t:tt) => { pm::hashed!($t) } }`): that invocation first, then
+    /// each it leads to, to the procedural macro's; of a macro that invokes itself, the
+    /// invocation that is not in its own code. Which of its tokens such a macro hands on is
+    /// not recorded: the site is in what the procedural macro may have been handed.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub input_of: Vec<ExpansionStep>,
 }
 
 /// Where the source names an item, as the compiler records it: its identifier (`f` of `fn f`;
@@ -1552,8 +1560,8 @@ pub struct BoundaryEdge {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub owner_at: Option<ItemAt>,
     /// As a site's (`Site::input_of`).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub input_of: Option<ExpansionStep>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub input_of: Vec<ExpansionStep>,
 }
 
 /// Whose code a call of `BoundaryEdge` runs for.

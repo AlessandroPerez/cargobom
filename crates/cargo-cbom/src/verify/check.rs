@@ -328,14 +328,39 @@ impl Files<'_> {
         // have to read of a call is not asked of it.
         // So in what a procedural function-like macro was handed, in a function the source
         // writes: the invocation that holds the position, as the compiler records it.
+        // Or of a declared macro whose code invokes the procedural one, and so for a position
+        // in a macro's code (`expanded from ..`): the invocation holds where that is written.
         let owner_macro = self.by_macro;
         let mut lent = owner_macro;
+        self.handed.clear();
         for p in parts(ctx.details) {
-            if let Some(record) = p.strip_prefix("in the input of ") {
-                self.check_input_of(record, (&path, line, offset))
-                    .map_err(|e| format!("`{p}`: {e}"))?;
-                lent = true;
+            let Some(record) = p.strip_prefix("in the input of ") else {
+                continue;
+            };
+            let held = self
+                .check_input_of(record)
+                .map_err(|e| format!("`{p}`: {e}"))?;
+            let here = self.in_input(&held, &path, (line, offset));
+            let mut holds = here;
+            for q in parts(ctx.details) {
+                let written = q.strip_prefix("expanded from ").or_else(|| {
+                    q.strip_prefix("expanded `")
+                        .and_then(|r| r.split_once("` from "))
+                        .map(|(_, r)| r)
+                });
+                if let Some(w) = written.and_then(witness::written_whole) {
+                    let file = self.resolve(&w.at.file)?;
+                    holds |= self.in_input(&held, &file, w.at.start);
+                }
             }
+            if !holds {
+                return Err(format!(
+                    "`{p}`: the invocation does not hold the position, nor where a macro \
+                     writes its code"
+                ));
+            }
+            lent |= here;
+            self.handed.push(held);
         }
         let mut unread: Option<String> = None;
         if !in_code {
@@ -1524,14 +1549,31 @@ impl Files<'_> {
                 let w = witness::written_whole(p)
                     .filter(|w| !w.steps.is_empty())
                     .ok_or_else(|| format!("`{part}`: where the code is written cannot be read"))?;
+                // (written in what a procedural function-like macro was handed, in the
+                // macro's code: the call may be that macro's, at a token of it)
+                let file = self.resolve(&w.at.file)?;
+                let handed = self
+                    .handed
+                    .iter()
+                    .any(|h| self.in_input(h, &file, w.at.start));
                 let plain = self
-                    .check_written(&w, Some(at), owner_macro)
+                    .check_written(&w, Some(at), owner_macro || handed)
                     .map_err(|e| format!("`{part}`: {e}"))?;
                 // (in an item a procedural macro writes, a span says where that macro took its
                 // code's span from, not what the code is: a derive's call at a field's type)
                 if plain && owner_plain && !self.names_symbol(&w, symbol)? {
-                    return Err(format!(
-                        "`{part}`: the macro's code there does not name `{symbol}`"
+                    if !handed {
+                        return Err(format!(
+                            "`{part}`: the macro's code there does not name `{symbol}`"
+                        ));
+                    }
+                    unshown(format!(
+                        "the call of `{symbol}`, which a procedural macro put at a token it \
+                         was given (no `{}` where the macro's code is written, {}:{}:{})",
+                        symbol.rsplit("::").next().unwrap_or(symbol),
+                        w.at.file,
+                        w.at.start.0,
+                        w.at.start.1
                     ));
                 }
                 continue;

@@ -531,58 +531,167 @@ fn steps_from(
     }
     out
 }
-/// The invocations of procedural function-like macros the crate's source writes
-/// (`pm::hashed!("text")`), each as the compiler records its expansion. The code such a macro
-/// writes has the spans the macro gives it, and where that is the span of a token it was
-/// handed, nothing of the code says a macro wrote it: the token is the source's. What the
-/// macro was handed is in its invocation, and a site there says which invocation that is
-/// (`Site::input_of`).
+/// An invocation of a function-like macro that holds what a procedural one may have been
+/// handed.
+pub(crate) struct Handed {
+    /// The expansions the invocation is in, innermost first: what it holds is in the same.
+    within: Vec<rcbom_facts::ExpansionStep>,
+    /// The invocation, then each its macro's code leads to, to the procedural macro's
+    /// (`Site::input_of`).
+    steps: Vec<rcbom_facts::ExpansionStep>,
+    /// The furthest end of the invocations of the file that start no later (`Inputs`).
+    far: (usize, usize),
+}
+/// The invocations that hold what a procedural function-like macro may have been handed, by
+/// the file each is in, in the order they start.
+pub(crate) struct Inputs(HashMap<String, Vec<Handed>>);
+
+/// The invocations of procedural function-like macros (`pm::hashed!("text")`), each as the
+/// compiler records its expansion, and those of the declared macros whose code invokes one
+/// (`via!("text")`, of `macro_rules! via { ($t:tt) => { pm::hashed!($t) } }`). The code a
+/// procedural macro writes has the spans the macro gives it, and where that is the span of a
+/// token it was handed, nothing of the code says a macro wrote it: the token is the source's,
+/// or the declared macro's whose code hands it on. What the macro was handed is in its
+/// invocation, or in the one whose macro invokes it, and a site there says which invocation
+/// that is (`Site::input_of`).
 ///
-/// A procedural macro is one of a crate the build loads for its macros only. The compiler has
-/// no list of a crate's expansions to give but the one it prints, a line for each
-/// (`crate0::{{expn7}}: parent: ..`): they are counted there and read by number.
-pub(crate) fn procedural_calls(tcx: TyCtxt<'_>) -> Vec<rcbom_facts::ExpansionStep> {
+/// A procedural macro is one of a crate the build loads for its macros only.
+pub(crate) fn procedural_inputs(tcx: TyCtxt<'_>) -> Inputs {
     use rustc_span::hygiene::{ExpnKind, LocalExpnId, MacroKind as K};
-    let listed = rustc_span::hygiene::debug_hygiene_data(false);
-    let n = listed
-        .lines()
-        .filter(|l| l.starts_with("crate0::{{expn"))
-        .count();
-    // (the root is the first: a list that reads otherwise is not the one this was written for)
-    assert!(
-        listed.starts_with("Expansions:\ncrate0::{{expn0}}: "),
-        "the compiler's list of expansions does not read as rcbom-driver expects"
-    );
-    let mut out = Vec::new();
+    let n = local_expansions();
+    let data = |i: usize| LocalExpnId::from_u32(i as u32).expn_data();
+    let sm = tcx.sess.source_map();
+    // An invocation is named where the source reads as it: the macro's path as the compiler
+    // has it, then `!`. One a procedural macro wrote has the span that macro gave it (its own
+    // invocation's, `define_derive_deftly!` for the `derive_deftly_engine!` its template
+    // invokes; a token's), and no text.
+    let reads = |expn: &rustc_span::hygiene::ExpnData| {
+        let ExpnKind::Macro(K::Bang, name) = expn.kind else {
+            return false;
+        };
+        let call = expn.call_site;
+        // (no more of the invocation than may hold the path: it may be a file long; a cut
+        // inside a character is no text, and one of four in a row is not)
+        let len = (call.hi() - call.lo()).0;
+        let want = name.as_str().len() as u32 + 16;
+        let Some(text) = (0..4).find_map(|more| {
+            let end = call.lo() + rustc_span::BytePos(len.min(want + more));
+            sm.span_to_snippet(call.with_hi(end)).ok()
+        }) else {
+            return false;
+        };
+        let mut text = text.chars().filter(|c| !c.is_whitespace());
+        name.as_str()
+            .chars()
+            .filter(|c| !c.is_whitespace())
+            .all(|c| text.next() == Some(c))
+            && text.next() == Some('!')
+    };
+    // for each invocation of a function-like macro, the nearest procedural one it leads to:
+    // how many invocations on, and which (itself, for a procedural macro's)
+    let mut nearest: BTreeMap<usize, (usize, usize)> = BTreeMap::new();
     for i in 1..n {
-        let expn = LocalExpnId::from_u32(i as u32).expn_data();
+        let expn = data(i);
         if !matches!(expn.kind, ExpnKind::Macro(K::Bang, _))
-            || expn.call_site.from_expansion()
             || expn.call_site.is_dummy()
             || !expn
                 .macro_def_id
                 .is_some_and(|d| !d.is_local() && tcx.crate_dep_kind(d.krate).macros_only())
+            || !reads(&expn)
         {
             continue;
         }
-        out.extend(steps_from(tcx, expn).into_iter().next());
+        let (mut at, mut k) = (i, 0);
+        loop {
+            if nearest.get(&at).is_some_and(|&(have, _)| have <= k) {
+                break;
+            }
+            nearest.insert(at, (k, i));
+            let call = data(at).call_site;
+            let Some(up) = call
+                .from_expansion()
+                .then(|| call.ctxt().outer_expn().as_local())
+                .flatten()
+                .filter(|up| reads(&up.expn_data()))
+            else {
+                break;
+            };
+            at = up.as_u32() as usize;
+            k += 1;
+        }
     }
-    out
+    let mut by_file: HashMap<String, Vec<Handed>> = HashMap::new();
+    for (_, (k, i)) in nearest {
+        // (innermost first: the procedural macro's, then each invocation it is in)
+        let chain = steps_from(tcx, data(i));
+        if chain.len() <= k {
+            continue;
+        }
+        // (a macro that invokes itself in its own code, tokio's `select!` once for each
+        // branch: the invocation that is not in its own code stands for them all, the code
+        // of the others being in the definition it names)
+        let mut steps: Vec<rcbom_facts::ExpansionStep> = Vec::new();
+        for (j, s) in chain[..=k].iter().enumerate().rev() {
+            let again = j > 0
+                && j < k
+                && (s.kind, &s.name, &s.def)
+                    == (chain[j + 1].kind, &chain[j + 1].name, &chain[j + 1].def);
+            if !again {
+                steps.push(s.clone());
+            }
+        }
+        let call = &chain[k].call;
+        by_file.entry(call.file.clone()).or_default().push(Handed {
+            within: chain[k + 1..].to_vec(),
+            steps,
+            far: (call.end_line, call.end_col),
+        });
+    }
+    for list in by_file.values_mut() {
+        list.sort_by(|a, b| {
+            let (a, b) = (&a.steps[0].call, &b.steps[0].call);
+            (a.line, a.col, b.end_line, b.end_col).cmp(&(b.line, b.col, a.end_line, a.end_col))
+        });
+        let mut far = (0, 0);
+        for h in list.iter_mut() {
+            far = far.max(h.far);
+            h.far = far;
+        }
+    }
+    Inputs(by_file)
 }
-/// The invocation among `calls` (`procedural_calls`) that holds a position: the innermost.
-pub(crate) fn input_of(
-    calls: &[rcbom_facts::ExpansionStep],
-    at: &Loc,
-) -> Option<rcbom_facts::ExpansionStep> {
-    calls
-        .iter()
-        .filter(|c| {
-            c.call.file == at.file
-                && (c.call.line, c.call.col) <= (at.line, at.col)
-                && (at.line, at.col) < (c.call.end_line, c.call.end_col)
-        })
-        .max_by_key(|c| (c.call.line, c.call.col))
-        .cloned()
+impl Inputs {
+    pub(crate) fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+    /// The invocation that holds a position written at `at`, in the expansions `within`
+    /// (those of the macro whose code it is in; none for the source's): the innermost.
+    pub(crate) fn input_of(
+        &self,
+        at: &Loc,
+        within: &[rcbom_facts::ExpansionStep],
+    ) -> Vec<rcbom_facts::ExpansionStep> {
+        let Some(list) = self.0.get(&at.file) else {
+            return Vec::new();
+        };
+        let here = (at.line, at.col);
+        let starts_by = list.partition_point(|h| {
+            let c = &h.steps[0].call;
+            (c.line, c.col) <= here
+        });
+        // (the latest to start that holds it is the innermost; none before one whose furthest
+        // end so far is not past the position)
+        for h in list[..starts_by].iter().rev() {
+            if h.far <= here {
+                break;
+            }
+            let c = &h.steps[0].call;
+            if here < (c.end_line, c.end_col) && h.within == within {
+                return h.steps.clone();
+            }
+        }
+        Vec::new()
+    }
 }
 /// The expansion that defines an item, as the compiler records it; the root's for one the
 /// source writes. Of another crate's items, the metadata keeps it for modules, types, traits

@@ -1,0 +1,20 @@
+# A declared macro of another crate whose code invokes a procedural one, as `tokio::select!`
+# does: `dep::via!("a token")`, of `macro_rules! via { ($t:tt) => { $crate::pm::hashed!($t) } }`
+# in `dep`. The invocation that holds the token is in this crate's source, and the one of the
+# procedural macro is in the other crate's file, which this build has no text of until it is
+# asked for. A site in such an invocation names both (`in the input of macro dep::via! at
+# src/main.rs:.., which invokes macro $crate::pm::hashed! at dep/src/lib.rs:..`), the verifier
+# reads both files, and the call the procedural macro puts at the literal is verified with that
+# fact not shown. A macro that hands the procedural one a part of what it is given and writes
+# the rest itself (`part!`) has the same record at both: the call the source writes is read as
+# written. One that invokes itself first (`again!`) names each invocation on the way.
+[package]
+name = "verify-68"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dep = { path = "dep" }
+sha2 = "0.10"
+
+[workspace]

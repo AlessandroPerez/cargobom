@@ -604,7 +604,7 @@ struct Holder {
 }
 
 /// A stretch of a file: from a position to another.
-type Extent = (PathBuf, (usize, usize), (usize, usize));
+pub(super) type Extent = (PathBuf, (usize, usize), (usize, usize));
 
 impl Holder {
     fn holds(&self, path: &Path, a: (usize, usize), b: (usize, usize)) -> bool {
@@ -643,43 +643,54 @@ impl Files<'_> {
 
     /// The detail of a position in what a procedural function-like macro was handed (`in the
     /// input of macro m! at <span> line #.. defined F:L-L`): the invocation is that macro's,
-    /// as the compiler records the expansion; the macro is none the source declares, whose
-    /// input would read as the code it is; and the invocation holds the position, past its
-    /// first token.
-    pub(super) fn check_input_of(
-        &mut self,
-        record: &str,
-        at: (&Path, usize, usize),
-    ) -> Result<(), String> {
-        let (st, rest) = step(record)
-            .filter(|(s, _)| s.kind == StepKind::Macro)
-            .ok_or("the invocation cannot be read")?;
-        let Some(call) = st.call.clone().filter(|_| rest.is_empty()) else {
-            return Err("the invocation cannot be read".into());
-        };
+    /// as the compiler records the expansion, and the macro is none the source declares, whose
+    /// input would read as the code it is. Or of a position in the invocation of a declared
+    /// macro whose code invokes such a macro (`in the input of macro via! at .., which invokes
+    /// macro m! at ..`): each invocation after the first is in the code or the invocation of
+    /// one before it, and the last is the procedural macro's. The first invocation, which is
+    /// to hold the position: its file, and from where to where.
+    pub(super) fn check_input_of(&mut self, record: &str) -> Result<Extent, String> {
+        let unread = || "the invocation cannot be read".to_string();
+        let mut steps = Vec::new();
+        let mut rest = record;
+        loop {
+            let (st, after) = step(rest)
+                .filter(|(s, _)| s.kind == StepKind::Macro && s.call.is_some())
+                .ok_or_else(unread)?;
+            steps.push(st);
+            if after.is_empty() {
+                break;
+            }
+            rest = after.strip_prefix(", which invokes ").ok_or_else(unread)?;
+        }
+        let call = |st: &Step| st.call.clone().ok_or_else(unread);
+        let first = call(&steps[0])?;
+        // (innermost first, as the expansions of written code are)
+        steps.reverse();
+        let last = call(&steps[0])?;
         let w = Written {
-            at: call.clone(),
+            at: last.clone(),
             text: None,
-            line: st.line.clone(),
-            steps: vec![st],
+            line: steps[0].line.clone(),
+            steps: vec![steps[0].clone()],
             within: None,
         };
         if self.check_written(&w, None, false)? {
             return Err(format!(
                 "the macro invoked at {}:{}:{} is declared: what it is handed reads as the \
                  code it is",
-                call.file, call.start.0, call.start.1
+                last.file, last.start.0, last.start.1
             ));
         }
-        if self.resolve(&call.file)? != at.0
-            || !(call.start < (at.1, at.2) && (at.1, at.2) < call.end)
-        {
-            return Err(format!(
-                "the invocation at {}:{}:{} does not hold the position",
-                call.file, call.start.0, call.start.1
-            ));
+        if steps.len() > 1 {
+            self.check_written(&Written { steps, ..w }, None, false)?;
         }
-        Ok(())
+        Ok((self.resolve(&first.file)?, first.start, first.end))
+    }
+
+    /// Whether an invocation (`check_input_of`) holds a position, past where it starts.
+    pub(super) fn in_input(&self, held: &Extent, path: &Path, at: (usize, usize)) -> bool {
+        held.0 == path && held.1 < at && at < held.2
     }
 
     /// A span's file read, the span in it: from a token's edge to a token's edge, in code
@@ -748,7 +759,15 @@ impl Files<'_> {
             .steps
             .iter()
             .any(|s| s.kind == StepKind::Rewrite(Rewrite::Format));
-        let (raw_path, raw_src) = self.span_at(&w.at, format)?;
+        // (a token a procedural macro was handed may be a literal)
+        let (raw_path, raw_src) = match self.span_at(&w.at, format) {
+            Err(e) if lent => self
+                .span_at(&w.at, true)
+                .ok()
+                .filter(|(_, src)| literal_at(src, w.at.start.0, w.at.start.1))
+                .ok_or(e)?,
+            r => r?,
+        };
         reads_as(
             &raw_src,
             &w.at,

@@ -213,7 +213,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             std_entry: None,
             self_ty: self_tree(tcx, did, iargs),
             owner_at: self.owner_at.clone(),
-            input_of: None,
+            input_of: Vec::new(),
         });
     }
 
@@ -244,7 +244,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             via: self.via.clone(),
             call: self.cur_call.clone(),
             owner_at: self.owner_at.clone(),
-            input_of: None,
+            input_of: Vec::new(),
         });
     }
 

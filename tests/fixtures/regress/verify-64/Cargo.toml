@@ -1,0 +1,28 @@
+# A call a procedural function-like macro writes at a token it was handed, where a declared macro
+# invokes the procedural one: `via!("text")` of `macro_rules! via { ($e:expr) => { pm::hashed!($e)
+# } }`. The compiler has the call at `$e` in the macro's code, or at the literal that code holds
+# (`fixed!()`), or, where the macro hands a token on as it is (`$t:tt`), at the token in the
+# source (`tok!("a token")`), and so where the invocation that hands the token on is itself in a
+# macro's code (`wrap!`). In none of them is an expansion of the procedural macro around the
+# position, and its invocation is not in the source: the verifier read each as written by the
+# declared macro (`the macro's code there does not name ..`, `not in code`, `position inside a
+# comment or literal`). The driver records, with every site written in such an invocation, the
+# invocation that holds it and each its macro's code leads to, to the procedural macro's (`in the
+# input of macro tok! at .., which invokes macro pm::hashed! at ..`); a position there that does
+# not read its callee is verified with that fact not shown, and one that does (`same!`, which
+# hands its tokens to a macro that gives them back) is read as before.
+# A token handed on a second time (`deep!`, which invokes itself; `outer!`, which invokes
+# `inner!`) has, for the compiler, the place of the second macro's `$t` and no expansion
+# (`regress/verify-65`): with a call that is all at that token, nothing around it says which
+# expansion wrote it, and it is the one the compiler's table of metavariable spans has, the
+# macro's expansions in the crate all coming from one invocation in the source.
+[package]
+name = "verify-64"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+pm = { path = "pm" }
+sha2 = "0.10"
+
+[workspace]

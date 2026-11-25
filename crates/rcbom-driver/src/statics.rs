@@ -285,7 +285,7 @@ fn site(
         via: via.to_vec(),
         call: None,
         owner_at: owner_at.clone(),
-        input_of: None,
+        input_of: Vec::new(),
     })
 }
 

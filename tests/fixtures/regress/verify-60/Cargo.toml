@@ -9,6 +9,10 @@
 # tor-key-forge's `define_ed25519_keypair!`), the compiler has the template invoked at the name
 # inside `#[derive_deftly(..)]`, with no expansion of `Deftly` between: an invocation cited inside
 # an attribute is whatever reads the attribute's, and its text is not held to read `name!`.
+# The template's macro in turn invokes a procedural one (`derive_deftly_engine!`) with the
+# template's tokens, and the compiler has that invocation, which `define_derive_deftly!` wrote,
+# where `define_derive_deftly!` is invoked: no text reads as it, and the driver names an
+# invocation that holds a site (`in the input of ..`) only where the source reads as one.
 [package]
 name = "verify-60"
 version = "0.1.0"
