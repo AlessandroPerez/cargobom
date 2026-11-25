@@ -127,7 +127,10 @@
 //!   built there holds the code instantiated in it, and the caller, named where the record
 //!   says, holds the position. An instantiation detail citing an `[instantiation]`
 //!   occurrence's position is of one of that position's assets, and an `[instantiation]`
-//!   occurrence cited by details is cited by its own asset's; an instance written `f::<..>`
+//!   occurrence cited by details is cited by its own asset's, among the details of the uses
+//!   reached through the same instance (those whose chain goes on as the occurrence's own: a
+//!   function two generic callers reach for one type is cited through one of them, and at the
+//!   other the position is cited for the caller's other types); an instance written `f::<..>`
 //!   whose call's arguments set up assets of the asset's primitive (`Algorithm::hash(
 //!   HmacSha256::new_from_slice(k)?, d)`) sets up this asset among them;
 //! - the item an occurrence is in (`owner at <span> within L:C-L:C`) is named at the span,
@@ -619,19 +622,16 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
             .or_default()
             .push(i);
     }
-    let mut cited: HashMap<(String, usize, usize), HashSet<String>> = HashMap::new();
+    // (each with the steps it cites after that one: the instance it was reached through is the
+    // one whose own chain those are)
+    let mut cited: HashMap<Pos, HashSet<(String, Vec<Pos>)>> = HashMap::new();
     for o in &occs {
-        for m in re!(r"instantiated by .*? at ([^\s;]+?):(\d+):(\d+)(?: as `[^`]*`)?(?: \(|;|$)")
-            .captures_iter(&o.context)
-        {
+        let steps = instantiations(&o.context);
+        for (k, at) in steps.iter().enumerate() {
             cited
-                .entry((
-                    m[1].to_string(),
-                    m[2].parse().unwrap_or(0),
-                    m[3].parse().unwrap_or(0),
-                ))
+                .entry(at.clone())
                 .or_default()
-                .insert(o.component_ref.clone());
+                .insert((o.component_ref.clone(), steps[k + 1..].to_vec()));
         }
     }
     let mut files = Files {
@@ -1030,7 +1030,7 @@ struct Files<'a> {
     at_line: HashMap<(String, usize), Vec<usize>>,
     /// (location, line, column) -> the assets whose details cite it (`instantiated by X at
     /// F:L:C`)
-    cited: HashMap<(String, usize, usize), HashSet<String>>,
+    cited: HashMap<Pos, HashSet<(String, Vec<Pos>)>>,
     graph: Graph,
     /// the type arguments of the generic function's instance the occurrence being checked is
     /// in, by the function's type parameters (`Reads::inst`)
@@ -1040,6 +1040,25 @@ struct Files<'a> {
     /// The occurrence being checked has its algorithm from a value that reaches the call from
     /// other functions (or is a part of one that has): no instance's arguments choose it.
     by_value: bool,
+}
+
+/// A position a detail cites: file, line, column.
+type Pos = (String, usize, usize);
+
+/// The positions an occurrence's details cite as instantiations (`instantiated by X at F:L:C`),
+/// in their order: the instance the occurrence is in was reached through the first, that one's
+/// through the next.
+fn instantiations(context: &str) -> Vec<Pos> {
+    re!(r"instantiated by .*? at ([^\s;]+?):(\d+):(\d+)(?: as `[^`]*`)?(?: \(|;|$)")
+        .captures_iter(context)
+        .map(|m| {
+            (
+                m[1].to_string(),
+                m[2].parse().unwrap_or(0),
+                m[3].parse().unwrap_or(0),
+            )
+        })
+        .collect()
 }
 
 /// The parts of an occurrence's context: the leading `[..]` tags, the details, and the source

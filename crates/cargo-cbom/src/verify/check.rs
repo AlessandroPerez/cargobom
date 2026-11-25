@@ -688,18 +688,32 @@ impl Files<'_> {
         // (or by one of this asset's name less its parameters, or more: the instance runs
         // `RSA-PKCS1-1.5` with whatever hash its callers' values name, and this call's is
         // `Pkcs1v15Sign::new::<Sha256>()`, RSA-PKCS1-1.5-SHA-256)
+        // (the uses reached through this instance, that is: those whose chain goes on from here
+        // as this occurrence's own. The function instantiated is one for each type, and where
+        // two generic callers reach it for one type, its uses cite the one the walk came
+        // through first; at the other, the uses that cite the position are those of the
+        // caller's other types: jwt's `get_hmac_with_data`, called by `sign` and by
+        // `verify_bytes`, in a program that signs with one hash and verifies with three)
         if kind == "instantiation"
-            && let Some(by) = self.cited.get(&(o.location.clone(), line, offset))
-            && !by.contains(&o.component_ref)
-            && !by.iter().any(|b| self.refines(b, &o.component_ref))
-            && by
-                .iter()
-                .any(|b| self.graph.primitive.get(b) == self.graph.primitive.get(&o.component_ref))
+            && let Some(all) = self.cited.get(&(o.location.clone(), line, offset))
         {
-            return Err(format!(
-                "the instantiation here is cited by {} occurrences of other assets only",
-                by.len()
-            ));
+            let own = super::instantiations(&o.context);
+            let by: HashSet<&String> = all
+                .iter()
+                .filter(|(_, rest)| *rest == own)
+                .map(|(b, _)| b)
+                .collect();
+            if !by.contains(&o.component_ref)
+                && !by.iter().any(|b| self.refines(b, &o.component_ref))
+                && by.iter().any(|b| {
+                    self.graph.primitive.get(*b) == self.graph.primitive.get(&o.component_ref)
+                })
+            {
+                return Err(format!(
+                    "the instantiation here is cited by {} occurrences of other assets only",
+                    by.len()
+                ));
+            }
         }
         // a component is used where the asset it is part of is used
         if kind == "component" {

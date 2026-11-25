@@ -1,0 +1,19 @@
+# One generic function called from two generic ones, and one type reaching it through both
+# (jwt 0.16's `get_hmac_with_data`, called by `sign` and by `verify_bytes`; cryptomator-rs-crypto
+# 0.1.2 signs with HMAC-SHA-256 and verifies with three boxed keys). The instance for that type
+# is one, and its uses cite the caller the walk reached it through first; at the other caller the
+# hash is still chosen, an instantiation of its own, and the uses that cite that position are
+# those of the caller's other types. The verifier held an instantiation that others of its kind
+# cite to be cited by its own asset, and called this one a mismatch. It holds it to the uses
+# reached through the same instance: those whose chain goes on as the instantiation's own.
+[package]
+name = "verify-58"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+hmac = "0.12"
+sha1 = "0.10"
+sha2 = "0.10"
+
+[workspace]
