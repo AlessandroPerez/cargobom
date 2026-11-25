@@ -182,7 +182,105 @@ pub struct Links {
     /// body each type coerced to it runs (`coercions`) may run.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub dyn_calls: Vec<DynCall>,
+    /// Where the records of the lists above are, for `merge` and the `add_*` (see `Seen`).
+    /// Not part of the facts: not written, and the same as any other.
+    #[serde(skip)]
+    pub index: Indexes,
 }
+
+/// Where a list's records are, by their hash: whether it holds one is not a search of it. The
+/// driver adds each body's records to its crate's, without duplicates, and searched the list
+/// for each: quadratic in what a crate records (chrono-tz 0.8.6's time zones are 596 constants
+/// storing 131,506 fields, which took twelve minutes of the thirteen the crate took).
+///
+/// It follows a list that only grows: records added without it are indexed at the next
+/// question, a list grown shorter is indexed again, and a record found is compared whole, so
+/// a list changed otherwise is at worst searched in vain. A short list is searched and has
+/// no index: most are a few records.
+#[derive(Clone, Debug, Default)]
+pub struct Seen {
+    /// The first record of each hash.
+    first: std::collections::HashMap<u64, usize>,
+    /// The records whose hash an earlier one has.
+    more: Vec<usize>,
+    /// How many of the list's records are in the two above.
+    indexed: usize,
+}
+
+impl Seen {
+    /// Up to how many records a list is searched.
+    const SHORT: usize = 16;
+
+    fn hash<K: std::hash::Hash + ?Sized>(k: &K) -> u64 {
+        use std::hash::Hasher;
+        let mut h = std::collections::hash_map::DefaultHasher::new();
+        k.hash(&mut h);
+        h.finish()
+    }
+
+    /// Where `list` has a record whose key (`key` of it) is `k`.
+    pub fn position<T, K: std::hash::Hash + Eq + ?Sized>(
+        &mut self,
+        list: &[T],
+        key: impl Fn(&T) -> &K,
+        k: &K,
+    ) -> Option<usize> {
+        if list.len() <= Self::SHORT {
+            return list.iter().position(|t| key(t) == k);
+        }
+        if list.len() < self.indexed {
+            *self = Seen::default();
+        }
+        for (i, t) in list.iter().enumerate().skip(self.indexed) {
+            match self.first.entry(Self::hash(key(t))) {
+                std::collections::hash_map::Entry::Vacant(v) => {
+                    v.insert(i);
+                }
+                std::collections::hash_map::Entry::Occupied(_) => self.more.push(i),
+            }
+        }
+        self.indexed = list.len();
+        let at = |i: &&usize| list.get(**i).is_some_and(|t| key(t) == k);
+        self.first
+            .get(&Self::hash(k))
+            .filter(at)
+            .or_else(|| self.more.iter().find(at))
+            .copied()
+    }
+
+    /// Adds `x` to `list` unless it holds an equal record. Whether it was added.
+    pub fn add<T: std::hash::Hash + Eq>(&mut self, list: &mut Vec<T>, x: T) -> bool {
+        if self.position(list, |t| t, &x).is_some() {
+            return false;
+        }
+        list.push(x);
+        true
+    }
+}
+
+/// A `Seen` for each list of `Links` that is added to without duplicates.
+#[derive(Clone, Debug, Default)]
+pub struct Indexes {
+    fields: Seen,
+    returns: Seen,
+    calls: Seen,
+    arg_calls: Seen,
+    writes: Seen,
+    statics: Seen,
+    truncated: Seen,
+    summarised: Seen,
+    named: Seen,
+    opaque: Seen,
+    dyn_calls: Seen,
+}
+
+impl PartialEq for Indexes {
+    fn eq(&self, _: &Self) -> bool {
+        true
+    }
+}
+
+impl Eq for Indexes {}
 
 /// A call of a trait's method on a trait object of `trait_path` (as `Coercion::trait_path`
 /// names it), by the trait method's path, and the method's type past the receiver (a `sig` as
@@ -274,36 +372,72 @@ pub struct ParamWrite {
 }
 
 impl Links {
+    /// Adds a field store unless it is recorded. Whether it was added (so the others below).
+    pub fn add_field(&mut self, f: FieldStore) -> bool {
+        self.index.fields.add(&mut self.fields, f)
+    }
+
+    pub fn add_return(&mut self, r: Returned) -> bool {
+        self.index.returns.add(&mut self.returns, r)
+    }
+
+    pub fn add_call(&mut self, c: LocalCall) -> bool {
+        self.index.calls.add(&mut self.calls, c)
+    }
+
+    pub fn add_arg_call(&mut self, c: LocalCall) -> bool {
+        self.index.arg_calls.add(&mut self.arg_calls, c)
+    }
+
+    pub fn add_write(&mut self, w: ParamWrite) -> bool {
+        self.index.writes.add(&mut self.writes, w)
+    }
+
+    pub fn add_truncated(&mut self, name: String) -> bool {
+        self.index.truncated.add(&mut self.truncated, name)
+    }
+
+    pub fn add_summarised(&mut self, name: String) -> bool {
+        self.index.summarised.add(&mut self.summarised, name)
+    }
+
+    pub fn add_named(&mut self, f: FnShape) -> bool {
+        self.index.named.add(&mut self.named, f)
+    }
+
+    pub fn add_opaque(&mut self, f: FnShape) -> bool {
+        self.index.opaque.add(&mut self.opaque, f)
+    }
+
+    pub fn add_dyn_call(&mut self, c: DynCall) -> bool {
+        self.index.dyn_calls.add(&mut self.dyn_calls, c)
+    }
+
     /// Adds `other`'s records, without duplicates.
     pub fn merge(&mut self, other: Links) {
         for f in other.fields {
-            if !self.fields.contains(&f) {
-                self.fields.push(f);
-            }
+            self.add_field(f);
         }
         for r in other.returns {
-            if !self.returns.contains(&r) {
-                self.returns.push(r);
-            }
+            self.add_return(r);
         }
         for c in other.calls {
-            if !self.calls.contains(&c) {
-                self.calls.push(c);
-            }
+            self.add_call(c);
         }
         for c in other.arg_calls {
-            if !self.arg_calls.contains(&c) {
-                self.arg_calls.push(c);
-            }
+            self.add_arg_call(c);
         }
         self.arg_call_refs.extend(other.arg_call_refs);
         for w in other.writes {
-            if !self.writes.contains(&w) {
-                self.writes.push(w);
-            }
+            self.add_write(w);
         }
         for s in other.statics {
-            match self.statics.iter_mut().find(|x| x.def.id == s.def.id) {
+            let at = self.index.statics.position(
+                &self.statics,
+                |x| x.def.id.as_str(),
+                s.def.id.as_str(),
+            );
+            match at.map(|i| &mut self.statics[i]) {
                 Some(x) => {
                     x.mutable |= s.mutable;
                     for v in s.values {
@@ -321,29 +455,19 @@ impl Links {
             }
         }
         for t in other.truncated {
-            if !self.truncated.contains(&t) {
-                self.truncated.push(t);
-            }
+            self.add_truncated(t);
         }
         for f in other.summarised {
-            if !self.summarised.contains(&f) {
-                self.summarised.push(f);
-            }
+            self.add_summarised(f);
         }
         for a in other.named {
-            if !self.named.contains(&a) {
-                self.named.push(a);
-            }
+            self.add_named(a);
         }
         for a in other.opaque {
-            if !self.opaque.contains(&a) {
-                self.opaque.push(a);
-            }
+            self.add_opaque(a);
         }
         for c in other.dyn_calls {
-            if !self.dyn_calls.contains(&c) {
-                self.dyn_calls.push(c);
-            }
+            self.add_dyn_call(c);
         }
     }
 }
@@ -1477,7 +1601,9 @@ pub struct PtaArg {
 
 #[cfg(test)]
 mod tests {
-    use super::{LINE_WINDOW, MAX_LINE_TEXT, fragment_path, site_line};
+    use super::{
+        FieldStore, LINE_WINDOW, Links, MAX_LINE_TEXT, Origin, Seen, fragment_path, site_line,
+    };
 
     #[test]
     fn a_long_line_is_carried_around_the_position() {
@@ -1527,5 +1653,75 @@ mod tests {
         assert_eq!(&t[fragment_path(t, "Y").unwrap()..], "$a::Y");
         // another metavariable of the same start is another
         assert_eq!(fragment_path("$t; $ty::new", "new"), None);
+    }
+
+    #[test]
+    fn a_list_added_to_through_its_index_is_the_one_a_search_makes() {
+        // (short and long: past `Seen::SHORT` the list is indexed)
+        for n in [5usize, 400] {
+            let records: Vec<String> = (0..n * 3).map(|i| format!("r{}", (i * 7) % n)).collect();
+            let mut searched: Vec<String> = Vec::new();
+            for r in &records {
+                if !searched.contains(r) {
+                    searched.push(r.clone());
+                }
+            }
+            let (mut seen, mut list) = (Seen::default(), Vec::new());
+            let added = records
+                .iter()
+                .filter(|r| seen.add(&mut list, (*r).clone()))
+                .count();
+            assert_eq!(list, searched);
+            assert_eq!(added, n);
+        }
+        // records added without the index are found, and one of them is not added again
+        let (mut seen, mut list) = (Seen::default(), Vec::new());
+        for i in 0..100 {
+            seen.add(&mut list, i);
+        }
+        list.extend(100..200);
+        assert!(!seen.add(&mut list, 150));
+        assert!(seen.add(&mut list, 200));
+        assert_eq!(seen.position(&list, |t| t, &199), Some(199));
+        // a list grown shorter is indexed again: what it lost is not found, and is added
+        list.truncate(50);
+        assert_eq!(seen.position(&list, |t| t, &150), None);
+        assert!(seen.add(&mut list, 150));
+        assert!(!seen.add(&mut list, 49));
+        // by a key: the first record of that key
+        let pairs: Vec<(u32, u32)> = (0..300).map(|i| (i % 100, i)).collect();
+        let mut seen = Seen::default();
+        assert_eq!(seen.position(&pairs, |p| &p.0, &42), Some(42));
+        assert_eq!(seen.position(&pairs, |p| &p.0, &100), None);
+    }
+
+    #[test]
+    fn links_merge_without_duplicates() {
+        let store = |i: usize| FieldStore {
+            adt: "a::S".into(),
+            path: vec![i % 40],
+            value: Origin::Unknown,
+            func: String::new(),
+            via_ref: false,
+            args: None,
+        };
+        let mut all = Links::default();
+        for part in 0..10 {
+            let mut l = Links::default();
+            for i in 0..20 {
+                l.add_field(store(part * 4 + i));
+                l.add_truncated(format!("f{}", (part + i) % 25));
+            }
+            all.merge(l);
+        }
+        assert_eq!(all.fields, (0..40).map(store).collect::<Vec<_>>());
+        assert_eq!(all.truncated.len(), 25);
+        // (the index is no part of what two `Links` are compared by)
+        let plain = Links {
+            fields: all.fields.clone(),
+            truncated: all.truncated.clone(),
+            ..Default::default()
+        };
+        assert_eq!(all, plain);
     }
 }

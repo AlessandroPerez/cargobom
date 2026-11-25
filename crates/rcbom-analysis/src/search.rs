@@ -1367,7 +1367,7 @@ mod tests {
 
     fn index(links: Links) -> LinkIndex {
         LinkIndex::new(
-            &[CrateFacts {
+            &mut [CrateFacts {
                 facts_version: rcbom_facts::FACTS_VERSION,
                 krate: CrateInfo {
                     name: "app".into(),

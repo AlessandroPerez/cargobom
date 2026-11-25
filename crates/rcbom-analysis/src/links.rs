@@ -14,7 +14,7 @@
 use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet};
 
-use rcbom_facts::{CrateFacts, NOT_FOLLOWED, Origin};
+use rcbom_facts::{CrateFacts, NOT_FOLLOWED, Origin, Seen};
 
 /// The callers of a function, each with the arguments it passes.
 type Callers = Vec<(String, Vec<Origin>)>;
@@ -270,7 +270,15 @@ impl Via {
 
 type Found = Vec<(Origin, String, Via)>;
 
-#[derive(PartialEq)]
+/// Lists being gathered, each with where its records are.
+type Gathered<K, T> = HashMap<K, (Vec<T>, Seen)>;
+
+/// The lists of `gathered`, once nothing more is added.
+fn lists<K: std::hash::Hash + Eq, T>(gathered: Gathered<K, T>) -> HashMap<K, Vec<T>> {
+    gathered.into_iter().map(|(k, (v, _))| (k, v)).collect()
+}
+
+#[derive(PartialEq, Eq, Hash)]
 struct Stored {
     value: Origin,
     /// The function storing it, whose parameters `value` names.
@@ -353,57 +361,26 @@ impl LinkIndex {
             .collect()
     }
 
-    pub fn new(facts: &[CrateFacts], location: &dyn Fn(&std::path::Path) -> String) -> LinkIndex {
+    /// The index of a build's links. The records that are most of a large build's facts (what
+    /// functions return and write, the calls between them, the stores into fields) are moved
+    /// out of `facts`, not copied: held twice, those of mockforge-ui 0.3.249 (816 crates, 2 GB
+    /// of facts) took the analysis past 10 GB.
+    pub fn new(
+        facts: &mut [CrateFacts],
+        location: &dyn Fn(&std::path::Path) -> String,
+    ) -> LinkIndex {
         let mut ix = LinkIndex::default();
-        for f in facts {
-            for s in &f.links.fields {
-                let v = ix
-                    .fields
-                    .entry((s.adt.clone(), s.path.clone()))
-                    .or_default();
-                let stored = Stored {
-                    value: s.value.clone(),
-                    func: s.func.clone(),
-                    via_ref: s.via_ref,
-                    args: s.args.clone(),
-                };
-                if !v.contains(&stored) {
-                    v.push(stored);
-                }
-            }
-            for r in &f.links.returns {
-                let v = ix
-                    .returns
-                    .entry((r.func.clone(), r.path.clone()))
-                    .or_default();
-                if !v.contains(&r.value) {
-                    v.push(r.value.clone());
-                }
-            }
-            for c in &f.links.calls {
-                let v = ix.calls.entry(c.callee.clone()).or_default();
-                let call = (c.caller.clone(), c.args.clone());
-                if !v.contains(&call) {
-                    v.push(call);
-                }
-            }
-            for c in &f.links.arg_calls {
-                let v = ix.arg_calls.entry(c.callee.clone()).or_default();
-                let call = (c.caller.clone(), c.args.clone());
-                if !v.contains(&call) {
-                    v.push(call);
-                }
-            }
-            if let Some(file) = &f.links.arg_calls_file {
-                let i = ix.arg_files.len();
-                ix.arg_files.push(file.clone());
-                for r in &f.links.arg_call_refs {
-                    ix.arg_refs
-                        .entry(r.callee.clone())
-                        .or_default()
-                        .push((i, r.at, r.len));
-                }
-            }
+        // each list with where its records are (`Seen`), while it is added to without
+        // duplicates: the stores into one field, or the calls of one function, can be tens of
+        // thousands, and searching the list for each took the 131,506 stores of chrono-tz
+        // 0.8.6's time zones, all into two fields, three minutes
+        let mut fields: Gathered<(String, Vec<usize>), Stored> = HashMap::new();
+        let mut returns: Gathered<(String, Vec<usize>), Origin> = HashMap::new();
+        let mut calls: Gathered<String, (String, Vec<Origin>)> = HashMap::new();
+        let mut arg_calls: Gathered<String, (String, Vec<Origin>)> = HashMap::new();
+        let mut writes: Gathered<(String, usize, Vec<usize>), Origin> = HashMap::new();
+        for f in facts.iter_mut() {
+            // (the names first: they are read from the records taken below)
             ix.truncated.extend(f.links.truncated.iter().cloned());
             ix.summarised.extend(
                 f.links
@@ -435,14 +412,41 @@ impl LinkIndex {
                     ix.instanced.insert(base);
                 }
             }
-            for w in &f.links.writes {
-                let v = ix
-                    .writes
-                    .entry((w.func.clone(), w.index, w.path.clone()))
-                    .or_default();
-                if !v.contains(&w.value) {
-                    v.push(w.value.clone());
+            for s in std::mem::take(&mut f.links.fields) {
+                let (v, seen) = fields.entry((s.adt, s.path)).or_default();
+                let stored = Stored {
+                    value: s.value,
+                    func: s.func,
+                    via_ref: s.via_ref,
+                    args: s.args,
+                };
+                seen.add(v, stored);
+            }
+            for r in std::mem::take(&mut f.links.returns) {
+                let (v, seen) = returns.entry((r.func, r.path)).or_default();
+                seen.add(v, r.value);
+            }
+            for c in std::mem::take(&mut f.links.calls) {
+                let (v, seen) = calls.entry(c.callee).or_default();
+                seen.add(v, (c.caller, c.args));
+            }
+            for c in std::mem::take(&mut f.links.arg_calls) {
+                let (v, seen) = arg_calls.entry(c.callee).or_default();
+                seen.add(v, (c.caller, c.args));
+            }
+            if let Some(file) = &f.links.arg_calls_file {
+                let i = ix.arg_files.len();
+                ix.arg_files.push(file.clone());
+                for r in &f.links.arg_call_refs {
+                    ix.arg_refs
+                        .entry(r.callee.clone())
+                        .or_default()
+                        .push((i, r.at, r.len));
                 }
+            }
+            for w in std::mem::take(&mut f.links.writes) {
+                let (v, seen) = writes.entry((w.func, w.index, w.path)).or_default();
+                seen.add(v, w.value);
             }
             for (ty, tree) in &f.links.coercion_types {
                 ix.coerced_types
@@ -488,6 +492,11 @@ impl LinkIndex {
                 }
             }
         }
+        ix.fields = lists(fields);
+        ix.returns = lists(returns);
+        ix.calls = lists(calls);
+        ix.arg_calls = lists(arg_calls);
+        ix.writes = lists(writes);
         // a trait object made from another (`&dyn Sub` upcast to `&dyn Super`): the types
         // coerced to that one, transitively
         // the trait methods types implement: `<A as app::Pick>::alg`, `app::Pick::alg for A`

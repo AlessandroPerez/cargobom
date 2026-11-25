@@ -159,7 +159,7 @@ fn generate(a: &GenArgs) -> Result<()> {
     // link, the analysis is done all the same: the CBOM is written without the check, says so,
     // and the run fails after it)
     let mut bins = None;
-    let facts = if a.manifest_only {
+    let mut facts = if a.manifest_only {
         Vec::new()
     } else {
         let facts_dir = dir.join("facts");
@@ -170,7 +170,7 @@ fn generate(a: &GenArgs) -> Result<()> {
         load_facts(&facts_dir, &units)?
     };
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
-    let mut an = analyze(&kb, &man, &facts);
+    let mut an = analyze(&kb, &man, &mut facts);
     an.layer2 = !a.manifest_only;
     let (walk_check, walk_failed) = match bins {
         Some(Ok(bins)) => match walkcheck::run(&sel, &man, &facts, &bins) {

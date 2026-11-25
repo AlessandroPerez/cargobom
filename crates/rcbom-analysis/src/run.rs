@@ -2,7 +2,7 @@
 
 use super::*;
 
-pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
+pub fn analyze(kb: &Kb, man: &Manifest, facts: &mut [CrateFacts]) -> Analysis {
     // knowledge-base lookups by crate name go through the package each crate of this build
     // comes from (the package md-5's library is named `md5`, like the package md5's)
     kb.bind_crates(
@@ -29,6 +29,7 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
         }
         ix
     };
+    let facts: &[CrateFacts] = facts;
     // calls through function pointers, as calls of the functions they hold; the namings they
     // account for are no occurrences of their own; the program's own functions called through
     // one get the call's arguments for their parameters

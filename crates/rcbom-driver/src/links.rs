@@ -270,9 +270,7 @@ pub(crate) fn body_links(
                 let t = rustc_internal::internal(tcx, t);
                 escaped.extend(runnables(cx, t, false).concat());
                 for a in named_functions(cx, t) {
-                    if !out.named.contains(&a) {
-                        out.named.push(a);
-                    }
+                    out.add_named(a);
                 }
             }
             // `S { f: v }`, `E::V(v)`: what each part of `v` that can carry an algorithm or a key
@@ -300,8 +298,8 @@ pub(crate) fn body_links(
                         via_ref: false,
                         args: None,
                     };
-                    if !empty(&s.value) && !out.fields.contains(&s) {
-                        out.fields.push(s);
+                    if !empty(&s.value) {
+                        out.add_field(s);
                     }
                 };
                 for (f, op) in ops.iter().enumerate() {
@@ -446,8 +444,8 @@ pub(crate) fn body_links(
                         value,
                         path: Vec::new(),
                     };
-                    if !empty(&w.value) && !out.writes.contains(&w) {
-                        out.writes.push(w);
+                    if !empty(&w.value) {
+                        out.add_write(w);
                     }
                 }
             }
@@ -493,9 +491,7 @@ pub(crate) fn body_links(
                             value: v,
                             path: Vec::new(),
                         };
-                        if !out.writes.contains(&w) {
-                            out.writes.push(w);
-                        }
+                        out.add_write(w);
                     }
                 }
             }
@@ -757,9 +753,7 @@ pub(crate) fn body_links(
                                 arity,
                                 sig,
                             };
-                            if !out.opaque.contains(&a) {
-                                out.opaque.push(a);
-                            }
+                            out.add_opaque(a);
                         }
                     }
                 }
@@ -875,9 +869,7 @@ pub(crate) fn body_links(
             caller: here.clone(),
             args: vec![Origin::Unknown],
         };
-        if !out.calls.contains(&c) {
-            out.calls.push(c);
-        }
+        out.add_call(c);
     }
     // a static whose contents change at run time starts with its initializer's value (a
     // `static mut`'s, a lock's), unless it starts empty (`OnceLock`) or its value is the
@@ -1043,9 +1035,7 @@ pub(crate) fn body_links(
                 value,
                 path: Vec::new(),
             };
-            if !out.writes.contains(&w) {
-                out.writes.push(w);
-            }
+            out.add_write(w);
         }
     }
     // what it writes through a borrow a parameter holds, by field (`fn wset(w: W) { *w.slot = v
@@ -1087,20 +1077,15 @@ pub(crate) fn body_links(
                         value,
                         path: vec![f],
                     };
-                    if !out.writes.contains(&w) {
-                        out.writes.push(w);
-                    }
+                    out.add_write(w);
                 }
             }
         }
     }
     // one taking a `&mut` (or a holder of one) that writes nothing through it (`fn up(&mut
     // self) {}`): summarised all the same, so its callers' values are left as they were
-    if (!mut_params.is_empty() || holders)
-        && !out.writes.iter().any(|w| w.func == here)
-        && !out.summarised.contains(&here)
-    {
-        out.summarised.push(here.clone());
+    if (!mut_params.is_empty() || holders) && !out.writes.iter().any(|w| w.func == here) {
+        out.add_summarised(here.clone());
     }
     // what a function returns, and each part of it that can carry an algorithm or a key; a
     // method implementing a trait's also as `<trait method> for <Self>`, the name its calls
@@ -1213,9 +1198,7 @@ pub(crate) fn instance_links(cx: &Cx<'_>, out: &mut Links, arg_calls: &mut ArgCa
     // the instances named but not summarised (past the bound, or whose analysis panicked):
     // a summary that is missing is a cut
     let cut = |name: String, out: &mut Links| {
-        if !out.truncated.contains(&name) {
-            out.truncated.push(name);
-        }
+        out.add_truncated(name);
     };
     loop {
         let todo = crate::origins::take_instances();
@@ -1440,9 +1423,7 @@ fn field_store(
                 via_ref: *via_ref,
                 args: args.clone(),
             };
-            if !out.fields.contains(&store) {
-                out.fields.push(store);
-            }
+            out.add_field(store);
         }
     }
 }
@@ -1644,9 +1625,7 @@ pub(crate) fn promoted_links(cx: &Cx<'_>, did: DefId, out: &mut Links) {
                     ) = &a.1
                 {
                     for n in named_functions(cx, op.ty(&tcx.promoted_mir(did)[p], tcx)) {
-                        if !out.named.contains(&n) {
-                            out.named.push(n);
-                        }
+                        out.add_named(n);
                     }
                 }
             }
