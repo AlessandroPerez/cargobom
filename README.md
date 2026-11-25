@@ -182,7 +182,7 @@ RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows be
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
-then the tool was run on 280 crates.io packages it had never been run on, in nine batches
+then the tool was run on 410 crates.io packages it had never been run on, in twelve batches
 (Unseen packages, below): what those runs found is fixed in this build, but for one finding
 (two versions of one crate in a build: Limitations), and changed
 three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
@@ -195,9 +195,9 @@ honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HM
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (377 outputs, the suite's included): 22,355 positions verified (21 of them with a fact the text does not show, all in the fixture built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 207,215 positions and spans of the compiler's record shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,453 calls (4,215 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,190 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
-| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 366 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
+| evidence | every cited position, `verify --self-test` | fixtures (380 outputs, the suite's included): 22,426 positions verified (21 of them with a fact the text does not show, all in the fixture built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 207,967 positions and spans of the compiler's record shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,477 calls (4,234 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,195 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 369 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
@@ -231,11 +231,11 @@ Where it is not exact, the CBOM says so instead of guessing:
 published. They have no labels: what a run shows is whether it completes, whether the verifier
 confirms every position and rejects every shifted one, whether the walk check finds a gap and
 the boundary check leaves a call out. A batch passes when every package does on its first run.
-None of the ten batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
-34, 27 of 35, 30 of 33, 27 of 32, 32 of 36). Each finding is fixed in this build and has a
-fixture, but for one (two versions of one crate in a build: Limitations), and the packages
-are development material from then on (`in-too-deep.md` 8 says what such a run can and cannot
-show).
+None of the twelve batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
+34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41). Each finding is fixed in this
+build and has a fixture, but for one (two versions of one crate in a build: Limitations), and
+the packages are development material from then on (`in-too-deep.md` 8 says what such a run
+can and cannot show).
 - *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
   nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
   branca 0.10.2, miniserve 0.35.0, jwt-compact 0.8.0, totp-rs 6.0.0, biscuit 0.8.0 and pgp 0.21.0
@@ -537,7 +537,7 @@ does not lead to is the compiler's word: the position is verified, and the fact 
 counted apart (`NOT SHOWN`, "verified with a fact the text does not show"), and the self-test
 counts a shift that passes only so apart as well. The cases are in the fixture built by
 construction (`regress/verify-55`): 286 positions verified, 21 of them with a fact the text
-does not show, every shifted position and span rejected. No position of the other 376 fixture
+does not show, every shifted position and span rejected. No position of the other 379 fixture
 outputs or of the labelled sets has such a fact.
 
 The ninth batch ran on the build with all of this: twenty-seven of thirty-two. Its CBOMs hold
@@ -631,6 +631,123 @@ many positions lie in macros, a quarter of an hour for the self-test of turbo-su
 (839 positions, 31,375 shifts): it compiled the same patterns for every position and formatted
 every package's name for every location. It takes 45 seconds now, its output the same byte for
 byte.
+
+An eleventh batch ran on 24 and 25 November, on the build with the tenth batch's fixes:
+forty-three packages by the same rule. Eight do not build here, with or without the tool: four
+do not compile on the pinned nightly (blazehash 0.2.5's sqlx-core and cnctd_server 0.6.6's
+redis, on what the never type falls back to; wasmer-runtime-core 0.17.1, on a feature the
+compiler has removed; drogue-tls 0.6.0, on one it has not made stable), hashiverse-lib 1.1.2
+asks moka for a trait the version it resolves to does not have, and three need what the machine
+does not have (lobstercove-lichen-core 0.5.229 what librocksdb-sys builds with, golem-cli 1.3.1
+an OpenSSL its openssl-sys finds, blueprint-auth 0.2.5 cmake for protobuf-src). Thirty-one of
+the thirty-five that build passed on the first run: ling-crypto 2030.1.13, craton-hsm 0.11.2,
+libtut 0.0.1, minipgp6-encrypt 0.0.6, tenzro-crypto 0.2.0, cardanowall 0.12.0,
+derec-cryptography 0.1.0, huddle-protocol 2.2.1, supso-project 1.0.0, arkhe-kernel 0.15.0,
+mldsa-core 0.4.1, truthlinked-staking 0.1.2, apfsds-crypto 0.4.0, noxtls-crypto 0.2.20,
+portal-solutions-sky 0.1.0, paraxiom-pqc 0.2.1, kotva-core 0.2.0, subxt-signer 0.51.1, dotslash
+0.5.7, wacore-noise 0.7.0, pkgar 0.2.4, bsv-wasm 1.3.4, erc20_payment_lib 0.5.1,
+gemachain-crate-features 1.8.2, radicle-keystore 0.2.0, matrix-sdk-search 0.19.1,
+spatial-hasher 0.1.7, mockforge-ui 0.3.249, zpdf-document 0.23.0, discret 0.6.2 and
+cyaxon-authifier 0.1.0. Their CBOMs, with rhwp's and blue-lang-runtime's as first made, hold
+10,688 verified positions and 10 more within a range, none rejected; 91,046 of 91,050 shifted
+positions and spans were rejected, and their eight binaries have no walk gap. They name ML-DSA
+in twelve packages, ML-KEM in thirteen, SLH-DSA in four and X-Wing in one. The four failures
+are of four causes, none seen before. Two stopped the batch for lack of memory, and both causes
+were the tool's. rhwp 0.9.1 is one crate of 957,000 lines, on which the compiler alone takes
+5.5 GB: the driver held 11.4 GB when the run's limit stopped it. Its scan took twelve minutes,
+because a closure's enclosing body was converted from the compiler's anew for every captured
+variable and every local asked the crate's recursive types again whether they hold a cell: the
+last four bodies are kept and the answer is per type, and the scan takes 139 seconds. The
+argument records of the calls between the program's own functions, 49,133 of them in 937 MB,
+took the driver 4 GB to hold: they are written to a file beside the facts, and the analysis
+reads those of the functions it asks about. And the walk check built the program while the
+facts were loaded, 6.8 GB beside the compiler's 5.5: it builds first. The package passes: 949
+positions verified, all 8,874 shifted ones rejected, no gap in its three binaries, in eighteen
+minutes and 8.9 GB. nab 0.13.3 depends on cranelift-codegen 0.135.10, whose build generates one
+function of 30,712 basic blocks, generic over a context whose types the driver cannot look
+into: every write a call may make through a `&mut` it is handed defined every place the body
+lends, 6.3 million definitions with a bit for each in each block, and the driver held 13.5 GB a
+minute into the crate. Nothing of it is cut and all of it is held differently
+(`regress/driver-56`, such a function written small: a place has one such definition with the
+list of the writes that make it, which the places written alike share; the sets are computed in
+sweeps in reverse postorder; whether a value at entry is overwritten is read off the
+dominators): the crate takes 21 seconds and 1.5 GB. nab's default features need cmake; built
+without the one that does (`impersonate`), it passes with 1,528 positions verified, all 12,803
+shifted ones rejected and no gap in its three binaries, in twenty minutes and 7 GB. In
+blue-lang-runtime 0.0.282 every position was verified and four shifted ones were accepted. The
+package names `Hmac::<Sha256>::new_from_slice` and `Hmac::<Sha512>::new_from_slice` as function
+pointers in two arms of a `match`, one below the other in the same column, and the detail of a
+call through such a pointer gave where it was named as a position alone: moved one line, it
+names the same function. A naming carries the start of its text and its line's fingerprint now,
+as every other position a detail gives (`regress/verify-57`), and all 6,018 shifted positions
+of the package are rejected. In cryptomator-rs-crypto 0.1.2 the verifier rejected one correct
+position. jwt 0.16 has one generic function, `get_hmac_with_data`, that its `sign` and its
+`verify_bytes` both call, and the package signs with HMAC-SHA-256 and verifies with one of
+three boxed keys. The instance for SHA-256 is one, and its uses cite the caller the walk
+reached it through first, `sign`; at the call in `verify_bytes` SHA-256 is chosen too, and the
+uses that cite that position are those of SHA-384 and SHA-512, each of another instance of
+`verify_bytes`. The verifier holds an instantiation that uses of its kind cite to be cited by a
+use of its own asset; it holds that among the uses reached through the same instance now, those
+whose chain goes on as the instantiation's own (`regress/verify-58`), and the package passes:
+165 positions verified, every shifted one rejected. A fifth was found by the probe written for
+the second. A function that assigns an algorithm to a field of its own parameter and then reads
+it (`cfg.alg = &SHA512; digest(cfg.alg, d)`) had its position rejected, the parameter read as a
+value from elsewhere: the verifier follows such an assignment as it follows a variable's, and
+takes it as the value where it is made on every way to the read and the parameter is not used
+between the two. One more thing the run showed, which none of the four questions asks.
+mockforge-ui 0.3.249 is 816 crates and 2 GB of facts, and the analysis held 10.7 GB on them:
+what functions return and write, the calls between them and the stores into fields are two
+thirds of those facts, and they were held twice, as read and in the index made of them. They
+are moved into the index, which holds 7.2 GB on the same build and makes the same CBOM, byte
+for byte.
+
+A twelfth batch ran on 25 November, on the build with the eleventh batch's fixes: forty-four
+packages by the same rule. Three do not build here, with or without the tool: axiom-cli 0.1.17
+resolves to a rustix that uses attributes of the compiler's own which the pinned nightly no
+longer has, buttercup-crypto 0.4.2 requires an aes-soft whose one version is yanked, and
+walletconnect-sdk 0.2.3 needs an OpenSSL its openssl-sys finds. Thirty-nine of the forty-one
+that build passed on the first run: zks_pqcrypto 0.1.0, qs-crypto 0.1.0, hide-sign 0.10.0,
+simien_crypto 0.1.2, fireplace-crypto 0.3.0, trustformers-mobile 0.2.1, algochat 0.6.0,
+alibi-plugins 0.13.0 (with its `rustls` feature in place of the default one, which needs
+OpenSSL), nexusq-core 4.1.2, pqrascv-core 0.2.0, qorechain-pqc 0.2.3,
+philharmonic-connector-client 0.1.2, ope-transport 0.1.0, hyde-core 0.2.0, oc-crypto 0.0.7,
+ope-e2e 0.1.0, kavach-pq 0.1.5, philharmonic-connector-service 0.2.2, lukuid-sdk 1.0.21,
+blockle-core 0.8.0, alloy-signer-aws 2.6.1, siwe 0.6.1, davey 0.2.0, affinidi-did-common 0.5.0,
+zebra-chain 16.0.0, fselect 0.10.4, vyre-driver 0.7.2, vsmtp-auth 2.2.1, redox_pkgutils 0.1.9,
+stdtx 0.7.0, axum-webtools 0.1.63, smol_db_common 1.4.0, dotenv-vault 0.1.2, dechdev_rs 0.1.50,
+dusk-node-data 1.7.0, rego 0.1.1, otoroshictl 0.0.20, argus-scanner 0.3.1 and fatima-core
+0.0.1. The forty-one CBOMs as first made hold 13,696 verified positions and 5 more within a
+range, with 13 rejected, every one of them a correct position; all 164,736 shifted positions
+and spans were rejected, and the eight binaries have no walk gap. They name ML-DSA in thirteen
+packages, ML-KEM in sixteen, SLH-DSA in four and X-Wing in one. The two failures are of two
+causes, both the verifier's reading of what macros write, neither seen before. In
+ic_object_store 1.4.4 it rejected one position. ic-transport-types 0.49.3 computes a request's
+id with a serde serializer that hashes every field, and the type it is given derives
+`Serialize`. serde's derive gives the call that serializes a field the span of the field whole,
+and a field starts at its documentation comment: the compiler has the call that instantiates
+the hashing `serialize_field` on a `///` line, where the verifier, reading comments as no code,
+found none. A documentation comment is a token of the item it is on, the attribute it stands
+for; a step of a chain may be at one where a procedural macro writes the caller, and nowhere
+else (`regress/verify-59`, where a derive also puts a hash call itself at such a span: that
+occurrence the driver cites at the derive, as before). In anyhide 0.16.0 it rejected twelve,
+all in code that derive-deftly's templates write (the key types of tor-key-forge 0.37.0, the
+tunnels of tor-circmgr 0.37.0). `define_derive_deftly! { Name for struct: .. }` writes a
+`macro_rules!` for the template, which the compiler has defined at that invocation, and the
+verifier held a macro's definition to read `macro_rules!` or `macro`, or to be a procedural
+macro's function. And where a `macro_rules!` writes the struct with its `#[derive(Deftly)]` and
+`#[derive_deftly(Name)]`, the compiler has the template invoked at the name inside the
+attribute, with no expansion of `Deftly` between the two, and the verifier held an invocation
+to read `name!` unless a procedural macro's expansion is around it. A macro may be defined at
+the invocation that writes it, and an invocation cited inside an attribute is the doing of
+whatever reads the attribute (`regress/verify-60`). Both pass: ic_object_store with 1,113
+positions verified and all 10,186 shifted ones rejected, anyhide with 1,421 and 17,086. And one
+more thing the run showed that the four questions do not ask. smol_db_common 1.4.0 and
+kavach-pq 0.1.5 took twelve and thirteen minutes, for lock files of 88 and 251 packages. Both
+depend on chrono-tz. The time zones of the 0.8.6 that smol_db_common resolves to are 596
+constants that store 131,506 fields, and each record was added to its crate's, and then to its
+field's in the analysis, by searching the list for one like it: 727 seconds in the driver and
+192 in the analysis for that one crate. A list longer than sixteen records has an index of
+where they are, exact, and the two packages take 26 and 55 seconds with the same CBOMs.
 
 After the third batch every earlier package that builds here was re-run, versions pinned, on
 the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
