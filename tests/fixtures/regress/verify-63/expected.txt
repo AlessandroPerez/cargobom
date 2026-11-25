@@ -1,0 +1,60 @@
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:13:14 | verify_63::Job::<D>::run | [reachable] [instantiation] in verify_63::main::{closure#0}; chosen as generic argument of verify_63::Job::<D>::run; owner at src/main.rs:12:0-12:15 as `#[pm::launched]` line #38015fa3 (by attribute pm::launched at src/main.rs:12:0-12:15 line #38015fa3 defined pm/src/lib.rs:26-26); instantiated by verify_63::main at src/main.rs:12:0 (built, to 12:15 as `#[pm::launched]` line #38015fa3, from src/main.rs:12:0-12:15 as `#[pm::launched]` line #38015fa3 (by attribute pm::launched at src/main.rs:12:0-12:15 line #38015fa3 defined pm/src/lib.rs:26-26), caller at src/main.rs:12:0-12:15 as `#[pm::launched]` line #38015fa3 (by attribute pm::launched at src/main.rs:12:0-12:15 line #38015fa3 defined pm/src/lib.rs:26-26)); line: `fn start() -> Job<Sha256> {`; code: `Job`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:8:8 | digest::digest::Digest::digest | [reachable] [call] in verify_63::Job::<..>::run::{closure#0}; use: digest; owner at src/main.rs:7:34-9:5 as `{` line #3f6154ac within 7:34-9:5; instantiated by verify_63::main::{closure#0} at src/main.rs:13:14 (call of `core::future::future::Future::poll`, to 13:17 as `Job` line #935aed56, from src/main.rs:13:14-13:17 as `Job` line #935aed56 (by rewrite await at src/main.rs:13:14-13:17 line #935aed56), caller at src/main.rs:12:0-12:15 as `#[pm::launched]` line #38015fa3 (by attribute pm::launched at src/main.rs:12:0-12:15 line #38015fa3 defined pm/src/lib.rs:26-26)); instantiated by verify_63::main at src/main.rs:12:0 (built, to 12:15 as `#[pm::launched]` line #38015fa3, from src/main.rs:12:0-12:15 as `#[pm::launched]` line #38015fa3 (by attribute pm::launched at src/main.rs:12:0-12:15 line #38015fa3 defined pm/src/lib.rs:26-26), caller at src/main.rs:12:0-12:15 as `#[pm::launched]` line #38015fa3 (by attribute pm::launched at src/main.rs:12:0-12:15 line #38015fa3 defined pm/src/lib.rs:26-26)); line: `D::digest(&self.0).to_vec()`; code: `D::digest`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:6:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via verify-63 -> sha2 -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via verify-63 -> sha2 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via verify-63 -> sha2 -> digest
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:70:0 | sha2 | [manifest] locked sha2 0.10.9; reached via verify-63 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:17:0 | sha2 | [manifest] declared by verify-63 (dependencies)
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=2
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop pm | pkg:cargo/pm@0.1.0 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library pm 0.1.0 | pkg:cargo/pm@0.1.0 | purl pkg:cargo/pm@0.1.0
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/verify-63@0.1.0 -> pkg:cargo/pm@0.1.0
+dep pkg:cargo/verify-63@0.1.0 -> pkg:cargo/sha2@0.10.9
+dependency crypto:algorithm:SHA-256
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/pm@0.1.0
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/verify-63@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+root {"bom-ref": "pkg:cargo/verify-63@0.1.0", "name": "verify-63", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/verify-63@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin verify-63
+run rcbom:run:boundary-check=1 calls into crypto packages: 1 cited, 0 cited by the check as unknown, 0 excused ()
+run rcbom:run:features=
+run rcbom:run:packages=11
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=96
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

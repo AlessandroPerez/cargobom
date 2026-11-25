@@ -272,10 +272,9 @@ impl Files<'_> {
         } else {
             text
         };
-        // code positions are in code, not in a comment or a literal
-        if src.class[line - 1].get(offset) != Some(&Class::Code) {
-            return Err(format!("position inside a comment or literal in {text:?}"));
-        }
+        // code positions are in code, not in a comment or a literal (held below, once the
+        // occurrence's item is read: a procedural macro's code may be at any token it was given)
+        let in_code = src.class[line - 1].get(offset) == Some(&Class::Code);
         // the generator records the source line and, when it is on one line outside a macro,
         // the exact text at the position, last in the context, in that order; the line may hold
         // backquotes, the text does not
@@ -303,6 +302,7 @@ impl Files<'_> {
         // (a macro's invocation making each) gives each one's, the others' by name (``owner
         // `item` at ..``).
         let mut owner_plain = true;
+        self.by_macro = false;
         let head = ctx
             .details
             .strip_prefix(ctx.tags)
@@ -318,6 +318,31 @@ impl Files<'_> {
             let w = witness::written_whole(at).ok_or_else(|| format!("`{p}` cannot be read"))?;
             let item = item.unwrap_or(head);
             owner_plain &= self.check_item_at(&w, item, (&path, line, Some(offset)), None)?;
+        }
+        // In an item a procedural macro writes (an attribute over a function, a derive, a
+        // function-like macro in item position), the compiler has a call where the macro put
+        // it: at its own invocation (tagged, below), at the code it was handed and kept, or at
+        // any other token it was handed, whose span it gave the call (`#[route("/x")]`: the
+        // literal, the function's name). There the text does not show the call: the position
+        // is the compiler's word, verified with that fact not shown, and what the text would
+        // have to read of a call is not asked of it.
+        // So in what a procedural function-like macro was handed, in a function the source
+        // writes: the invocation that holds the position, as the compiler records it.
+        let owner_macro = self.by_macro;
+        let mut lent = owner_macro;
+        for p in parts(ctx.details) {
+            if let Some(record) = p.strip_prefix("in the input of ") {
+                self.check_input_of(record, (&path, line, offset))
+                    .map_err(|e| format!("`{p}`: {e}"))?;
+                lent = true;
+            }
+        }
+        let mut unread: Option<String> = None;
+        if !in_code {
+            if !(lent && (doc_comment_at(&src, line, offset) || literal_at(&src, line, offset))) {
+                return Err(format!("position inside a comment or literal in {text:?}"));
+            }
+            unread = Some("a literal or a documentation comment".into());
         }
         // (an algorithm a value brings to the call from other functions is whichever of them
         // reaches it, in every instance of the function: the arguments of the call that makes
@@ -350,7 +375,7 @@ impl Files<'_> {
             &o.symbol,
             (&path, line, offset),
             &o.component_ref,
-            owner_plain,
+            (owner_plain, owner_macro),
         )?;
         // where a type was made a trait object
         self.check_coercions(ctx.details)?;
@@ -450,62 +475,70 @@ impl Files<'_> {
         let owner = man.owner_of(&path);
         let owner_id = owner.map(|p| p.id.repr.clone());
         if !tagged {
-            // the enclosing item the context names (an identical statement in another
-            // function, or in another type's method of that name, is another occurrence), and
-            // no macro's body (a macro's code is cited where it is called)
-            // a definition names a new item, it does not use one (`fn seal<..>`, `pub fn digest`)
-            if let Some(w) = word_before(&src, line, offset)
-                && matches!(
-                    w.as_str(),
-                    "fn" | "struct"
-                        | "enum"
-                        | "union"
-                        | "trait"
-                        | "type"
-                        | "mod"
-                        | "static"
-                        | "const"
-                        | "let"
-                        | "macro_rules"
-                )
-            {
-                return Err(format!("position after `{w}`: a definition, in {text:?}"));
-            }
-            // code: the callee or static, by name or by an import alias of it (a raw
-            // identifier's name without `r#`: `rand::Rng::r#gen` is written `.r#gen()`)
-            let ident = sym
-                .trim_end_matches(':')
-                .rsplit("::")
-                .next()
-                .unwrap_or("")
-                .trim_start_matches("r#")
-                .to_string();
-            if ident.is_empty() {
-                return Err("no identifier in symbol".into());
-            }
-            // an operator trait's method is called by its operator (`point * scalar`): the
-            // position is the operator, unless the code names the method itself
-            // (`Pin::new(&mut fut).poll(cx)`, `a.add(b)`)
-            let by_name = at.starts_with(ident.as_str())
-                && !at[ident.len()..].starts_with(is_ident)
-                && starts_token;
-            let op = operator_of(&o.symbol).filter(|_| !by_name && held_in.is_none());
-            if let Some(op) = op
-                && !(at.starts_with(op)
-                    && !at[op.len()..].starts_with('=')
-                    && !(op == "await" && at[op.len()..].starts_with(is_ident)))
-            {
-                return Err(format!("expected the operator `{op}` in {text:?}"));
-            }
-            // a call through a function pointer (`h(&SHA256, d)`): the position is the call's
-            // callee expression, a name, a field or a parenthesised expression followed by its
-            // arguments; the position the detail gives for where the function was made the
-            // pointer names it (or an import alias of it)
-            // (each function the pointer may hold: `FNS[i](..)` over `[digest, my_hash]`)
-            // (with the start of the text at the naming and the fingerprint of its line, as
-            // the compiler records them: the naming is held to both)
-            type Naming = (String, usize, usize, Option<String>, Option<String>);
-            let pointers: Vec<Naming> = re!(
+            'text: {
+                if unread.is_some() {
+                    break 'text;
+                }
+                // the enclosing item the context names (an identical statement in another
+                // function, or in another type's method of that name, is another occurrence), and
+                // no macro's body (a macro's code is cited where it is called)
+                // a definition names a new item, it does not use one (`fn seal<..>`, `pub fn digest`)
+                if let Some(w) = word_before(&src, line, offset)
+                    && matches!(
+                        w.as_str(),
+                        "fn" | "struct"
+                            | "enum"
+                            | "union"
+                            | "trait"
+                            | "type"
+                            | "mod"
+                            | "static"
+                            | "const"
+                            | "let"
+                            | "macro_rules"
+                    )
+                {
+                    if lent {
+                        unread = Some(format!("the name after `{w}`"));
+                        break 'text;
+                    }
+                    return Err(format!("position after `{w}`: a definition, in {text:?}"));
+                }
+                // code: the callee or static, by name or by an import alias of it (a raw
+                // identifier's name without `r#`: `rand::Rng::r#gen` is written `.r#gen()`)
+                let ident = sym
+                    .trim_end_matches(':')
+                    .rsplit("::")
+                    .next()
+                    .unwrap_or("")
+                    .trim_start_matches("r#")
+                    .to_string();
+                if ident.is_empty() {
+                    return Err("no identifier in symbol".into());
+                }
+                // an operator trait's method is called by its operator (`point * scalar`): the
+                // position is the operator, unless the code names the method itself
+                // (`Pin::new(&mut fut).poll(cx)`, `a.add(b)`)
+                let by_name = at.starts_with(ident.as_str())
+                    && !at[ident.len()..].starts_with(is_ident)
+                    && starts_token;
+                let op = operator_of(&o.symbol).filter(|_| !by_name && held_in.is_none());
+                if let Some(op) = op
+                    && !(at.starts_with(op)
+                        && !at[op.len()..].starts_with('=')
+                        && !(op == "await" && at[op.len()..].starts_with(is_ident)))
+                {
+                    return Err(format!("expected the operator `{op}` in {text:?}"));
+                }
+                // a call through a function pointer (`h(&SHA256, d)`): the position is the call's
+                // callee expression, a name, a field or a parenthesised expression followed by its
+                // arguments; the position the detail gives for where the function was made the
+                // pointer names it (or an import alias of it)
+                // (each function the pointer may hold: `FNS[i](..)` over `[digest, my_hash]`)
+                // (with the start of the text at the naming and the fingerprint of its line, as
+                // the compiler records them: the naming is held to both)
+                type Naming = (String, usize, usize, Option<String>, Option<String>);
+                let pointers: Vec<Naming> = re!(
                 r"called through a function pointer to `[^`]+` named at ([^\s;]+?):(\d+):(\d+)(?: as `([^`]*)`)?(?: line #([0-9a-f]{8}))?(?:;|$)"
             )
             .captures_iter(ctx.details)
@@ -519,165 +552,182 @@ impl Files<'_> {
                 )
             })
             .collect();
-            let pointer = pointers.first().map(|p| (p.0.clone(), p.1, p.2));
-            for (file, l2, c2, named_text, named_mark) in &pointers {
-                let (l2, c2) = (*l2, *c2);
-                // the callee expression: a parenthesised expression (`(h.f)`), or a path with
-                // fields, indexes and calls after it (`h`, `Self::F`, `fs[ix[0]]`, `get()`),
-                // then the arguments, on the lines after too
-                let (rs, rc) = rest(&src, line, offset);
-                let callee = pointer_callee(&rs, &rc);
-                // not a method (`.next(`) or the rest of a path (`digest::digest(`): those
-                // name a function, not a pointer (the value of a field, `tag: h(..)`, is one)
-                let before: Vec<char> = chars[..offset]
-                    .iter()
-                    .rev()
-                    .filter(|c| !c.is_whitespace())
-                    .take(2)
-                    .copied()
-                    .collect();
-                let inside = before.first() == Some(&'.') || before == [':', ':'];
-                let Some(callee) = callee.filter(|_| starts_token && !inside) else {
-                    return Err(format!(
-                        "expected a call through a function pointer in {text:?}"
-                    ));
-                };
-                // (which bracketed group after the path is the call's own arguments, the
-                // text recorded at the position says: `get()` of `get()(..)`; else the last)
-                let end = ctx
-                    .code
-                    .map(|c| c.chars().count())
-                    .filter(|n| callee.ends.contains(n))
-                    .or(callee.ends.last().copied())
-                    .unwrap_or(0);
-                let root = callee.root.clone();
-                // (where the root is read: `self` in `(self.f)(..)`, on its own line)
-                let root_pos = {
-                    let lines = rs[..callee.root_at].iter().filter(|&&c| c == '\n').count();
-                    let col = match rs[..callee.root_at].iter().rposition(|&c| c == '\n') {
-                        Some(n) => callee.root_at - n - 1,
-                        None => offset + callee.root_at,
-                    };
-                    (line + lines, col)
-                };
-                // a name alone before the arguments is a variable, a constant or a static,
-                // not a function of the file (`run(`)
-                if Some(end) == callee.path_end
-                    && src
-                        .items
+                let pointer = pointers.first().map(|p| (p.0.clone(), p.1, p.2));
+                for (file, l2, c2, named_text, named_mark) in &pointers {
+                    let (l2, c2) = (*l2, *c2);
+                    // the callee expression: a parenthesised expression (`(h.f)`), or a path with
+                    // fields, indexes and calls after it (`h`, `Self::F`, `fs[ix[0]]`, `get()`),
+                    // then the arguments, on the lines after too
+                    let (rs, rc) = rest(&src, line, offset);
+                    let callee = pointer_callee(&rs, &rc);
+                    // not a method (`.next(`) or the rest of a path (`digest::digest(`): those
+                    // name a function, not a pointer (the value of a field, `tag: h(..)`, is one)
+                    let before: Vec<char> = chars[..offset]
                         .iter()
-                        .any(|i| i.kind == ItemKind::Fn && i.name == root)
-                    && binding(&src, src.idx(root_pos), &root).is_none()
-                {
-                    return Err(format!(
-                        "`{root}` is a function of the file, not a pointer, in {text:?}"
-                    ));
-                }
-                // the variable holds the function named where the function binds it: in the
-                // statement when it calls nothing (`let p: HashFn = digest::digest;`), in the
-                // binding of the variable it copies (`if let Some(f) = o`: `o`'s), in the body
-                // of the file's function it calls (`let g = get();`: `get`'s)
-                if !root.is_empty() && self.resolve(file).ok().as_deref() == Some(path.as_path()) {
-                    let root_at = src.idx(root_pos);
-                    // (where the text does not lead from the call to the naming, a field a
-                    // constructor sets, a pointer another function hands on: not shown)
-                    if let Err(e) = pointer_bound(&src, root_at, &root, l2, src.idx((l2, c2))) {
-                        unshown(format!(
-                            "{e}: the text does not show that it holds the function named at \
+                        .rev()
+                        .filter(|c| !c.is_whitespace())
+                        .take(2)
+                        .copied()
+                        .collect();
+                    let inside = before.first() == Some(&'.') || before == [':', ':'];
+                    let Some(callee) = callee.filter(|_| starts_token && !inside) else {
+                        return Err(format!(
+                            "expected a call through a function pointer in {text:?}"
+                        ));
+                    };
+                    // (which bracketed group after the path is the call's own arguments, the
+                    // text recorded at the position says: `get()` of `get()(..)`; else the last)
+                    let end = ctx
+                        .code
+                        .map(|c| c.chars().count())
+                        .filter(|n| callee.ends.contains(n))
+                        .or(callee.ends.last().copied())
+                        .unwrap_or(0);
+                    let root = callee.root.clone();
+                    // (where the root is read: `self` in `(self.f)(..)`, on its own line)
+                    let root_pos = {
+                        let lines = rs[..callee.root_at].iter().filter(|&&c| c == '\n').count();
+                        let col = match rs[..callee.root_at].iter().rposition(|&c| c == '\n') {
+                            Some(n) => callee.root_at - n - 1,
+                            None => offset + callee.root_at,
+                        };
+                        (line + lines, col)
+                    };
+                    // a name alone before the arguments is a variable, a constant or a static,
+                    // not a function of the file (`run(`)
+                    if Some(end) == callee.path_end
+                        && src
+                            .items
+                            .iter()
+                            .any(|i| i.kind == ItemKind::Fn && i.name == root)
+                        && binding(&src, src.idx(root_pos), &root).is_none()
+                    {
+                        return Err(format!(
+                            "`{root}` is a function of the file, not a pointer, in {text:?}"
+                        ));
+                    }
+                    // the variable holds the function named where the function binds it: in the
+                    // statement when it calls nothing (`let p: HashFn = digest::digest;`), in the
+                    // binding of the variable it copies (`if let Some(f) = o`: `o`'s), in the body
+                    // of the file's function it calls (`let g = get();`: `get`'s)
+                    if !root.is_empty()
+                        && self.resolve(file).ok().as_deref() == Some(path.as_path())
+                    {
+                        let root_at = src.idx(root_pos);
+                        // (where the text does not lead from the call to the naming, a field a
+                        // constructor sets, a pointer another function hands on: not shown)
+                        if let Err(e) = pointer_bound(&src, root_at, &root, l2, src.idx((l2, c2))) {
+                            unshown(format!(
+                                "{e}: the text does not show that it holds the function named at \
                              {file}:{l2}:{c2}"
+                            ));
+                        }
+                    }
+                    let p2 = self.resolve(file)?;
+                    let src2 = self
+                        .source(&p2)
+                        .ok_or_else(|| format!("cannot read {file}, named in the context"))?;
+                    super::witness::reads_at(
+                        &src2,
+                        file,
+                        (l2, c2),
+                        named_text.as_deref(),
+                        named_mark.as_deref(),
+                    )?;
+                    let named = src2.lines.get(l2.wrapping_sub(1)).and_then(|t| {
+                        let chars: Vec<char> = t.chars().collect();
+                        let (rs, rc) = rest(&src2, l2, c2);
+                        (c2 < chars.len() && token_start(&src2, l2, c2))
+                            .then(|| path_and_generics(&rs, &rc))
+                            .flatten()
+                    });
+                    let names = named.is_some_and(|(quals, last, _)| {
+                        self.names_item(&src2, &p2, &quals, &last, &ident, &sym, &sym_crate)
+                    });
+                    // or a macro whose expansion binds it is invoked there (`bind!(m)` with `let
+                    // $n: HashFn = digest::digest;`): its body names it, in the file or in
+                    // another of the package
+                    let by_macro = !names
+                        && macro_call_at(&src2, (l2, c2))
+                        && invocation_text(&src2, (l2, c2)).is_some_and(|(m, _)| {
+                            let mut files = vec![p2.clone()];
+                            if let Some(p) = self.man.owner_of(&p2) {
+                                files.extend(manifest::package_files(&p.manifest_dir));
+                            }
+                            files.iter().any(|f| {
+                                self.source(f).is_some_and(|s| {
+                                    s.items
+                                        .iter()
+                                        .filter(|i| i.kind == ItemKind::Macro && i.name == m)
+                                        .any(|i| {
+                                            let (a, b) = s.span(i);
+                                            super::compiled(&format!(
+                                                r"\b{}\b",
+                                                regex::escape(&ident)
+                                            ))
+                                            .is_ok_and(|r| r.is_match(&s.text(a, b)))
+                                        })
+                                })
+                            })
+                        });
+                    if !names && !by_macro {
+                        return Err(format!(
+                            "the function pointer's position {file}:{l2}:{c2} does not name `{ident}`"
                         ));
                     }
                 }
-                let p2 = self.resolve(file)?;
-                let src2 = self
-                    .source(&p2)
-                    .ok_or_else(|| format!("cannot read {file}, named in the context"))?;
-                super::witness::reads_at(
-                    &src2,
-                    file,
-                    (l2, c2),
-                    named_text.as_deref(),
-                    named_mark.as_deref(),
-                )?;
-                let named = src2.lines.get(l2.wrapping_sub(1)).and_then(|t| {
-                    let chars: Vec<char> = t.chars().collect();
-                    let (rs, rc) = rest(&src2, l2, c2);
-                    (c2 < chars.len() && token_start(&src2, l2, c2))
-                        .then(|| path_and_generics(&rs, &rc))
-                        .flatten()
-                });
-                let names = named.is_some_and(|(quals, last, _)| {
-                    self.names_item(&src2, &p2, &quals, &last, &ident, &sym, &sym_crate)
-                });
-                // or a macro whose expansion binds it is invoked there (`bind!(m)` with `let
-                // $n: HashFn = digest::digest;`): its body names it, in the file or in
-                // another of the package
-                let by_macro = !names
-                    && macro_call_at(&src2, (l2, c2))
-                    && invocation_text(&src2, (l2, c2)).is_some_and(|(m, _)| {
-                        let mut files = vec![p2.clone()];
-                        if let Some(p) = self.man.owner_of(&p2) {
-                            files.extend(manifest::package_files(&p.manifest_dir));
-                        }
-                        files.iter().any(|f| {
-                            self.source(f).is_some_and(|s| {
-                                s.items
-                                    .iter()
-                                    .filter(|i| i.kind == ItemKind::Macro && i.name == m)
-                                    .any(|i| {
-                                        let (a, b) = s.span(i);
-                                        super::compiled(&format!(r"\b{}\b", regex::escape(&ident)))
-                                            .is_ok_and(|r| r.is_match(&s.text(a, b)))
-                                    })
-                            })
-                        })
+                // the path, from the position on over the next lines (rustfmt breaks long paths);
+                // generic arguments balanced, so it cannot run on into the next expression
+                let (rs, rc) = rest(&src, line, offset);
+                parsed = path_and_generics(&rs, &rc);
+                method_call = before_blank(&src.code, src.idx((line, offset)))
+                    .is_some_and(|k| src.code[k] == '.');
+                let ok = starts_token
+                    && parsed.as_ref().is_some_and(|(quals, last, _)| {
+                        self.names_item(&src, &path, quals, last, &ident, &sym, &sym_crate)
                     });
-                if !names && !by_macro {
-                    return Err(format!(
-                        "the function pointer's position {file}:{l2}:{c2} does not name `{ident}`"
-                    ));
-                }
-            }
-            // the path, from the position on over the next lines (rustfmt breaks long paths);
-            // generic arguments balanced, so it cannot run on into the next expression
-            let (rs, rc) = rest(&src, line, offset);
-            parsed = path_and_generics(&rs, &rc);
-            method_call = before_blank(&src.code, src.idx((line, offset)))
-                .is_some_and(|k| src.code[k] == '.');
-            let ok = starts_token
-                && parsed.as_ref().is_some_and(|(quals, last, _)| {
-                    self.names_item(&src, &path, quals, last, &ident, &sym, &sym_crate)
-                });
-            // (a `for` loop calls its iterator's `next`, and `into_iter` first: at the `for`)
-            let looped = re!(
+                // (a `for` loop calls its iterator's `next`, and `into_iter` first: at the `for`)
+                let looped = re!(
                 r"core::iter::traits::(?:iterator::Iterator\b.*::next|collect::IntoIterator\b.*::into_iter)$"
             )
             .is_match(&o.symbol)
                 && held_in.is_none()
                 && at.starts_with("for")
                 && !at["for".len()..].starts_with(is_ident);
-            if pointer.is_none() && op.is_none() && !looped && !ok {
-                return Err(format!("expected `{ident}` in {text:?}"));
-            }
-            // a method called on the result of a call of the same name, or whose result one is
-            // called on (`.get_ref()` three times down a chain, each another type's): where the
-            // CBOM does not cite the neighbour as this function too, the text cannot say which
-            // of them is the symbol's, and the position is one of that range
-            if pointer.is_none() && op.is_none() {
-                for (l, c) in chain_neighbours(&src, src.idx((line, offset)), &ident) {
-                    // (another occurrence: not this one's own position, beside the one a
-                    // shift moved it to)
-                    let same = self
-                        .at_pos
-                        .get(&(o.location.clone(), l, c))
-                        .is_some_and(|v| {
-                            v.iter()
-                                .any(|&j| j != oi && self.occs[j].symbol == o.symbol)
-                        });
-                    if !same {
-                        RANGED.with(|r| r.set(true));
+                if pointer.is_none() && op.is_none() && !looped && !ok {
+                    if lent {
+                        unread = Some(format!("no `{ident}`"));
+                        break 'text;
+                    }
+                    return Err(format!("expected `{ident}` in {text:?}"));
+                }
+                // a method called on the result of a call of the same name, or whose result one is
+                // called on (`.get_ref()` three times down a chain, each another type's): where the
+                // CBOM does not cite the neighbour as this function too, the text cannot say which
+                // of them is the symbol's, and the position is one of that range
+                if pointer.is_none() && op.is_none() {
+                    for (l, c) in chain_neighbours(&src, src.idx((line, offset)), &ident) {
+                        // (another occurrence: not this one's own position, beside the one a
+                        // shift moved it to)
+                        let same = self
+                            .at_pos
+                            .get(&(o.location.clone(), l, c))
+                            .is_some_and(|v| {
+                                v.iter()
+                                    .any(|&j| j != oi && self.occs[j].symbol == o.symbol)
+                            });
+                        if !same {
+                            RANGED.with(|r| r.set(true));
+                        }
                     }
                 }
+            }
+            if let Some(reads) = &unread {
+                unshown(format!(
+                    "the call of `{}`, which a procedural macro put at a token it was given \
+                     ({reads} at the position)",
+                    o.symbol
+                ));
             }
         }
         // an instantiation's position that details cite (`instantiated by X at F:L:C`) is cited
@@ -776,7 +826,8 @@ impl Files<'_> {
         // the descriptor a call's algorithm comes from names the asset too
         let mut descriptors: Vec<String> = Vec::new();
         // the call a table member is read at (not a macro's: its code is the macro's)
-        let call_at = (kind == "call" && !ctx.tags.contains("[macro ")).then_some((line, offset));
+        let call_at = (kind == "call" && !ctx.tags.contains("[macro ") && unread.is_none())
+            .then_some((line, offset));
         for p in parts(ctx.details) {
             // a member of a boundary model (jsonwebtoken's `Header.alg`)
             if let Some(m) = re!(
@@ -959,7 +1010,7 @@ impl Files<'_> {
             // the code the call reads names it (`Salt::new(hkdf::HKDF_SHA256, ..)` is no
             // `HKDF_SHA384`; `prk.expand(.., HKDF_SHA256)` with `prk` from `Salt::new(HKDF_SHA384,
             // ..)` may be either)
-            if p.ends_with(" in the arguments") {
+            if p.ends_with(" in the arguments") && unread.is_none() {
                 let members = named.clone();
                 let expanded: Vec<usize> =
                     re!(r"expanded (?:`[^`]*` )?from ([^\s;]+?):(\d+)(?::\d+-|;|$)")
@@ -984,6 +1035,7 @@ impl Files<'_> {
             if !p.ends_with(" in the arguments")
                 && kind == "call"
                 && !ctx.tags.contains("[macro ")
+                && unread.is_none()
                 && re!(r"reaching the call from another function|from other functions").is_match(p)
                 && (re!(r"; member: (?:object|caller|fixed|dyn|container|type-join|impl)\b")
                     .is_match(ctx.details)
@@ -1278,7 +1330,7 @@ impl Files<'_> {
         symbol: &str,
         at: (&Path, usize, usize),
         component_ref: &str,
-        owner_plain: bool,
+        (owner_plain, owner_macro): (bool, bool),
     ) -> Result<(), String> {
         let mut callee = details
             .strip_prefix(tags)
@@ -1457,7 +1509,7 @@ impl Files<'_> {
                     .filter(|w| !w.steps.is_empty())
                     .ok_or_else(|| format!("`{part}`: where the code is written cannot be read"))?;
                 let plain = self
-                    .check_written(&w, Some(at))
+                    .check_written(&w, Some(at), owner_macro)
                     .map_err(|e| format!("`{part}`: {e}"))?;
                 // (in an item a procedural macro writes, a span says where that macro took its
                 // code's span from, not what the code is: a derive's call at a field's type)

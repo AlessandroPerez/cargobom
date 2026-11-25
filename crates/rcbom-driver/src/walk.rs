@@ -637,6 +637,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
                                 .get(&a.caller)
                                 .map(|s| rustc_internal::internal(tcx, *s)),
                         ),
+                        input_of: None,
                     });
                 }
                 for p in self.callers.get(&s).into_iter().flatten() {
@@ -1290,6 +1291,7 @@ impl<'a, 'tcx> Walker<'a, 'tcx> {
             std_entry: None,
             self_ty: self_tree(tcx, did, inst.args),
             owner_at: crate::names::item_at(tcx, item, None),
+            input_of: None,
         })
     }
 

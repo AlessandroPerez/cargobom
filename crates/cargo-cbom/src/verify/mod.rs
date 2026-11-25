@@ -177,6 +177,14 @@
 //! with a fact the text does not show"), never as a mismatch. The self-test counts a shifted
 //! position or detail that passes only so as rejected, and says how many.
 //!
+//! So a call a procedural macro writes at a token it was handed that is not the call (the
+//! literal of `hashed!("text")`, the name of the function an attribute is on): the compiler
+//! has it there, and the text shows a literal or a definition. In an item such a macro writes
+//! (the record of the item says so), and in the invocation of a procedural function-like
+//! macro (`in the input of macro m! at ..`, the record of the position, checked as any
+//! expansion and held to a macro the source does not declare), a position that does not read
+//! its callee is verified with the call not shown. Anywhere else it is a mismatch.
+//!
 //! Not checked, by design (the walk, the value search and the knowledge base decide them, which
 //! a reader of the text cannot redo): the reachability tier (`[reachable]`, `[present]`,
 //! `rcbom:reachability`) and the artifacts an occurrence is tagged with; the provenance class of
@@ -658,6 +666,7 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
         inst: Vec::new(),
         alg_arg: None,
         by_value: false,
+        by_macro: false,
     };
     let mut bad = 0;
     let mut ranged = 0;
@@ -1040,6 +1049,9 @@ struct Files<'a> {
     /// The occurrence being checked has its algorithm from a value that reaches the call from
     /// other functions (or is a part of one that has): no instance's arguments choose it.
     by_value: bool,
+    /// A procedural macro, or one built into the compiler, is among what writes the code last
+    /// read by `check_written` (set there, cleared by who asks).
+    by_macro: bool,
 }
 
 /// A position a detail cites: file, line, column.

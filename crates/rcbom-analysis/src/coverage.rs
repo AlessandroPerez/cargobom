@@ -537,6 +537,11 @@ fn floor(
                     .iter()
                     .map(|x| crate::witness::expanded(x, files)),
             )
+            .chain(
+                e.input_of
+                    .iter()
+                    .map(|s| crate::witness::input_of(s, files)),
+            )
             .collect(),
         package,
         provenance: Vec::new(),

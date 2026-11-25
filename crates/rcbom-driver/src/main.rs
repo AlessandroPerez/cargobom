@@ -514,74 +514,75 @@ fn analyze(tcx: TyCtxt<'_>) {
     // parameters (`v.shuffle::<R>(rng)`), unknown where no instance shows them
     let generic_paths: Vec<String> = generic.iter().map(|d| path_of(cx.tcx, *d)).collect();
     let generic: Vec<String> = generic.iter().map(|d| def_hash(cx.tcx, *d)).collect();
-    let reach = (!roots.is_empty() || !static_roots.is_empty() || !generic.is_empty()).then(|| {
-        if let Some(p) = cx.pta.as_mut() {
-            p.set_roots(&roots);
-        }
-        let mut w = Walker::new(&mut cx);
-        let mut r = w.run(roots, static_roots);
-        // a library's generic functions' calls, where no walked instance makes the same call
-        let walked: HashSet<(Loc, Option<rcbom_facts::CallId>)> = r
-            .boundary
-            .iter()
-            .map(|e| (e.span.clone(), e.call.clone()))
-            .collect();
-        r.boundary.extend(
-            std::mem::take(&mut lib_edges)
-                .into_iter()
-                .filter(|e| !walked.contains(&(e.span.clone(), e.call.clone()))),
-        );
-        r.boundary.sort_by(|a, b| {
-            (&a.span, &a.callee.path, &a.owner.id).cmp(&(&b.span, &b.callee.path, &b.owner.id))
-        });
-        r.boundary.dedup();
-        // which artifact this walk is of: a binary by cargo's name for it (`rage-keygen`), a
-        // library by its package's
-        r.artifact = match std::env::var("CARGO_BIN_NAME") {
-            Ok(b) if rustc_public::entry_fn().is_some() => format!("bin {b}"),
-            _ if rustc_public::entry_fn().is_some() => format!("bin {}", krate.name),
-            _ => format!("lib {}", krate.package),
-        };
-        // a panic in the points-to analysis is counted as an item not analysed, like the
-        // others; the facts are written without its answers
-        if let Some(p) = w.cx.pta.take() {
-            let tcx = w.cx.tcx;
-            match catch_unwind(AssertUnwindSafe(|| pta_dump(tcx, p))) {
-                Ok(pt) => r.points_to = Some(pt),
-                Err(_) => w.cx.errors += 1,
+    let mut reach =
+        (!roots.is_empty() || !static_roots.is_empty() || !generic.is_empty()).then(|| {
+            if let Some(p) = cx.pta.as_mut() {
+                p.set_roots(&roots);
             }
-        }
-        w.cx.links.coercion_types = std::mem::take(&mut w.coercion_types).into_iter().collect();
-        let coercions = std::mem::take(&mut w.coercions);
-        w.cx.links.coercions = coercions
-            .into_iter()
-            .map(|((trait_path, ty), (at, in_static, methods))| {
-                let (at, text, mark) = match at {
-                    Some((l, t, m)) => (Some(l), t, m),
-                    None => (None, None, None),
-                };
-                rcbom_facts::Coercion {
-                    trait_path,
-                    ty,
-                    at,
-                    in_static,
-                    methods,
-                    text,
-                    mark,
+            let mut w = Walker::new(&mut cx);
+            let mut r = w.run(roots, static_roots);
+            // a library's generic functions' calls, where no walked instance makes the same call
+            let walked: HashSet<(Loc, Option<rcbom_facts::CallId>)> = r
+                .boundary
+                .iter()
+                .map(|e| (e.span.clone(), e.call.clone()))
+                .collect();
+            r.boundary.extend(
+                std::mem::take(&mut lib_edges)
+                    .into_iter()
+                    .filter(|e| !walked.contains(&(e.span.clone(), e.call.clone()))),
+            );
+            r.boundary.sort_by(|a, b| {
+                (&a.span, &a.callee.path, &a.owner.id).cmp(&(&b.span, &b.callee.path, &b.owner.id))
+            });
+            r.boundary.dedup();
+            // which artifact this walk is of: a binary by cargo's name for it (`rage-keygen`), a
+            // library by its package's
+            r.artifact = match std::env::var("CARGO_BIN_NAME") {
+                Ok(b) if rustc_public::entry_fn().is_some() => format!("bin {b}"),
+                _ if rustc_public::entry_fn().is_some() => format!("bin {}", krate.name),
+                _ => format!("lib {}", krate.package),
+            };
+            // a panic in the points-to analysis is counted as an item not analysed, like the
+            // others; the facts are written without its answers
+            if let Some(p) = w.cx.pta.take() {
+                let tcx = w.cx.tcx;
+                match catch_unwind(AssertUnwindSafe(|| pta_dump(tcx, p))) {
+                    Ok(pt) => r.points_to = Some(pt),
+                    Err(_) => w.cx.errors += 1,
                 }
-            })
-            .collect();
-        sites.extend(w.sites);
-        r.fns.extend(generic);
-        r.fns.sort();
-        r.fns.dedup();
-        r.generic = generic_paths.clone();
-        r.generic.sort();
-        r.paths.extend(generic_paths);
-        r.paths.sort();
-        r.paths.dedup();
-        r
-    });
+            }
+            w.cx.links.coercion_types = std::mem::take(&mut w.coercion_types).into_iter().collect();
+            let coercions = std::mem::take(&mut w.coercions);
+            w.cx.links.coercions = coercions
+                .into_iter()
+                .map(|((trait_path, ty), (at, in_static, methods))| {
+                    let (at, text, mark) = match at {
+                        Some((l, t, m)) => (Some(l), t, m),
+                        None => (None, None, None),
+                    };
+                    rcbom_facts::Coercion {
+                        trait_path,
+                        ty,
+                        at,
+                        in_static,
+                        methods,
+                        text,
+                        mark,
+                    }
+                })
+                .collect();
+            sites.extend(w.sites);
+            r.fns.extend(generic);
+            r.fns.sort();
+            r.fns.dedup();
+            r.generic = generic_paths.clone();
+            r.generic.sort();
+            r.paths.extend(generic_paths);
+            r.paths.sort();
+            r.paths.dedup();
+            r
+        });
     phase("walk", timer);
     if debug {
         eprintln!(
@@ -660,6 +661,27 @@ fn analyze(tcx: TyCtxt<'_>) {
     } else {
         Default::default()
     };
+    // a site the source writes inside the invocation of a procedural function-like macro
+    // says which invocation: the code may be the macro's, at a token it was handed
+    // (asked of the compiler only for a crate that has a site at all)
+    let cited = !sites.is_empty() || reach.as_ref().is_some_and(|r| !r.boundary.is_empty());
+    let calls = if cited {
+        procedural_calls(tcx)
+    } else {
+        Vec::new()
+    };
+    if !calls.is_empty() {
+        for s in sites.iter_mut().filter(|s| s.expansion.is_none()) {
+            s.input_of = input_of(&calls, &s.span);
+        }
+        for e in reach
+            .iter_mut()
+            .flat_map(|r| r.boundary.iter_mut())
+            .filter(|e| e.expansion.is_none())
+        {
+            e.input_of = input_of(&calls, &e.span);
+        }
+    }
     let facts = CrateFacts {
         facts_version: FACTS_VERSION,
         krate,

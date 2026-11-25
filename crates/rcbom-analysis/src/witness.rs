@@ -118,6 +118,15 @@ pub(crate) fn expanded(e: &Expansion, named: Named) -> String {
     format!("expanded from {}", written(e, named))
 }
 
+/// The detail of a position in what a procedural function-like macro was handed: `in the input
+/// of macro m! at <span> line #.. defined F:L-L`, the invocation as the compiler records it.
+pub(crate) fn input_of(s: &ExpansionStep, named: Named) -> String {
+    format!(
+        "in the input of {}",
+        step(s, named).trim_start_matches("by ")
+    )
+}
+
 /// Where an item is named: its span, or for one a macro writes, where its name is written and
 /// the expansions it is in.
 fn item(at: &ItemAt, named: Named) -> String {

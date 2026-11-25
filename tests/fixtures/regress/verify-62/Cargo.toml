@@ -1,0 +1,21 @@
+# Calls a procedural macro writes at a token it was handed that is not the call: `hashed!("text")`
+# and `hashed!(name)` hash their argument with a call spanned as that argument, `#[keyed("name")]`
+# writes a function whose call has the span of the literal in the attribute, and `#[counted]`
+# puts a call at the name of the function it is on. The compiler has each call at that token, in
+# the source's own context: the position is right and its text shows no call. The verifier held
+# every position the source writes to read the callee (`position inside a comment or literal`,
+# `expected digest`, `position after fn: a definition`). In an item a procedural macro writes, and
+# in the invocation of a procedural function-like macro, which the driver now records with every
+# site in it (`in the input of macro hashed! at ..`), a position that does not read the call is
+# verified with that fact not shown; one that does (`tag`'s own `Sha512::digest`, the
+# `Sha512_256::digest` under `#[counted]`) is read as before.
+[package]
+name = "verify-62"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+pm = { path = "pm" }
+sha2 = "0.10"
+
+[workspace]

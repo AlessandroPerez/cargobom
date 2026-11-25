@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 49;
+pub const FACTS_VERSION: u32 = 50;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -1083,6 +1083,13 @@ pub struct Site {
     /// Where the source names the owner.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub owner_at: Option<ItemAt>,
+    /// For a site the source writes (no `expansion`) inside the invocation of a procedural
+    /// function-like macro (`pm::hashed!("text")`): that invocation, as the compiler records
+    /// the expansion. What such a macro is handed is in its invocation, and the code it writes
+    /// has the span it gives it: a token it was handed, whether or not that token is the code
+    /// (the literal, for a call the macro writes to hash it).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_of: Option<ExpansionStep>,
 }
 
 /// Where the source names an item, as the compiler records it: its identifier (`f` of `fn f`;
@@ -1544,6 +1551,9 @@ pub struct BoundaryEdge {
     /// Where the source names the owner.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub owner_at: Option<ItemAt>,
+    /// As a site's (`Site::input_of`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_of: Option<ExpansionStep>,
 }
 
 /// Whose code a call of `BoundaryEdge` runs for.

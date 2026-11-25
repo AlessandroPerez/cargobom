@@ -641,6 +641,47 @@ impl Files<'_> {
         reads_as(&src, &w.at, w.at.start, w.text.as_deref(), Some(mark))
     }
 
+    /// The detail of a position in what a procedural function-like macro was handed (`in the
+    /// input of macro m! at <span> line #.. defined F:L-L`): the invocation is that macro's,
+    /// as the compiler records the expansion; the macro is none the source declares, whose
+    /// input would read as the code it is; and the invocation holds the position, past its
+    /// first token.
+    pub(super) fn check_input_of(
+        &mut self,
+        record: &str,
+        at: (&Path, usize, usize),
+    ) -> Result<(), String> {
+        let (st, rest) = step(record)
+            .filter(|(s, _)| s.kind == StepKind::Macro)
+            .ok_or("the invocation cannot be read")?;
+        let Some(call) = st.call.clone().filter(|_| rest.is_empty()) else {
+            return Err("the invocation cannot be read".into());
+        };
+        let w = Written {
+            at: call.clone(),
+            text: None,
+            line: st.line.clone(),
+            steps: vec![st],
+            within: None,
+        };
+        if self.check_written(&w, None, false)? {
+            return Err(format!(
+                "the macro invoked at {}:{}:{} is declared: what it is handed reads as the \
+                 code it is",
+                call.file, call.start.0, call.start.1
+            ));
+        }
+        if self.resolve(&call.file)? != at.0
+            || !(call.start < (at.1, at.2) && (at.1, at.2) < call.end)
+        {
+            return Err(format!(
+                "the invocation at {}:{}:{} does not hold the position",
+                call.file, call.start.0, call.start.1
+            ));
+        }
+        Ok(())
+    }
+
     /// A span's file read, the span in it: from a token's edge to a token's edge, in code
     /// (`literal`: or in a literal, a format string's part). A documentation comment is a
     /// token too, an attribute of the item it is on: a span may start at one, and what holds
@@ -694,12 +735,14 @@ impl Files<'_> {
     /// Where code is written and the expansions it is in, each as the detail says: the spans,
     /// the text, each invocation and definition, and each span inside what holds it. `cited`
     /// is the position the last expansion's invocation is cited at, where an occurrence or a
-    /// step cites it. Whether no procedural or built-in macro is among the expansions: the code
-    /// is then written as it reads.
+    /// step cites it. `lent`: the code is in an item a procedural macro writes, which may have
+    /// put it at any token it was handed. Whether no procedural or built-in macro is among the
+    /// expansions: the code is then written as it reads.
     pub(super) fn check_written(
         &mut self,
         w: &Written,
         cited: Option<(&Path, usize, usize)>,
+        lent: bool,
     ) -> Result<bool, String> {
         let format = w
             .steps
@@ -893,6 +936,7 @@ impl Files<'_> {
                         plain = false;
                     }
                     procedural.push(!declared || built_in);
+                    self.by_macro |= !declared || built_in;
                     // (the compiler records where a macro of another crate starts: it runs
                     // to its closing bracket)
                     let end =
@@ -904,6 +948,7 @@ impl Files<'_> {
                 None => {
                     plain = false;
                     procedural.push(!matches!(st.kind, StepKind::Rewrite(_)));
+                    self.by_macro |= !matches!(st.kind, StepKind::Rewrite(_));
                 }
             }
             holders.push(holder);
@@ -912,10 +957,14 @@ impl Files<'_> {
         // it is written as it reads: a procedural macro puts what it writes at a span of its
         // choosing (its own invocation, a token of the item it is on), whose text is not that
         // syntax (rust-s3's `#[maybe_async::maybe_async]` writes `#[async_trait::async_trait]`
-        // over the trait it is on, at its own span)
-        if let Some((_, e)) = unread
-            .into_iter()
-            .find(|(i, _)| !procedural.get(i + 1).copied().unwrap_or(false))
+        // over the trait it is on, at its own span). So in an item a procedural macro
+        // writes, with no expansion of that macro around the code: the span is a token the
+        // macro was handed (rocket's `#[launch]` awaits what the function returns, and gives
+        // the `.await` the span of the function's return type)
+        if !lent
+            && let Some((_, e)) = unread
+                .into_iter()
+                .find(|(i, _)| !procedural.get(i + 1).copied().unwrap_or(false))
         {
             return Err(e);
         }
@@ -1072,7 +1121,7 @@ impl Files<'_> {
         if !w.steps.is_empty() {
             // an item a macro writes: named where the detail says, in that macro's code or its
             // invocation; the position is in the invocation, or in the item its attribute is on
-            let plain = self.check_written(w, None)?;
+            let plain = self.check_written(w, None, false)?;
             if plain
                 && !unnamed(item)
                 && let Some(t) = &w.text
@@ -1264,11 +1313,6 @@ impl Files<'_> {
                 return Err(err(format!("`{n}` is of no crate of the build")));
             }
         }
-        // where a macro writes its code: in the expansions the step is cited at
-        if let Some(w) = &via.from {
-            self.check_written(w, Some((path, line, col)))
-                .map_err(err)?;
-        }
         // (a closure or an `async` block built there is not held to the span of the code that
         // builds it: a procedural macro gives that code the span of whatever it was made from,
         // `async` of an `async fn` for the block it wraps the body in. The closure is held to
@@ -1283,12 +1327,21 @@ impl Files<'_> {
             let end = item_after(&src, src.idx((line, col)))?;
             Some(((line, 0), src.pos(end + 1)))
         });
-        match &via.caller {
+        self.by_macro = false;
+        let as_read = match &via.caller {
             Some(w) => self
                 .check_item_at(w, caller, (path, line, Some(col)), on)
-                .map_err(err),
-            None => Ok(true),
+                .map_err(err)?,
+            None => true,
+        };
+        // where a macro writes its code: in the expansions the step is cited at (read as the
+        // caller is written: by a procedural macro, at whatever token that macro chose)
+        let lent = self.by_macro;
+        if let Some(w) = &via.from {
+            self.check_written(w, Some((path, line, col)), lent)
+                .map_err(err)?;
         }
+        Ok(as_read)
     }
 }
 

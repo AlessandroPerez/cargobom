@@ -410,6 +410,13 @@ pub(super) fn doc_comment_at(src: &Source, line: usize, col: usize) -> bool {
         _ => false,
     }
 }
+/// Whether a string or character literal starts at `col` of `line` (1-based): a token, as a
+/// documentation comment is.
+pub(super) fn literal_at(src: &Source, line: usize, col: usize) -> bool {
+    src.class.get(line.wrapping_sub(1)).is_some_and(|cls| {
+        cls.get(col) == Some(&Class::Literal) && (col == 0 || cls[col - 1] != Class::Literal)
+    })
+}
 /// A context's parts, split at the `; ` outside brackets (`in <[u8; 32] as From>::from; ..`).
 pub(super) fn parts(details: &str) -> Vec<&str> {
     let b = details.as_bytes();

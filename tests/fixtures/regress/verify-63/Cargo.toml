@@ -1,0 +1,19 @@
+# An `.await` a procedural macro writes at a token it was handed: rocket's `#[launch]` over
+# `fn rocket() -> Rocket<Build>` writes `async fn main` awaiting what the function returns, and
+# gives that `.await` the span of the return type (l402_middleware 2.3.6). Here `#[pm::launched]`
+# over `fn start() -> Job<Sha256>` does the same, and the future awaited is a generic function's:
+# the SHA-256 in `Job::<D>::run` is instantiated by the poll at that `.await`, a step of its
+# chain at `Job`. The verifier held what the compiler records as an `await` to read `.await`
+# unless a procedural macro's expansion is around it, and there is none around this one: the
+# token is the source's. The record of the item it is in says a procedural macro writes it, and
+# in such an item a rewrite or an invocation reads as whatever token it was put at.
+[package]
+name = "verify-63"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+pm = { path = "pm" }
+sha2 = "0.10"
+
+[workspace]

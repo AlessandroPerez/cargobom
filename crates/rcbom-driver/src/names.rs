@@ -434,6 +434,59 @@ fn steps_from(
     }
     out
 }
+/// The invocations of procedural function-like macros the crate's source writes
+/// (`pm::hashed!("text")`), each as the compiler records its expansion. The code such a macro
+/// writes has the spans the macro gives it, and where that is the span of a token it was
+/// handed, nothing of the code says a macro wrote it: the token is the source's. What the
+/// macro was handed is in its invocation, and a site there says which invocation that is
+/// (`Site::input_of`).
+///
+/// A procedural macro is one of a crate the build loads for its macros only. The compiler has
+/// no list of a crate's expansions to give but the one it prints, a line for each
+/// (`crate0::{{expn7}}: parent: ..`): they are counted there and read by number.
+pub(crate) fn procedural_calls(tcx: TyCtxt<'_>) -> Vec<rcbom_facts::ExpansionStep> {
+    use rustc_span::hygiene::{ExpnKind, LocalExpnId, MacroKind as K};
+    let listed = rustc_span::hygiene::debug_hygiene_data(false);
+    let n = listed
+        .lines()
+        .filter(|l| l.starts_with("crate0::{{expn"))
+        .count();
+    // (the root is the first: a list that reads otherwise is not the one this was written for)
+    assert!(
+        listed.starts_with("Expansions:\ncrate0::{{expn0}}: "),
+        "the compiler's list of expansions does not read as rcbom-driver expects"
+    );
+    let mut out = Vec::new();
+    for i in 1..n {
+        let expn = LocalExpnId::from_u32(i as u32).expn_data();
+        if !matches!(expn.kind, ExpnKind::Macro(K::Bang, _))
+            || expn.call_site.from_expansion()
+            || expn.call_site.is_dummy()
+            || !expn
+                .macro_def_id
+                .is_some_and(|d| !d.is_local() && tcx.crate_dep_kind(d.krate).macros_only())
+        {
+            continue;
+        }
+        out.extend(steps_from(tcx, expn).into_iter().next());
+    }
+    out
+}
+/// The invocation among `calls` (`procedural_calls`) that holds a position: the innermost.
+pub(crate) fn input_of(
+    calls: &[rcbom_facts::ExpansionStep],
+    at: &Loc,
+) -> Option<rcbom_facts::ExpansionStep> {
+    calls
+        .iter()
+        .filter(|c| {
+            c.call.file == at.file
+                && (c.call.line, c.call.col) <= (at.line, at.col)
+                && (at.line, at.col) < (c.call.end_line, c.call.end_col)
+        })
+        .max_by_key(|c| (c.call.line, c.call.col))
+        .cloned()
+}
 /// The expansion that defines an item, as the compiler records it; the root's for one the
 /// source writes. Of another crate's items, the metadata keeps it for modules, types, traits
 /// and impls only: an item in one of those a macro defines is that macro's. One in none of
