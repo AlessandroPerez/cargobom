@@ -866,6 +866,9 @@ struct Scanner<'a, 'tcx> {
     boundary: Vec<rcbom_facts::BoundaryEdge>,
     /// The call whose terminator is being scanned: the sites it gives name it.
     cur_call: Option<rcbom_facts::CallId>,
+    /// The statement or terminator being scanned: the code around what it names
+    /// (`names::written`).
+    around: Option<rustc_span::Span>,
 }
 
 /// The instance graph from `main`, after the compiler's mono-item collector: calls resolved

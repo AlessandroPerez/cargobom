@@ -1511,8 +1511,17 @@ impl Edges<'_, '_> {
                     && let Some(RigidTy::FnDef(def, args)) = ty.kind_of().rigid()
                     && let Ok(i) = Instance::resolve(*def, args)
                 {
+                    // (a name a macro was handed, in the expansion its call is in:
+                    // `names::written`)
                     let span = match func {
-                        Operand::Constant(c) => c.span,
+                        Operand::Constant(c) => {
+                            let at = rustc_internal::internal(self.tcx, c.span);
+                            let call = rustc_internal::internal(self.tcx, term.source_info.span);
+                            match crate::names::written(at, call) {
+                                to if to == at => c.span,
+                                to => rustc_internal::stable(to),
+                            }
+                        }
                         _ => term.source_info.span,
                     };
                     let named = path_of(self.tcx, rustc_internal::internal(self.tcx, def.def_id()));
@@ -1726,14 +1735,18 @@ pub(super) fn named_values<'tcx>(
         /// time).
         next: Vec<(rustc_span::def_id::DefId, bool)>,
         ctfe: bool,
+        /// The body being read: the statement a constant is in is the code around it
+        /// (`names::written`).
+        body: &'a rustc_middle::mir::Body<'tcx>,
     }
     impl<'tcx> Visitor<'tcx> for Named<'_, 'tcx> {
         fn visit_const_operand(
             &mut self,
             c: &rustc_middle::mir::ConstOperand<'tcx>,
-            _: rustc_middle::mir::Location,
+            at: rustc_middle::mir::Location,
         ) {
             let tcx = self.tcx;
+            let span = crate::names::written(c.span, self.body.source_info(at).span);
             if let rustc_middle::ty::FnDef(d, args) = *c.const_.ty().kind()
                 && !args.skip_binder().has_non_region_param()
                 && let Ok(Some(i)) = rustc_middle::ty::Instance::try_resolve(
@@ -1743,7 +1756,7 @@ pub(super) fn named_values<'tcx>(
                     args.skip_binder(),
                 )
             {
-                self.out.push((self.item, i, c.span));
+                self.out.push((self.item, i, span));
                 if self.ctfe && i.def_id().is_local() && tcx.is_const_fn(i.def_id()) {
                     self.next.push((i.def_id(), true));
                 }
@@ -1784,9 +1797,11 @@ pub(super) fn named_values<'tcx>(
         out,
         next: Vec::new(),
         ctfe,
+        body,
     };
     v.visit_body(body);
     for p in tcx.promoted_mir(did).iter() {
+        v.body = p;
         v.visit_body(p);
     }
     let next = std::mem::take(&mut v.next);
@@ -2089,6 +2104,7 @@ fn only_coerced(tcx: TyCtxt<'_>, body: &Body, local: rustc_public::mir::Local) -
 /// The start of the source text where a span is cited (for a macro's code, at the outermost
 /// invocation).
 pub(crate) fn cited_head(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+    let span = crate::names::written(span, span);
     let at = if span.from_expansion() {
         span.source_callsite()
     } else {
@@ -2098,6 +2114,7 @@ pub(crate) fn cited_head(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<Stri
 }
 /// The fingerprint of where a span is cited, in its line.
 pub(crate) fn cited_mark(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+    let span = crate::names::written(span, span);
     let at = if span.from_expansion() {
         span.source_callsite()
     } else {

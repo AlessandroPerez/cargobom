@@ -91,12 +91,20 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             lib_generic: false,
             boundary: Vec::new(),
             cur_call: None,
+            around: None,
         }
+    }
+
+    /// A span as the macro whose code it is in wrote it, by the statement being scanned
+    /// (`names::written`).
+    fn written(&self, span: rustc_span::Span) -> rustc_span::Span {
+        crate::names::written(span, self.around.unwrap_or(span))
     }
 
     /// Where a site at `internal` is: code a derive generates with an input token's span
     /// (`quote_spanned!` at a field's name) is the derive's, not the field's.
     fn site_span(&self, internal: rustc_span::Span) -> rustc_span::Span {
+        let internal = self.written(internal);
         if !internal.from_expansion()
             && let Some(did) = self.def
             && let Some(call) = derive_site(self.cx.tcx, did)
@@ -164,7 +172,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
             }
             Operand::Constant(c) => Some(crate::names::named_span(
                 tcx,
-                rustc_internal::internal(tcx, c.span),
+                self.written(rustc_internal::internal(tcx, c.span)),
                 named,
             )),
             _ => callee_span(tcx, call_span).or_else(|| {
@@ -359,7 +367,8 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
     ) {
         let tcx = self.cx.tcx;
         let did = rustc_internal::internal(tcx, def.def_id());
-        let span = crate::names::named_span(tcx, span, did);
+        // (a name a macro was handed, in the expansion the statement is in)
+        let span = crate::names::named_span(tcx, self.written(span), did);
         // where the function is named: where the pointer called was made, or here when it is
         // named as a value
         let named = match &through {
@@ -853,18 +862,32 @@ impl MirVisitor for Scanner<'_, '_> {
     // `async` closure's type is lost this way (`has_unconvertible`); any other panic is a bug,
     // counted as one
     fn visit_terminator(&mut self, term: &Terminator, loc: Location) {
+        let before = self.around_at(loc);
         let r = catch_unwind(AssertUnwindSafe(|| self.scan_terminator(term, loc)));
+        self.around = before;
         self.caught(r.err(), "a call");
     }
 
     fn visit_rvalue(&mut self, rv: &Rvalue, loc: Location) {
+        let before = self.around_at(loc);
         let r = catch_unwind(AssertUnwindSafe(|| self.scan_rvalue(rv, loc)));
+        self.around = before;
         self.caught(r.err(), "a value");
     }
 
     fn visit_const_operand(&mut self, c: &ConstOperand, loc: Location) {
+        let before = self.around_at(loc);
         let r = catch_unwind(AssertUnwindSafe(|| self.scan_const(c, loc)));
+        self.around = before;
         self.caught(r.err(), "a constant");
+    }
+}
+impl Scanner<'_, '_> {
+    /// The statement or terminator at `loc` becomes the code around what is scanned; what was
+    /// before (a constant is scanned inside its statement).
+    fn around_at(&mut self, loc: Location) -> Option<rustc_span::Span> {
+        let at = rustc_internal::internal(self.cx.tcx, loc.span());
+        self.around.replace(at)
     }
 }
 impl Scanner<'_, '_> {

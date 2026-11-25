@@ -1,0 +1,21 @@
+# A token a declared macro hands on a second time: `call_first!(compute)`, of a macro whose code
+# is `call_last!($f)`, whose own is `$f(b"y")`, both taking `$f:tt`. A token handed on as it is
+# keeps the span the source gave it; handed on again, it has for the compiler the place of the
+# second macro's `$f` and still the source's context: the call of `md5::compute` was at
+# `src/main.rs:6:8`, a position in the macro's definition, in no expansion, the same for each of
+# the three invocations (`main` at .. does not hold 6:8; and for the two not first, a call the
+# boundary check cited itself as unknown). The compiler's table of metavariable spans says the
+# span is such a place, and the call it is the callee of is in the expansion that wrote it there:
+# the site is that expansion's, cited at its invocation, in `other` and twice in `main`. A
+# function named there as a value with nothing of the macro's around it (`value_first!`) is the
+# expansion's the table has, the macro's expansions all coming from one invocation.
+[package]
+name = "verify-65"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+md5 = "0.7"
+sha2 = "0.10"
+
+[workspace]

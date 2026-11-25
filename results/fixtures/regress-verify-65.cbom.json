@@ -1,0 +1,440 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via verify-65 -> sha2 -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via verify-65 -> sha2 -> digest -> crypto-common",
+            "line": 30,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/digest@0.10.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via verify-65 -> sha2 -> digest",
+            "line": 40,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "digest"
+          }
+        ]
+      },
+      "name": "digest",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.10.7",
+      "type": "library",
+      "version": "0.10.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/md5@0.7.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by verify-65 (dependencies)",
+            "line": 18,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "md5"
+          },
+          {
+            "additionalContext": "[manifest] locked md5 0.7.0; reached via verify-65 -> md5",
+            "line": 66,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "md5"
+          }
+        ]
+      },
+      "name": "md5",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/md5@0.7.0",
+      "type": "library",
+      "version": "0.7.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha2@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by verify-65 (dependencies)",
+            "line": 19,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "sha2"
+          },
+          {
+            "additionalContext": "[manifest] locked sha2 0.10.9; reached via verify-65 -> sha2",
+            "line": 72,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha2"
+          }
+        ]
+      },
+      "name": "sha2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha2@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "crypto:algorithm:MD5",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "MD5",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [macro call_first!] in verify_65::other; use: digest; owner at src/main.rs:40:3-40:8 within 40:0-42:1; expanded from src/main.rs:6:8-6:10 as `$f` line #455fc7a3 (by macro call_last! at src/main.rs:11:8-11:22 line #d0bf38d6 defined src/main.rs:4-8, by macro call_first! at src/main.rs:41:4-41:24 line #25b7a153 defined src/main.rs:9-13); line: `call_first!(compute)`",
+            "line": 41,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "md5::compute"
+          },
+          {
+            "additionalContext": "[reachable] [call] [macro call_first!] in verify_65::main; use: digest; owner at src/main.rs:44:3-44:7 within 44:0-52:1; expanded from src/main.rs:6:8-6:10 as `$f` line #455fc7a3 (by macro call_last! at src/main.rs:11:8-11:22 line #d0bf38d6 defined src/main.rs:4-8, by macro call_first! at src/main.rs:45:22-45:42 line #0f5236dc defined src/main.rs:9-13); line: `println!(\"{:x?}\", call_first!(compute));`",
+            "line": 45,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "md5::compute"
+          },
+          {
+            "additionalContext": "[reachable] [call] [macro call_first!] in verify_65::main; use: digest; owner at src/main.rs:44:3-44:7 within 44:0-52:1; expanded from src/main.rs:6:8-6:10 as `$f` line #455fc7a3 (by macro call_last! at src/main.rs:11:8-11:22 line #d0bf38d6 defined src/main.rs:4-8, by macro call_first! at src/main.rs:49:22-49:42 line #0f5236dc defined src/main.rs:9-13); line: `println!(\"{:x?}\", call_first!(compute));`",
+            "line": 49,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "md5::compute"
+          },
+          {
+            "additionalContext": "[reachable] [call] in verify_65::main; use: digest; owner at src/main.rs:44:3-44:7 within 44:0-52:1; called through a function pointer to `md5::compute` named at src/main.rs:50:49 as `value_first!(compute)` line #bfe257ad; line: `println!(\"{:x?}\", f(b\"v\"));`; code: `f`",
+            "line": 51,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "md5::compute"
+          }
+        ]
+      },
+      "name": "MD5",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:param:output_bytes",
+          "value": "16"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "4"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "nistQuantumSecurityLevel": 2,
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] in verify_65::run::<..>; use: digest; owner at src/main.rs:15:3-15:6 within 15:0-17:1; instantiated by verify_65::main at src/main.rs:47:22 (call, to 47:35 as `arg_first!(h)` line #86d91b27, from src/main.rs:20:8-20:11 as `run` line #2f0f846f (by macro arg_last! at src/main.rs:25:8-25:21 line #1186c712 defined src/main.rs:18-22, by macro arg_first! at src/main.rs:47:22-47:35 line #86d91b27 defined src/main.rs:23-27), caller at src/main.rs:44:3-44:7 within 44:0-52:1); line: `D::digest(b\"z\").to_vec()`; code: `D::digest`",
+            "line": 16,
+            "location": "src/main.rs",
+            "offset": 4,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [call] in verify_65::main; new: setup, not a use; owner at src/main.rs:44:3-44:7 within 44:0-52:1; line: `let h = Sha256::new();`; code: `Sha256::new`",
+            "line": 46,
+            "location": "src/main.rs",
+            "offset": 12,
+            "symbol": "digest::digest::Digest::new"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [macro arg_first!] in verify_65::main; chosen as generic argument of verify_65::run; owner at src/main.rs:44:3-44:7 within 44:0-52:1; expanded from src/main.rs:20:8-20:11 as `run` line #2f0f846f (by macro arg_last! at src/main.rs:25:8-25:21 line #1186c712 defined src/main.rs:18-22, by macro arg_first! at src/main.rs:47:22-47:35 line #86d91b27 defined src/main.rs:23-27); line: `println!(\"{:x?}\", arg_first!(h));`",
+            "line": 47,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "verify_65::run"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:MD5"
+      ],
+      "ref": "pkg:cargo/md5@0.7.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/md5@0.7.0",
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/verify-65@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:MD5"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/verify-65@0.1.0",
+      "name": "verify-65",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/verify-65@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "11"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "61"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin verify-65"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "9 calls into crypto packages: 5 cited, 0 cited by the check as unknown, 4 excused (format 4)"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:50b92b30-1529-8254-870c-ee11b9a27b20",
+  "specVersion": "1.7",
+  "version": 1
+}

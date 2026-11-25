@@ -192,8 +192,100 @@ pub(crate) fn def_hash(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> Strin
     let (a, b) = tcx.def_path_hash(did).0.split();
     format!("{:016x}{:016x}", a.as_u64(), b.as_u64())
 }
+/// A span as the macro whose code it is in wrote it.
+///
+/// A token a declared macro hands on as it is (`$f:tt`) keeps the span the source gave it.
+/// Handed on a second time (`first!(compute)`, of a macro whose code is `last!($f)`, whose own
+/// is `$f(data)`), it has for the compiler the place of the metavariable in the second macro's
+/// code and still the context it came with (`rustc_expand`'s `maybe_use_metavar_location`):
+/// code at a position in a macro's definition that no expansion is recorded for, and the same
+/// span for every invocation that hands a token on to that place. The compiler's table of
+/// metavariable spans says the span is such a place, and has the first expansion that handed
+/// a token on there.
+///
+/// Which expansion wrote this one there is the one, among those the code `around` it is in
+/// (the call whose callee it is, the statement it is in: their other tokens are the macro's),
+/// whose macro's definition holds the place. With nothing around it to say (the token is all
+/// of the statement, or a procedural macro gave the statement the token's span), it is the
+/// table's where every expansion of that macro in the crate comes from one invocation in the
+/// source; from several, the compiler does not record which, and the span is left as it is:
+/// a position in the macro's code, in no expansion.
+pub(crate) fn written(span: rustc_span::Span, around: rustc_span::Span) -> rustc_span::Span {
+    let Some(var) = rustc_span::with_metavar_spans(|m| m.get(span))
+        .filter(|v| (v.lo(), v.hi()) == (span.lo(), span.hi()) && v.ctxt() != span.ctxt())
+    else {
+        return span;
+    };
+    let mut at = around;
+    for _ in 0..64 {
+        if !at.from_expansion() {
+            break;
+        }
+        let expn = at.ctxt().outer_expn_data();
+        if expn.def_site.lo() <= span.lo() && span.hi() <= expn.def_site.hi() {
+            return span.with_ctxt(at.ctxt());
+        }
+        at = expn.call_site;
+    }
+    let expn = var.ctxt().outer_expn_data();
+    let def = (expn.def_site.lo(), expn.def_site.hi());
+    let from = source_invocation(expn);
+    thread_local! {
+        static SOLE: std::cell::OnceCell<HashMap<Extent, Option<Extent>>> =
+            const { std::cell::OnceCell::new() };
+    }
+    let sole = SOLE.with(|s| s.get_or_init(sole_invocations).get(&def).copied().flatten());
+    if sole == Some(from) { var } else { span }
+}
+/// From where to where, in the compiler's positions.
+type Extent = (rustc_span::BytePos, rustc_span::BytePos);
+/// The invocation in the source an expansion comes from: its own, or that of the outermost
+/// expansion it is in.
+fn source_invocation(mut expn: rustc_span::hygiene::ExpnData) -> Extent {
+    for _ in 0..64 {
+        if !expn.call_site.from_expansion() {
+            break;
+        }
+        expn = expn.call_site.ctxt().outer_expn_data();
+    }
+    (expn.call_site.lo(), expn.call_site.hi())
+}
+/// For each function-like macro the crate expands, by where it is defined: the one invocation
+/// in the source all its expansions come from, or none where they come from several.
+fn sole_invocations() -> HashMap<Extent, Option<Extent>> {
+    use rustc_span::hygiene::{ExpnKind, LocalExpnId, MacroKind as K};
+    let mut out: HashMap<Extent, Option<Extent>> = HashMap::new();
+    for i in 1..local_expansions() {
+        let expn = LocalExpnId::from_u32(i as u32).expn_data();
+        if !matches!(expn.kind, ExpnKind::Macro(K::Bang, _)) {
+            continue;
+        }
+        let def = (expn.def_site.lo(), expn.def_site.hi());
+        let from = source_invocation(expn);
+        out.entry(def)
+            .and_modify(|have| *have = have.filter(|h| *h == from))
+            .or_insert(Some(from));
+    }
+    out
+}
+/// How many expansions the crate has, the root with them. The compiler has no list of them to
+/// give but the one it prints, a line for each (`crate0::{{expn7}}: parent: ..`): they are
+/// counted there, and read by number.
+fn local_expansions() -> usize {
+    let listed = rustc_span::hygiene::debug_hygiene_data(false);
+    // (the root is the first: a list that reads otherwise is not the one this was written for)
+    assert!(
+        listed.starts_with("Expansions:\ncrate0::{{expn0}}: "),
+        "the compiler's list of expansions does not read as rcbom-driver expects"
+    );
+    listed
+        .lines()
+        .filter(|l| l.starts_with("crate0::{{expn"))
+        .count()
+}
 /// The source text of a span on one line outside macros: what an occurrence names.
 pub(crate) fn span_text(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+    let span = written(span, span);
     if span.from_expansion() {
         return None;
     }
@@ -207,6 +299,7 @@ pub(crate) fn span_text(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<Strin
 /// (libsecp256k1's precomputed points, 49,152 calls on a line of 4.7 MB), and each site would
 /// carry the line.
 pub(crate) fn line_text(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+    let span = written(span, span);
     let at = if span.from_expansion() {
         span.source_callsite()
     } else {
@@ -295,6 +388,7 @@ pub(crate) fn derive_site(
 /// Source position of a span; code from a macro is attributed to the outermost call site in
 /// the user's source, with the position inside the macro kept as `Expansion`.
 pub(crate) fn locate(tcx: TyCtxt<'_>, span: rustc_span::Span) -> (Loc, Option<Expansion>) {
+    let span = written(span, span);
     if span.from_expansion() {
         let call = span.source_callsite();
         // the outermost expansion is the one whose call site is in the user's source:
@@ -333,6 +427,7 @@ pub(crate) fn named_span(
     span: rustc_span::Span,
     did: rustc_span::def_id::DefId,
 ) -> rustc_span::Span {
+    let span = written(span, span);
     if !span.from_expansion() {
         return span;
     }
@@ -351,6 +446,7 @@ pub(crate) fn named_span(
 /// itself, or for a macro's code the invocation in the source that writes it (`locate`'s
 /// position), with how it starts there and the fingerprint of its line at its column.
 pub(crate) fn place(tcx: TyCtxt<'_>, span: rustc_span::Span) -> crate::Place {
+    let span = written(span, span);
     let s = if span.from_expansion() {
         span.source_callsite()
     } else {
@@ -378,6 +474,7 @@ pub(crate) fn span_mark(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<Strin
 }
 /// Every expansion a span is in, innermost first, as the compiler records them.
 fn expansion_steps(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Vec<rcbom_facts::ExpansionStep> {
+    let span = written(span, span);
     if !span.from_expansion() {
         return Vec::new();
     }
