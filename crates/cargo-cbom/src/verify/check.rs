@@ -502,8 +502,11 @@ impl Files<'_> {
             // arguments; the position the detail gives for where the function was made the
             // pointer names it (or an import alias of it)
             // (each function the pointer may hold: `FNS[i](..)` over `[digest, my_hash]`)
-            let pointers: Vec<(String, usize, usize)> = re!(
-                r"called through a function pointer to `[^`]+` named at ([^\s;]+?):(\d+):(\d+)(?:;|$)"
+            // (with the start of the text at the naming and the fingerprint of its line, as
+            // the compiler records them: the naming is held to both)
+            type Naming = (String, usize, usize, Option<String>, Option<String>);
+            let pointers: Vec<Naming> = re!(
+                r"called through a function pointer to `[^`]+` named at ([^\s;]+?):(\d+):(\d+)(?: as `([^`]*)`)?(?: line #([0-9a-f]{8}))?(?:;|$)"
             )
             .captures_iter(ctx.details)
             .map(|m| {
@@ -511,11 +514,13 @@ impl Files<'_> {
                     m[1].to_string(),
                     m[2].parse::<usize>().unwrap_or(0),
                     m[3].parse::<usize>().unwrap_or(0),
+                    m.get(4).map(|g| g.as_str().to_string()),
+                    m.get(5).map(|g| g.as_str().to_string()),
                 )
             })
             .collect();
-            let pointer = pointers.first().cloned();
-            for (file, l2, c2) in &pointers {
+            let pointer = pointers.first().map(|p| (p.0.clone(), p.1, p.2));
+            for (file, l2, c2, named_text, named_mark) in &pointers {
                 let (l2, c2) = (*l2, *c2);
                 // the callee expression: a parenthesised expression (`(h.f)`), or a path with
                 // fields, indexes and calls after it (`h`, `Self::F`, `fs[ix[0]]`, `get()`),
@@ -587,6 +592,13 @@ impl Files<'_> {
                 let src2 = self
                     .source(&p2)
                     .ok_or_else(|| format!("cannot read {file}, named in the context"))?;
+                super::witness::reads_at(
+                    &src2,
+                    file,
+                    (l2, c2),
+                    named_text.as_deref(),
+                    named_mark.as_deref(),
+                )?;
                 let named = src2.lines.get(l2.wrapping_sub(1)).and_then(|t| {
                     let chars: Vec<char> = t.chars().collect();
                     let (rs, rc) = rest(&src2, l2, c2);

@@ -1477,6 +1477,8 @@ mod tests {
             through: None,
             value: false,
             takes_self: false,
+            named_text: None,
+            named_mark: None,
         };
         let salt = |protocol: bool| -> Vec<String> {
             of_call(&kb, &LinkIndex::default(), "", &call(1), protocol)

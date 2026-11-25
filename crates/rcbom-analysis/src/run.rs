@@ -877,20 +877,25 @@ pub fn analyze(kb: &Kb, man: &Manifest, facts: &[CrateFacts]) -> Analysis {
                 }
                 // a call through a function pointer: the operation is at the call, the function
                 // was named elsewhere (`let h = digest;`)
+                // (with the start of the text there and its line's fingerprint, as the compiler
+                // records them: `witness::reads`)
                 if let Target::Call {
                     through: Some(t),
                     callee,
+                    named_text,
+                    named_mark,
                     ..
                 } = &site.target
                 {
                     let tp = PathBuf::from(&t.file);
                     let tp = if tp.is_absolute() { tp } else { cwd.join(tp) };
                     detail.push(format!(
-                        "called through a function pointer to `{}` named at {}:{}:{}",
+                        "called through a function pointer to `{}` named at {}:{}:{}{}",
                         short(&callee.path),
                         man.location(&tp),
                         t.line,
-                        t.col.saturating_sub(1)
+                        t.col.saturating_sub(1),
+                        crate::witness::reads(named_text.as_ref(), named_mark.as_ref())
                     ));
                 }
                 // each step of the chain with the item it instantiates: the occurrence's, then

@@ -1,0 +1,125 @@
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:10:18 | digest::mac::Mac::new_from_slice | [reachable] [call] in verify_57::mac_of::<..>; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of verify_57::mac); owner at src/main.rs:5:3-5:9 within 5:0-13:1; called through a function pointer to `digest::mac::Mac::new_from_slice` named at src/main.rs:17:33 as `Hmac::<Sha256>::new_from_slice` line #ddd1f4f0; instantiated by verify_57::mac at src/main.rs:18:15 as `mac_of` (call, to 18:21 as `mac_of` line #e453dc24, caller at src/main.rs:15:7-15:10 within 15:0-21:1); `verify_57::mac_of::<..>` instantiated by verify_57::mac at src/main.rs:17:15 as `mac_of` (call, to 17:21 as `mac_of` line #c3599f38, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `let mut mac = new(key).ok()?;`; code: `new`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:11:8 | digest::mac::Mac::update | [reachable] [call] in verify_57::mac_of::<..>; use: tag; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:17:15 as `mac_of` (call, to 17:21 as `mac_of` line #c3599f38, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `mac.update(data);`; code: `update`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:12:13 | digest::mac::Mac::finalize | [reachable] [call] in verify_57::mac_of::<..>; use: tag; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:17:15 as `mac_of` (call, to 17:21 as `mac_of` line #c3599f38, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `Some(mac.finalize().into_bytes().to_vec())`; code: `finalize`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:12:24 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in verify_57::mac_of::<..>; into_bytes: setup, not a use; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:17:15 as `mac_of` (call, to 17:21 as `mac_of` line #c3599f38, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `Some(mac.finalize().into_bytes().to_vec())`; code: `into_bytes`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:17:15 | verify_57::mac_of | [reachable] [instantiation] in verify_57::mac; chosen as generic argument of verify_57::mac_of; owner at src/main.rs:15:7-15:10 within 15:0-21:1; line: `256 => mac_of(key, data, Hmac::<Sha256>::new_from_slice),`; code: `mac_of`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:10:18 | digest::mac::Mac::new_from_slice | [reachable] [call] in verify_57::mac_of::<..>; new_from_slice: setup, not a use; key: environment (std::env::args) or parameter (argument 0 of the enclosing function) or parameter (argument 1 of verify_57::mac); owner at src/main.rs:5:3-5:9 within 5:0-13:1; called through a function pointer to `digest::mac::Mac::new_from_slice` named at src/main.rs:18:33 as `Hmac::<Sha512>::new_from_slice` line #aea59ce8; instantiated by verify_57::mac at src/main.rs:18:15 as `mac_of` (call, to 18:21 as `mac_of` line #e453dc24, caller at src/main.rs:15:7-15:10 within 15:0-21:1); `verify_57::mac_of::<..>` instantiated by verify_57::mac at src/main.rs:17:15 as `mac_of` (call, to 17:21 as `mac_of` line #c3599f38, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `let mut mac = new(key).ok()?;`; code: `new`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:11:8 | digest::mac::Mac::update | [reachable] [call] in verify_57::mac_of::<..>; use: tag; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:18:15 as `mac_of` (call, to 18:21 as `mac_of` line #e453dc24, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `mac.update(data);`; code: `update`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:12:13 | digest::mac::Mac::finalize | [reachable] [call] in verify_57::mac_of::<..>; use: tag; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:18:15 as `mac_of` (call, to 18:21 as `mac_of` line #e453dc24, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `Some(mac.finalize().into_bytes().to_vec())`; code: `finalize`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:12:24 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in verify_57::mac_of::<..>; into_bytes: setup, not a use; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:18:15 as `mac_of` (call, to 18:21 as `mac_of` line #e453dc24, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `Some(mac.finalize().into_bytes().to_vec())`; code: `into_bytes`
+  occ HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | src/main.rs:18:15 | verify_57::mac_of | [reachable] [instantiation] in verify_57::mac; chosen as generic argument of verify_57::mac_of; owner at src/main.rs:15:7-15:10 within 15:0-21:1; line: `512 => mac_of(key, data, Hmac::<Sha512>::new_from_slice),`; code: `mac_of`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:10:18 | digest::mac::Mac::new_from_slice | [reachable] [component] in verify_57::mac_of::<..>; part of HMAC-SHA-256; owner at src/main.rs:5:3-5:9 within 5:0-13:1; called through a function pointer to `digest::mac::Mac::new_from_slice` named at src/main.rs:17:33 as `Hmac::<Sha256>::new_from_slice` line #ddd1f4f0; instantiated by verify_57::mac at src/main.rs:18:15 as `mac_of` (call, to 18:21 as `mac_of` line #e453dc24, caller at src/main.rs:15:7-15:10 within 15:0-21:1); `verify_57::mac_of::<..>` instantiated by verify_57::mac at src/main.rs:17:15 as `mac_of` (call, to 17:21 as `mac_of` line #c3599f38, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `let mut mac = new(key).ok()?;`; code: `new`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:11:8 | digest::mac::Mac::update | [reachable] [component] in verify_57::mac_of::<..>; part of HMAC-SHA-256; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:17:15 as `mac_of` (call, to 17:21 as `mac_of` line #c3599f38, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `mac.update(data);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:12:13 | digest::mac::Mac::finalize | [reachable] [component] in verify_57::mac_of::<..>; part of HMAC-SHA-256; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:17:15 as `mac_of` (call, to 17:21 as `mac_of` line #c3599f38, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `Some(mac.finalize().into_bytes().to_vec())`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:12:24 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in verify_57::mac_of::<..>; part of HMAC-SHA-256; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:17:15 as `mac_of` (call, to 17:21 as `mac_of` line #c3599f38, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `Some(mac.finalize().into_bytes().to_vec())`; code: `into_bytes`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:17:15 | verify_57::mac_of | [reachable] [component] in verify_57::mac; part of HMAC-SHA-256; owner at src/main.rs:15:7-15:10 within 15:0-21:1; line: `256 => mac_of(key, data, Hmac::<Sha256>::new_from_slice),`; code: `mac_of`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:26:5 | digest::digest::Digest::digest | [reachable] [call] in verify_57::hashes; use: digest; owner at src/main.rs:23:7-23:13 within 23:0-27:1; called through a function pointer to `digest::digest::Digest::digest` named at src/main.rs:24:12 as `Sha256::digest` line #5b7c6c6b; line: `(h(data).to_vec(), g(data).to_vec())`; code: `h`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:10:18 | digest::mac::Mac::new_from_slice | [reachable] [component] in verify_57::mac_of::<..>; part of HMAC-SHA-512; owner at src/main.rs:5:3-5:9 within 5:0-13:1; called through a function pointer to `digest::mac::Mac::new_from_slice` named at src/main.rs:18:33 as `Hmac::<Sha512>::new_from_slice` line #aea59ce8; instantiated by verify_57::mac at src/main.rs:18:15 as `mac_of` (call, to 18:21 as `mac_of` line #e453dc24, caller at src/main.rs:15:7-15:10 within 15:0-21:1); `verify_57::mac_of::<..>` instantiated by verify_57::mac at src/main.rs:17:15 as `mac_of` (call, to 17:21 as `mac_of` line #c3599f38, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `let mut mac = new(key).ok()?;`; code: `new`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:11:8 | digest::mac::Mac::update | [reachable] [component] in verify_57::mac_of::<..>; part of HMAC-SHA-512; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:18:15 as `mac_of` (call, to 18:21 as `mac_of` line #e453dc24, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `mac.update(data);`; code: `update`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:12:13 | digest::mac::Mac::finalize | [reachable] [component] in verify_57::mac_of::<..>; part of HMAC-SHA-512; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:18:15 as `mac_of` (call, to 18:21 as `mac_of` line #e453dc24, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `Some(mac.finalize().into_bytes().to_vec())`; code: `finalize`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:12:24 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in verify_57::mac_of::<..>; part of HMAC-SHA-512; owner at src/main.rs:5:3-5:9 within 5:0-13:1; instantiated by verify_57::mac at src/main.rs:18:15 as `mac_of` (call, to 18:21 as `mac_of` line #e453dc24, caller at src/main.rs:15:7-15:10 within 15:0-21:1); line: `Some(mac.finalize().into_bytes().to_vec())`; code: `into_bytes`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:18:15 | verify_57::mac_of | [reachable] [component] in verify_57::mac; part of HMAC-SHA-512; owner at src/main.rs:15:7-15:10 within 15:0-21:1; line: `512 => mac_of(key, data, Hmac::<Sha512>::new_from_slice),`; code: `mac_of`
+  occ SHA-512 | crypto:algorithm:SHA-512 | src/main.rs:26:23 | digest::digest::Digest::digest | [reachable] [call] in verify_57::hashes; use: digest; owner at src/main.rs:23:7-23:13 within 23:0-27:1; called through a function pointer to `digest::digest::Digest::digest` named at src/main.rs:25:12 as `Sha512::digest` line #d249adef; line: `(h(data).to_vec(), g(data).to_vec())`; code: `g`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:6:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via verify-57 -> hmac -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via verify-57 -> hmac -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via verify-57 -> hmac -> digest
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:61:0 | hmac | [manifest] locked hmac 0.12.1; reached via verify-57 -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:15:0 | hmac | [manifest] declared by verify-57 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:76:0 | sha2 | [manifest] locked sha2 0.10.9; reached via verify-57 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:16:0 | sha2 | [manifest] declared by verify-57 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:87:0 | subtle | [manifest] locked subtle 2.6.1; reached via verify-57 -> hmac -> digest -> subtle
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=5
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=environment,parameter
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:confidence=high
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:functions:source=observed
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:occurrences=5
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:provenance:key=environment,parameter
+  prop HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=observed
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=6
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=observed
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=6
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-512, collision and preimage category
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset HMAC-SHA-512 | crypto:algorithm:HMAC-SHA-512 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 5, "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep crypto:algorithm:HMAC-SHA-512 -> crypto:algorithm:SHA-512
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/verify-57@0.1.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/verify-57@0.1.0 -> pkg:cargo/sha2@0.10.9
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:HMAC-SHA-512
+dependency crypto:algorithm:SHA-256
+dependency crypto:algorithm:SHA-512
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/verify-57@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-512
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+root {"bom-ref": "pkg:cargo/verify-57@0.1.0", "name": "verify-57", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/verify-57@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin verify-57
+run rcbom:run:boundary-check=5 calls into crypto packages: 5 cited, 0 cited by the check as unknown, 0 excused ()
+run rcbom:run:features=
+run rcbom:run:packages=12
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=109
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

@@ -2088,7 +2088,7 @@ fn only_coerced(tcx: TyCtxt<'_>, body: &Body, local: rustc_public::mir::Local) -
 }
 /// The start of the source text where a span is cited (for a macro's code, at the outermost
 /// invocation).
-fn cited_head(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+pub(crate) fn cited_head(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
     let at = if span.from_expansion() {
         span.source_callsite()
     } else {
@@ -2097,7 +2097,7 @@ fn cited_head(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
     crate::names::span_head(tcx, at, 60)
 }
 /// The fingerprint of where a span is cited, in its line.
-fn cited_mark(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
+pub(crate) fn cited_mark(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Option<String> {
     let at = if span.from_expansion() {
         span.source_callsite()
     } else {

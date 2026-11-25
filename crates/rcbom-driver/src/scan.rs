@@ -353,11 +353,18 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         args: &GenericArgs,
         span: rustc_span::Span,
         call: Option<(&[Operand], &Terminator)>,
-        through: Option<Loc>,
+        through: Option<(Loc, rustc_span::Span)>,
     ) {
         let tcx = self.cx.tcx;
         let did = rustc_internal::internal(tcx, def.def_id());
         let span = crate::names::named_span(tcx, span, did);
+        // where the function is named: where the pointer called was made, or here when it is
+        // named as a value
+        let named = match &through {
+            Some((_, at)) => Some(*at),
+            None => call.is_none().then(|| self.site_span(span)),
+        };
+        let through = through.map(|(l, _)| l);
         let callee = def_ref_internal(tcx, did);
         let method = strip_generics(&callee.path)
             .rsplit("::")
@@ -405,6 +412,8 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
                 through,
                 value: call.is_none(),
                 takes_self: tcx.opt_associated_item(did).is_some_and(|a| a.is_method()),
+                named_text: named.and_then(|s| crate::walk::cited_head(tcx, s)),
+                named_mark: named.and_then(|s| crate::walk::cited_mark(tcx, s)),
             },
         );
     }
@@ -456,7 +465,7 @@ impl<'a, 'tcx> Scanner<'a, 'tcx> {
         let through = Some(locate(tcx, named).0).filter(|l| l.line != 0);
         match (call, through) {
             (Some(call), Some(t)) => {
-                self.record_call_at(def, args, call, Some((call_args, term)), Some(t))
+                self.record_call_at(def, args, call, Some((call_args, term)), Some((t, named)))
             }
             _ => self.record_call_at(def, args, named, Some((call_args, term)), None),
         }

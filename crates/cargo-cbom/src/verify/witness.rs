@@ -470,7 +470,18 @@ fn reads_as(
     text: Option<&str>,
     line: Option<&str>,
 ) -> Result<(), String> {
-    let at = format!("{}:{}:{}", span.file, start.0, start.1);
+    reads_at(src, &span.file, start, text, line)
+}
+
+/// `reads_as` for a position a detail gives alone (where a function pointer was named).
+pub(super) fn reads_at(
+    src: &Source,
+    file: &str,
+    start: (usize, usize),
+    text: Option<&str>,
+    line: Option<&str>,
+) -> Result<(), String> {
+    let at = format!("{file}:{}:{}", start.0, start.1);
     if let Some(t) = text {
         let got = text_of(src, start, (start.0, usize::MAX));
         if !got.starts_with(t) {

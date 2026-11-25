@@ -123,6 +123,8 @@ pub(crate) fn resolve(
                             self_ty,
                             args,
                             takes_self,
+                            named_text,
+                            named_mark,
                             ..
                         } = &v.target
                         else {
@@ -141,6 +143,9 @@ pub(crate) fn resolve(
                                 through: Some(at.clone()),
                                 value: false,
                                 takes_self: *takes_self,
+                                // (the naming's own text and line: the value site's)
+                                named_text: named_text.clone(),
+                                named_mark: named_mark.clone(),
                             },
                             ..s.clone()
                         });

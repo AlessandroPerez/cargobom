@@ -114,9 +114,12 @@
 //!   storing it into the container it is read from (`map.insert("a", digest)`, also a field's,
 //!   `t.map.insert(1, digest)`); a variable computed by code not followed (another crate's
 //!   function, a labelled block) reads a variable bound there. The position named must name
-//!   the function (by its name, an alias, or a macro invoked there whose body does); where the
-//!   text does not lead from the call to it (a field a constructor sets, a pointer another
-//!   function hands on, a macro's binding), the fact is not shown (below), no mismatch;
+//!   the function (by its name, an alias, or a macro invoked there whose body does), start
+//!   with the text given and be on a line of the fingerprint given (`named at F:L:C as `..`
+//!   line #..`: the line above may name the same function for another type in the same
+//!   column); where the text does not lead from the call to it (a field a constructor sets, a
+//!   pointer another function hands on, a macro's binding), the fact is not shown (below), no
+//!   mismatch;
 //! - a step of an instantiation chain (`instantiated by X at F:L:C as `text` (call of `f`, to
 //!   L:C as `..` line #.., from .., caller at ..)`) is as the compiler records it: the code at
 //!   the position starts with the text given and has the fingerprint given (of its column in
@@ -788,13 +791,15 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
                 let mut tried = HashSet::new();
                 // (with whether the position has a fingerprint of its own: a step's is after
                 // where its span ends, a span's after its text)
+                // (a naming's is its own: `named at F:L:C as `..` line #..`)
                 let steps = re!(
-                    r"(?:instantiated by .*? at|named at) [^\s;]+?:(\d+)(?::(\d+))?(?: as `[^`]*`)?(?: \(|;|$)"
+                    r"(?:instantiated by .*? at|named at) [^\s;]+?:(\d+)(?::(\d+))?(?: as `[^`]*`)?( line #[0-9a-f]{8})?(?: \(|;|$)"
                 )
                 .captures_iter(&o.context)
                 .map(|m| {
-                    let marked = re!(r"^[a-z ]+(?: of `[^`]*`)?, to \d+:\d+(?: as `[^`]*`)? line #")
-                        .is_match(&o.context[m.get(0).map_or(0, |g| g.end())..]);
+                    let marked = m.get(3).is_some()
+                        || re!(r"^[a-z ]+(?: of `[^`]*`)?, to \d+:\d+(?: as `[^`]*`)? line #")
+                            .is_match(&o.context[m.get(0).map_or(0, |g| g.end())..]);
                     (m, marked)
                 });
                 let spans = re!(

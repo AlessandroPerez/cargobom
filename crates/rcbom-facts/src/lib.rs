@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 48;
+pub const FACTS_VERSION: u32 = 49;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there
@@ -580,6 +580,15 @@ pub enum Target {
         /// (`Sha256::new()`; `<dyn MessageEncrypter>::invalid()`, at which no trait object is).
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         takes_self: bool,
+        /// The start of the source text where the function was named, and the fingerprint of
+        /// that position in its line (`line_mark`): at `through`, or at the site's own position
+        /// for a function named as a value (`value`), which a call through the pointer cites.
+        /// A naming is held to them as every position a detail gives is: two lines that name
+        /// one function for two types in one column are told apart by nothing else.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        named_text: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        named_mark: Option<String>,
     },
     /// A call through a function pointer whose function is not named in this body (`(h.f)(..)`,
     /// a parameter, a returned pointer): the site is the call's callee expression; `origin` is

@@ -1,0 +1,16 @@
+# A function pointer named in two arms of a `match`: the same function for another type on the
+# line below, in the same column (`Hmac::<Sha256>::new_from_slice` over `Hmac::<Sha512>::
+# new_from_slice`; blue-lang-runtime 0.0.282). The detail of the call through the pointer gave
+# where it was named as a position alone, and the verifier's self-test accepted that position
+# moved to the next line: the path there names the same function. A naming carries the start of
+# its text and its line's fingerprint, as every other position a detail gives, and is held to
+# them. The same for a pointer the body binds itself (`let h = Sha256::digest;` over `let g =
+# Sha512::digest;`).
+[package]
+name = "verify-57"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+hmac = "0.12"
+sha2 = "0.10"
