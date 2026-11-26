@@ -182,7 +182,7 @@ RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows be
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
-then the tool was run on 661 crates.io packages it had never been run on, in eighteen batches
+then the tool was run on 705 crates.io packages it had never been run on, in nineteen batches
 (Unseen packages, below): what those runs found is fixed in this build, but for one finding
 (two versions of one crate in a build: Limitations), and changed
 three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
@@ -231,11 +231,12 @@ Where it is not exact, the CBOM says so instead of guessing:
 published. They have no labels: what a run shows is whether it completes, whether the verifier
 confirms every position and rejects every shifted one, whether the walk check finds a gap and
 the boundary check leaves a call out. A batch passes when every package does on its first run.
-None of the eighteen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
-34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37, 29 of 32,
-35 of 36, 30 of 35, 34 of 35). Each finding is fixed in this build and has a fixture, but for
-one (two versions of one crate in a build: Limitations), and the packages are development
-material from then on (`in-too-deep.md` 8 says what such a run can and cannot show).
+The nineteenth batch did, all thirty-one of its packages that build (26 November), after
+eighteen that did not (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of 34, 27 of 35, 30
+of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37, 29 of 32, 35 of 36, 30 of
+35, 34 of 35). Each finding is fixed in this build and has a fixture, but for one (two versions
+of one crate in a build: Limitations), and the packages are development material from then on
+(`in-too-deep.md` 8 says what such a run can and cannot show).
 - *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
   nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
   branca 0.10.2, miniserve 0.35.0, jwt-compact 0.8.0, totp-rs 6.0.0, biscuit 0.8.0 and pgp 0.21.0
@@ -1048,6 +1049,32 @@ nothing of that body is read for it: a capture is then a value the closure was g
 parameters are (`regress/driver-60`; facts 54). With the fix qsv gets as far as its own code,
 which does not compile here with either of its features, with or without the tool (its `json`
 command calls a method that the json-objects-to-csv it resolves to does not have).
+
+A nineteenth batch ran the same day, on the build with the eighteenth batch's fixes: forty-four
+packages by the same rule over the packages that depend on a classical one alone, those that
+depend on a post-quantum package having all been drawn. Thirteen do not build here, with or
+without the tool: ffsend-api 0.7.3, encrypted_fs 0.1.21 and dmzj 0.3.0 need OpenSSL; the build
+scripts of systemprompt-api 0.87.0's pg_query, of sentc-crypto-rec-keys 0.15.0's safe-oqs-sys
+and of solana-gossip 4.4.1's clang-sys look for a libclang that is not here; the pinned nightly
+does not compile enarx-shim-kvm 0.6.3 (an attribute it holds unsafe), the pear_codegen 0.1.4 of
+game 1.0.8, the num-bigint 0.4.0 of sampi 0.4.0, the ahash 0.8.3 of envn 0.5.0 or the sqlx-core
+0.5.13 of dialtone_sqlx 0.1.0; the alloy-consensus 0.9.2 of gadget-sdk 0.6.2 uses a private
+module of serde that the serde it resolves to no longer has; and mutiny-core 0.4.39 requires a
+bdk whose version is yanked. All thirty-one that build passed on the first run: bcrypt-pbkdf
+0.11.0, cairo-lang-starknet-classes 2.22.0, spacetimedb-sats 2.16.3, ic-sha3 1.0.0, near-cli-rs
+0.31.1, surrealdb-datastore 4.0.1, noise-framework 0.4.1, linera-version 0.15.23, loco-protocol
+6.5.0, blaze-ssl-async 0.4.0, mcvm_auth 0.7.0, palcrypto-rs 0.2.9, passafe 1.0.4, yamldap
+0.2.1, pn_utils 0.1.0, lws-signer 0.2.27, substrate-bip39 0.6.1, aisimulate-core 0.13.0,
+aurora-evm 3.2.0, aube-registry 2.11.0, sigstore-verification 0.2.8, bashrs 7.5.0,
+devolutions-crypto 0.10.3, jacs 0.16.1, klirr-core 0.2.1, ironfish-frost 0.1.0, nostro2-nips
+0.7.0, zero-postgres 0.11.0, axiam-opaque 1.3.1, urma-chain 0.3.0 and metaunmask 0.1.0. Their
+CBOMs hold 8,137 verified positions and 9 more within a range, none rejected; all 73,704
+shifted positions and spans were rejected, the eight binaries have no walk gap, and none of the
+builds holds less than its manifest declares. Eight positions are verified with a fact not
+shown, all in devolutions-crypto and each checked by hand: its `online_ciphertext_impl!` calls
+`self.cipher.[<$func _next>](..)` inside `paste!`, which makes `encrypt_next` of the `encrypt`
+the macro is handed, a name no text spells. They name ML-DSA in three packages and ML-KEM in
+four. It is the first batch in which every package that builds passed as first run.
 
 After the third batch every earlier package that builds here was re-run, versions pinned, on
 the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
