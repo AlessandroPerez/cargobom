@@ -1,0 +1,298 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via driver-58 -> sha2 -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via driver-58 -> sha2 -> digest -> crypto-common",
+            "line": 30,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/digest@0.10.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via driver-58 -> sha2 -> digest",
+            "line": 40,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "digest"
+          }
+        ]
+      },
+      "name": "digest",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.10.7",
+      "type": "library",
+      "version": "0.10.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha2@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by driver-58 (dependencies)",
+            "line": 15,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "sha2"
+          },
+          {
+            "additionalContext": "[manifest] locked sha2 0.10.9; reached via driver-58 -> sha2",
+            "line": 73,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha2"
+          }
+        ]
+      },
+      "name": "sha2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha2@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "nistQuantumSecurityLevel": 2,
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [macro each!] in driver_58::main; use: digest; owner at src/main.rs:13:3-13:7 within 13:0-23:1; expanded from src/main.rs:6:8-6:22 as `Sha256::digest` line #1ed9c136 (by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:9:8-9:24 line #a00a5c9b defined src/main.rs:4-11, by macro each! at src/main.rs:15:17-21:5 line #3f5ee6e1 defined src/main.rs:4-11); line: `let digest = each!(`",
+            "line": 15,
+            "location": "src/main.rs",
+            "offset": 17,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/driver-58@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-256"
+      ],
+      "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/driver-58@0.1.0",
+      "name": "driver-58",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/driver-58@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "10"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "28"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin driver-58"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "1 calls into crypto packages: 1 cited, 0 cited by the check as unknown, 0 excused ()"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:a8a9886f-c7ba-80ca-bb9f-b11270c423f6",
+  "specVersion": "1.7",
+  "version": 1
+}

@@ -216,11 +216,10 @@ pub(crate) fn written(span: rustc_span::Span, around: rustc_span::Span) -> rustc
     else {
         return span;
     };
+    // (an expansion is invoked in the source or in an expansion made before it: the way out
+    // ends)
     let mut at = around;
-    for _ in 0..64 {
-        if !at.from_expansion() {
-            break;
-        }
+    while at.from_expansion() {
         let expn = at.ctxt().outer_expn_data();
         if expn.def_site.lo() <= span.lo() && span.hi() <= expn.def_site.hi() {
             return span.with_ctxt(at.ctxt());
@@ -242,10 +241,7 @@ type Extent = (rustc_span::BytePos, rustc_span::BytePos);
 /// The invocation in the source an expansion comes from: its own, or that of the outermost
 /// expansion it is in.
 fn source_invocation(mut expn: rustc_span::hygiene::ExpnData) -> Extent {
-    for _ in 0..64 {
-        if !expn.call_site.from_expansion() {
-            break;
-        }
+    while expn.call_site.from_expansion() {
         expn = expn.call_site.ctxt().outer_expn_data();
     }
     (expn.call_site.lo(), expn.call_site.hi())
@@ -480,7 +476,11 @@ fn expansion_steps(tcx: TyCtxt<'_>, span: rustc_span::Span) -> Vec<rcbom_facts::
     }
     steps_from(tcx, span.ctxt().outer_expn_data())
 }
-/// An expansion and those it is in, innermost first.
+/// An expansion and those it is in, innermost first: all of them. A macro that invokes itself
+/// once for each token it is handed (async-stream 0.2's `dispatch!`, which counts the `!` of
+/// a `try_stream!` body to pick the procedural macro that rewrites it) is as many expansions
+/// deep as the crate's recursion limit lets it be, 256 in base58-monero 0.2.1; a record cut
+/// short of the invocation in the source names no position the occurrence is cited at.
 fn steps_from(
     tcx: TyCtxt<'_>,
     first: rustc_span::hygiene::ExpnData,
@@ -489,9 +489,7 @@ fn steps_from(
     use rustc_span::hygiene::{DesugaringKind as D, ExpnKind, MacroKind as K};
     let mut out = Vec::new();
     let mut next = Some(first);
-    while let Some(expn) = next.take()
-        && out.len() < 64
-    {
+    while let Some(expn) = next.take() {
         let (kind, name) = match expn.kind {
             ExpnKind::Root => break,
             ExpnKind::Macro(K::Bang, name) => (StepKind::Bang, name.to_string()),

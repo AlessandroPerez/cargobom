@@ -1,0 +1,17 @@
+# A call a hundred and one expansions deep: `each!(x x x ..)`, a macro that invokes itself once
+# for each token it is handed and hashes when none is left. The driver recorded the expansions a
+# position is in up to sixty-four, and the record of this one ended inside the macro's own code,
+# short of the invocation in the source: the verifier found the last expansion invoked elsewhere
+# than the position cited (`the last expansion is invoked at .., not at the position cited`).
+# So in wagyu-bitcoin 0.6.3 (fifteenth batch), whose base58-monero 0.2.1 hashes inside
+# async-stream 0.2's `try_stream!`: its `dispatch!` invokes itself for each token of the body,
+# under a recursion limit of 256. The record is of all the expansions.
+[package]
+name = "driver-58"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"
+
+[workspace]
