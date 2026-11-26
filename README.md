@@ -182,7 +182,7 @@ RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows be
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
-then the tool was run on 618 crates.io packages it had never been run on, in seventeen batches
+then the tool was run on 661 crates.io packages it had never been run on, in eighteen batches
 (Unseen packages, below): what those runs found is fixed in this build, but for one finding
 (two versions of one crate in a build: Limitations), and changed
 three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
@@ -195,9 +195,9 @@ honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HM
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (396 outputs, the suite's included): 22,779 positions verified (36 of them with a fact the text does not show, all in the six fixtures built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 211,960 positions and spans of the compiler's record shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,612 calls (4,333 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,231 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
-| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 385 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
+| evidence | every cited position, `verify --self-test` | fixtures (399 outputs, the suite's included): 22,798 positions verified (36 of them with a fact the text does not show, all in the six fixtures built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 212,027 positions and spans of the compiler's record shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,614 calls (4,335 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,231 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 387 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
@@ -231,11 +231,11 @@ Where it is not exact, the CBOM says so instead of guessing:
 published. They have no labels: what a run shows is whether it completes, whether the verifier
 confirms every position and rejects every shifted one, whether the walk check finds a gap and
 the boundary check leaves a call out. A batch passes when every package does on its first run.
-None of the seventeen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27
-of 34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37, 29 of
-32, 35 of 36, 30 of 35). Each finding is fixed in this build and has a fixture, but for one
-(two versions of one crate in a build: Limitations), and the packages are development material
-from then on (`in-too-deep.md` 8 says what such a run can and cannot show).
+None of the eighteen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
+34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37, 29 of 32,
+35 of 36, 30 of 35, 34 of 35). Each finding is fixed in this build and has a fixture, but for
+one (two versions of one crate in a build: Limitations), and the packages are development
+material from then on (`in-too-deep.md` 8 says what such a run can and cannot show).
 - *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
   nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
   branca 0.10.2, miniserve 0.35.0, jwt-compact 0.8.0, totp-rs 6.0.0, biscuit 0.8.0 and pgp 0.21.0
@@ -541,7 +541,7 @@ does not show, every shifted position and span rejected. Four later fixtures hol
 kind, a call a procedural macro puts at a token that is not the call (`regress/verify-62`,
 `verify-63`, `verify-64` and `verify-68`, fourteen positions; the thirteenth and fourteenth
 batches below), and one a third, an instantiation whose type argument the code there does not
-name (`regress/verify-69`, one position; the fifteenth batch). No position of the other 390
+name (`regress/verify-69`, one position; the fifteenth batch). No position of the other 393
 fixture outputs or of the labelled sets has such a fact.
 
 The ninth batch ran on the build with all of this: twenty-seven of thirty-two. Its CBOMs hold
@@ -1011,6 +1011,43 @@ parameter (`hybrid_generate_keypair::<P>` in lupine-cert 0.1.1) whose caller nam
 one written with a metavariable (`::<$P>`) whose macro is handed the type by the invocation
 (`$callback!(::ml_dsa::MlDsa44, ..)`). Both are read there now (`regress/verify-72`,
 `verify-71`): canus-lupus has 252 positions verified, none of them so.
+
+An eighteenth batch ran the same day, on the build with the seventeenth batch's fixes:
+forty-three packages by the same rule, the last it draws of those that depend on a post-quantum
+package. Eight do not build here, with or without the tool: the build scripts of quicsh 0.1.0's
+quicsh-vt, of kbve 0.1.25's mysqlclient-sys and of kychacha_crypto 6.0.1's oqs-sys fail (the
+last two for a library and a libclang that are not here); the pinned nightly does not compile
+the proc-macro2 that internet2 0.9.0 and walletd_bip39 0.2.0 lock (1.0.51, 1.0.56) or the ahash
+of novasmt 0.2.20 and auth_lite 0.1.1 (0.7.6, 0.8.3); and solana_libra_crypto 0.0.0 requires a
+bitvec whose versions are yanked. tmkms 0.15.0 asks for one of its backends and was run with
+`softsign`. Thirty-four of the thirty-five others passed on the first run: pq-bridge-core
+0.0.1, pq-ratchet 0.2.1, revault_migrate_v1 0.1.0, umbera-core 1.1.0, ling-messenger 0.1.0,
+mldsa-kit 0.1.0, keystore-pqc 1.0.0, kinetic-core 0.2.0, lythiumseal 0.1.0, prism_lib_rs 0.1.0,
+sk-pqc 0.1.0, pq-aura 0.1.0, pqc-vault-tfm 0.1.1, pqguard 0.1.0, fips204-ffi 0.5.0,
+qorechain-qoreseal 0.1.0, phlow-experiment 0.1.0, qorel-signer 0.1.0, rise-core 0.2.0,
+wasm4pm-conform 26.10.11, einfile-sig-mldsa 0.1.0, eip55 0.4.0, tmkms 0.15.0, cryptimitives
+0.20.0, abe_gpsw 2.0.0, blueprint-client-tangle 0.2.4, shmap 0.5.0, envio 0.8.0, agora-agentkit
+0.171.0, argon2-async 0.2.0, axonyx-runtime 0.8.7, arbhx-vfs 1.6.0, oximedia-mam 0.2.1 and
+rustywallet-import 0.1.0. Their thirty-four CBOMs as first made hold 8,268 verified positions,
+none within a range and none rejected; all 71,884 shifted positions and spans were rejected, no
+position is verified with a fact not shown, and the nine binaries have no walk gap. They name
+ML-DSA in eighteen packages, ML-KEM in fourteen, X-Wing in one and HashML-DSA in one. The one
+that did not pass is qsv 16.1.0, twice over. Its three binaries each need a feature, and with
+none of them cargo builds nothing and reports success: the run compiled no crate and wrote a
+CBOM of the manifest's forty-three crypto packages and no code, with nothing to say that no
+target was built. The run now names each binary of the selection that the build analysed does
+not hold, with the features its manifest builds it only with, and says where it holds none at
+all (`regress/select-05`, `select-06`). Run with the feature its main binary needs, the driver
+overflowed the compiler's stack in flexi_logger 0.31.8, which qsv depends on. flexi_logger's
+`write_buffered` hands on a closure that assigns its result through one capture and calls the
+formatting function it holds in another. What a closure may assign through a capture is read
+for the flow of the function that builds it; where the closure's captured function is named is
+read from that same flow; and the driver, computing the one, asked for the other, each time in
+a new reading of the function, until the stack was full. While a body's flow is computed,
+nothing of that body is read for it: a capture is then a value the closure was given, as its
+parameters are (`regress/driver-60`; facts 54). With the fix qsv gets as far as its own code,
+which does not compile here with either of its features, with or without the tool (its `json`
+command calls a method that the json-objects-to-csv it resolves to does not have).
 
 After the third batch every earlier package that builds here was re-run, versions pinned, on
 the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
