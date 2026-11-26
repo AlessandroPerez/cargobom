@@ -56,6 +56,9 @@ pub struct Pkg {
     pub lib_name: Option<String>,
     /// The crate names of its binary targets (`jwt` for the package jwt-cli).
     pub bins: Vec<String>,
+    /// Its binary targets as the manifest names them, each with the features it is built
+    /// only with (`required-features`; none for one that is always built).
+    pub bin_requires: Vec<(String, Vec<String>)>,
     /// The knowledge base has entries for this version. A crypto crate in another version is
     /// still a crypto crate, but its APIs are not matched (`unsupported-version`).
     pub kb_supported: bool,
@@ -676,6 +679,12 @@ fn build(
                 .iter()
                 .filter(|t| t.kind.iter().any(|k| k.to_string() == "bin"))
                 .map(|t| t.name.replace('-', "_"))
+                .collect(),
+            bin_requires: p
+                .targets
+                .iter()
+                .filter(|t| t.kind.iter().any(|k| k.to_string() == "bin"))
+                .map(|t| (t.name.to_string(), t.required_features.clone()))
                 .collect(),
             kb_supported: exact.is_some(),
             candidates: exact.map(|e| e.candidates.clone()).unwrap_or_default(),

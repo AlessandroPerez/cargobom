@@ -1,0 +1,30 @@
+# Binaries the manifest declares and the build leaves out. `plain` is always built; `hashed`
+# needs the feature `hash`, which nothing enables, and cargo then builds the package without it
+# and says nothing. The CBOM of that build describes none of `hashed`'s code, its SHA-256
+# neither reached nor present, and said so nowhere: qsv 16.1.0 declares three binaries, each
+# behind a feature, and with none of them the run compiled nothing and wrote a CBOM of the
+# manifest's forty-three crypto packages and no code, as if the program used none (eighteenth
+# batch). A binary of a selected member that no walk is of is named in a note of the run, with
+# the features its manifest builds it only with.
+[package]
+name = "select-05"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+hash = ["dep:sha2"]
+
+[dependencies]
+md-5 = "0.10"
+sha2 = { version = "0.10", optional = true }
+
+[[bin]]
+name = "plain"
+path = "src/bin/plain.rs"
+
+[[bin]]
+name = "hashed"
+path = "src/bin/hashed.rs"
+required-features = ["hash"]
+
+[workspace]

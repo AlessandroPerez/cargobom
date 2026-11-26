@@ -1,0 +1,22 @@
+# A build that holds nothing of the program: the package's one binary needs the feature `hash`,
+# which nothing enables. cargo compiles nothing and reports success, and the CBOM is of the
+# manifest alone, SHA-2 a candidate declared and never built: the run says that no binary and no
+# library of the workspace is in the build analysed (qsv 16.1.0 with its default features,
+# eighteenth batch).
+[package]
+name = "select-06"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+hash = []
+
+[dependencies]
+sha2 = "0.10"
+
+[[bin]]
+name = "hashed"
+path = "src/main.rs"
+required-features = ["hash"]
+
+[workspace]

@@ -172,6 +172,9 @@ fn generate(a: &GenArgs) -> Result<()> {
     eprintln!("cbom: layer 2 analysis ({} crates)", facts.len());
     let mut an = analyze(&kb, &man, &mut facts);
     an.layer2 = !a.manifest_only;
+    if an.layer2 {
+        an.notes.extend(unbuilt(&sel, &man, &an.artifacts));
+    }
     let (walk_check, walk_failed) = match bins {
         Some(Ok(bins)) => match walkcheck::run(&sel, &man, &facts, &bins) {
             Ok(r) => (r, None),
@@ -308,6 +311,56 @@ fn find_driver(explicit: Option<&Path>) -> Result<PathBuf> {
 
 /// Runs the build with the driver; returns the units (`<crate><extra-filename>`) the build
 /// consists of, fresh or rebuilt, as cargo reports them.
+/// What the manifest declares and the build analysed does not hold: each binary of a selected
+/// member that no walk is of, with the features it is built only with, and that nothing at
+/// all was walked. cargo leaves a binary out without a word where a feature it requires is not
+/// enabled (qsv 16.1.0 declares three, each behind a feature: with none, nothing is compiled),
+/// and a CBOM of that build describes none of its code: the run says so.
+fn unbuilt(
+    sel: &rcbom_manifest::Selection,
+    man: &rcbom_manifest::Manifest,
+    artifacts: &[String],
+) -> Vec<String> {
+    let walked: Vec<String> = artifacts
+        .iter()
+        .filter_map(|a| a.strip_prefix("bin "))
+        .map(|n| n.replace('-', "_"))
+        .collect();
+    let mut notes = Vec::new();
+    for p in man
+        .packages
+        .iter()
+        .filter(|p| p.member && (sel.packages.is_empty() || sel.packages.contains(&p.name)))
+    {
+        for (bin, requires) in &p.bin_requires {
+            if walked.contains(&bin.replace('-', "_")) {
+                continue;
+            }
+            let why = match requires.as_slice() {
+                [] => String::new(),
+                [one] => format!(", which its manifest builds only with the feature `{one}`"),
+                more => format!(
+                    ", which its manifest builds only with the features `{}`",
+                    more.join("`, `")
+                ),
+            };
+            notes.push(format!(
+                "the binary {bin} of {} is not in the build analysed{why}: none of its code is \
+                 described",
+                p.name
+            ));
+        }
+    }
+    if artifacts.is_empty() {
+        notes.push(
+            "the build analysed holds no binary and no library of the workspace: the CBOM \
+             describes what the manifest declares, and no code"
+                .into(),
+        );
+    }
+    notes
+}
+
 fn run_driver(
     a: &GenArgs,
     sel: &rcbom_manifest::Selection,

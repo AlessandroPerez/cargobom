@@ -1,0 +1,56 @@
+  occ MD5 | crypto:algorithm:MD5 | src/bin/plain.rs:4:22 | digest::digest::Digest::digest | [reachable] [call] in plain::main; use: digest; owner at src/bin/plain.rs:3:3-3:7 within 3:0-5:1; line: `println!("{:x?}", Md5::digest(b"always built"));`; code: `Md5::digest`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:6:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via select-05 -> md-5 -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:30:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via select-05 -> md-5 -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:40:0 | digest | [manifest] locked digest 0.10.7; reached via select-05 -> md-5 -> digest
+  occ md-5 | pkg:cargo/md-5@0.10.6 | Cargo.lock:66:0 | md-5 | [manifest] locked md-5 0.10.6; reached via select-05 -> md-5
+  occ md-5 | pkg:cargo/md-5@0.10.6 | Cargo.toml:18:0 | md-5 | [manifest] declared by select-05 (dependencies)
+  prop MD5 | crypto:algorithm:MD5 | rcbom:confidence=high
+  prop MD5 | crypto:algorithm:MD5 | rcbom:detection:method=type-resolved
+  prop MD5 | crypto:algorithm:MD5 | rcbom:functions:source=observed
+  prop MD5 | crypto:algorithm:MD5 | rcbom:kb:version=0.2.0
+  prop MD5 | crypto:algorithm:MD5 | rcbom:occurrences=1
+  prop MD5 | crypto:algorithm:MD5 | rcbom:param:output_bytes=16
+  prop MD5 | crypto:algorithm:MD5 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:crypto-role=algorithm
+  prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:scope=required
+  prop md-5 | pkg:cargo/md-5@0.10.6 | rcbom:usage=reachable
+asset MD5 | crypto:algorithm:MD5 | {"algorithmProperties": {"algorithmFamily": "MD5", "cryptoFunctions": ["digest"], "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library md-5 0.10.6 | pkg:cargo/md-5@0.10.6 | purl pkg:cargo/md-5@0.10.6
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/md-5@0.10.6 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/select-05@0.1.0 -> pkg:cargo/md-5@0.10.6
+dependency crypto:algorithm:MD5
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/md-5@0.10.6
+dependency pkg:cargo/select-05@0.1.0
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/md-5@0.10.6 -> crypto:algorithm:MD5
+root {"bom-ref": "pkg:cargo/select-05@0.1.0", "name": "select-05", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/select-05@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin plain
+run rcbom:run:boundary-check=1 calls into crypto packages: 1 cited, 0 cited by the check as unknown, 0 excused ()
+run rcbom:run:features=
+run rcbom:run:note=the binary hashed of select-05 is not in the build analysed, which its manifest builds only with the feature `hash`: none of its code is described
+run rcbom:run:packages=9
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=28
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}
