@@ -126,13 +126,17 @@
 //!   its line), a macro writing it is as the record says (below), a closure or an `async` block
 //!   built there holds the code instantiated in it, and the caller, named where the record
 //!   says, holds the position. An instantiation detail citing an `[instantiation]`
-//!   occurrence's position is of one of that position's assets, and an `[instantiation]`
-//!   occurrence cited by details is cited by its own asset's, among the details of the uses
-//!   reached through the same instance (those whose chain goes on as the occurrence's own: a
-//!   function two generic callers reach for one type is cited through one of them, and at the
-//!   other the position is cited for the caller's other types); an instance written `f::<..>`
-//!   whose call's arguments set up assets of the asset's primitive (`Algorithm::hash(
-//!   HmacSha256::new_from_slice(k)?, d)`) sets up this asset among them;
+//!   occurrence's position is of one of that position's assets. What an `[instantiation]`
+//!   occurrence chooses is shown by its text (the code names a type that is the asset by
+//!   itself, or is written with a type parameter in an instance an instantiation of its chain
+//!   gave the asset) or by a use of its asset that cites it, among the uses reached through
+//!   the same instance (those whose chain goes on as the occurrence's own); where neither
+//!   shows it and uses of other assets of its kind cite it, it is verified as a fact the text
+//!   does not show, and is no mismatch: a function two generic callers reach for one type is
+//!   cited through one of them, and the function instantiated may run an algorithm of its own
+//!   of that kind (a hybrid signature's Ed25519 beside its ML-DSA); an instance written
+//!   `f::<..>` whose call's arguments set up assets of the asset's primitive
+//!   (`Algorithm::hash(HmacSha256::new_from_slice(k)?, d)`) sets up this asset among them;
 //! - the item an occurrence is in (`owner at <span> within L:C-L:C`) is named at the span,
 //!   after `fn`, `static` or `const`, and holds the position; a closure or an `async` block,
 //!   which has no name, starts with the text and has the fingerprint its record gives (`owner
@@ -639,12 +643,13 @@ pub fn run(cbom: &Path, manifest_path: &Path, self_test: bool) -> Result<()> {
     // one whose own chain those are)
     let mut cited: HashMap<Pos, HashSet<(String, Vec<Pos>)>> = HashMap::new();
     for o in &occs {
-        let steps = instantiations(&o.context);
-        for (k, at) in steps.iter().enumerate() {
-            cited
-                .entry(at.clone())
-                .or_default()
-                .insert((o.component_ref.clone(), steps[k + 1..].to_vec()));
+        for steps in instantiations(&o.context) {
+            for (k, at) in steps.iter().enumerate() {
+                cited
+                    .entry(at.clone())
+                    .or_default()
+                    .insert((o.component_ref.clone(), steps[k + 1..].to_vec()));
+            }
         }
     }
     let mut files = Files {
@@ -1068,18 +1073,45 @@ type Pos = (String, usize, usize);
 
 /// The positions an occurrence's details cite as instantiations (`instantiated by X at F:L:C`),
 /// in their order: the instance the occurrence is in was reached through the first, that one's
-/// through the next.
-fn instantiations(context: &str) -> Vec<Pos> {
-    re!(r"instantiated by .*? at ([^\s;]+?):(\d+):(\d+)(?: as `[^`]*`)?(?: \(|;|$)")
-        .captures_iter(context)
-        .map(|m| {
-            (
-                m[1].to_string(),
-                m[2].parse().unwrap_or(0),
-                m[3].parse().unwrap_or(0),
-            )
-        })
-        .collect()
+/// through the next. A chain for each way the details give. A detail that names the item it
+/// goes on from (`` `f::<..>` instantiated by Y at .. ``) starts the next way: from the start
+/// for another instance of the occurrence's own function, and for an item an earlier step
+/// names as its instantiator (another instance of that caller, a closure two chains part at),
+/// after the steps up to that one, which the two ways share.
+fn instantiations(context: &str) -> Vec<Vec<Pos>> {
+    let mut chains: Vec<Vec<Pos>> = Vec::new();
+    // (the last way's instantiators, step by step)
+    let mut by: Vec<String> = Vec::new();
+    for m in re!(
+        r"(?:`([^`]*)` )?instantiated by (.*?) at ([^\s;]+?):(\d+):(\d+)(?: as `[^`]*`)?(?: \(|;|$)"
+    )
+    .captures_iter(context)
+    {
+        let at = (
+            m[3].to_string(),
+            m[4].parse().unwrap_or(0),
+            m[5].parse().unwrap_or(0),
+        );
+        if let Some(from) = m.get(1) {
+            let shared = by
+                .iter()
+                .rposition(|b| b == from.as_str())
+                .map_or(0, |k| k + 1);
+            let head: Vec<Pos> = chains
+                .last()
+                .map(|c| c[..shared.min(c.len())].to_vec())
+                .unwrap_or_default();
+            by.truncate(head.len());
+            chains.push(head);
+        } else if chains.is_empty() {
+            chains.push(Vec::new());
+        }
+        by.push(m[2].to_string());
+        if let Some(chain) = chains.last_mut() {
+            chain.push(at);
+        }
+    }
+    chains
 }
 
 /// The parts of an occurrence's context: the leading `[..]` tags, the details, and the source

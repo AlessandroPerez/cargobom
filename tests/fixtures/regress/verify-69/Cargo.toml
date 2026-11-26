@@ -1,0 +1,25 @@
+# A function that runs an algorithm of its own beside the one its type argument chooses, of the
+# same kind: lupine-sign's hybrid signature, an Ed25519 beside the ML-DSA of `P` (lupine-cert
+# 0.1.1). The ML-DSA verification is one instance for each parameter set, and its uses cite the
+# caller the walk came through first, here the verification of ML-DSA alone. At the hybrid's
+# call the instantiation is then cited by the hybrid's Ed25519 and by nothing of ML-DSA, and
+# the verifier, which held an instantiation that uses of its kind cite to be cited by a use of
+# its own asset, called it a mismatch (`the instantiation here is cited by 3 occurrences of
+# other assets only`). What the uses left at a call are of does not say what the call chooses.
+# The text does where it names a type that is the asset by itself (`both::<ml_dsa::MlDsa65>`),
+# and where it is written with a type parameter in an instance that an instantiation of its
+# own chain gave the asset (`both::<P>` in `through::<ml_dsa::MlDsa44>`). Where neither the
+# text nor a use of the asset does (`both::<Strongest>`, an alias), what is chosen is the
+# compiler's word: verified, with that fact not shown.
+# (The lock file is lupine-cert's: ml-dsa 0.1.0-rc.7 does not build with the pkcs8 a new
+# resolution gives it.)
+[package]
+name = "verify-69"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+lupine-sign = "=0.1.1"
+ml-dsa = "=0.1.0-rc.7"
+
+[workspace]

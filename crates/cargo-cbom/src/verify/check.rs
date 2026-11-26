@@ -771,27 +771,58 @@ impl Files<'_> {
                 ));
             }
         }
-        // an instantiation's position that details cite (`instantiated by X at F:L:C`) is cited
-        // by one of this asset's, where an asset of its kind cites it at all: the function
-        // instantiated may use, beside the algorithm its type argument chooses, one of its own
-        // (pgp's `StreamDecryptor::<Aes128>::new`: the cipher chosen, and the SHA-1 of its
-        // integrity check, whose occurrences cite the instantiation)
-        // (or by one of this asset's name less its parameters, or more: the instance runs
-        // `RSA-PKCS1-1.5` with whatever hash its callers' values name, and this call's is
-        // `Pkcs1v15Sign::new::<Sha256>()`, RSA-PKCS1-1.5-SHA-256)
-        // (the uses reached through this instance, that is: those whose chain goes on from here
-        // as this occurrence's own. The function instantiated is one for each type, and where
-        // two generic callers reach it for one type, its uses cite the one the walk came
-        // through first; at the other, the uses that cite the position are those of the
-        // caller's other types: jwt's `get_hmac_with_data`, called by `sign` and by
-        // `verify_bytes`, in a program that signs with one hash and verifies with three)
+        // An `[instantiation]` occurrence says which algorithm the call's type argument chooses.
+        // The text shows it where the code there names a type that is this asset by itself
+        // (`verify_hybrid::<ml_dsa::MlDsa87>`), or is written with a type parameter of its
+        // function where the instance it is in was given this asset by an instantiation of
+        // its chain. The uses show it where one of this asset's cites the position
+        // (`instantiated by X at F:L:C`) among those reached through this instance, which are
+        // those whose chain goes on from here as this occurrence's own; or one of this asset's
+        // name less its parameters, or more (the instance runs `RSA-PKCS1-1.5` with whatever
+        // hash its callers' values name, and this call's is `Pkcs1v15Sign::new::<Sha256>()`,
+        // RSA-PKCS1-1.5-SHA-256).
+        // Where neither does, and uses of other assets of its kind cite the position, what is
+        // chosen is the compiler's word: verified, as a fact the text does not show. It is no
+        // mismatch. The function instantiated is one for each type and its uses cite the
+        // caller the walk came through first, so the uses left at another caller are those of
+        // the caller's other types (jwt's `get_hmac_with_data`, called by `sign` and by
+        // `verify_bytes`, in a program that signs with one hash and verifies with three), or
+        // of an algorithm the function runs beside the one chosen (a hybrid signature's
+        // Ed25519 beside its ML-DSA, whose own uses cite lupine-cert's pure ML-DSA
+        // verification; of another kind, the SHA-1 of the integrity check in pgp's
+        // `StreamDecryptor::<Aes128>::new`). A use written with a type parameter is held to
+        // what the instantiations of its chain choose (`check_details`).
+        let at_here = (o.location.clone(), line, offset);
+        // (its own chain, or each of them: none for one in a function of one instance)
+        let mut own = super::instantiations(&o.context);
+        if own.is_empty() {
+            own.push(Vec::new());
+        }
+        let shown = kind == "instantiation"
+            && self.cited.contains_key(&at_here)
+            && match self.path_names(&path, line, offset, &o.component_ref) {
+                Some((true, _)) => true,
+                // (code written with a type parameter of its function, `sign::<P>(..)`, chooses
+                // what the instance it is in was given: an instantiation of its chain is of
+                // this asset)
+                Some((false, true)) => own.iter().flatten().any(|at| {
+                    self.at_pos.get(at).is_some_and(|v| {
+                        v.iter().any(|&j| {
+                            self.occs[j].context.contains("] [instantiation]")
+                                && (self.occs[j].component_ref == o.component_ref
+                                    || self.refines(&self.occs[j].component_ref, &o.component_ref))
+                        })
+                    })
+                }),
+                _ => false,
+            };
         if kind == "instantiation"
-            && let Some(all) = self.cited.get(&(o.location.clone(), line, offset))
+            && !shown
+            && let Some(all) = self.cited.get(&at_here)
         {
-            let own = super::instantiations(&o.context);
             let by: HashSet<&String> = all
                 .iter()
-                .filter(|(_, rest)| *rest == own)
+                .filter(|(_, rest)| own.contains(rest))
                 .map(|(b, _)| b)
                 .collect();
             if !by.contains(&o.component_ref)
@@ -800,8 +831,9 @@ impl Files<'_> {
                     self.graph.primitive.get(*b) == self.graph.primitive.get(&o.component_ref)
                 })
             {
-                return Err(format!(
-                    "the instantiation here is cited by {} occurrences of other assets only",
+                unshown(format!(
+                    "the algorithm the instantiation chooses, which the code there does not \
+                     name: the uses reached through it that cite it are of {} other assets",
                     by.len()
                 ));
             }
@@ -1353,6 +1385,85 @@ impl Files<'_> {
         Ok(())
     }
 
+    /// What the path written at a position names, for an occurrence of an asset there: whether
+    /// a type that is the asset by itself (a type of that name the knowledge base has for it),
+    /// and whether a type parameter of the function or the impl the position is in. Every name
+    /// in the path's generic arguments is read (`sha2::Sha224` is `Sha224`'s). `None` where no
+    /// path in a function is written there.
+    fn path_names(
+        &mut self,
+        path: &Path,
+        line: usize,
+        col: usize,
+        component_ref: &str,
+    ) -> Option<(bool, bool)> {
+        let asset = component_ref
+            .strip_prefix("crypto:algorithm:")
+            .unwrap_or(component_ref);
+        let kb = self.kb;
+        let occ = self.source(path)?;
+        let (rs, rc) = rest(&occ, line, col);
+        let (quals, last, generics) = path_and_generics(&rs, &rc)?;
+        let f = occ.enclosing((line, col), &[ItemKind::Fn])?;
+        let mut params = fn_sig(&occ, f).generics;
+        if let Some(b) = impl_of(&occ, f) {
+            let (ba, bb) = occ.span(b);
+            let head = occ.text(ba, scan_to(&occ.code, ba, bb, |k| occ.code[k] == '{'));
+            // (the parameters the impl declares: the first `<..>` after `impl`)
+            if let Some(h) = head
+                .trim_start()
+                .strip_prefix("impl")
+                .map(str::trim_start)
+                .filter(|r| r.starts_with('<'))
+            {
+                let hs: Vec<char> = h.chars().collect();
+                let cls = vec![Class::Code; hs.len()];
+                if let Some(e) = skip_angle(&hs, &cls, 0) {
+                    let inner: String = hs[1..e - 1].iter().collect();
+                    params.extend(split_top(&inner).iter().filter_map(|g| {
+                        let g = g.trim().trim_start_matches("const ").trim();
+                        let n: String = g.chars().take_while(|c| is_ident(*c)).collect();
+                        (!n.is_empty() && !g.starts_with('\'')).then_some(n)
+                    }));
+                }
+            }
+        }
+        // (every name in the path's generic arguments: `sha2::Sha224` is `Sha224`'s)
+        let mut inside: Vec<String> = Vec::new();
+        let mut i = 0;
+        while i < rs.len() && rc[i] == Class::Code {
+            if rs[i] == '<' {
+                let Some(close) = skip_angle(&rs, &rc, i) else {
+                    break;
+                };
+                let text: String = rs[i + 1..close - 1].iter().collect();
+                inside.extend(
+                    re!(r"[A-Za-z_]\w*")
+                        .find_iter(&text)
+                        .map(|m| m.as_str().to_string()),
+                );
+                i = close;
+            } else if is_ident(rs[i]) || rs[i] == ':' || rs[i].is_whitespace() {
+                i += 1;
+            } else {
+                break;
+            }
+        }
+        let own = quals.iter().chain(&inside).any(|w| {
+            !params.contains(w)
+                && kb
+                    .types
+                    .iter()
+                    .any(|e| e.name == *w && e.algo.asset == asset)
+        });
+        let param = quals
+            .iter()
+            .chain(&generics)
+            .chain(std::iter::once(&last))
+            .any(|w| params.contains(w));
+        Some((own, param))
+    }
+
     /// Whether one of two assets is the other with more of its parameters named
     /// (`RSA-PKCS1-1.5-SHA-256` and `RSA-PKCS1-1.5`): by their names, as `extends` reads them.
     fn refines(&self, a: &str, b: &str) -> bool {
@@ -1394,75 +1505,10 @@ impl Files<'_> {
         // impl it is in: its asset is then what an instance's arguments choose. Not where it
         // also names a type that is this asset by itself (`run_oaep_primitive::<D, Sha1>` is
         // SHA-1's whatever `D` is, xml-sec)
-        let asset = component_ref
-            .strip_prefix("crypto:algorithm:")
-            .unwrap_or(component_ref);
-        let kb = self.kb;
-        let by_param = self.source(at.0).is_some_and(|occ| {
-            let (rs, rc) = rest(&occ, at.1, at.2);
-            let Some((quals, last, generics)) = path_and_generics(&rs, &rc) else {
-                return false;
-            };
-            let Some(f) = occ.enclosing((at.1, at.2), &[ItemKind::Fn]) else {
-                return false;
-            };
-            let mut params = fn_sig(&occ, f).generics;
-            if let Some(b) = impl_of(&occ, f) {
-                let (ba, bb) = occ.span(b);
-                let head = occ.text(ba, scan_to(&occ.code, ba, bb, |k| occ.code[k] == '{'));
-                // (the parameters the impl declares: the first `<..>` after `impl`)
-                if let Some(h) = head
-                    .trim_start()
-                    .strip_prefix("impl")
-                    .map(str::trim_start)
-                    .filter(|r| r.starts_with('<'))
-                {
-                    let hs: Vec<char> = h.chars().collect();
-                    let cls = vec![Class::Code; hs.len()];
-                    if let Some(e) = skip_angle(&hs, &cls, 0) {
-                        let inner: String = hs[1..e - 1].iter().collect();
-                        params.extend(split_top(&inner).iter().filter_map(|g| {
-                            let g = g.trim().trim_start_matches("const ").trim();
-                            let n: String = g.chars().take_while(|c| is_ident(*c)).collect();
-                            (!n.is_empty() && !g.starts_with('\'')).then_some(n)
-                        }));
-                    }
-                }
-            }
-            // (every name in the path's generic arguments: `sha2::Sha224` is `Sha224`'s)
-            let mut inside: Vec<String> = Vec::new();
-            let mut i = 0;
-            while i < rs.len() && rc[i] == Class::Code {
-                if rs[i] == '<' {
-                    let Some(close) = skip_angle(&rs, &rc, i) else {
-                        break;
-                    };
-                    let text: String = rs[i + 1..close - 1].iter().collect();
-                    inside.extend(
-                        re!(r"[A-Za-z_]\w*")
-                            .find_iter(&text)
-                            .map(|m| m.as_str().to_string()),
-                    );
-                    i = close;
-                } else if is_ident(rs[i]) || rs[i] == ':' || rs[i].is_whitespace() {
-                    i += 1;
-                } else {
-                    break;
-                }
-            }
-            let own = quals.iter().chain(&inside).any(|w| {
-                !params.contains(w)
-                    && kb
-                        .types
-                        .iter()
-                        .any(|e| e.name == *w && e.algo.asset == asset)
-            });
-            !own && quals
-                .iter()
-                .chain(&generics)
-                .chain(std::iter::once(&last))
-                .any(|w| params.contains(w))
-        });
+        let by_param = matches!(
+            self.path_names(at.0, at.1, at.2, component_ref),
+            Some((false, true))
+        );
         // what the instantiations of the chains choose: one that chooses others of this
         // asset's kind and not it, and whether one chooses it
         let mut unchosen: Option<String> = None;
