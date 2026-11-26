@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const CLOSURE_INPUT: &str = "<input>";
 
 /// Bumped whenever the shape below changes; the analysis refuses mismatched facts.
-pub const FACTS_VERSION: u32 = 53;
+pub const FACTS_VERSION: u32 = 54;
 
 /// How the links name a static's initializer as the owner of what it stores and calls
 /// (`FieldStore::func`, `LocalCall::caller`): `static <path> <id>`, so that a value stored there

@@ -1477,6 +1477,10 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             return None;
         }
         let parent = self.tcx.parent(did);
+        // (not for the parent's own flow: `building`)
+        if building(parent) {
+            return None;
+        }
         let shared = shared_body(parent)?;
         let body = &shared.body;
         let mut outer = Origins::of_shared(self.tcx, &shared, parent);

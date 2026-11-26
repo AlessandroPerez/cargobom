@@ -1,0 +1,19 @@
+# A closure that assigns through one capture and calls a function it holds in another:
+# `write_buffered` hands `with_buffer` a closure that sets `result` and calls `format`, the
+# function pointer it was given (flexi_logger 0.31.8's function of that name, under qsv 16.1.0:
+# eighteenth batch). What the closure may assign through `result` is read for the flow of
+# `write_buffered`, which builds it; what the closure holds in `format` is read from that same
+# flow. The driver asked for the closure's writes while it was reading them, each time in a new
+# reading of the body, until the compiler's stack was full (`thread 'rustc' has overflowed its
+# stack`): the package did not build under the tool. A question asked while it is being
+# answered has no answer there: the capture is then a holder as any other, written by the call
+# the closure is handed to. The SHA-256 the pointer names is cited as before.
+[package]
+name = "driver-60"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sha2 = "0.10"
+
+[workspace]

@@ -434,6 +434,20 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
 
     fn flow(&self) -> &Flow {
         self.shared_flow.unwrap_or(&self.flow).get_or_init(|| {
+            struct Built(bool);
+            impl Drop for Built {
+                fn drop(&mut self) {
+                    if self.0 {
+                        BUILDING.with(|b| {
+                            b.borrow_mut().pop();
+                        });
+                    }
+                }
+            }
+            let _built = Built(self.def.is_some_and(|d| {
+                BUILDING.with(|b| b.borrow_mut().push(d));
+                true
+            }));
             Flow::new(
                 self.tcx,
                 self.body,
@@ -442,6 +456,25 @@ impl<'a, 'tcx> Origins<'a, 'tcx> {
             )
         })
     }
+}
+
+thread_local! {
+    /// The bodies whose flow is being computed (`Origins::flow`), the innermost last.
+    static BUILDING: RefCell<Vec<DefId>> = const { RefCell::new(Vec::new()) };
+}
+
+/// Is the flow of `def`'s body being computed?
+///
+/// A body's flow reads the closures the body builds: what one assigns through a capture, what
+/// one returns. A closure reads what it captured in the body that builds it, from that body's
+/// flow. Read for the flow of its own parent, a closure would ask for the flow that is being
+/// computed, and that one for the closure again, without end: flexi_logger 0.31.8's
+/// `write_buffered` hands on a closure that assigns `result` and calls `format_function`, a
+/// function it captured, and the driver filled the compiler's stack looking for where the
+/// parent names that function. While a body's flow is computed, nothing of the body is read
+/// for it: a capture is then a value the closure was given, as its parameters are.
+pub(super) fn building(def: DefId) -> bool {
+    BUILDING.with(|b| b.borrow().contains(&def))
 }
 
 /// A body the queries of another body read: the function a closure is written in, where its
