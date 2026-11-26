@@ -182,7 +182,7 @@ RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows be
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
-then the tool was run on 577 crates.io packages it had never been run on, in sixteen batches
+then the tool was run on 618 crates.io packages it had never been run on, in seventeen batches
 (Unseen packages, below): what those runs found is fixed in this build, but for one finding
 (two versions of one crate in a build: Limitations), and changed
 three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
@@ -195,9 +195,9 @@ honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HM
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (393 outputs, the suite's included): 22,623 positions verified (36 of them with a fact the text does not show, all in the six fixtures built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 210,203 positions and spans of the compiler's record shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,551 calls (4,298 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,205 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
-| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 382 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
+| evidence | every cited position, `verify --self-test` | fixtures (396 outputs, the suite's included): 22,779 positions verified (36 of them with a fact the text does not show, all in the six fixtures built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 211,960 positions and spans of the compiler's record shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,612 calls (4,333 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,231 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 385 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
@@ -231,11 +231,11 @@ Where it is not exact, the CBOM says so instead of guessing:
 published. They have no labels: what a run shows is whether it completes, whether the verifier
 confirms every position and rejects every shifted one, whether the walk check finds a gap and
 the boundary check leaves a call out. A batch passes when every package does on its first run.
-None of the sixteen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
-34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37, 29 of 32,
-35 of 36). Each finding is fixed in this build and has a fixture, but for one (two versions of
-one crate in a build: Limitations), and the packages are development material from then on
-(`in-too-deep.md` 8 says what such a run can and cannot show).
+None of the seventeen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27
+of 34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37, 29 of
+32, 35 of 36, 30 of 35). Each finding is fixed in this build and has a fixture, but for one
+(two versions of one crate in a build: Limitations), and the packages are development material
+from then on (`in-too-deep.md` 8 says what such a run can and cannot show).
 - *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
   nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
   branca 0.10.2, miniserve 0.35.0, jwt-compact 0.8.0, totp-rs 6.0.0, biscuit 0.8.0 and pgp 0.21.0
@@ -541,7 +541,7 @@ does not show, every shifted position and span rejected. Four later fixtures hol
 kind, a call a procedural macro puts at a token that is not the call (`regress/verify-62`,
 `verify-63`, `verify-64` and `verify-68`, fourteen positions; the thirteenth and fourteenth
 batches below), and one a third, an instantiation whose type argument the code there does not
-name (`regress/verify-69`, one position; the fifteenth batch). No position of the other 387
+name (`regress/verify-69`, one position; the fifteenth batch). No position of the other 390
 fixture outputs or of the labelled sets has such a fact.
 
 The ninth batch ran on the build with all of this: twenty-seven of thirty-two. Its CBOMs hold
@@ -958,6 +958,60 @@ a function and an associated function named so in a dependency's generic code; f
 is left with nothing around it is under Limitations). artisan_middleware passes with 977
 positions verified.
 
+A seventeenth batch ran the same day, on the build with the sixteenth batch's fix: forty-one
+packages by the same rule (two more it draws, neotales-ssh and tsaur-core, have no released
+version). Six do not build here, with or without the tool: the pinned nightly does not compile
+the allocative 0.3.4 of linera-base 0.15.23; the p256k1 7.2.2 of stacks-rpc-client 2.0.0
+imports names its generated bindings do not have here; dexios-core 1.2.0 does not compile
+against the balloon-hash it resolves to; autoschematic-core 0.14.2 needs OpenSSL and
+trezor-connect-rs 10.0.1 `protoc`; and cryptoballot 0.4.0 requires an aes whose versions are
+yanked. Thirty of the thirty-five that build passed on the first run: torvyon-core 0.1.3,
+canus-lupus 0.1.1, cipherbox-pqc-core 0.7.0, omne-attest 0.1.0, echovalidum-receipt 0.3.0,
+yip-utls 0.1.0, arkhe-ipv7 0.6.2, identikey-auth 0.1.0, zorph-crypto 0.1.0, keystore-cms 1.0.0,
+nkct 2.2.1, yip-crypto 0.1.0, opaque-ke-hybrid 0.1.0, revault_archive_v1_legacy_reader 0.0.5,
+affidavit-core 26.10.17, bp-test-utils 0.30.0, fff-search 0.11.0, nova-snark 0.76.0,
+saorsa-gossip-rendezvous 0.6.1, lockstitch 0.29.0, tetcore-bip39 0.4.2, rgb-aluvm 0.11.1,
+pe-sign 0.1.10, w5500-tls 0.4.0, git-simple-encrypt 3.1.3, aigc_keychain 5.1.2, makiatto-cli
+0.6.1, kshana 0.41.0, lazycurl-core 0.5.5 and keyclaw 0.2.1. The thirty-five CBOMs as first
+made hold 10,167 verified positions and 1 more within a range, with 11 rejected and 27 verified
+with a fact not shown; all 108,115 shifted positions and spans were rejected, and three of the
+fourteen binaries have a walk gap. They name ML-DSA in sixteen packages, ML-KEM in seventeen
+and SLH-DSA in five. Five did not pass: one for a cause in the verifier, three for one in the
+walk check, and one by the limit of two versions of one crate. In lupine-cli 0.1.1 the verifier
+rejected ten positions, the key generations its `keygen` command writes in macros. lupine-sign
+re-exports its key generation under names of its own (`pub use mldsa::generate_keypair as
+ml_dsa_generate_keypair`), and lupine-cli calls them in macros it declares inside its functions
+(`ml_dsa_generate_keypair::<$P>`), one of them imported under a third name (`use
+lupine_sign::hybrid_generate_keypair as hybrid_sign_generate_keypair`). What a path names is
+read through the file's imports and the names other packages give an item; the verifier read a
+macro's code by the item's own name and the file's imports of it alone, and followed one
+renaming where there are two. A macro's code is read as any other where it is written, and a
+name the file imports under another is read as the path it is imported as, in a macro or not
+(`regress/verify-71`). lupine-cli passes: 324 positions verified. revault_migrate_v2 0.1.1,
+revault_migrate_v3 0.1.0 and revault_migrate_v4 0.1.1 each have a binary with a walk gap of
+forty-two functions, all of zstd-complete 0.3.0's optimal parser. The walk is right: nothing
+the binaries run calls them. They are the instances that only compression with an attached
+dictionary calls, which these programs do not use, and they are linked all the same because
+zstd-complete names the section its parser is placed in (`#[link_section =
+".text.sorted.030.ruzstd.opt.parser"]`). The linker keeps or drops a section whole, and keeps
+what a kept section refers to: the instances the programs call keep the section, the section
+keeps the others, and those keep what they call in turn. The check took every function linked
+for one that code which runs refers to, which holds where each function has a section of its
+own, as the compiler emits it unless the source says otherwise. It now reads the objects the
+linker was given: a function in a section with walked code, and one that such a function refers
+to, is counted apart (`kept with a section`), the linker showing nothing of it either way
+(`regress/driver-59`; Limitations). The three pass, with forty-two functions each counted so
+and no gap. pq-objectstore 0.2.0 holds rustls 0.21.12 and 0.23.45, and rustls-webpki 0.101.7
+and 0.103.15: one position is rejected and twenty-five are verified with a fact not shown, each
+a function of one version looked for in the other (Limitations). And in canus-lupus 0.1.1,
+which passed, two positions were verified with a fact not shown that the text does show, as
+were three of lupine-cli once its names were read: an instantiation written with a type
+parameter (`hybrid_generate_keypair::<P>` in lupine-cert 0.1.1) whose caller names the type
+(`self_signed_hybrid::<ml_dsa::MlDsa44>`) in a package the CBOM cites no instantiation of, and
+one written with a metavariable (`::<$P>`) whose macro is handed the type by the invocation
+(`$callback!(::ml_dsa::MlDsa44, ..)`). Both are read there now (`regress/verify-72`,
+`verify-71`): canus-lupus has 252 positions verified, none of them so.
+
 After the third batch every earlier package that builds here was re-run, versions pinned, on
 the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
 complete; 18,275 positions verified and 93 within a range, none mismatched; all 98,256
@@ -1170,12 +1224,22 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
 - *Two versions of one crate.* Values are followed across functions by their paths, and a path
   names a crate by its name: where a build holds two versions of a crate (apple-codesign 0.29.0
   holds rustls-webpki 0.101.7 and 0.102.8, both `webpki`; raddy-http 0.8.0 holds rcgen 0.13.2
-  and 0.14.10), what one version's functions pass and return is attributed to the other's too.
-  The members found are then too many, never too few, and a witness function can be named in
-  the wrong version: the verifier rejects those positions (22 in apple-codesign, 9 in
-  raddy-http), and where it looks for a function only one version declares in the text of the
-  other, it finds none and counts the fact as not shown (4 in raddy-http). The driver records
-  which crates each unit is compiled against; the analysis does not use it yet.
+  and 0.14.10; pq-objectstore 0.2.0 holds two of rustls and two of rustls-webpki), what one
+  version's functions pass and return is attributed to the other's too. The members found are
+  then too many, never too few, and a witness function can be named in the wrong version: the
+  verifier rejects those positions (22 in apple-codesign, 9 in raddy-http, 1 in
+  pq-objectstore), and where it looks for a function only one version declares in the text of
+  the other, it finds none and counts the fact as not shown (4 in raddy-http, 25 in
+  pq-objectstore). The driver records which crates each unit is compiled against; the analysis
+  does not use it yet.
+- *What the walk check rests on.* The linker keeps what code that runs refers to, a section at
+  a time. Each function has a section of its own as the compiler emits it, and the check then
+  shows every function the walk missed. Where the source names the section of several functions
+  (`#[link_section]`), the linker keeps them together: a function linked there with a walked
+  one, and one that such a function refers to, is counted apart (`kept with a section`), and
+  the check shows nothing of it, neither that it runs nor that it does not. zstd-complete's
+  optimal parser is placed so (42 functions in each of three packages of the seventeenth
+  batch).
 - *A token used a second time.* A declared macro that takes a token as it is (`$f:tt`) and uses
   it at a second place, in its own code or in that of a macro it hands it on to, leaves the
   compiler with the place of that second `$f` for it and no expansion, the same span for every
