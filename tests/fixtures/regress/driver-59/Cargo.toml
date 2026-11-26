@@ -1,0 +1,21 @@
+# The walk check against a section the source names. `grouped` puts two functions in
+# `.text.grouped` (`#[link_section]`): `used`, which the program calls, and `unused`, which
+# nothing calls and which calls `helper`. The linker keeps or drops a section whole and keeps
+# what a kept section refers to: the binary holds `unused` for the sake of `used`, and `helper`
+# for the sake of `unused`, and the check called both a gap (`linked, not walked:
+# grouped::unused`), a walk edge missing where no code that runs has one. zstd-complete 0.3.0
+# places its optimal parser so, and the instances only compression with an attached dictionary
+# calls were forty-two gaps in revault_migrate_v2 0.1.1, v3 and v4. The check reads the
+# objects the linker was given: a function in a section with walked code, and one that such a
+# function refers to, is counted apart (`kept with a section 2`), the linker showing nothing of
+# either. `other` is as before: in a section of its own, called by nothing, not linked.
+[package]
+name = "driver-59"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["grouped"]
+
+[dependencies]
+grouped = { path = "grouped" }

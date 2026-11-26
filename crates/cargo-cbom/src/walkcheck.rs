@@ -22,6 +22,13 @@
 //! - `uncalled object`, `behind a constant`: what only the methods of a trait object nothing
 //!   calls through reach, and what only code behind a branch on a constant reaches
 //!   (`Reach::uncalled`, `Reach::folded`): compiled into this binary, and never run;
+//! - `kept with a section`: in an input section of the build's object files that also holds
+//!   code the walk reached, or referred to by code that is. The linker keeps or drops a section
+//!   whole, and keeps what a kept section refers to: it keeps exactly the code the binary
+//!   contains where each function has a section of its own, which is how the compiler emits
+//!   one unless its source names its section (`#[link_section]`). What keeps such a section is
+//!   its walked code, and of the rest of it, and of what only that rest refers to, the linker
+//!   shows nothing either way (`kept_with_sections`);
 //! - `other`: a crate that is neither the program's nor holds a crypto call: code there that
 //!   reached the program's or crypto code would show as a gap itself;
 //! - `gap`: anything else, in the program's crates, the crypto crates the knowledge base
@@ -52,7 +59,7 @@ impl Report {
         // (what a vtable nothing calls through keeps in the binary: named where there is any)
         let classes: Vec<String> = CLASSES
             .iter()
-            .filter(|c| !matches!(**c, UNCALLED | FOLDED) || self.classes.contains_key(*c))
+            .filter(|c| !matches!(**c, UNCALLED | FOLDED | SHARED) || self.classes.contains_key(*c))
             .map(|c| format!("{c} {}", self.classes.get(c).copied().unwrap_or(0)))
             .collect();
         format!(
@@ -72,13 +79,21 @@ const UNCALLED: &str = "uncalled object";
 /// never runs and which this build, made without optimisation, compiles all the same
 /// (`Reach::folded`).
 const FOLDED: &str = "behind a constant";
-const CLASSES: [&str; 8] = [
+/// Linked, not walked, and nothing the linker shows: in an input section with code the walk
+/// reached, which the linker keeps whole, or referred to by such code (`kept_with_sections`).
+/// zstd-complete 0.3.0 puts its optimal parser in `.text.sorted.030.ruzstd.opt.parser`, and
+/// the instances of it that only compression with an attached dictionary calls are linked
+/// with those a program without one calls, and with them what they call in turn
+/// (revault_migrate_v2 0.1.1: forty-two functions, called by nothing the binary runs).
+const SHARED: &str = "kept with a section";
+const CLASSES: [&str; 9] = [
     "entry",
     "std",
     "modelled",
     "constructor",
     UNCALLED,
     FOLDED,
+    SHARED,
     "other",
     "gap",
 ];
@@ -146,6 +161,7 @@ pub(crate) fn run(
             classes: BTreeMap::new(),
             gaps: Vec::new(),
         };
+        let mut unexplained: Vec<(&str, &String)> = Vec::new();
         for (sym, d) in &linked {
             if walked.contains(d) {
                 continue;
@@ -155,11 +171,28 @@ pub(crate) fn run(
                 "gap" if folded.contains(d) => FOLDED,
                 c => c,
             };
+            if class == "gap" {
+                unexplained.push((sym, d));
+                continue;
+            }
+            *r.classes.entry(class).or_default() += 1;
+            if class == "other" && std::env::var_os("RCBOM_DEBUG").is_some() {
+                eprintln!("cbom: walk check: {}: other: {d}", w.artifact);
+            }
+        }
+        // (what the linker shows of each is asked of the objects it was given, where there is
+        // any: every archive of the build is read for it)
+        let kept = match (unexplained.is_empty(), exe.parent()) {
+            (false, Some(dir)) => {
+                kept_with_sections(dir, &unexplained.iter().map(|(s, _)| *s).collect(), &walked)
+            }
+            _ => HashSet::new(),
+        };
+        for (sym, d) in unexplained {
+            let class = if kept.contains(sym) { SHARED } else { "gap" };
             *r.classes.entry(class).or_default() += 1;
             if class == "gap" {
                 r.gaps.push(d.clone());
-            } else if class == "other" && std::env::var_os("RCBOM_DEBUG").is_some() {
-                eprintln!("cbom: walk check: {}: other: {d}", w.artifact);
             }
         }
         r.gaps.sort();
@@ -243,6 +276,159 @@ fn unoptimised(args: &[String]) -> Vec<String> {
     .into_iter()
     .flat_map(|o| ["-C".to_string(), o])
     .collect()
+}
+
+/// Those of the symbols `asked` (linked, not walked) that the linker has for the sake of a
+/// section, as the objects of the build under `dir` show: those of its libraries' archives. (A
+/// binary's own crate is compiled from its entry points on, and holds no function that
+/// nothing of it refers to; a library is compiled whole.)
+///
+/// The linker takes sections, not functions: one that holds a function something kept refers
+/// to is in the binary with all it holds, and with what all of it refers to. The compiler
+/// gives each function a section of its own unless the source names one, so a function linked
+/// is as a rule one referred to by code that runs. Not so:
+/// - a function in a section that also holds a walked one: the section is kept for that one;
+/// - a function that such a function refers to, or whose section it refers to, and so on: it
+///   is kept for a function that is itself there for another's sake.
+///
+/// A symbol several objects define is one of these in each of them. Which function a
+/// relocation is in is read from the symbols' addresses and sizes, and what it refers to from
+/// its symbol: one the object defines, by the section it is in, or a name another defines.
+fn kept_with_sections(
+    dir: &Path,
+    asked: &HashSet<&str>,
+    walked: &HashSet<String>,
+) -> HashSet<String> {
+    use object::{Object, ObjectSection, ObjectSymbol, RelocationTarget, SymbolKind};
+    /// One definition of an asked symbol: where, whether a walked function shares its
+    /// section, and what its code refers to (a section of its object, or a name).
+    struct Def {
+        at: (usize, usize),
+        with_walked: bool,
+        sections: Vec<(usize, usize)>,
+        names: Vec<String>,
+    }
+    // (Mach-O adds a leading underscore)
+    let v0 = |n: &str| {
+        let n = n
+            .strip_prefix("__R")
+            .map_or(n.to_string(), |r| format!("_R{r}"));
+        n.starts_with("_R").then_some(n)
+    };
+    let mut defs: HashMap<String, Vec<Def>> = HashMap::new();
+    let mut objects = 0usize;
+    let mut read = |data: &[u8]| {
+        let Ok(file) = object::File::parse(data) else {
+            return;
+        };
+        objects += 1;
+        let object = objects;
+        // (section, address, size, name) of each function with a v0 name
+        let mut fns: Vec<(usize, u64, u64, String)> = file
+            .symbols()
+            .filter(|s| s.is_definition() && s.kind() == SymbolKind::Text)
+            .filter_map(|s| {
+                let n = v0(s.name().ok()?)?;
+                Some((s.section_index()?.0, s.address(), s.size(), n))
+            })
+            .collect();
+        if !fns.iter().any(|f| asked.contains(f.3.as_str())) {
+            return;
+        }
+        fns.sort();
+        for (i, f) in fns.iter().enumerate() {
+            if !asked.contains(f.3.as_str()) {
+                continue;
+            }
+            let with_walked = fns
+                .iter()
+                .any(|m| m.0 == f.0 && m.3 != f.3 && walked.contains(&demangle(&m.3)));
+            // (to its size, or where the format has none, to the next function of the section)
+            let end = match f.2 {
+                0 => fns
+                    .get(i + 1)
+                    .filter(|n| n.0 == f.0)
+                    .map_or(u64::MAX, |n| n.1),
+                size => f.1 + size,
+            };
+            let (mut sections, mut names) = (Vec::new(), Vec::new());
+            let relocations = file
+                .section_by_index(object::SectionIndex(f.0))
+                .ok()
+                .into_iter()
+                .flat_map(|s| s.relocations().collect::<Vec<_>>());
+            for (offset, r) in relocations {
+                if offset < f.1 || offset >= end {
+                    continue;
+                }
+                let RelocationTarget::Symbol(to) = r.target() else {
+                    continue;
+                };
+                let Ok(to) = file.symbol_by_index(to) else {
+                    continue;
+                };
+                match to.section_index() {
+                    Some(section) => sections.push((object, section.0)),
+                    None => names.extend(to.name().ok().and_then(v0)),
+                }
+            }
+            defs.entry(f.3.clone()).or_default().push(Def {
+                at: (object, f.0),
+                with_walked,
+                sections,
+                names,
+            });
+        }
+    };
+    let mut dirs = vec![dir.to_path_buf()];
+    while let Some(d) = dirs.pop() {
+        for e in std::fs::read_dir(&d).into_iter().flatten().flatten() {
+            let p = e.path();
+            let name = e.file_name().to_string_lossy().into_owned();
+            if e.file_type().is_ok_and(|t| t.is_dir()) {
+                dirs.push(p);
+            } else if name.ends_with(".rlib") {
+                let Ok(data) = std::fs::read(&p) else {
+                    continue;
+                };
+                let Ok(archive) = object::read::archive::ArchiveFile::parse(&*data) else {
+                    continue;
+                };
+                for m in archive.members().flatten() {
+                    if m.name().ends_with(b".o")
+                        && let Ok(o) = m.data(&*data)
+                    {
+                        read(o);
+                    }
+                }
+            }
+        }
+    }
+    // what a function kept so refers to is kept so: its sections, and the names it calls
+    let mut kept: HashSet<String> = HashSet::new();
+    let (mut sections, mut names): (HashSet<(usize, usize)>, HashSet<String>) = Default::default();
+    loop {
+        let more: Vec<&String> = defs
+            .iter()
+            .filter(|(n, ds)| {
+                !kept.contains(*n)
+                    && ds
+                        .iter()
+                        .all(|d| d.with_walked || sections.contains(&d.at) || names.contains(*n))
+            })
+            .map(|(n, _)| n)
+            .collect();
+        if more.is_empty() {
+            return kept;
+        }
+        for n in more {
+            for d in &defs[n] {
+                sections.extend(d.sections.iter().copied());
+                names.extend(d.names.iter().cloned());
+            }
+            kept.insert(n.clone());
+        }
+    }
 }
 
 /// The arguments with those of each `@file` in its place (one a line), as the compiler reads
