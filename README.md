@@ -182,7 +182,7 @@ RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows be
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
-then the tool was run on 495 crates.io packages it had never been run on, in fourteen batches
+then the tool was run on 534 crates.io packages it had never been run on, in fifteen batches
 (Unseen packages, below): what those runs found is fixed in this build, but for one finding
 (two versions of one crate in a build: Limitations), and changed
 three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
@@ -195,9 +195,9 @@ honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HM
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (389 outputs, the suite's included): 22,514 positions verified (35 of them with a fact the text does not show, all in the five fixtures built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 208,721 positions and spans of the compiler's record shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,517 calls (4,268 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,201 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
-| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 378 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
+| evidence | every cited position, `verify --self-test` | fixtures (392 outputs, the suite's included): 22,605 positions verified (36 of them with a fact the text does not show, all in the six fixtures built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 209,941 positions and spans of the compiler's record shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,536 calls (4,283 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,205 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 381 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
@@ -231,11 +231,11 @@ Where it is not exact, the CBOM says so instead of guessing:
 published. They have no labels: what a run shows is whether it completes, whether the verifier
 confirms every position and rejects every shifted one, whether the walk check finds a gap and
 the boundary check leaves a call out. A batch passes when every package does on its first run.
-None of the fourteen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27
-of 34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37). Each
-finding is fixed in this build and has a fixture, but for one (two versions of one crate in a
-build: Limitations), and the packages are development material from then on (`in-too-deep.md`
-8 says what such a run can and cannot show).
+None of the fifteen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
+34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37, 29 of 32).
+Each finding is fixed in this build and has a fixture, but for one (two versions of one crate
+in a build: Limitations), and the packages are development material from then on
+(`in-too-deep.md` 8 says what such a run can and cannot show).
 - *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
   nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
   branca 0.10.2, miniserve 0.35.0, jwt-compact 0.8.0, totp-rs 6.0.0, biscuit 0.8.0 and pgp 0.21.0
@@ -537,11 +537,12 @@ does not lead to is the compiler's word: the position is verified, and the fact 
 counted apart (`NOT SHOWN`, "verified with a fact the text does not show"), and the self-test
 counts a shift that passes only so apart as well. The cases are in the fixture built by
 construction (`regress/verify-55`): 286 positions verified, 21 of them with a fact the text
-does not show, every shifted position and span rejected. Four later fixtures hold the one other
+does not show, every shifted position and span rejected. Four later fixtures hold a second
 kind, a call a procedural macro puts at a token that is not the call (`regress/verify-62`,
 `verify-63`, `verify-64` and `verify-68`, fourteen positions; the thirteenth and fourteenth
-batches below). No position of the other 384 fixture outputs or of the labelled sets has such a
-fact.
+batches below), and one a third, an instantiation whose type argument the code there does not
+name (`regress/verify-69`, one position; the fifteenth batch). No position of the other 386
+fixture outputs or of the labelled sets has such a fact.
 
 The ninth batch ran on the build with all of this: twenty-seven of thirty-two. Its CBOMs hold
 14,616 verified positions, 8 more within a range and the 5 rejected ones; all 124,602 shifted
@@ -863,6 +864,60 @@ callee of, is in the expansion that wrote it there (`regress/verify-65`; what is
 nothing is around it is under Limitations). And a function handed to a declared macro as an
 identifier and held as a pointer, `val!(compute)` with `$f:ident`, whose naming the verifier
 looked for in the macro's code and not in the invocation (`regress/verify-66`).
+
+A fifteenth batch ran the same day, on the build with the fourteenth batch's fixes: thirty-nine
+packages by the same rule (four more it draws, tidecoin, neotales-x509, libfcp-core and
+rustls-rustcrypto, have no released version). Seven do not build here, with or without the
+tool: the pinned nightly does not compile the rustix 0.37.28 of truthlinked-net 0.1.2
+(attributes it reserves to the compiler), the git-url-parse 0.6.0 of omnicli 2025.11.0 or the
+voprf 0.4.0-pre.3 of opaquebind 0.3.6; motsu 0.10.0, nebulous 0.1.86 and graph_fs 0.1.5 need
+the OpenSSL their openssl-sys looks for; and parker 0.0.0 requires a block-cipher-trait whose
+versions are yanked. Twenty-nine of the thirty-two that build passed on the first run:
+shadowforge 0.3.5, unified-dns 1.1.1, zk-encryption 0.1.5, age-plugin-lupine 0.1.1,
+swift-rs-blockchain 0.2.0, philharmonic 0.3.3, equs-credentials-sdk 1.4.0, forager-wallet
+0.5.2, paseto-pq 0.1.2, encryption-rust 1.3.2, mldsa-verify 0.2.0, ap-relay-protocol 0.12.0,
+sigilup-core 0.1.3, vouch-core 3.0.0, scrutari-verify 1.5.0, aegisnet-hsm 0.3.2, zkhash 0.2.0,
+wacore-appstate 0.7.0, aube-store 2.11.0, sn_curv 0.10.1, ribir_core 0.3.0, threatflux-hashing
+1.7.6, safecoin-sdk 1.14.17, convertor 2.6.12, vgi 0.53.2, tari_ootle_wallet_crypto 0.57.0,
+oracledb-protocol 0.9.1, zebflow 0.16.0 and parse-rust-auth 0.4.0. The thirty-one CBOMs as
+first made hold 18,547 verified positions and 3 more within a range, with 5 rejected; all
+175,864 shifted positions and spans were rejected, no position is verified with a fact not
+shown, and the six binaries have no walk gap. They name ML-DSA in thirteen packages, ML-KEM in
+eight and SLH-DSA in one. Three did not pass, each for a cause not seen before, one in each
+part of the tool. In lupine-cert 0.1.1 the verifier rejected one correct position, the call
+`verify_hybrid::<ml_dsa::MlDsa87>` cited as what chooses ML-DSA-87. lupine-sign's hybrid
+signature verifies an Ed25519 and the ML-DSA of its type argument. The ML-DSA verification for
+a parameter set is one instance, and the walk had reached it through the verification of ML-DSA
+alone, so the uses that cite the hybrid's call are its Ed25519 ones: of the kind of ML-DSA-87,
+and none of it. The verifier held an instantiation that uses of its kind cite to be cited by a
+use of its own asset, and called this one a mismatch; it is the rule that failed in the tenth
+batch, on the other thing the uses left at a call can be. What they are of does not say what
+the call chooses, and the rule calls no mismatch any more. What is chosen is read from the text
+first, where the code names a type that is the asset by itself (`MlDsa87`) or is written with a
+type parameter in an instance that an instantiation of its own chain gave the asset; then from
+a use of the asset that cites the position; and where neither shows it and other uses of its
+kind cite it (the type argument is an alias, or is inferred), the position is verified with
+that fact not shown (`regress/verify-69`). A use written with a type parameter is still held to
+what the instantiations of its chain choose. lupine-cert passes: 135 positions verified, none
+of them so. In justssh 0.4.0 the analysis had not ended when the run was stopped after ninety
+minutes, the build having taken twenty seconds. What a key or a nonce comes from is searched up
+the callers: a parameter is what each caller of its function passes, a field of a value each
+value written there. The search followed every way up and kept no answer, so the same parameter
+and the same field were asked about along each way that reaches them, and justssh holds its
+cipher state in a field of its transport that every key exchange writes. The answers are kept
+now, for a function's argument, for a field read of a value and for the values in a field, each
+as the search without them gives it: every fixture's CBOM is the same (`regress/analysis-201`,
+6^11 ways from a key to its use). justssh takes four minutes, with 289 positions verified,
+every shifted one rejected and one fact not shown, a `fill_bytes` on a boxed `dyn CryptoRng`
+that the build makes of the system's generator alone. In wagyu-bitcoin 0.6.3 four positions
+were rejected, all in base58-monero 0.2.1, which hashes inside async-stream 0.2's
+`try_stream!`. That macro's `dispatch!` invokes itself once for each token of the body, to
+count its `!` and pick the procedural macro that rewrites it, under a recursion limit the crate
+sets to 256. The driver recorded the expansions a position is in up to sixty-four of them: the
+record ended inside `dispatch!`'s own code, short of the invocation in the source, and the
+verifier found the last expansion invoked elsewhere than at the position cited. Every expansion
+is recorded now (`regress/driver-58`, a call a hundred and one expansions deep; facts 52), and
+wagyu-bitcoin passes with 114 positions verified.
 
 After the third batch every earlier package that builds here was re-run, versions pinned, on
 the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
