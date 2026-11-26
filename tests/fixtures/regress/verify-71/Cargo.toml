@@ -1,0 +1,25 @@
+# A macro's code that names a function by a name its package does not give it. lupine-sign
+# re-exports its key generation under names of its own (`pub use mldsa::generate_keypair as
+# ml_dsa_generate_keypair`, `hybrid::generate_keypair as hybrid_generate_keypair`), and
+# lupine-cli 0.1.1 calls them in macros it declares inside its functions, each invoked by
+# another once for each parameter set: `ml_dsa_generate_keypair::<$P>`, imported in the
+# function, and `hybrid_sign_generate_keypair::<$P>`, imported under a third name. The verifier
+# read what a macro's code names by the function's own name and the file's imports of it, and
+# not, as for code outside a macro, through the names another package gives it: ten positions
+# rejected (`the macro's code there does not name `lupine_sign::mldsa::generate_keypair``). A
+# macro's code is read as any other, where it is written; and a name the file imports under
+# another is read as the path it is imported as, in a macro or not (`plain`, rejected too:
+# `expected `generate_keypair``). What the instantiation chooses, written `$P`, is read in the
+# invocation that hands the macro its tokens (`$callback!(::ml_dsa::MlDsa44, ..)`): the
+# hybrid's was verified with that fact not shown, the uses that cite it being its Ed25519 ones.
+[package]
+name = "verify-71"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+lupine-sign = "=0.1.1"
+ml-dsa = "=0.1.0-rc.7"
+rand = "0.10"
+
+[workspace]

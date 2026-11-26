@@ -1,0 +1,427 @@
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | lupine-sign-0.1.1/src/hybrid.rs:108:8 | rand_core::Rng::fill_bytes | [reachable] [call] in lupine_sign::hybrid::generate_keypair::<..>; use: generate; owner at lupine-sign-0.1.1/src/hybrid.rs:98:7-98:23 within 98:0-117:1; instantiated by verify_71::hybrid at src/main.rs:34:4 (call, to 34:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:30:28-30:45 as `hybrid_keys::<$P>` line #bf4c7dae (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:26:3-26:9 within 26:0-35:1); `lupine_sign::hybrid::generate_keypair::<..>` instantiated by verify_71::hybrid at src/main.rs:34:4 (call, to 34:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:30:28-30:45 as `hybrid_keys::<$P>` line #bf4c7dae (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:26:3-26:9 within 26:0-35:1); `lupine_sign::hybrid::generate_keypair::<..>` instantiated by verify_71::plain at src/main.rs:39:20 as `hybrid_keys::<ml_dsa::MlDsa65>` (call, to 39:50 as `hybrid_keys::<ml_dsa::MlDsa65>` line #171c6c40, caller at src/main.rs:37:3-37:8 within 37:0-41:1); line: `rng.fill_bytes(&mut seed);`; code: `fill_bytes`
+  occ ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | lupine-sign-0.1.1/src/mldsa.rs:97:8 | rand_core::Rng::fill_bytes | [reachable] [call] in lupine_sign::mldsa::generate_keypair::<..>; use: generate; owner at lupine-sign-0.1.1/src/mldsa.rs:89:7-89:23 within 89:0-121:1; instantiated by verify_71::pure at src/main.rs:23:4 (call, to 23:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:19:28-19:57 as `ml_dsa_generate_keypair::<$P>` line #e38a3bed (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:14:3-14:7 within 14:0-24:1); `lupine_sign::mldsa::generate_keypair::<..>` instantiated by verify_71::pure at src/main.rs:23:4 (call, to 23:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:19:28-19:57 as `ml_dsa_generate_keypair::<$P>` line #e38a3bed (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:14:3-14:7 within 14:0-24:1); `lupine_sign::mldsa::generate_keypair::<..>` instantiated by lupine_sign::hybrid::generate_keypair::<..> at lupine-sign-0.1.1/src/hybrid.rs:112:31 as `mldsa_keygen::<P>` (call, to 112:48 as `mldsa_keygen::<P>` line #bcda4dc2, caller at lupine-sign-0.1.1/src/hybrid.rs:98:7-98:23 within 98:0-117:1); instantiated by verify_71::plain at src/main.rs:39:20 as `hybrid_keys::<ml_dsa::MlDsa65>` (call, to 39:50 as `hybrid_keys::<ml_dsa::MlDsa65>` line #171c6c40, caller at src/main.rs:37:3-37:8 within 37:0-41:1); line: `rng.fill_bytes(&mut seed_bytes);`; code: `fill_bytes`
+  occ Ed25519 | crypto:algorithm:Ed25519 | lupine-sign-0.1.1/src/hybrid.rs:109:16 | ed25519_dalek::signing::SigningKey::from_bytes | [reachable] [call] in lupine_sign::hybrid::generate_keypair::<..>; from_bytes: setup, not a use; key: rng (rand_core::Rng::fill_bytes); owner at lupine-sign-0.1.1/src/hybrid.rs:98:7-98:23 within 98:0-117:1; instantiated by verify_71::hybrid at src/main.rs:34:4 (call, to 34:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:30:28-30:45 as `hybrid_keys::<$P>` line #bf4c7dae (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:26:3-26:9 within 26:0-35:1); `lupine_sign::hybrid::generate_keypair::<..>` instantiated by verify_71::hybrid at src/main.rs:34:4 (call, to 34:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:30:28-30:45 as `hybrid_keys::<$P>` line #bf4c7dae (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:26:3-26:9 within 26:0-35:1); `lupine_sign::hybrid::generate_keypair::<..>` instantiated by verify_71::plain at src/main.rs:39:20 as `hybrid_keys::<ml_dsa::MlDsa65>` (call, to 39:50 as `hybrid_keys::<ml_dsa::MlDsa65>` line #171c6c40, caller at src/main.rs:37:3-37:8 within 37:0-41:1); line: `let ed_sk = Ed25519SigningKey::from_bytes(&seed);`; code: `Ed25519SigningKey::from_bytes`
+  occ Ed25519 | crypto:algorithm:Ed25519 | lupine-sign-0.1.1/src/hybrid.rs:110:16 | core::convert::From::from | [reachable] [call] in lupine_sign::hybrid::generate_keypair::<..>; from: setup, not a use; owner at lupine-sign-0.1.1/src/hybrid.rs:98:7-98:23 within 98:0-117:1; instantiated by verify_71::hybrid at src/main.rs:34:4 (call, to 34:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:30:28-30:45 as `hybrid_keys::<$P>` line #bf4c7dae (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:26:3-26:9 within 26:0-35:1); `lupine_sign::hybrid::generate_keypair::<..>` instantiated by verify_71::hybrid at src/main.rs:34:4 (call, to 34:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:30:28-30:45 as `hybrid_keys::<$P>` line #bf4c7dae (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:26:3-26:9 within 26:0-35:1); `lupine_sign::hybrid::generate_keypair::<..>` instantiated by verify_71::plain at src/main.rs:39:20 as `hybrid_keys::<ml_dsa::MlDsa65>` (call, to 39:50 as `hybrid_keys::<ml_dsa::MlDsa65>` line #171c6c40, caller at src/main.rs:37:3-37:8 within 37:0-41:1); line: `let ed_pk = Ed25519VerifyingKey::from(&ed_sk);`; code: `Ed25519VerifyingKey::from`
+  occ Ed25519 | crypto:algorithm:Ed25519 | lupine-sign-0.1.1/src/hybrid.rs:150:32 | signature::signer::Signer::sign | [present] [call] in lupine_sign::hybrid::HybridSigningKey::<P>::sign; use: sign; owner at lupine-sign-0.1.1/src/hybrid.rs:149:11-149:15 within 149:4-153:5; line: `let ed_sig = self.ed_sk.sign(message);`; code: `sign`
+  occ Ed25519 | crypto:algorithm:Ed25519 | lupine-sign-0.1.1/src/hybrid.rs:162:41 | ed25519_dalek::signing::SigningKey::as_bytes | [reachable] [call] in lupine_sign::hybrid::HybridSigningKey::<..>::to_bytes; as_bytes: setup, not a use; owner at lupine-sign-0.1.1/src/hybrid.rs:160:11-160:19 within 160:4-165:5; instantiated by verify_71::hybrid at src/main.rs:34:4 (call, to 34:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:31:15-31:23 as `to_bytes` line #69dae765 (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:26:3-26:9 within 26:0-35:1); `lupine_sign::hybrid::HybridSigningKey::<..>::to_bytes` instantiated by verify_71::hybrid at src/main.rs:34:4 (call, to 34:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:31:15-31:23 as `to_bytes` line #69dae765 (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:26:3-26:9 within 26:0-35:1); `lupine_sign::hybrid::HybridSigningKey::<..>::to_bytes` instantiated by verify_71::plain at src/main.rs:40:7 as `to_bytes` (call, to 40:15 as `to_bytes` line #3dc15739, caller at src/main.rs:37:3-37:8 within 37:0-41:1); line: `out.extend_from_slice(self.ed_sk.as_bytes());`; code: `as_bytes`
+  occ Ed25519 | crypto:algorithm:Ed25519 | lupine-sign-0.1.1/src/hybrid.rs:179:20 | ed25519_dalek::signing::SigningKey::from_bytes | [present] [call] in lupine_sign::hybrid::HybridSigningKey::<P>::from_bytes; from_bytes: setup, not a use; key: parameter (argument 0 of the enclosing function); owner at lupine-sign-0.1.1/src/hybrid.rs:174:11-174:21 within 174:4-182:5; line: `let ed_sk = Ed25519SigningKey::from_bytes(&ed_seed);`; code: `Ed25519SigningKey::from_bytes`
+  occ Ed25519 | crypto:algorithm:Ed25519 | lupine-sign-0.1.1/src/hybrid.rs:186:20 | core::convert::From::from | [present] [call] in lupine_sign::hybrid::HybridSigningKey::<P>::verifying_key; from: setup, not a use; owner at lupine-sign-0.1.1/src/hybrid.rs:185:11-185:24 within 185:4-189:5; line: `let ed_pk = Ed25519VerifyingKey::from(&self.ed_sk);`; code: `Ed25519VerifyingKey::from`
+  occ Ed25519 | crypto:algorithm:Ed25519 | lupine-sign-0.1.1/src/hybrid.rs:223:13 | signature::verifier::Verifier::verify | [present] [call] in lupine_sign::hybrid::HybridVerifyingKey::<P>::verify; use: verify; owner at lupine-sign-0.1.1/src/hybrid.rs:220:11-220:17 within 220:4-227:5; line: `.verify(message, &signature.ed_sig)`; code: `verify`
+  occ Ed25519 | crypto:algorithm:Ed25519 | lupine-sign-0.1.1/src/hybrid.rs:235:41 | ed25519_dalek::verifying::VerifyingKey::as_bytes | [present] [call] in lupine_sign::hybrid::HybridVerifyingKey::<P>::to_bytes; as_bytes: setup, not a use; owner at lupine-sign-0.1.1/src/hybrid.rs:232:11-232:19 within 232:4-238:5; line: `out.extend_from_slice(self.ed_pk.as_bytes());`; code: `as_bytes`
+  occ Ed25519 | crypto:algorithm:Ed25519 | lupine-sign-0.1.1/src/hybrid.rs:253:20 | ed25519_dalek::verifying::VerifyingKey::from_bytes | [present] [call] in lupine_sign::hybrid::HybridVerifyingKey::<P>::from_bytes; from_bytes: setup, not a use; owner at lupine-sign-0.1.1/src/hybrid.rs:248:11-248:21 within 248:4-256:5; line: `let ed_pk = Ed25519VerifyingKey::from_bytes(&ed_bytes).map_err(|_| Error::InvalidKey)?;`; code: `Ed25519VerifyingKey::from_bytes`
+  occ HMAC | crypto:candidate:hmac@0.13.0-rc.6:HMAC | Cargo.lock:296:0 | hmac | [manifest] locked hmac 0.13.0-rc.6; reached via verify-71 -> lupine-sign -> slh-dsa -> hmac
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | lupine-sign-0.1.1/src/mldsa.rs:100:20 | ml_dsa::SigningKey::<P>::from_seed | [reachable] [call] in lupine_sign::mldsa::generate_keypair::<..>; from_seed: setup, not a use; owner at lupine-sign-0.1.1/src/mldsa.rs:89:7-89:23 within 89:0-121:1; instantiated by verify_71::pure at src/main.rs:23:4 (call, to 23:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:19:28-19:57 as `ml_dsa_generate_keypair::<$P>` line #e38a3bed (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:14:3-14:7 within 14:0-24:1); line: `let sk_native = SigningKey::<P>::from_seed(&seed);`; code: `SigningKey::<P>::from_seed`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | lupine-sign-0.1.1/src/mldsa.rs:101:30 | ml_dsa::SigningKey::<P>::verifying_key | [reachable] [call] in lupine_sign::mldsa::generate_keypair::<..>; verifying_key: setup, not a use; owner at lupine-sign-0.1.1/src/mldsa.rs:89:7-89:23 within 89:0-121:1; instantiated by verify_71::pure at src/main.rs:23:4 (call, to 23:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:19:28-19:57 as `ml_dsa_generate_keypair::<$P>` line #e38a3bed (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:14:3-14:7 within 14:0-24:1); line: `let vk_native = sk_native.verifying_key();`; code: `verifying_key`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | lupine-sign-0.1.1/src/mldsa.rs:102:29 | ml_dsa::VerifyingKey::<P>::encode | [reachable] [call] in lupine_sign::mldsa::generate_keypair::<..>; encode: setup, not a use; owner at lupine-sign-0.1.1/src/mldsa.rs:89:7-89:23 within 89:0-121:1; instantiated by verify_71::pure at src/main.rs:23:4 (call, to 23:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:19:28-19:57 as `ml_dsa_generate_keypair::<$P>` line #e38a3bed (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:14:3-14:7 within 14:0-24:1); line: `let vk_bytes = vk_native.encode().to_vec();`; code: `encode`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:23:4 | lupine_sign::mldsa::generate_keypair | [reachable] [instantiation] [macro dispatch!] in verify_71::pure; chosen as generic argument of lupine_sign::mldsa::generate_keypair; owner at src/main.rs:14:3-14:7 within 14:0-24:1; expanded from src/main.rs:19:28-19:57 as `ml_dsa_generate_keypair::<$P>` line #e38a3bed (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12); line: `dispatch!(alg, keygen!(0))`
+  occ ML-DSA-44 | crypto:algorithm:ML-DSA-44 | src/main.rs:34:4 | lupine_sign::hybrid::generate_keypair | [reachable] [instantiation] [macro dispatch!] in verify_71::hybrid; chosen as generic argument of lupine_sign::hybrid::generate_keypair; owner at src/main.rs:26:3-26:9 within 26:0-35:1; expanded from src/main.rs:30:28-30:45 as `hybrid_keys::<$P>` line #bf4c7dae (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12); line: `dispatch!(alg, keygen!(0))`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | lupine-sign-0.1.1/src/mldsa.rs:100:20 | ml_dsa::SigningKey::<P>::from_seed | [reachable] [call] in lupine_sign::mldsa::generate_keypair::<..>; from_seed: setup, not a use; owner at lupine-sign-0.1.1/src/mldsa.rs:89:7-89:23 within 89:0-121:1; instantiated by lupine_sign::hybrid::generate_keypair::<..> at lupine-sign-0.1.1/src/hybrid.rs:112:31 as `mldsa_keygen::<P>` (call, to 112:48 as `mldsa_keygen::<P>` line #bcda4dc2, caller at lupine-sign-0.1.1/src/hybrid.rs:98:7-98:23 within 98:0-117:1); instantiated by verify_71::plain at src/main.rs:39:20 as `hybrid_keys::<ml_dsa::MlDsa65>` (call, to 39:50 as `hybrid_keys::<ml_dsa::MlDsa65>` line #171c6c40, caller at src/main.rs:37:3-37:8 within 37:0-41:1); line: `let sk_native = SigningKey::<P>::from_seed(&seed);`; code: `SigningKey::<P>::from_seed`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | lupine-sign-0.1.1/src/mldsa.rs:101:30 | ml_dsa::SigningKey::<P>::verifying_key | [reachable] [call] in lupine_sign::mldsa::generate_keypair::<..>; verifying_key: setup, not a use; owner at lupine-sign-0.1.1/src/mldsa.rs:89:7-89:23 within 89:0-121:1; instantiated by lupine_sign::hybrid::generate_keypair::<..> at lupine-sign-0.1.1/src/hybrid.rs:112:31 as `mldsa_keygen::<P>` (call, to 112:48 as `mldsa_keygen::<P>` line #bcda4dc2, caller at lupine-sign-0.1.1/src/hybrid.rs:98:7-98:23 within 98:0-117:1); instantiated by verify_71::plain at src/main.rs:39:20 as `hybrid_keys::<ml_dsa::MlDsa65>` (call, to 39:50 as `hybrid_keys::<ml_dsa::MlDsa65>` line #171c6c40, caller at src/main.rs:37:3-37:8 within 37:0-41:1); line: `let vk_native = sk_native.verifying_key();`; code: `verifying_key`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | lupine-sign-0.1.1/src/mldsa.rs:102:29 | ml_dsa::VerifyingKey::<P>::encode | [reachable] [call] in lupine_sign::mldsa::generate_keypair::<..>; encode: setup, not a use; owner at lupine-sign-0.1.1/src/mldsa.rs:89:7-89:23 within 89:0-121:1; instantiated by lupine_sign::hybrid::generate_keypair::<..> at lupine-sign-0.1.1/src/hybrid.rs:112:31 as `mldsa_keygen::<P>` (call, to 112:48 as `mldsa_keygen::<P>` line #bcda4dc2, caller at lupine-sign-0.1.1/src/hybrid.rs:98:7-98:23 within 98:0-117:1); instantiated by verify_71::plain at src/main.rs:39:20 as `hybrid_keys::<ml_dsa::MlDsa65>` (call, to 39:50 as `hybrid_keys::<ml_dsa::MlDsa65>` line #171c6c40, caller at src/main.rs:37:3-37:8 within 37:0-41:1); line: `let vk_bytes = vk_native.encode().to_vec();`; code: `encode`
+  occ ML-DSA-65 | crypto:algorithm:ML-DSA-65 | src/main.rs:39:20 | lupine_sign::hybrid::generate_keypair | [reachable] [instantiation] in verify_71::plain; chosen as generic argument of lupine_sign::hybrid::generate_keypair; owner at src/main.rs:37:3-37:8 within 37:0-41:1; line: `let (sk, _vk) = hybrid_keys::<ml_dsa::MlDsa65>(&mut rng).expect("a key pair");`; code: `hybrid_keys::<ml_dsa::MlDsa65>`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | lupine-sign-0.1.1/src/mldsa.rs:100:20 | ml_dsa::SigningKey::<P>::from_seed | [reachable] [call] in lupine_sign::mldsa::generate_keypair::<..>; from_seed: setup, not a use; owner at lupine-sign-0.1.1/src/mldsa.rs:89:7-89:23 within 89:0-121:1; instantiated by verify_71::pure at src/main.rs:23:4 (call, to 23:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:19:28-19:57 as `ml_dsa_generate_keypair::<$P>` line #e38a3bed (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:14:3-14:7 within 14:0-24:1); line: `let sk_native = SigningKey::<P>::from_seed(&seed);`; code: `SigningKey::<P>::from_seed`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | lupine-sign-0.1.1/src/mldsa.rs:101:30 | ml_dsa::SigningKey::<P>::verifying_key | [reachable] [call] in lupine_sign::mldsa::generate_keypair::<..>; verifying_key: setup, not a use; owner at lupine-sign-0.1.1/src/mldsa.rs:89:7-89:23 within 89:0-121:1; instantiated by verify_71::pure at src/main.rs:23:4 (call, to 23:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:19:28-19:57 as `ml_dsa_generate_keypair::<$P>` line #e38a3bed (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:14:3-14:7 within 14:0-24:1); line: `let vk_native = sk_native.verifying_key();`; code: `verifying_key`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | lupine-sign-0.1.1/src/mldsa.rs:102:29 | ml_dsa::VerifyingKey::<P>::encode | [reachable] [call] in lupine_sign::mldsa::generate_keypair::<..>; encode: setup, not a use; owner at lupine-sign-0.1.1/src/mldsa.rs:89:7-89:23 within 89:0-121:1; instantiated by verify_71::pure at src/main.rs:23:4 (call, to 23:30 as `dispatch!(alg, keygen!(0))` line #00723daa, from src/main.rs:19:28-19:57 as `ml_dsa_generate_keypair::<$P>` line #e38a3bed (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12), caller at src/main.rs:14:3-14:7 within 14:0-24:1); line: `let vk_bytes = vk_native.encode().to_vec();`; code: `encode`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:23:4 | lupine_sign::mldsa::generate_keypair | [reachable] [instantiation] [macro dispatch!] in verify_71::pure; chosen as generic argument of lupine_sign::mldsa::generate_keypair; owner at src/main.rs:14:3-14:7 within 14:0-24:1; expanded from src/main.rs:19:28-19:57 as `ml_dsa_generate_keypair::<$P>` line #e38a3bed (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12); line: `dispatch!(alg, keygen!(0))`
+  occ ML-DSA-87 | crypto:algorithm:ML-DSA-87 | src/main.rs:34:4 | lupine_sign::hybrid::generate_keypair | [reachable] [instantiation] [macro dispatch!] in verify_71::hybrid; chosen as generic argument of lupine_sign::hybrid::generate_keypair; owner at src/main.rs:26:3-26:9 within 26:0-35:1; expanded from src/main.rs:30:28-30:45 as `hybrid_keys::<$P>` line #bf4c7dae (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12); line: `dispatch!(alg, keygen!(0))`
+  occ SHA-2 | crypto:candidate:sha2@0.11.0:SHA-2 | Cargo.lock:583:0 | sha2 | [manifest] locked sha2 0.11.0; reached via verify-71 -> lupine-sign -> slh-dsa -> sha2
+  occ SHA-512 | crypto:algorithm:SHA-512 | lupine-sign-0.1.1/src/hybrid.rs:150:32 | signature::signer::Signer::sign | [present] [component] in lupine_sign::hybrid::HybridSigningKey::<P>::sign; part of Ed25519; owner at lupine-sign-0.1.1/src/hybrid.rs:149:11-149:15 within 149:4-153:5; line: `let ed_sig = self.ed_sk.sign(message);`; code: `sign`
+  occ SHA-512 | crypto:algorithm:SHA-512 | lupine-sign-0.1.1/src/hybrid.rs:223:13 | signature::verifier::Verifier::verify | [present] [component] in lupine_sign::hybrid::HybridVerifyingKey::<P>::verify; part of Ed25519; owner at lupine-sign-0.1.1/src/hybrid.rs:220:11-220:17 within 220:4-227:5; line: `.verify(message, &signature.ed_sig)`; code: `verify`
+  occ SLH-DSA | crypto:candidate:slh-dsa@0.2.0-rc.4:SLH-DSA | Cargo.lock:623:0 | slh-dsa | [manifest] locked slh-dsa 0.2.0-rc.4; reached via verify-71 -> lupine-sign -> slh-dsa
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:30:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via verify-71 -> lupine-sign -> ed25519-dalek -> curve25519-dalek -> digest -> block-buffer
+  occ block-buffer | pkg:cargo/block-buffer@0.12.0 | Cargo.lock:39:0 | block-buffer | [manifest] locked block-buffer 0.12.0; reached via verify-71 -> lupine-sign -> signature -> digest -> block-buffer
+  occ chacha20 | pkg:cargo/chacha20@0.10.0 | Cargo.lock:54:0 | chacha20 | [manifest] locked chacha20 0.10.0; reached via verify-71 -> rand -> chacha20
+  occ cmov | pkg:cargo/cmov@0.5.2 | Cargo.lock:65:0 | cmov | [manifest] locked cmov 0.5.2; reached via verify-71 -> lupine-sign -> signature -> digest -> ctutils -> cmov
+  occ const-oid | pkg:cargo/const-oid@0.10.2 | Cargo.lock:77:0 | const-oid | [manifest] locked const-oid 0.10.2; reached via verify-71 -> ml-dsa -> const-oid
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:101:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via verify-71 -> lupine-sign -> ed25519-dalek -> curve25519-dalek -> digest -> crypto-common
+  occ crypto-common | pkg:cargo/crypto-common@0.2.1 | Cargo.lock:111:0 | crypto-common | [manifest] locked crypto-common 0.2.1; reached via verify-71 -> lupine-sign -> signature -> digest -> crypto-common
+  occ ctutils | pkg:cargo/ctutils@0.4.0 | Cargo.lock:120:0 | ctutils | [manifest] locked ctutils 0.4.0; reached via verify-71 -> lupine-sign -> signature -> digest -> ctutils
+  occ curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | Cargo.lock:129:0 | curve25519-dalek | [manifest] locked curve25519-dalek 4.1.3; reached via verify-71 -> lupine-sign -> ed25519-dalek -> curve25519-dalek
+  occ der | pkg:cargo/der@0.8.0 | Cargo.lock:166:0 | der | [manifest] locked der 0.8.0; reached via verify-71 -> ml-dsa -> pkcs8 -> der
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:176:0 | digest | [manifest] locked digest 0.10.7; reached via verify-71 -> lupine-sign -> ed25519-dalek -> curve25519-dalek -> digest
+  occ digest | pkg:cargo/digest@0.11.2 | Cargo.lock:186:0 | digest | [manifest] locked digest 0.11.2; reached via verify-71 -> lupine-sign -> signature -> digest
+  occ ed25519 | pkg:cargo/ed25519@2.2.3 | Cargo.lock:197:0 | ed25519 | [manifest] locked ed25519 2.2.3; reached via verify-71 -> lupine-sign -> ed25519-dalek -> ed25519
+  occ ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | Cargo.lock:207:0 | ed25519-dalek | [manifest] locked ed25519-dalek 2.2.0; reached via verify-71 -> lupine-sign -> ed25519-dalek
+  occ getrandom | pkg:cargo/getrandom@0.4.2 | Cargo.lock:261:0 | getrandom | [manifest] locked getrandom 0.4.2; reached via verify-71 -> rand -> getrandom
+  occ hmac | pkg:cargo/hmac@0.13.0-rc.6 | Cargo.lock:296:0 | hmac | [manifest] locked hmac 0.13.0-rc.6; reached via verify-71 -> lupine-sign -> slh-dsa -> hmac
+  occ keccak | pkg:cargo/keccak@0.2.0 | Cargo.lock:339:0 | keccak | [manifest] locked keccak 0.2.0; reached via verify-71 -> ml-dsa -> sha3 -> keccak
+  occ lupine-core | pkg:cargo/lupine-core@0.1.0 | Cargo.lock:367:0 | lupine-core | [manifest] locked lupine-core 0.1.0; reached via verify-71 -> lupine-sign -> lupine-core
+  occ lupine-sign | pkg:cargo/lupine-sign@0.1.1 | Cargo.lock:377:0 | lupine-sign | [manifest] locked lupine-sign 0.1.1; reached via verify-71 -> lupine-sign
+  occ lupine-sign | pkg:cargo/lupine-sign@0.1.1 | Cargo.toml:21:0 | lupine-sign | [manifest] declared by verify-71 (dependencies)
+  occ ml-dsa | pkg:cargo/ml-dsa@0.1.0-rc.7 | Cargo.lock:399:0 | ml-dsa | [manifest] locked ml-dsa 0.1.0-rc.7; reached via verify-71 -> ml-dsa
+  occ ml-dsa | pkg:cargo/ml-dsa@0.1.0-rc.7 | Cargo.toml:22:0 | ml-dsa | [manifest] declared by verify-71 (dependencies)
+  occ module-lattice | pkg:cargo/module-lattice@0.1.0 | Cargo.lock:415:0 | module-lattice | [manifest] locked module-lattice 0.1.0; reached via verify-71 -> ml-dsa -> module-lattice
+  occ pkcs8 | pkg:cargo/pkcs8@0.11.0-rc.11 | Cargo.lock:445:0 | pkcs8 | [manifest] locked pkcs8 0.11.0-rc.11; reached via verify-71 -> ml-dsa -> pkcs8
+  occ rand | pkg:cargo/rand@0.10.1 | Cargo.lock:489:0 | rand | [manifest] locked rand 0.10.1; reached via verify-71 -> rand
+  occ rand | pkg:cargo/rand@0.10.1 | Cargo.toml:23:0 | rand | [manifest] declared by verify-71 (dependencies)
+  occ rand_core | pkg:cargo/rand_core@0.10.0 | Cargo.lock:509:0 | rand_core | [manifest] locked rand_core 0.10.0; reached via verify-71 -> lupine-sign -> rand_core
+  occ rand_core | pkg:cargo/rand_core@0.6.4 | Cargo.lock:500:0 | rand_core | [manifest] locked rand_core 0.6.4; reached via verify-71 -> lupine-sign -> ed25519-dalek -> rand_core
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:572:0 | sha2 | [manifest] locked sha2 0.10.9; reached via verify-71 -> lupine-sign -> ed25519-dalek -> sha2
+  occ sha2 | pkg:cargo/sha2@0.11.0 | Cargo.lock:583:0 | sha2 | [manifest] locked sha2 0.11.0; reached via verify-71 -> lupine-sign -> slh-dsa -> sha2
+  occ sha3 | pkg:cargo/sha3@0.11.0-rc.9 | Cargo.lock:594:0 | sha3 | [manifest] locked sha3 0.11.0-rc.9; reached via verify-71 -> ml-dsa -> sha3
+  occ signature | pkg:cargo/signature@2.2.0 | Cargo.lock:604:0 | signature | [manifest] locked signature 2.2.0; reached via verify-71 -> lupine-sign -> ed25519-dalek -> ed25519 -> signature
+  occ signature | pkg:cargo/signature@3.0.0-rc.10 | Cargo.lock:613:0 | signature | [manifest] locked signature 3.0.0-rc.10; reached via verify-71 -> lupine-sign -> signature
+  occ slh-dsa | pkg:cargo/slh-dsa@0.2.0-rc.4 | Cargo.lock:623:0 | slh-dsa | [manifest] locked slh-dsa 0.2.0-rc.4; reached via verify-71 -> lupine-sign -> slh-dsa
+  occ spki | pkg:cargo/spki@0.8.0-rc.4 | Cargo.lock:653:0 | spki | [manifest] locked spki 0.8.0-rc.4; reached via verify-71 -> ml-dsa -> pkcs8 -> spki
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:663:0 | subtle | [manifest] locked subtle 2.6.1; reached via verify-71 -> lupine-sign -> ed25519-dalek -> subtle
+  occ unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | src/main.rs:23:4 | lupine_sign::mldsa::MlDsaSigningKey::<P>::to_bytes | [reachable] [call] [macro dispatch!] in verify_71::pure; use: unknown; algorithm unresolved: `lupine_sign::mldsa::MlDsaSigningKey::<P>::to_bytes` of lupine-sign 0.1.1, a crypto package the knowledge base does not model: what the call does is not known; owner at src/main.rs:14:3-14:7 within 14:0-24:1; expanded from src/main.rs:20:15-20:23 as `to_bytes` line #69dae765 (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12); expanded from src/main.rs:20:15-20:23 as `to_bytes` line #69dae765 (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:16-22, by macro dispatch! at src/main.rs:23:4-23:30 line #00723daa defined src/main.rs:5-12); line: `dispatch!(alg, keygen!(0))`
+  occ unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | src/main.rs:34:4 | lupine_sign::hybrid::HybridSigningKey::<P>::to_bytes | [reachable] [call] [macro dispatch!] in verify_71::hybrid; use: unknown; algorithm unresolved: `lupine_sign::hybrid::HybridSigningKey::<P>::to_bytes` of lupine-sign 0.1.1, a crypto package the knowledge base does not model: what the call does is not known; owner at src/main.rs:26:3-26:9 within 26:0-35:1; expanded from src/main.rs:31:15-31:23 as `to_bytes` line #69dae765 (by macro keygen! at src/main.rs:8:17-8:57 line #118b689c defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12); expanded from src/main.rs:31:15-31:23 as `to_bytes` line #69dae765 (by macro keygen! at src/main.rs:9:17-9:57 line #e46409de defined src/main.rs:27-33, by macro dispatch! at src/main.rs:34:4-34:30 line #00723daa defined src/main.rs:5-12); line: `dispatch!(alg, keygen!(0))`
+  occ unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | src/main.rs:40:7 | lupine_sign::hybrid::HybridSigningKey::<P>::to_bytes | [reachable] [call] in verify_71::plain; use: unknown; algorithm unresolved: `lupine_sign::hybrid::HybridSigningKey::<P>::to_bytes` of lupine-sign 0.1.1, a crypto package the knowledge base does not model: what the call does is not known; owner at src/main.rs:37:3-37:8 within 37:0-41:1; line: `sk.to_bytes().len()`; code: `to_bytes`
+  occ zeroize | pkg:cargo/zeroize@1.8.2 | Cargo.lock:879:0 | zeroize | [manifest] locked zeroize 1.8.2; reached via verify-71 -> lupine-sign -> zeroize
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:confidence=high
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:detection:method=type-resolved
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:functions:source=observed
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:kb:version=0.2.0
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:occurrences=2
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:reachability=reachable
+  prop ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | rcbom:registry-name=unmatched
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:confidence=high
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:detection:method=type-resolved
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:functions:source=knowledge-base
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:kb:version=0.2.0
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:occurrences=9
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:provenance:key=parameter,rng
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:quantum-level:source=quantum-vulnerable: EdDSA, broken by Shor's algorithm (NIST IR 8547, Table 2)
+  prop Ed25519 | crypto:algorithm:Ed25519 | rcbom:reachability=reachable
+  prop HMAC | crypto:candidate:hmac@0.13.0-rc.6:HMAC | rcbom:confidence=low
+  prop HMAC | crypto:candidate:hmac@0.13.0-rc.6:HMAC | rcbom:detection:method=manifest
+  prop HMAC | crypto:candidate:hmac@0.13.0-rc.6:HMAC | rcbom:kb:version=0.2.0
+  prop HMAC | crypto:candidate:hmac@0.13.0-rc.6:HMAC | rcbom:usage=declared-not-used
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:confidence=high
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:detection:method=type-resolved
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:functions:source=knowledge-base
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:kb:version=0.2.0
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:occurrences=5
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:quantum-level:source=NIST IR 8547, Table 3: ML-DSA-44 (category 1 if its random bits come from a generator of less than 192 bits of security)
+  prop ML-DSA-44 | crypto:algorithm:ML-DSA-44 | rcbom:reachability=reachable
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:confidence=high
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:detection:method=type-resolved
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:functions:source=knowledge-base
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:kb:version=0.2.0
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:occurrences=4
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:quantum-level:source=NIST IR 8547, Table 3: ML-DSA-65
+  prop ML-DSA-65 | crypto:algorithm:ML-DSA-65 | rcbom:reachability=reachable
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:confidence=high
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:detection:method=type-resolved
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:functions:source=knowledge-base
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:kb:version=0.2.0
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:occurrences=5
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:quantum-level:source=NIST IR 8547, Table 3: ML-DSA-87
+  prop ML-DSA-87 | crypto:algorithm:ML-DSA-87 | rcbom:reachability=reachable
+  prop SHA-2 | crypto:candidate:sha2@0.11.0:SHA-2 | rcbom:confidence=low
+  prop SHA-2 | crypto:candidate:sha2@0.11.0:SHA-2 | rcbom:detection:method=manifest
+  prop SHA-2 | crypto:candidate:sha2@0.11.0:SHA-2 | rcbom:kb:version=0.2.0
+  prop SHA-2 | crypto:candidate:sha2@0.11.0:SHA-2 | rcbom:registry-name=unmatched
+  prop SHA-2 | crypto:candidate:sha2@0.11.0:SHA-2 | rcbom:usage=declared-not-used
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:confidence=high
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:detection:method=type-resolved
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:functions:source=knowledge-base
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:kb:version=0.2.0
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:occurrences=2
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:only-as-component=true
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-512, collision and preimage category
+  prop SHA-512 | crypto:algorithm:SHA-512 | rcbom:reachability=present
+  prop SLH-DSA | crypto:candidate:slh-dsa@0.2.0-rc.4:SLH-DSA | rcbom:confidence=low
+  prop SLH-DSA | crypto:candidate:slh-dsa@0.2.0-rc.4:SLH-DSA | rcbom:detection:method=manifest
+  prop SLH-DSA | crypto:candidate:slh-dsa@0.2.0-rc.4:SLH-DSA | rcbom:kb:version=0.2.0
+  prop SLH-DSA | crypto:candidate:slh-dsa@0.2.0-rc.4:SLH-DSA | rcbom:registry-name=unmatched
+  prop SLH-DSA | crypto:candidate:slh-dsa@0.2.0-rc.4:SLH-DSA | rcbom:usage=declared-not-used
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.12.0 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.12.0 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.12.0 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.12.0 | rcbom:usage=reachable
+  prop chacha20 | pkg:cargo/chacha20@0.10.0 | rcbom:crypto-role=algorithm
+  prop chacha20 | pkg:cargo/chacha20@0.10.0 | rcbom:scope=required
+  prop chacha20 | pkg:cargo/chacha20@0.10.0 | rcbom:usage=reachable
+  prop cmov | pkg:cargo/cmov@0.5.2 | rcbom:crypto-role=support
+  prop cmov | pkg:cargo/cmov@0.5.2 | rcbom:kb-coverage=unmodelled
+  prop cmov | pkg:cargo/cmov@0.5.2 | rcbom:scope=required
+  prop cmov | pkg:cargo/cmov@0.5.2 | rcbom:usage=present
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:crypto-role=support
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:kb-coverage=unmodelled
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:scope=required
+  prop const-oid | pkg:cargo/const-oid@0.10.2 | rcbom:usage=present
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop crypto-common | pkg:cargo/crypto-common@0.2.1 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.2.1 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.0 | rcbom:crypto-role=support
+  prop ctutils | pkg:cargo/ctutils@0.4.0 | rcbom:kb-coverage=unmodelled
+  prop ctutils | pkg:cargo/ctutils@0.4.0 | rcbom:scope=required
+  prop ctutils | pkg:cargo/ctutils@0.4.0 | rcbom:usage=present
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:crypto-role=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:kb-coverage=unmodelled
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:scope=required
+  prop curve25519-dalek | pkg:cargo/curve25519-dalek@4.1.3 | rcbom:usage=reachable
+  prop der | pkg:cargo/der@0.8.0 | rcbom:crypto-role=support
+  prop der | pkg:cargo/der@0.8.0 | rcbom:kb-coverage=unmodelled
+  prop der | pkg:cargo/der@0.8.0 | rcbom:scope=required
+  prop der | pkg:cargo/der@0.8.0 | rcbom:usage=present
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.11.2 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.11.2 | rcbom:scope=required
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:crypto-role=unmodelled
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:kb-coverage=unmodelled
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:scope=required
+  prop ed25519 | pkg:cargo/ed25519@2.2.3 | rcbom:usage=present
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:crypto-role=algorithm
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:scope=required
+  prop ed25519-dalek | pkg:cargo/ed25519-dalek@2.2.0 | rcbom:usage=reachable
+  prop getrandom | pkg:cargo/getrandom@0.4.2 | rcbom:crypto-role=algorithm
+  prop getrandom | pkg:cargo/getrandom@0.4.2 | rcbom:scope=required
+  prop getrandom | pkg:cargo/getrandom@0.4.2 | rcbom:usage=reachable
+  prop hmac | pkg:cargo/hmac@0.13.0-rc.6 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.13.0-rc.6 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.13.0-rc.6 | rcbom:usage=declared-not-used
+  prop keccak | pkg:cargo/keccak@0.2.0 | rcbom:crypto-role=unmodelled
+  prop keccak | pkg:cargo/keccak@0.2.0 | rcbom:kb-coverage=unmodelled
+  prop keccak | pkg:cargo/keccak@0.2.0 | rcbom:scope=required
+  prop keccak | pkg:cargo/keccak@0.2.0 | rcbom:usage=reachable
+  prop lupine-core | pkg:cargo/lupine-core@0.1.0 | rcbom:crypto-role=unmodelled
+  prop lupine-core | pkg:cargo/lupine-core@0.1.0 | rcbom:kb-coverage=unmodelled
+  prop lupine-core | pkg:cargo/lupine-core@0.1.0 | rcbom:scope=required
+  prop lupine-core | pkg:cargo/lupine-core@0.1.0 | rcbom:usage=reachable
+  prop lupine-sign | pkg:cargo/lupine-sign@0.1.1 | rcbom:crypto-role=unmodelled
+  prop lupine-sign | pkg:cargo/lupine-sign@0.1.1 | rcbom:kb-coverage=unmodelled
+  prop lupine-sign | pkg:cargo/lupine-sign@0.1.1 | rcbom:scope=required
+  prop lupine-sign | pkg:cargo/lupine-sign@0.1.1 | rcbom:usage=reachable
+  prop ml-dsa | pkg:cargo/ml-dsa@0.1.0-rc.7 | rcbom:crypto-role=algorithm
+  prop ml-dsa | pkg:cargo/ml-dsa@0.1.0-rc.7 | rcbom:scope=required
+  prop ml-dsa | pkg:cargo/ml-dsa@0.1.0-rc.7 | rcbom:usage=reachable
+  prop module-lattice | pkg:cargo/module-lattice@0.1.0 | rcbom:crypto-role=support
+  prop module-lattice | pkg:cargo/module-lattice@0.1.0 | rcbom:kb-coverage=unmodelled
+  prop module-lattice | pkg:cargo/module-lattice@0.1.0 | rcbom:scope=required
+  prop module-lattice | pkg:cargo/module-lattice@0.1.0 | rcbom:usage=reachable
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0-rc.11 | rcbom:crypto-role=support
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0-rc.11 | rcbom:kb-coverage=unmodelled
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0-rc.11 | rcbom:scope=required
+  prop pkcs8 | pkg:cargo/pkcs8@0.11.0-rc.11 | rcbom:usage=present
+  prop rand | pkg:cargo/rand@0.10.1 | rcbom:crypto-role=algorithm
+  prop rand | pkg:cargo/rand@0.10.1 | rcbom:scope=required
+  prop rand | pkg:cargo/rand@0.10.1 | rcbom:usage=reachable
+  prop rand_core | pkg:cargo/rand_core@0.10.0 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.10.0 | rcbom:scope=required
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:crypto-role=trait
+  prop rand_core | pkg:cargo/rand_core@0.6.4 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.11.0 | rcbom:usage=declared-not-used
+  prop sha3 | pkg:cargo/sha3@0.11.0-rc.9 | rcbom:crypto-role=algorithm
+  prop sha3 | pkg:cargo/sha3@0.11.0-rc.9 | rcbom:scope=required
+  prop sha3 | pkg:cargo/sha3@0.11.0-rc.9 | rcbom:usage=reachable
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@2.2.0 | rcbom:scope=required
+  prop signature | pkg:cargo/signature@3.0.0-rc.10 | rcbom:crypto-role=trait
+  prop signature | pkg:cargo/signature@3.0.0-rc.10 | rcbom:scope=required
+  prop slh-dsa | pkg:cargo/slh-dsa@0.2.0-rc.4 | rcbom:crypto-role=algorithm
+  prop slh-dsa | pkg:cargo/slh-dsa@0.2.0-rc.4 | rcbom:scope=required
+  prop slh-dsa | pkg:cargo/slh-dsa@0.2.0-rc.4 | rcbom:usage=declared-not-used
+  prop spki | pkg:cargo/spki@0.8.0-rc.4 | rcbom:crypto-role=support
+  prop spki | pkg:cargo/spki@0.8.0-rc.4 | rcbom:kb-coverage=unmodelled
+  prop spki | pkg:cargo/spki@0.8.0-rc.4 | rcbom:scope=required
+  prop spki | pkg:cargo/spki@0.8.0-rc.4 | rcbom:usage=present
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=reachable
+  prop unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | rcbom:algorithm=unresolved
+  prop unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | rcbom:confidence=high
+  prop unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | rcbom:detection:method=type-resolved
+  prop unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | rcbom:functions:source=observed
+  prop unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | rcbom:kb:version=0.2.0
+  prop unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | rcbom:occurrences=3
+  prop unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | rcbom:reachability=reachable
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:crypto-role=support
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:kb-coverage=unmodelled
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:scope=required
+  prop zeroize | pkg:cargo/zeroize@1.8.2 | rcbom:usage=reachable
+asset ChaCha12-RNG | crypto:algorithm:ChaCha12-RNG | {"algorithmProperties": {"cryptoFunctions": ["generate"], "primitive": "drbg"}, "assetType": "algorithm"}
+asset Ed25519 | crypto:algorithm:Ed25519 | {"algorithmProperties": {"algorithmFamily": "EdDSA", "cryptoFunctions": ["sign", "verify"], "ellipticCurve": "other/Ed25519", "nistQuantumSecurityLevel": 0, "primitive": "signature"}, "assetType": "algorithm"}
+asset HMAC | crypto:candidate:hmac@0.13.0-rc.6:HMAC | {"algorithmProperties": {"algorithmFamily": "HMAC", "primitive": "mac"}, "assetType": "algorithm"}
+asset ML-DSA-44 | crypto:algorithm:ML-DSA-44 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "nistQuantumSecurityLevel": 2, "primitive": "signature"}, "assetType": "algorithm"}
+asset ML-DSA-65 | crypto:algorithm:ML-DSA-65 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "nistQuantumSecurityLevel": 3, "primitive": "signature"}, "assetType": "algorithm"}
+asset ML-DSA-87 | crypto:algorithm:ML-DSA-87 | {"algorithmProperties": {"algorithmFamily": "ML-DSA", "cryptoFunctions": ["keygen", "sign", "verify"], "nistQuantumSecurityLevel": 5, "primitive": "signature"}, "assetType": "algorithm"}
+asset SHA-2 | crypto:candidate:sha2@0.11.0:SHA-2 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "primitive": "hash"}, "assetType": "algorithm"}
+asset SHA-512 | crypto:algorithm:SHA-512 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 5, "primitive": "hash"}, "assetType": "algorithm"}
+asset SLH-DSA | crypto:candidate:slh-dsa@0.2.0-rc.4:SLH-DSA | {"algorithmProperties": {"algorithmFamily": "SLH-DSA", "primitive": "signature"}, "assetType": "algorithm"}
+asset unknown | crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa | {"algorithmProperties": {"cryptoFunctions": ["unknown"], "primitive": "unknown"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library block-buffer 0.12.0 | pkg:cargo/block-buffer@0.12.0 | purl pkg:cargo/block-buffer@0.12.0
+component library chacha20 0.10.0 | pkg:cargo/chacha20@0.10.0 | purl pkg:cargo/chacha20@0.10.0
+component library cmov 0.5.2 | pkg:cargo/cmov@0.5.2 | purl pkg:cargo/cmov@0.5.2
+component library const-oid 0.10.2 | pkg:cargo/const-oid@0.10.2 | purl pkg:cargo/const-oid@0.10.2
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library crypto-common 0.2.1 | pkg:cargo/crypto-common@0.2.1 | purl pkg:cargo/crypto-common@0.2.1
+component library ctutils 0.4.0 | pkg:cargo/ctutils@0.4.0 | purl pkg:cargo/ctutils@0.4.0
+component library curve25519-dalek 4.1.3 | pkg:cargo/curve25519-dalek@4.1.3 | purl pkg:cargo/curve25519-dalek@4.1.3
+component library der 0.8.0 | pkg:cargo/der@0.8.0 | purl pkg:cargo/der@0.8.0
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library digest 0.11.2 | pkg:cargo/digest@0.11.2 | purl pkg:cargo/digest@0.11.2
+component library ed25519 2.2.3 | pkg:cargo/ed25519@2.2.3 | purl pkg:cargo/ed25519@2.2.3
+component library ed25519-dalek 2.2.0 | pkg:cargo/ed25519-dalek@2.2.0 | purl pkg:cargo/ed25519-dalek@2.2.0
+component library getrandom 0.4.2 | pkg:cargo/getrandom@0.4.2 | purl pkg:cargo/getrandom@0.4.2
+component library hmac 0.13.0-rc.6 | pkg:cargo/hmac@0.13.0-rc.6 | purl pkg:cargo/hmac@0.13.0-rc.6
+component library keccak 0.2.0 | pkg:cargo/keccak@0.2.0 | purl pkg:cargo/keccak@0.2.0
+component library lupine-core 0.1.0 | pkg:cargo/lupine-core@0.1.0 | purl pkg:cargo/lupine-core@0.1.0
+component library lupine-sign 0.1.1 | pkg:cargo/lupine-sign@0.1.1 | purl pkg:cargo/lupine-sign@0.1.1
+component library ml-dsa 0.1.0-rc.7 | pkg:cargo/ml-dsa@0.1.0-rc.7 | purl pkg:cargo/ml-dsa@0.1.0-rc.7
+component library module-lattice 0.1.0 | pkg:cargo/module-lattice@0.1.0 | purl pkg:cargo/module-lattice@0.1.0
+component library pkcs8 0.11.0-rc.11 | pkg:cargo/pkcs8@0.11.0-rc.11 | purl pkg:cargo/pkcs8@0.11.0-rc.11
+component library rand 0.10.1 | pkg:cargo/rand@0.10.1 | purl pkg:cargo/rand@0.10.1
+component library rand_core 0.10.0 | pkg:cargo/rand_core@0.10.0 | purl pkg:cargo/rand_core@0.10.0
+component library rand_core 0.6.4 | pkg:cargo/rand_core@0.6.4 | purl pkg:cargo/rand_core@0.6.4
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library sha2 0.11.0 | pkg:cargo/sha2@0.11.0 | purl pkg:cargo/sha2@0.11.0
+component library sha3 0.11.0-rc.9 | pkg:cargo/sha3@0.11.0-rc.9 | purl pkg:cargo/sha3@0.11.0-rc.9
+component library signature 2.2.0 | pkg:cargo/signature@2.2.0 | purl pkg:cargo/signature@2.2.0
+component library signature 3.0.0-rc.10 | pkg:cargo/signature@3.0.0-rc.10 | purl pkg:cargo/signature@3.0.0-rc.10
+component library slh-dsa 0.2.0-rc.4 | pkg:cargo/slh-dsa@0.2.0-rc.4 | purl pkg:cargo/slh-dsa@0.2.0-rc.4
+component library spki 0.8.0-rc.4 | pkg:cargo/spki@0.8.0-rc.4 | purl pkg:cargo/spki@0.8.0-rc.4
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+component library zeroize 1.8.2 | pkg:cargo/zeroize@1.8.2 | purl pkg:cargo/zeroize@1.8.2
+dep crypto:algorithm:Ed25519 -> crypto:algorithm:SHA-512
+dep pkg:cargo/block-buffer@0.12.0 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/chacha20@0.10.0 -> pkg:cargo/rand_core@0.10.0
+dep pkg:cargo/crypto-common@0.2.1 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/ctutils@0.4.0 -> pkg:cargo/cmov@0.5.2
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/curve25519-dalek@4.1.3 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/der@0.8.0 -> pkg:cargo/const-oid@0.10.2
+dep pkg:cargo/der@0.8.0 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.11.2 -> pkg:cargo/block-buffer@0.12.0
+dep pkg:cargo/digest@0.11.2 -> pkg:cargo/crypto-common@0.2.1
+dep pkg:cargo/digest@0.11.2 -> pkg:cargo/ctutils@0.4.0
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/curve25519-dalek@4.1.3
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/ed25519@2.2.3
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/ed25519-dalek@2.2.0 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/ed25519@2.2.3 -> pkg:cargo/signature@2.2.0
+dep pkg:cargo/getrandom@0.4.2 -> pkg:cargo/rand_core@0.10.0
+dep pkg:cargo/hmac@0.13.0-rc.6 -> pkg:cargo/digest@0.11.2
+dep pkg:cargo/lupine-core@0.1.0 -> pkg:cargo/rand_core@0.6.4
+dep pkg:cargo/lupine-core@0.1.0 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/lupine-sign@0.1.1 -> pkg:cargo/ed25519-dalek@2.2.0
+dep pkg:cargo/lupine-sign@0.1.1 -> pkg:cargo/lupine-core@0.1.0
+dep pkg:cargo/lupine-sign@0.1.1 -> pkg:cargo/ml-dsa@0.1.0-rc.7
+dep pkg:cargo/lupine-sign@0.1.1 -> pkg:cargo/rand@0.10.1
+dep pkg:cargo/lupine-sign@0.1.1 -> pkg:cargo/rand_core@0.10.0
+dep pkg:cargo/lupine-sign@0.1.1 -> pkg:cargo/signature@3.0.0-rc.10
+dep pkg:cargo/lupine-sign@0.1.1 -> pkg:cargo/slh-dsa@0.2.0-rc.4
+dep pkg:cargo/lupine-sign@0.1.1 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/ml-dsa@0.1.0-rc.7 -> pkg:cargo/const-oid@0.10.2
+dep pkg:cargo/ml-dsa@0.1.0-rc.7 -> pkg:cargo/module-lattice@0.1.0
+dep pkg:cargo/ml-dsa@0.1.0-rc.7 -> pkg:cargo/pkcs8@0.11.0-rc.11
+dep pkg:cargo/ml-dsa@0.1.0-rc.7 -> pkg:cargo/rand_core@0.10.0
+dep pkg:cargo/ml-dsa@0.1.0-rc.7 -> pkg:cargo/sha3@0.11.0-rc.9
+dep pkg:cargo/ml-dsa@0.1.0-rc.7 -> pkg:cargo/signature@3.0.0-rc.10
+dep pkg:cargo/ml-dsa@0.1.0-rc.7 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/module-lattice@0.1.0 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/pkcs8@0.11.0-rc.11 -> pkg:cargo/der@0.8.0
+dep pkg:cargo/pkcs8@0.11.0-rc.11 -> pkg:cargo/spki@0.8.0-rc.4
+dep pkg:cargo/rand@0.10.1 -> pkg:cargo/chacha20@0.10.0
+dep pkg:cargo/rand@0.10.1 -> pkg:cargo/getrandom@0.4.2
+dep pkg:cargo/rand@0.10.1 -> pkg:cargo/rand_core@0.10.0
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.11.0 -> pkg:cargo/digest@0.11.2
+dep pkg:cargo/sha3@0.11.0-rc.9 -> pkg:cargo/digest@0.11.2
+dep pkg:cargo/sha3@0.11.0-rc.9 -> pkg:cargo/keccak@0.2.0
+dep pkg:cargo/signature@3.0.0-rc.10 -> pkg:cargo/digest@0.11.2
+dep pkg:cargo/signature@3.0.0-rc.10 -> pkg:cargo/rand_core@0.10.0
+dep pkg:cargo/slh-dsa@0.2.0-rc.4 -> pkg:cargo/const-oid@0.10.2
+dep pkg:cargo/slh-dsa@0.2.0-rc.4 -> pkg:cargo/digest@0.11.2
+dep pkg:cargo/slh-dsa@0.2.0-rc.4 -> pkg:cargo/hmac@0.13.0-rc.6
+dep pkg:cargo/slh-dsa@0.2.0-rc.4 -> pkg:cargo/pkcs8@0.11.0-rc.11
+dep pkg:cargo/slh-dsa@0.2.0-rc.4 -> pkg:cargo/rand_core@0.10.0
+dep pkg:cargo/slh-dsa@0.2.0-rc.4 -> pkg:cargo/sha2@0.11.0
+dep pkg:cargo/slh-dsa@0.2.0-rc.4 -> pkg:cargo/sha3@0.11.0-rc.9
+dep pkg:cargo/slh-dsa@0.2.0-rc.4 -> pkg:cargo/signature@3.0.0-rc.10
+dep pkg:cargo/slh-dsa@0.2.0-rc.4 -> pkg:cargo/zeroize@1.8.2
+dep pkg:cargo/spki@0.8.0-rc.4 -> pkg:cargo/der@0.8.0
+dep pkg:cargo/verify-71@0.1.0 -> pkg:cargo/lupine-sign@0.1.1
+dep pkg:cargo/verify-71@0.1.0 -> pkg:cargo/ml-dsa@0.1.0-rc.7
+dep pkg:cargo/verify-71@0.1.0 -> pkg:cargo/rand@0.10.1
+dependency crypto:algorithm:ChaCha12-RNG
+dependency crypto:algorithm:Ed25519
+dependency crypto:algorithm:ML-DSA-44
+dependency crypto:algorithm:ML-DSA-65
+dependency crypto:algorithm:ML-DSA-87
+dependency crypto:algorithm:SHA-512
+dependency crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa
+dependency crypto:candidate:hmac@0.13.0-rc.6:HMAC
+dependency crypto:candidate:sha2@0.11.0:SHA-2
+dependency crypto:candidate:slh-dsa@0.2.0-rc.4:SLH-DSA
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/block-buffer@0.12.0
+dependency pkg:cargo/chacha20@0.10.0
+dependency pkg:cargo/cmov@0.5.2
+dependency pkg:cargo/const-oid@0.10.2
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/crypto-common@0.2.1
+dependency pkg:cargo/ctutils@0.4.0
+dependency pkg:cargo/curve25519-dalek@4.1.3
+dependency pkg:cargo/der@0.8.0
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/digest@0.11.2
+dependency pkg:cargo/ed25519-dalek@2.2.0
+dependency pkg:cargo/ed25519@2.2.3
+dependency pkg:cargo/getrandom@0.4.2
+dependency pkg:cargo/hmac@0.13.0-rc.6
+dependency pkg:cargo/keccak@0.2.0
+dependency pkg:cargo/lupine-core@0.1.0
+dependency pkg:cargo/lupine-sign@0.1.1
+dependency pkg:cargo/ml-dsa@0.1.0-rc.7
+dependency pkg:cargo/module-lattice@0.1.0
+dependency pkg:cargo/pkcs8@0.11.0-rc.11
+dependency pkg:cargo/rand@0.10.1
+dependency pkg:cargo/rand_core@0.10.0
+dependency pkg:cargo/rand_core@0.6.4
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/sha2@0.11.0
+dependency pkg:cargo/sha3@0.11.0-rc.9
+dependency pkg:cargo/signature@2.2.0
+dependency pkg:cargo/signature@3.0.0-rc.10
+dependency pkg:cargo/slh-dsa@0.2.0-rc.4
+dependency pkg:cargo/spki@0.8.0-rc.4
+dependency pkg:cargo/subtle@2.6.1
+dependency pkg:cargo/verify-71@0.1.0
+dependency pkg:cargo/zeroize@1.8.2
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/chacha20@0.10.0 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/ed25519-dalek@2.2.0 -> crypto:algorithm:Ed25519
+provides pkg:cargo/hmac@0.13.0-rc.6 -> crypto:candidate:hmac@0.13.0-rc.6:HMAC
+provides pkg:cargo/lupine-sign@0.1.1 -> crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa
+provides pkg:cargo/ml-dsa@0.1.0-rc.7 -> crypto:algorithm:ML-DSA-44
+provides pkg:cargo/ml-dsa@0.1.0-rc.7 -> crypto:algorithm:ML-DSA-65
+provides pkg:cargo/ml-dsa@0.1.0-rc.7 -> crypto:algorithm:ML-DSA-87
+provides pkg:cargo/ml-dsa@0.1.0-rc.7 -> crypto:algorithm:unknown:unknown:lupine-sign+ml-dsa
+provides pkg:cargo/rand@0.10.1 -> crypto:algorithm:ChaCha12-RNG
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-512
+provides pkg:cargo/sha2@0.11.0 -> crypto:candidate:sha2@0.11.0:SHA-2
+provides pkg:cargo/slh-dsa@0.2.0-rc.4 -> crypto:candidate:slh-dsa@0.2.0-rc.4:SLH-DSA
+root {"bom-ref": "pkg:cargo/verify-71@0.1.0", "name": "verify-71", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/verify-71@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin verify-71
+run rcbom:run:boundary-check=20 calls into crypto packages: 14 cited, 0 cited by the check as unknown, 6 excused (format 3, generator setup 3)
+run rcbom:run:features=
+run rcbom:run:packages=55
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=195
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

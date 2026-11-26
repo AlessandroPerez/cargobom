@@ -8,8 +8,45 @@ impl Files<'_> {
     /// of the file, or by an alias another file defines, of this package or of the crate the
     /// path goes through (`mylib::hash_it` for `pub use ring::digest::digest as hash_it;` in
     /// mylib; a name a glob import brings from a module that re-exports the item under it)?
+    ///
+    /// A name the file imports under another is read as the path it is imported as: lupine-cli's
+    /// `use lupine_sign::hybrid_generate_keypair as hybrid_sign_generate_keypair;`, of a name
+    /// that lupine-sign itself re-exports `hybrid::generate_keypair` as.
     #[allow(clippy::too_many_arguments)]
-    fn names_item(
+    pub(super) fn names_item(
+        &mut self,
+        src: &Source,
+        file: &Path,
+        quals: &[String],
+        last: &str,
+        ident: &str,
+        sym: &str,
+        sym_crate: &str,
+    ) -> bool {
+        // (each import read is of another name: a file's imports are followed once each)
+        let mut read = vec![last.to_string()];
+        let mut at = (quals.to_vec(), last.to_string());
+        loop {
+            if self.names_item_as(src, file, &at.0, &at.1, ident, sym, sym_crate) {
+                return true;
+            }
+            let renamed = at.0.is_empty().then(|| {
+                src.binds.iter().find(|b| {
+                    b.name == at.1
+                        && b.path.len() > 1
+                        && b.path.last().is_some_and(|l| !read.contains(l))
+                })
+            });
+            let Some(Some((l, q))) = renamed.map(|b| b.and_then(|b| b.path.split_last())) else {
+                return false;
+            };
+            read.push(l.clone());
+            at = (q.to_vec(), l.clone());
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn names_item_as(
         &mut self,
         src: &Source,
         file: &Path,
@@ -798,13 +835,19 @@ impl Files<'_> {
         if own.is_empty() {
             own.push(Vec::new());
         }
+        let asset = o
+            .component_ref
+            .strip_prefix("crypto:algorithm:")
+            .unwrap_or(&o.component_ref);
         let shown = kind == "instantiation"
             && self.cited.contains_key(&at_here)
-            && match self.path_names(&path, line, offset, &o.component_ref) {
+            && (match self.path_names(&path, line, offset, &o.component_ref) {
                 Some((true, _)) => true,
                 // (code written with a type parameter of its function, `sign::<P>(..)`, chooses
                 // what the instance it is in was given: an instantiation of its chain is of
-                // this asset)
+                // this asset, or the call of a step of the chain names a type that is it, where
+                // the CBOM cites no instantiation: lupine-cert's `self_signed_hybrid::<ml_dsa::
+                // MlDsa44>(algo)`, in a package that is a dependency of the one analysed)
                 Some((false, true)) => own.iter().flatten().any(|at| {
                     self.at_pos.get(at).is_some_and(|v| {
                         v.iter().any(|&j| {
@@ -812,10 +855,22 @@ impl Files<'_> {
                                 && (self.occs[j].component_ref == o.component_ref
                                     || self.refines(&self.occs[j].component_ref, &o.component_ref))
                         })
+                    }) || self.resolve(&at.0).is_ok_and(|p| {
+                        matches!(
+                            self.path_names(&p, at.1, at.2, &o.component_ref),
+                            Some((true, _))
+                        )
                     })
                 }),
                 _ => false,
-            };
+            }
+            // (a macro's code, read where it is written and in the invocations that hand it
+            // its tokens)
+            || parts(ctx.details).iter().any(|part| {
+                part.strip_prefix("expanded from ")
+                    .and_then(witness::written_whole)
+                    .is_some_and(|w| self.macro_names_asset(&w, asset))
+            }));
         if kind == "instantiation"
             && !shown
             && let Some(all) = self.cited.get(&at_here)

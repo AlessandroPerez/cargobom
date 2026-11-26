@@ -1,0 +1,18 @@
+# An instantiation written with a type parameter, in a package the CBOM cites no instantiation
+# of. lupine-cert 0.1.1's `self_signed_hybrid::<P>` calls lupine-sign's hybrid key generation
+# with its own `P` (`hybrid_generate_keypair::<P>`), and is itself called with each parameter
+# set named (`self.self_signed_hybrid::<ml_dsa::MlDsa44>(algo)`). The verifier holds such an
+# instantiation to what the instantiations of its chain choose, and looked for one cited at the
+# chain's call: there is one where lupine-cert is the package analysed, and none where it is a
+# dependency (canus-lupus 0.1.1), and the position was verified with the fact not shown, the
+# uses that cite it being the hybrid's Ed25519 ones. The chain's call is read where it is
+# written: it names a type that is the asset by itself.
+[package]
+name = "verify-72"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+lupine-cert = "=0.1.1"
+
+[workspace]

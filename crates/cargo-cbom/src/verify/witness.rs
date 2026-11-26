@@ -1037,7 +1037,8 @@ impl Files<'_> {
             .and_then(|l| l.chars().nth(w.at.start.1))
             == Some('$');
         let (rs, rc) = rest(&src, w.at.start.0, w.at.start.1 + usize::from(dollar));
-        let last = path_and_generics(&rs, &rc).map(|(_, last, _)| last);
+        let parsed = path_and_generics(&rs, &rc);
+        let last = parsed.as_ref().map(|(_, last, _)| last.clone());
         if last.as_deref().map(|l| l.trim_start_matches("r#")) == Some(ident.as_str()) {
             return Ok(true);
         }
@@ -1048,6 +1049,18 @@ impl Files<'_> {
                 .any(|b| b.name == *l && b.path.last() == Some(&ident))
         {
             return Ok(true);
+        }
+        // (as a path of plain code names an item, where the macro's code is written: by an
+        // alias another file defines, of this package or of the crate the path goes through.
+        // lupine-cli's `do_mldsa_keygen!` calls `ml_dsa_generate_keypair::<$P>`, which the
+        // function declaring the macro imports from lupine-sign, whose `lib.rs` has
+        // `pub use mldsa::generate_keypair as ml_dsa_generate_keypair;`)
+        if let Some((quals, l, _)) = &parsed {
+            let sym = strip_generics(symbol);
+            let sym_crate = sym.split("::").next().unwrap_or("").to_string();
+            if self.names_item(&src, &path, quals, l, &ident, &sym, &sym_crate) {
+                return Ok(true);
+            }
         }
         // (a `macro_rules!` body's path is resolved where the macro is invoked: a name the
         // invoking file imports the symbol as; and `$crate::name`, one the macro's package
@@ -1117,6 +1130,47 @@ impl Files<'_> {
             }
         }
         Ok(false)
+    }
+
+    /// Whether code a macro writes names a type that is `asset` by itself: where the code is
+    /// written, or, where that code has a metavariable (`generate::<$P>`), in the invocation
+    /// that hands the macro its tokens, and so on outwards while an invocation is written with
+    /// one (lupine-cli's `do_keygen!` is invoked as `$callback!(::ml_dsa::MlDsa44, $($args)*)`
+    /// by its `dispatch!`). Every type of the knowledge base that the text read names is to be
+    /// of the asset: one that names two does not say which the code is given.
+    pub(super) fn macro_names_asset(&mut self, w: &Written, asset: &str) -> bool {
+        let kb = self.kb;
+        let mut spans = vec![w.at.clone()];
+        spans.extend(
+            w.steps
+                .iter()
+                .filter(|s| s.kind == StepKind::Macro)
+                .filter_map(|s| s.call.clone()),
+        );
+        for at in spans {
+            let Some(src) = self.resolve(&at.file).ok().and_then(|p| self.source(&p)) else {
+                return false;
+            };
+            let code = text_of(&src, at.start, at.end);
+            let mut of_asset = false;
+            for m in re!(r"[A-Za-z_]\w*").find_iter(&code) {
+                let mut named = kb.types.iter().filter(|e| e.name == m.as_str()).peekable();
+                if named.peek().is_none() {
+                    continue;
+                }
+                if !named.all(|e| e.algo.asset == asset) {
+                    return false;
+                }
+                of_asset = true;
+            }
+            if of_asset {
+                return true;
+            }
+            if !re!(r"\$[A-Za-z_]\w*").is_match(&code) {
+                return false;
+            }
+        }
+        false
     }
 
     /// An item is named where the detail says, and holds the position `held`: the occurrence's,
