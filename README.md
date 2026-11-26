@@ -182,7 +182,7 @@ RustCrypto generation after 0.10, blake2, p521, uuid's random draw): the rows be
 it, so all four sets are development sets now. Before it (the build of 26 October) the held-out
 row was 38 correct, 4 less-specific, 40 honest-unknown, 4 miss, the review row 28, 1, 3, 1, and
 the suite had 3 less-specific sites; no algorithm was reported wrongly then or now. Since
-then the tool was run on 534 crates.io packages it had never been run on, in fifteen batches
+then the tool was run on 577 crates.io packages it had never been run on, in sixteen batches
 (Unseen packages, below): what those runs found is fixed in this build, but for one finding
 (two versions of one crate in a build: Limitations), and changed
 three labelled sites' verdicts, all to correct: rustic_core's private `apply_with_rng`, an
@@ -195,9 +195,9 @@ honest unknown, and jwt's `Hmac<D>` signing and verification, less specific (`HM
 | held-out | boringtun, dufs, totp-rs, gcp_auth, rustic_core, ssh-key, jwt | Layer 1: 112/112 found, none reported that is not; Layer 2: 86 live sites: 72 correct, 0 less-specific, 13 honest-unknown, 1 miss, 0 wrong; 10 dead sites, nothing reported there |
 | review | rbw 1.15.0, biscuit-auth 6.0.0 (the reviewer's labels) | Layer 1: 67/68 found, none reported that is not (the one not found, quinn-proto, is in rbw's lockfile but not in its build); Layer 2: 33 sites: 29 correct, 1 less-specific, 3 honest-unknown, 0 miss, 0 wrong |
 | rusi fixtures | three labelled cdxgen fixtures, against rusi 4.1.1 | cargo-cbom: 14/14 core sites found, 19/19 reported correct, 14/14 fully named, key provenance 10/10; rusi: 12/14, 12/15, 7/14, 0/10 |
-| evidence | every cited position, `verify --self-test` | fixtures (392 outputs, the suite's included): 22,605 positions verified (36 of them with a fact the text does not show, all in the six fixtures built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 209,941 positions and spans of the compiler's record shifted by a line or a column rejected |
-| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,536 calls (4,283 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,205 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
-| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 381 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
+| evidence | every cited position, `verify --self-test` | fixtures (393 outputs, the suite's included): 22,623 positions verified (36 of them with a fact the text does not show, all in the six fixtures built for that), 1 more within a range of identical candidates, and 3 the verifier cannot confirm (each checked correct by hand); corpus 1,872, held-out 1,406 and review 803 verified, none within a range, none with a fact not shown; every one of 210,203 positions and spans of the compiler's record shifted by a line or a column rejected |
+| boundary check | every call the walked code makes into a crypto package, those the standard library makes for it and those of a library's generic functions (`rcbom:run:boundary-check`) | none left out: fixtures 12,551 calls (4,298 cited, 19 cited by the check by name, 29 cited by the check as unknown, 8,205 excused), corpus 1,568 (334, 0, 0, 1,234), held-out 1,138 (392, 3, 1, 742), review 801 (174, 1, 1, 625) |
+| walk vs linker | code each binary links that the walk did not reach (`--check-walk`) | gap 0 on realapp, jwt-cli, rage, rage-keygen, xh, dufs, rbw, rbw-agent, and on the 382 binaries of the fixtures that link (`cargo xtask e2e --walk`; one fixture's does not, by design) |
 | cost | one cold run per project on 4 cores: compilation, analysis, walk check | 4 s (totp-rs) to 206 s (dufs) for the corpus and held-out projects, 347 s for rbw; peak memory of the process tree 0.3 to 3.5 GB (4.8 GB for rbw), measured on the build of 26 October; reruns reproduce each CBOM exactly |
 
 Where it is not exact, the CBOM says so instead of guessing:
@@ -231,10 +231,10 @@ Where it is not exact, the CBOM says so instead of guessing:
 published. They have no labels: what a run shows is whether it completes, whether the verifier
 confirms every position and rejects every shifted one, whether the walk check finds a gap and
 the boundary check leaves a call out. A batch passes when every package does on its first run.
-None of the fifteen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
-34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37, 29 of 32).
-Each finding is fixed in this build and has a fixture, but for one (two versions of one crate
-in a build: Limitations), and the packages are development material from then on
+None of the sixteen batches so far did (0 of 15, 15 of 30, 14 of 19, 17 of 22, 24 of 32, 27 of
+34, 27 of 35, 30 of 33, 27 of 32, 32 of 36, 31 of 35, 39 of 41, 34 of 35, 35 of 37, 29 of 32,
+35 of 36). Each finding is fixed in this build and has a fixture, but for one (two versions of
+one crate in a build: Limitations), and the packages are development material from then on
 (`in-too-deep.md` 8 says what such a run can and cannot show).
 - *Fifteen, 10 November:* rsign2 0.6.7, cocoon 0.5.0, magic-crypt 6.0.0, djangohashers 1.8.4,
   nkeys 0.4.5, cookie 0.18.2 (`secure`), htpasswd-verify 0.3.0, passwords 3.1.19, sha256 1.6.0,
@@ -541,7 +541,7 @@ does not show, every shifted position and span rejected. Four later fixtures hol
 kind, a call a procedural macro puts at a token that is not the call (`regress/verify-62`,
 `verify-63`, `verify-64` and `verify-68`, fourteen positions; the thirteenth and fourteenth
 batches below), and one a third, an instantiation whose type argument the code there does not
-name (`regress/verify-69`, one position; the fifteenth batch). No position of the other 386
+name (`regress/verify-69`, one position; the fifteenth batch). No position of the other 387
 fixture outputs or of the labelled sets has such a fact.
 
 The ninth batch ran on the build with all of this: twenty-seven of thirty-two. Its CBOMs hold
@@ -919,6 +919,45 @@ verifier found the last expansion invoked elsewhere than at the position cited. 
 is recorded now (`regress/driver-58`, a call a hundred and one expansions deep; facts 52), and
 wagyu-bitcoin passes with 114 positions verified.
 
+A sixteenth batch ran on 26 November, on the build with the fifteenth batch's fixes:
+forty-three packages by the same rule. Seven do not build here, with or without the tool: the
+piu_engine 0.4.1 of piu_crypto 0.273.0 wants one of two features that piu_crypto does not
+enable; oarust 0.17.0 needs the ALSA and PipeWire libraries its alsa-sys and libspa-sys look
+for, and dendrite_auth 0.11.1 and hiero-sdk 0.45.0 the `protoc` their build scripts run; the
+monero 0.17.3 of farcaster_core 0.6.4 imports a private module of serde that the serde it
+resolves to no longer has; and the pinned nightly does not compile the rustix 0.37.28 of
+truthlinked-consensus 0.1.2 or the sqlx-postgres 0.7.4 of security-cam-common 0.1.5.
+Thirty-five of the thirty-six that build passed on the first run: kernoid-crypt 0.6.0,
+smp-pqc-core 1.0.0, atlas-pca 0.4.3, kxco-verify 1.2.2, licoarc 0.2.0, pqbind-crypto 0.2.0,
+cleitonq 0.2.0, qorx 1.0.6, qurox-pq 0.2.1, silithium 0.0.2, revault_archive_v1_reader 0.0.5,
+frasil-crypto 0.1.0, revault_archive_v3_reader 0.0.9, nexusq-x509 4.1.1, abir_guard 3.1.1,
+cipherbox-pqc-native 0.7.0, revault_archive_v1_initial_reader 0.0.5, kyriotes-csk2 0.1.2,
+enclave-pqc-primitives 0.1.1, iroh-gossip 0.103.0, rialo-venus-build-helper 0.27.0, dixscript
+1.0.0, mandos 0.18.0, lakers-crypto-rustcrypto 0.8.0, zakura-note-encryption 5.4.0, namada_core
+0.251.4, idempotent-proxy-types 1.2.2, modu 3.3.0, smart-locker 0.3.1, p12_q3 0.8.0, wgctrl
+0.1.0, rustauth-core 0.3.2, wrapper-bcrypt 0.1.0, qualia2fa-core 0.4.1 and sz-rust-addons-admin
+2.1.0. The thirty-six CBOMs as first made hold 7,133 verified positions and 4 more within a
+range, with 1 rejected; all 57,599 shifted positions and spans were rejected, no position is
+verified with a fact not shown, and the eleven binaries have no walk gap. They name ML-DSA in
+eighteen packages, ML-KEM in thirteen, SLH-DSA in four and X-Wing in one. One did not pass, for
+a cause the fourteenth batch had found half of. In artisan_middleware 7.3.0 the verifier
+rejected one position, a step of the chain that makes the encryption of aead-stream 0.6.0
+XChaCha20-Poly1305. aead-stream's `impl_stream_object!` takes the name of the method its
+encryptor calls as a token (`$op:tt`) and writes `self.stream.$op(..)` in two methods. Where
+the macro first uses it the token keeps the span the source gave it; at the second place the
+compiler gives it the place of that `$op` in the macro's definition and no expansion, as it
+does a token handed on to a second macro. The driver has taken the expansion of such a token
+from the code around it since the fourteenth batch, where the compiler's table of metavariable
+spans says the span is one. That table is of the crate being compiled, and aead-stream's
+generic methods are compiled where they are instantiated, with their spans as aead-stream's
+compilation left them and no table: the call of `encrypt` was cited at 299:28, in the macro's
+definition, for a method that the invocation at line 323 writes. Without the table the place is
+known by what it reads, a metavariable, in a context that is not the expansion's whose macro
+holds it; the expansion is told by the code around it as before (`regress/verify-70`, a method,
+a function and an associated function named so in a dependency's generic code; facts 53; what
+is left with nothing around it is under Limitations). artisan_middleware passes with 977
+positions verified.
+
 After the third batch every earlier package that builds here was re-run, versions pinned, on
 the builds pushed on 11 November (64 of them; jj-cli on the build before, as clean): all
 complete; 18,275 positions verified and 93 within a range, none mismatched; all 98,256
@@ -1137,16 +1176,19 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   raddy-http), and where it looks for a function only one version declares in the text of the
   other, it finds none and counts the fact as not shown (4 in raddy-http). The driver records
   which crates each unit is compiled against; the analysis does not use it yet.
-- *A token handed on twice.* A declared macro that hands a token on as it is (`$f:tt`) to
-  another that does so again leaves the compiler with the place of the second macro's `$f` for
-  it and no expansion, the same span for every invocation. The driver takes the expansion from
-  the code around the token (the call it is the callee of, the statement it is in), or, with
-  nothing around it, from the compiler's table of metavariable spans where the macro's
-  expansions all come from one invocation (`regress/verify-65`). A token that is all of its
+- *A token used a second time.* A declared macro that takes a token as it is (`$f:tt`) and uses
+  it at a second place, in its own code or in that of a macro it hands it on to, leaves the
+  compiler with the place of that second `$f` for it and no expansion, the same span for every
+  invocation. The driver takes the expansion from the code around the token (the call it is the
+  callee of, the statement it is in), or, with nothing around it, from the compiler's table of
+  metavariable spans where the macro's expansions all come from one invocation
+  (`regress/verify-65`). The table is of the crate being compiled: in code of another crate
+  that is compiled here, a generic function's, the place is known by reading as a metavariable,
+  and the expansion by the code around it (`regress/verify-70`). A token that is all of its
   statement, or a call a procedural macro puts whole at such a token, in a macro invoked from
-  several places, stays at a position in the macro's definition: the compiler records nothing
-  that tells the invocations apart, and the verifier rejects the position. No package of the
-  batches has one.
+  several places or in code of another crate, stays at a position in the macro's definition:
+  the compiler records nothing that tells the invocations apart, and the verifier rejects the
+  position. No package of the batches has one.
 - *Toolchain.* The driver needs its pinned nightly. Layer 2 compiles the project, so the
   project's build scripts and procedural macros run. A published package whose `Cargo.lock`
   locks versions the nightly no longer builds (bore-cli 0.6.0's proc-macro2 1.0.56, cargo-vet
