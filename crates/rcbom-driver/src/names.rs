@@ -194,14 +194,15 @@ pub(crate) fn def_hash(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> Strin
 }
 /// A span as the macro whose code it is in wrote it.
 ///
-/// A token a declared macro hands on as it is (`$f:tt`) keeps the span the source gave it.
-/// Handed on a second time (`first!(compute)`, of a macro whose code is `last!($f)`, whose own
-/// is `$f(data)`), it has for the compiler the place of the metavariable in the second macro's
-/// code and still the context it came with (`rustc_expand`'s `maybe_use_metavar_location`):
-/// code at a position in a macro's definition that no expansion is recorded for, and the same
-/// span for every invocation that hands a token on to that place. The compiler's table of
-/// metavariable spans says the span is such a place, and has the first expansion that handed
-/// a token on there.
+/// A token a declared macro takes as it is (`$f:tt`) keeps the span the source gave it where
+/// the macro first uses it. Used at a second place, in the macro's own code (`self.0.$op(..)`
+/// in two methods it writes) or in that of a macro it is handed on to (`first!(compute)`, of a
+/// macro whose code is `last!($f)`, whose own is `$f(data)`), it has for the compiler the place
+/// of that metavariable and still the context it came with (`rustc_expand`'s
+/// `maybe_use_metavar_location`): code at a position in a macro's definition that no expansion
+/// is recorded for, and the same span for every invocation that brings a token to that place.
+/// The compiler's table of metavariable spans says the span is such a place, and has the first
+/// expansion that brought a token there.
 ///
 /// Which expansion wrote this one there is the one, among those the code `around` it is in
 /// (the call whose callee it is, the statement it is in: their other tokens are the macro's),
@@ -210,22 +211,42 @@ pub(crate) fn def_hash(tcx: TyCtxt<'_>, did: rustc_span::def_id::DefId) -> Strin
 /// table's where every expansion of that macro in the crate comes from one invocation in the
 /// source; from several, the compiler does not record which, and the span is left as it is:
 /// a position in the macro's code, in no expansion.
+///
+/// The table is of the crate being compiled. Code of another crate that is compiled here (a
+/// generic function's) has such a span as that crate's compilation left it and no entry:
+/// aead-stream 0.6.0's `impl_stream_object!` writes `self.stream.$op(..)` in two
+/// methods, and the second `$op` is where the call of `encrypt` is for every crate that
+/// encrypts a last message. The place is known without the table by what it reads, a
+/// metavariable (`$op`: no other code of a macro's definition is a `$` and a name, `$crate`
+/// apart), in a context that is not the expansion's whose macro holds it.
 pub(crate) fn written(span: rustc_span::Span, around: rustc_span::Span) -> rustc_span::Span {
-    let Some(var) = rustc_span::with_metavar_spans(|m| m.get(span))
-        .filter(|v| (v.lo(), v.hi()) == (span.lo(), span.hi()) && v.ctxt() != span.ctxt())
-    else {
+    let var = rustc_span::with_metavar_spans(|m| m.get(span))
+        .filter(|v| (v.lo(), v.hi()) == (span.lo(), span.hi()) && v.ctxt() != span.ctxt());
+    // (a token the code around it came with is no handed one: the macro's code has its
+    // expansion's context, a handed token the context of where it was written)
+    if var.is_none() && span.ctxt() == around.ctxt() {
         return span;
-    };
+    }
     // (an expansion is invoked in the source or in an expansion made before it: the way out
     // ends)
     let mut at = around;
     while at.from_expansion() {
         let expn = at.ctxt().outer_expn_data();
-        if expn.def_site.lo() <= span.lo() && span.hi() <= expn.def_site.hi() {
-            return span.with_ctxt(at.ctxt());
+        if !expn.def_site.is_dummy()
+            && expn.def_site.lo() <= span.lo()
+            && span.hi() <= expn.def_site.hi()
+        {
+            return if var.is_some() || (at.ctxt() != span.ctxt() && metavariable(span)) {
+                span.with_ctxt(at.ctxt())
+            } else {
+                span
+            };
         }
         at = expn.call_site;
     }
+    let Some(var) = var else {
+        return span;
+    };
     let expn = var.ctxt().outer_expn_data();
     let def = (expn.def_site.lo(), expn.def_site.hi());
     let from = source_invocation(expn);
@@ -235,6 +256,18 @@ pub(crate) fn written(span: rustc_span::Span, around: rustc_span::Span) -> rustc
     }
     let sole = SOLE.with(|s| s.get_or_init(sole_invocations).get(&def).copied().flatten());
     if sole == Some(from) { var } else { span }
+}
+/// Whether the source at a span reads as a metavariable of a declared macro, whole.
+fn metavariable(span: rustc_span::Span) -> bool {
+    rustc_middle::ty::tls::with(|tcx| tcx.sess.source_map().span_to_snippet(span).ok())
+        .and_then(|t| t.strip_prefix('$').map(str::to_string))
+        .is_some_and(|n| {
+            n != "crate"
+                && n.chars()
+                    .next()
+                    .is_some_and(|c| c == '_' || c.is_alphabetic())
+                && n.chars().all(|c| c == '_' || c.is_alphanumeric())
+        })
 }
 /// From where to where, in the compiler's positions.
 type Extent = (rustc_span::BytePos, rustc_span::BytePos);

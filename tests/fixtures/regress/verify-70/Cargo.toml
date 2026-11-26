@@ -1,0 +1,24 @@
+# A token a declared macro uses a second time, in code of another crate that is compiled here.
+# `dep`'s `object!` writes `self.0.$op(data)` in two methods of a generic type, `$op:tt` (the
+# shape of aead-stream 0.6.0's `impl_stream_object!`, under artisan_middleware 7.3.0). The
+# compiler gives the token the place of the second `$op` and the context it came with
+# (`maybe_use_metavar_location`), and its table of such spans, which says so, is of the crate
+# that expanded the macro. The methods are compiled where they are instantiated, here, with no
+# table: the call was at `dep/src/lib.rs:26:23`, a position in the macro's definition, in no
+# expansion (`the invocation at dep/src/lib.rs:31:0 that makes `seal_last` does not hold
+# 26:23`), and so was the use of MD5 that a function made the same way writes as `$f(..)`
+# (`twice!`). The place reads as a metavariable, in a context that is not the expansion's whose
+# macro holds it, and the code around it is in that expansion: the call is the expansion's,
+# cited at its invocation. A path that ends in the token (`D::$m`, `assoc!`) has the
+# expansion's context from the compiler, and the macro of the crate itself (`local!`) the
+# table's.
+[package]
+name = "verify-70"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dep = { path = "dep" }
+sha2 = "0.10"
+
+[workspace]

@@ -1,0 +1,677 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:cargo/block-buffer@0.10.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked block-buffer 0.10.4; reached via verify-70 -> sha2 -> digest -> block-buffer",
+            "line": 6,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "block-buffer"
+          }
+        ]
+      },
+      "name": "block-buffer",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "support"
+        },
+        {
+          "name": "rcbom:kb-coverage",
+          "value": "unmodelled"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/block-buffer@0.10.4",
+      "type": "library",
+      "version": "0.10.4"
+    },
+    {
+      "bom-ref": "pkg:cargo/crypto-common@0.1.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked crypto-common 0.1.7; reached via verify-70 -> sha2 -> digest -> crypto-common",
+            "line": 30,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "crypto-common"
+          }
+        ]
+      },
+      "name": "crypto-common",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/crypto-common@0.1.7",
+      "type": "library",
+      "version": "0.1.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/dep@0.1.0",
+      "name": "dep",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/dep@0.1.0",
+      "type": "library",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/digest@0.10.7",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] locked digest 0.10.7; reached via verify-70 -> sha2 -> digest",
+            "line": 48,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "digest"
+          }
+        ]
+      },
+      "name": "digest",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "trait"
+        }
+      ],
+      "purl": "pkg:cargo/digest@0.10.7",
+      "type": "library",
+      "version": "0.10.7"
+    },
+    {
+      "bom-ref": "pkg:cargo/md5@0.7.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by dep (dependencies)",
+            "line": 7,
+            "location": "dep/Cargo.toml",
+            "offset": 0,
+            "symbol": "md5"
+          },
+          {
+            "additionalContext": "[manifest] locked md5 0.7.0; reached via dep -> md5",
+            "line": 74,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "md5"
+          }
+        ]
+      },
+      "name": "md5",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/md5@0.7.0",
+      "type": "library",
+      "version": "0.7.0"
+    },
+    {
+      "bom-ref": "pkg:cargo/sha2@0.10.9",
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[manifest] declared by verify-70 (dependencies)",
+            "line": 22,
+            "location": "Cargo.toml",
+            "offset": 0,
+            "symbol": "sha2"
+          },
+          {
+            "additionalContext": "[manifest] declared by dep (dependencies)",
+            "line": 8,
+            "location": "dep/Cargo.toml",
+            "offset": 0,
+            "symbol": "sha2"
+          },
+          {
+            "additionalContext": "[manifest] locked sha2 0.10.9; reached via verify-70 -> sha2",
+            "line": 80,
+            "location": "Cargo.lock",
+            "offset": 0,
+            "symbol": "sha2"
+          }
+        ]
+      },
+      "name": "sha2",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        },
+        {
+          "name": "rcbom:crypto-role",
+          "value": "algorithm"
+        },
+        {
+          "name": "rcbom:usage",
+          "value": "reachable"
+        }
+      ],
+      "purl": "pkg:cargo/sha2@0.10.9",
+      "type": "library",
+      "version": "0.10.9"
+    },
+    {
+      "bom-ref": "crypto:algorithm:MD5",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "MD5",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-70] [macro twice!] in dep::second_md5::<&str>; use: digest; owner at dep/src/lib.rs:44:18-44:28 as `second_md5` line #fabe113b (by macro twice! at dep/src/lib.rs:44:0-44:38 line #9d2da7cf defined dep/src/lib.rs:34-43); expanded from dep/src/lib.rs:40:12-40:14 as `$f` line #e2048bb4 (by macro twice! at dep/src/lib.rs:44:0-44:38 line #9d2da7cf defined dep/src/lib.rs:34-43); instantiated by verify_70::main at src/main.rs:35:22 as `dep::second_md5` (call, to 35:37 as `dep::second_md5` line #1d35c8d6, caller at src/main.rs:29:3-29:7 within 29:0-41:1); line: `twice!(first_md5, second_md5, compute);`",
+            "line": 44,
+            "location": "dep/src/lib.rs",
+            "offset": 0,
+            "symbol": "md5::compute"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-70] in dep::first_md5::<&str>; use: digest; owner at dep/src/lib.rs:44:7-44:16 as `first_md5` line #0c193e2d (by macro twice! at dep/src/lib.rs:44:0-44:38 line #9d2da7cf defined dep/src/lib.rs:34-43); instantiated by verify_70::main at src/main.rs:36:22 as `dep::first_md5` (call, to 36:36 as `dep::first_md5` line #598b604b, caller at src/main.rs:29:3-29:7 within 29:0-41:1); line: `twice!(first_md5, second_md5, compute);`; code: `compute`",
+            "line": 44,
+            "location": "dep/src/lib.rs",
+            "offset": 30,
+            "symbol": "md5::compute"
+          }
+        ]
+      },
+      "name": "MD5",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin verify-70"
+        },
+        {
+          "name": "rcbom:param:output_bytes",
+          "value": "16"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "2"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-224",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "nistQuantumSecurityLevel": 0,
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-70] in <verify_70::With<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B1>, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha224>>> as verify_70::Local>::sum; use: digest; owner at src/main.rs:9:7-9:10 within 9:4-11:5; instantiated by verify_70::Here::<..>::sum_last at src/main.rs:27:0 (call, to 27:37 as `local!(Here, sum_next, sum_last, sum)` line #b7ca3bdb, from src/main.rs:22:23-22:26 as `$op` line #2da512a9 (by macro local! at src/main.rs:27:0-27:37 line #b7ca3bdb defined src/main.rs:13-26), caller at src/main.rs:27:23-27:31 as `sum_last` line #94f1c021 (by macro local! at src/main.rs:27:0-27:37 line #b7ca3bdb defined src/main.rs:13-26)); instantiated by verify_70::main at src/main.rs:40:24 as `sum_last` (call, to 40:32 as `sum_last` line #00aba9d3, caller at src/main.rs:29:3-29:7 within 29:0-41:1); line: `D::digest(data).to_vec()`; code: `D::digest`",
+            "line": 10,
+            "location": "src/main.rs",
+            "offset": 8,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-224",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-224 and SHA-512/224, collision category below 1 (preimage: 3)"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin verify-70"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-256",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "nistQuantumSecurityLevel": 2,
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-70] in <dep::Hashing<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha256VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha256>>> as dep::Stream>::seal; use: digest; owner at dep/src/lib.rs:10:7-10:11 within 10:4-12:5; instantiated by dep::Sealer::<..>::seal_last at dep/src/lib.rs:31:0 (call, to 31:43 as `object!(Sealer, seal_next, seal_last, seal)` line #c73b5bbd, from dep/src/lib.rs:26:23-26:26 as `$op` line #2da512a9 (by macro object! at dep/src/lib.rs:31:0-31:43 line #c73b5bbd defined dep/src/lib.rs:18-30), caller at dep/src/lib.rs:31:27-31:36 as `seal_last` line #55a977d3 (by macro object! at dep/src/lib.rs:31:0-31:43 line #c73b5bbd defined dep/src/lib.rs:18-30)); instantiated by verify_70::main at src/main.rs:31:24 as `seal_last` (call, to 31:33 as `seal_last` line #8e63c5ac, caller at src/main.rs:29:3-29:7 within 29:0-41:1); line: `D::digest(data).to_vec()`; code: `D::digest`",
+            "line": 11,
+            "location": "dep/src/lib.rs",
+            "offset": 8,
+            "symbol": "digest::digest::Digest::digest"
+          }
+        ]
+      },
+      "name": "SHA-256",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin verify-70"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "1"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-384",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "nistQuantumSecurityLevel": 4,
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-70] [macro assoc!] in dep::one::<..>; use: digest; owner at dep/src/lib.rs:56:7-56:10 as `one` line #b8c02ac9 (by macro assoc! at dep/src/lib.rs:56:0-56:24 line #31809efd defined dep/src/lib.rs:46-55); expanded from dep/src/lib.rs:49:12-49:17 as `D::$m` line #27c5552e (by macro assoc! at dep/src/lib.rs:56:0-56:24 line #31809efd defined dep/src/lib.rs:46-55); instantiated by verify_70::main at src/main.rs:37:22 as `dep::one::<Sha384>` (call, to 37:40 as `dep::one::<Sha384>` line #83e18c04, caller at src/main.rs:29:3-29:7 within 29:0-41:1); owner `dep::two::<..>` at dep/src/lib.rs:56:12-56:15 as `two` line #bda9fe41 (by macro assoc! at dep/src/lib.rs:56:0-56:24 line #31809efd defined dep/src/lib.rs:46-55); expanded from dep/src/lib.rs:52:12-52:17 as `D::$m` line #27c5552e (by macro assoc! at dep/src/lib.rs:56:0-56:24 line #31809efd defined dep/src/lib.rs:46-55); `dep::two::<..>` instantiated by verify_70::main at src/main.rs:38:22 as `dep::two::<Sha384>` (call, to 38:40 as `dep::two::<Sha384>` line #3eb878ee, caller at src/main.rs:29:3-29:7 within 29:0-41:1); line: `assoc!(one, two, digest);`",
+            "line": 56,
+            "location": "dep/src/lib.rs",
+            "offset": 0,
+            "symbol": "digest::digest::Digest::digest"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-70] in verify_70::main; chosen as generic argument of dep::one; owner at src/main.rs:29:3-29:7 within 29:0-41:1; line: `println!(\"{:x?}\", dep::one::<Sha384>(b\"g\"));`; code: `dep::one::<Sha384>`",
+            "line": 37,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "dep::one"
+          },
+          {
+            "additionalContext": "[reachable] [instantiation] [artifacts: bin verify-70] in verify_70::main; chosen as generic argument of dep::two; owner at src/main.rs:29:3-29:7 within 29:0-41:1; line: `println!(\"{:x?}\", dep::two::<Sha384>(b\"g\"));`; code: `dep::two::<Sha384>`",
+            "line": 38,
+            "location": "src/main.rs",
+            "offset": 22,
+            "symbol": "dep::two"
+          }
+        ]
+      },
+      "name": "SHA-384",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-384, collision category (preimage: 5)"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin verify-70"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    },
+    {
+      "bom-ref": "crypto:algorithm:SHA-512",
+      "cryptoProperties": {
+        "algorithmProperties": {
+          "algorithmFamily": "SHA-2",
+          "cryptoFunctions": [
+            "digest"
+          ],
+          "nistQuantumSecurityLevel": 5,
+          "primitive": "hash"
+        },
+        "assetType": "algorithm"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-70] in <dep::Hashing<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>> as dep::Stream>::open; new: setup, not a use; owner at dep/src/lib.rs:13:7-13:11 within 13:4-15:5; instantiated by dep::Opener::<..>::open_next at dep/src/lib.rs:32:38 as `open` (call, to 32:42 as `open` line #2f15354b, caller at dep/src/lib.rs:32:16-32:25 as `open_next` line #fbaedf25 (by macro object! at dep/src/lib.rs:32:0-32:43 line #0ed0d327 defined dep/src/lib.rs:18-30)); instantiated by verify_70::main at src/main.rs:33:24 as `open_next` (call, to 33:33 as `open_next` line #c2ba0ea1, caller at src/main.rs:29:3-29:7 within 29:0-41:1); line: `D::new().chain_update(data).finalize().to_vec()`; code: `D::new`",
+            "line": 14,
+            "location": "dep/src/lib.rs",
+            "offset": 8,
+            "symbol": "digest::digest::Digest::new"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-70] in <dep::Hashing<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>> as dep::Stream>::open; use: digest; owner at dep/src/lib.rs:13:7-13:11 within 13:4-15:5; instantiated by dep::Opener::<..>::open_next at dep/src/lib.rs:32:38 as `open` (call, to 32:42 as `open` line #2f15354b, caller at dep/src/lib.rs:32:16-32:25 as `open_next` line #fbaedf25 (by macro object! at dep/src/lib.rs:32:0-32:43 line #0ed0d327 defined dep/src/lib.rs:18-30)); instantiated by verify_70::main at src/main.rs:33:24 as `open_next` (call, to 33:33 as `open_next` line #c2ba0ea1, caller at src/main.rs:29:3-29:7 within 29:0-41:1); line: `D::new().chain_update(data).finalize().to_vec()`; code: `chain_update`",
+            "line": 14,
+            "location": "dep/src/lib.rs",
+            "offset": 17,
+            "symbol": "digest::digest::Digest::chain_update"
+          },
+          {
+            "additionalContext": "[reachable] [call] [artifacts: bin verify-70] in <dep::Hashing<digest::core_api::wrapper::CoreWrapper<digest::core_api::ct_variable::CtVariableCoreWrapper<sha2::core_api::Sha512VarCore, typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UInt<typenum::uint::UTerm, typenum::bit::B1>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, typenum::bit::B0>, sha2::OidSha512>>> as dep::Stream>::open; use: digest; owner at dep/src/lib.rs:13:7-13:11 within 13:4-15:5; instantiated by dep::Opener::<..>::open_next at dep/src/lib.rs:32:38 as `open` (call, to 32:42 as `open` line #2f15354b, caller at dep/src/lib.rs:32:16-32:25 as `open_next` line #fbaedf25 (by macro object! at dep/src/lib.rs:32:0-32:43 line #0ed0d327 defined dep/src/lib.rs:18-30)); instantiated by verify_70::main at src/main.rs:33:24 as `open_next` (call, to 33:33 as `open_next` line #c2ba0ea1, caller at src/main.rs:29:3-29:7 within 29:0-41:1); line: `D::new().chain_update(data).finalize().to_vec()`; code: `finalize`",
+            "line": 14,
+            "location": "dep/src/lib.rs",
+            "offset": 36,
+            "symbol": "digest::digest::Digest::finalize"
+          }
+        ]
+      },
+      "name": "SHA-512",
+      "properties": [
+        {
+          "name": "rcbom:detection:method",
+          "value": "type-resolved"
+        },
+        {
+          "name": "rcbom:confidence",
+          "value": "high"
+        },
+        {
+          "name": "rcbom:reachability",
+          "value": "reachable"
+        },
+        {
+          "name": "rcbom:functions:source",
+          "value": "observed"
+        },
+        {
+          "name": "rcbom:kb:version",
+          "value": "0.2.0"
+        },
+        {
+          "name": "rcbom:quantum-level:source",
+          "value": "NIST IR 8547, Table 8: SHA-512, collision and preimage category"
+        },
+        {
+          "name": "rcbom:artifact",
+          "value": "bin verify-70"
+        },
+        {
+          "name": "rcbom:occurrences",
+          "value": "3"
+        }
+      ],
+      "type": "cryptographic-asset"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/block-buffer@0.10.4"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:cargo/crypto-common@0.1.7"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/md5@0.7.0",
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/dep@0.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/block-buffer@0.10.4",
+        "pkg:cargo/crypto-common@0.1.7"
+      ],
+      "ref": "pkg:cargo/digest@0.10.7"
+    },
+    {
+      "dependsOn": [],
+      "provides": [
+        "crypto:algorithm:MD5"
+      ],
+      "ref": "pkg:cargo/md5@0.7.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/digest@0.10.7"
+      ],
+      "provides": [
+        "crypto:algorithm:SHA-224",
+        "crypto:algorithm:SHA-256",
+        "crypto:algorithm:SHA-384",
+        "crypto:algorithm:SHA-512"
+      ],
+      "ref": "pkg:cargo/sha2@0.10.9"
+    },
+    {
+      "dependsOn": [
+        "pkg:cargo/dep@0.1.0",
+        "pkg:cargo/sha2@0.10.9"
+      ],
+      "ref": "pkg:cargo/verify-70@0.1.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:MD5"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-224"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-256"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-384"
+    },
+    {
+      "dependsOn": [],
+      "ref": "crypto:algorithm:SHA-512"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:cargo/verify-70@0.1.0",
+      "name": "verify-70",
+      "properties": [
+        {
+          "name": "rcbom:scope",
+          "value": "required"
+        }
+      ],
+      "purl": "pkg:cargo/verify-70@0.1.0",
+      "type": "application",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "rcbom:run:toolchain",
+        "value": "nightly-2026-09-25"
+      },
+      {
+        "name": "rcbom:run:target",
+        "value": "x86_64-unknown-linux-gnu"
+      },
+      {
+        "name": "rcbom:run:features",
+        "value": ""
+      },
+      {
+        "name": "rcbom:run:profile",
+        "value": "release"
+      },
+      {
+        "name": "rcbom:run:packages",
+        "value": "12"
+      },
+      {
+        "name": "rcbom:run:sandbox",
+        "value": "none (draft: run only on trusted code)"
+      },
+      {
+        "name": "rcbom:kb:version",
+        "value": "0.2.0"
+      },
+      {
+        "name": "rcbom:run:reachable-instances",
+        "value": "81"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "bin verify-70"
+      },
+      {
+        "name": "rcbom:run:artifact",
+        "value": "lib dep"
+      },
+      {
+        "name": "rcbom:run:boundary-check",
+        "value": "15 calls into crypto packages: 15 cited, 0 cited by the check as unknown, 0 excused ()"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "name": "cargo-cbom",
+          "type": "application",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "serialNumber": "urn:uuid:1e7a217d-dbe0-8ec8-988f-8ffb55a66779",
+  "specVersion": "1.7",
+  "version": 1
+}
