@@ -109,6 +109,18 @@ pub struct LinkIndex {
     /// The functions an entry point reaches, by defining path, once known: a value found
     /// through a caller outside them (dead code) is labelled with that caller.
     reached: RefCell<Option<HashSet<String>>>,
+    /// What a field of a value was classified as (`provenance`), by the function it is read
+    /// in and the value.
+    field_classes: RefCell<HashMap<String, Kept<Origin>>>,
+    /// What the callers of a function pass for a parameter, classified: asked along every way
+    /// up to a use, answered once.
+    param_classes: RefCell<Kept<crate::provenance::ParamKey>>,
+    /// How deep the classification under way has gone (`Kept`).
+    pub(crate) deepest: Cell<usize>,
+    /// The parts found for a field of a value (`field_parts`), by the value, the struct and
+    /// the field; and their size, in origins (`MEMO_NODES`).
+    parts: RefCell<HashMap<(Origin, String, usize), Option<Parts>>>,
+    parts_nodes: Cell<usize>,
     /// The generic functions whose instances' summaries are recorded (`app::pass` for
     /// `app::pass::<app::A>`), none cut by the bound: what the generic item's own body records
     /// (its calls, its stores, for no type in particular) is said by the instances.
@@ -314,6 +326,57 @@ const MAX_FIELD_DEPTH: usize = 64;
 /// dropped and found again when asked for.
 const MEMO_NODES: usize = 4_000_000;
 
+/// A set of classes kept (`provenance`).
+type Classes = std::rc::Rc<std::collections::BTreeSet<crate::provenance::Class>>;
+
+/// The classes found for the questions of one kind. The depth a question is asked at changes
+/// its answer only where the search below it meets its bound (`provenance::MAX_CLASS_DEPTH`):
+/// an answer the bound did not cut is the answer at any depth that leaves the search as much
+/// room as it took, and is kept with how far below the question it went. One the bound cut is
+/// kept for the depth it was asked at.
+struct Kept<K> {
+    whole: HashMap<K, (Classes, usize)>,
+    cut: HashMap<K, HashMap<usize, Classes>>,
+    /// The size of the keys, in origins.
+    nodes: usize,
+}
+
+impl<K> Default for Kept<K> {
+    fn default() -> Self {
+        Kept {
+            whole: HashMap::new(),
+            cut: HashMap::new(),
+            nodes: 0,
+        }
+    }
+}
+
+impl<K: std::hash::Hash + Eq + Clone> Kept<K> {
+    /// The answer kept for a question asked at `depth`, and how deep its search went from
+    /// there.
+    fn get(&self, key: &K, depth: usize) -> Option<(Classes, usize)> {
+        let bound = crate::provenance::MAX_CLASS_DEPTH;
+        if let Some((found, below)) = self.whole.get(key)
+            && depth + below <= bound
+        {
+            return Some((found.clone(), depth + below));
+        }
+        let found = self.cut.get(key)?.get(&depth)?;
+        Some((found.clone(), bound + 1))
+    }
+
+    fn put(&mut self, key: K, depth: usize, reached: usize, found: Classes, weight: usize) {
+        self.nodes += weight;
+        if reached <= crate::provenance::MAX_CLASS_DEPTH {
+            self.whole.insert(key, (found, reached - depth));
+        } else {
+            self.cut.entry(key).or_default().insert(depth, found);
+        }
+    }
+}
+
+/// The values in a field of a value (`LinkIndex::field_parts`), kept.
+pub(crate) type Parts = std::rc::Rc<Vec<Origin>>;
 /// A field read, from the outermost struct in: (struct, field, the struct's type arguments when
 /// known).
 type FieldPath = [(String, usize, Option<String>)];
@@ -682,6 +745,67 @@ impl LinkIndex {
         }
         self.memo.borrow_mut().clear();
         self.memo_nodes.set(0);
+        *self.param_classes.borrow_mut() = Kept::default();
+        self.field_classes.borrow_mut().clear();
+        self.parts.borrow_mut().clear();
+        self.parts_nodes.set(0);
+    }
+
+    /// The classes found before for a field read `o` in `owner`, asked at `depth`.
+    pub(crate) fn field_classes(&self, owner: &str, o: &Origin, depth: usize) -> Option<Classes> {
+        let (found, reached) = self.field_classes.borrow().get(owner)?.get(o, depth)?;
+        self.deepest.set(self.deepest.get().max(reached));
+        Some(found)
+    }
+
+    /// Keeps the classes found for a field read asked at `depth`, the search having gone as
+    /// deep as `reached`.
+    pub(crate) fn keep_field_classes(
+        &self,
+        owner: &str,
+        o: &Origin,
+        depth: usize,
+        reached: usize,
+        found: std::collections::BTreeSet<crate::provenance::Class>,
+    ) {
+        let mut kept = self.field_classes.borrow_mut();
+        // (past `MEMO_NODES` origins over all the functions, all are dropped)
+        let weight = o.nodes(MAX_NODES);
+        if kept.values().map(|k| k.nodes).sum::<usize>() + weight > MEMO_NODES {
+            kept.clear();
+        }
+        kept.entry(owner.to_string()).or_default().put(
+            o.clone(),
+            depth,
+            reached,
+            std::rc::Rc::new(found),
+            weight,
+        );
+    }
+
+    /// The classes found before for a parameter, asked at `depth`.
+    pub(crate) fn param_classes(
+        &self,
+        key: &crate::provenance::ParamKey,
+        depth: usize,
+    ) -> Option<Classes> {
+        let (found, reached) = self.param_classes.borrow().get(key, depth)?;
+        self.deepest.set(self.deepest.get().max(reached));
+        Some(found)
+    }
+
+    /// Keeps the classes found for a parameter asked at `depth`, the search having gone as
+    /// deep as `reached`.
+    pub(crate) fn keep_param_classes(
+        &self,
+        key: crate::provenance::ParamKey,
+        depth: usize,
+        reached: usize,
+        found: std::collections::BTreeSet<crate::provenance::Class>,
+    ) {
+        self.param_classes
+            .borrow_mut()
+            .put(key, depth, reached, std::rc::Rc::new(found), 0);
     }
 
     /// What `func` returns, whole.
@@ -724,9 +848,34 @@ impl LinkIndex {
     /// `Set`s): the values a write to that field puts there, and the field of the value before
     /// where it may not write it; none for a write to another field (`self.n += 7` is no part of
     /// `self.key`). `None` for any other value.
-    pub fn field_parts(&self, w: &Origin, adt: &str, field: usize) -> Option<Vec<Origin>> {
+    ///
+    /// Answered once for a value and a field: the classes of a field are asked at every depth
+    /// it is reached at, and the parts are the same at each.
+    pub fn field_parts(&self, w: &Origin, adt: &str, field: usize) -> Option<Parts> {
+        if w.nodes(MAX_NODES) > MAX_NODES {
+            return None;
+        }
+        let key = (w.clone(), adt.to_string(), field);
+        if let Some(known) = self.parts.borrow().get(&key) {
+            return known.clone();
+        }
         let mut steps = MAX_FIELD_STEPS;
-        self.field_parts_in(w, adt, field, 0, &mut steps)
+        let found = self
+            .field_parts_in(w, adt, field, 0, &mut steps)
+            .map(std::rc::Rc::new);
+        let weight = key.0.nodes(MAX_NODES)
+            + found
+                .iter()
+                .flat_map(|v| v.iter())
+                .map(|x| x.nodes(MAX_NODES))
+                .sum::<usize>();
+        if self.parts_nodes.get() + weight > MEMO_NODES {
+            self.parts.borrow_mut().clear();
+            self.parts_nodes.set(0);
+        }
+        self.parts_nodes.set(self.parts_nodes.get() + weight);
+        self.parts.borrow_mut().insert(key, found.clone());
+        found
     }
 
     /// `field_parts`, bounded: a field of a value that a long chain of calls wrote, each

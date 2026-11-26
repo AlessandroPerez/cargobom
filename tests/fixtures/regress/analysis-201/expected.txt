@@ -1,0 +1,92 @@
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:5:18 | digest::mac::Mac::new_from_slice | [reachable] [call] in analysis_201::tag; new_from_slice: setup, not a use; key: hard-coded (28 bytes, literal at line 97) or parameter (argument 0 of analysis_201::a0) or parameter (argument 0 of analysis_201::a1) or parameter (argument 0 of analysis_201::a2) or parameter (argument 0 of analysis_201::a3) or parameter (argument 0 of analysis_201::a4) or parameter (argument 0 of analysis_201::a5) or parameter (argument 0 of analysis_201::b0) or parameter (argument 0 of analysis_201::b1) or parameter (argument 0 of analysis_201::b2) or parameter (argument 0 of analysis_201::b3) or parameter (argument 0 of analysis_201::b4) or parameter (argument 0 of analysis_201::b5) or parameter (argument 0 of analysis_201::c0) or parameter (argument 0 of analysis_201::c1) or parameter (argument 0 of analysis_201::c2) or parameter (argument 0 of analysis_201::c3) or parameter (argument 0 of analysis_201::c4) or parameter (argument 0 of analysis_201::c5) or parameter (argument 0 of analysis_201::d0) or parameter (argument 0 of analysis_201::d1) or parameter (argument 0 of analysis_201::d2) or parameter (argument 0 of analysis_201::d3) or parameter (argument 0 of analysis_201::d4) or parameter (argument 0 of analysis_201::d5) or parameter (argument 0 of analysis_201::e0) or parameter (argument 0 of analysis_201::e1) or parameter (argument 0 of analysis_201::e2) or parameter (argument 0 of analysis_201::e3) or parameter (argument 0 of analysis_201::e4) or parameter (argument 0 of analysis_201::e5) or parameter (argument 0 of analysis_201::f0) or parameter (argument 0 of analysis_201::f1) or parameter (argument 0 of analysis_201::f2) or parameter (argument 0 of analysis_201::f3) or parameter (argument 0 of analysis_201::f4) or parameter (argument 0 of analysis_201::f5) or parameter (argument 0 of analysis_201::g0) or parameter (argument 0 of analysis_201::g1) or parameter (argument 0 of analysis_201::g2) or parameter (argument 0 of analysis_201::g3) or parameter (argument 0 of analysis_201::g4) or parameter (argument 0 of analysis_201::g5) or parameter (argument 0 of analysis_201::h0) or parameter (argument 0 of analysis_201::h1) or parameter (argument 0 of analysis_201::h2) or parameter (argument 0 of analysis_201::h3) or parameter (argument 0 of analysis_201::h4) or parameter (argument 0 of analysis_201::h5) or parameter (argument 0 of analysis_201::i0) or parameter (argument 0 of analysis_201::i1) or parameter (argument 0 of analysis_201::i2) or parameter (argument 0 of analysis_201::i3) or parameter (argument 0 of analysis_201::i4) or parameter (argument 0 of analysis_201::i5) or parameter (argument 0 of analysis_201::j0) or parameter (argument 0 of analysis_201::j1) or parameter (argument 0 of analysis_201::j2) or parameter (argument 0 of analysis_201::j3) or parameter (argument 0 of analysis_201::j4) or parameter (argument 0 of analysis_201::j5) or parameter (argument 0 of analysis_201::k0) or parameter (argument 0 of analysis_201::k1) or parameter (argument 0 of analysis_201::k2) or parameter (argument 0 of analysis_201::k3) or parameter (argument 0 of analysis_201::k4) or parameter (argument 0 of analysis_201::k5) or parameter (argument 0 of the enclosing function); owner at src/main.rs:4:3-4:6 within 4:0-8:1; line: `let mut mac = Hmac::<Sha256>::new_from_slice(key).unwrap();`; code: `Hmac::<Sha256>::new_from_slice`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:6:8 | digest::mac::Mac::update | [reachable] [call] in analysis_201::tag; use: tag; owner at src/main.rs:4:3-4:6 within 4:0-8:1; line: `mac.update(data);`; code: `update`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:7:19 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [call] in analysis_201::tag; into_bytes: setup, not a use; owner at src/main.rs:4:3-4:6 within 4:0-8:1; line: `mac.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | src/main.rs:7:8 | digest::mac::Mac::finalize | [reachable] [call] in analysis_201::tag; use: tag; owner at src/main.rs:4:3-4:6 within 4:0-8:1; line: `mac.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:5:18 | digest::mac::Mac::new_from_slice | [reachable] [component] in analysis_201::tag; part of HMAC-SHA-256; owner at src/main.rs:4:3-4:6 within 4:0-8:1; line: `let mut mac = Hmac::<Sha256>::new_from_slice(key).unwrap();`; code: `Hmac::<Sha256>::new_from_slice`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:6:8 | digest::mac::Mac::update | [reachable] [component] in analysis_201::tag; part of HMAC-SHA-256; owner at src/main.rs:4:3-4:6 within 4:0-8:1; line: `mac.update(data);`; code: `update`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:7:19 | digest::mac::CtOutput::<T>::into_bytes | [reachable] [component] in analysis_201::tag; part of HMAC-SHA-256; owner at src/main.rs:4:3-4:6 within 4:0-8:1; line: `mac.finalize().into_bytes().to_vec()`; code: `into_bytes`
+  occ SHA-256 | crypto:algorithm:SHA-256 | src/main.rs:7:8 | digest::mac::Mac::finalize | [reachable] [component] in analysis_201::tag; part of HMAC-SHA-256; owner at src/main.rs:4:3-4:6 within 4:0-8:1; line: `mac.finalize().into_bytes().to_vec()`; code: `finalize`
+  occ block-buffer | pkg:cargo/block-buffer@0.10.4 | Cargo.lock:14:0 | block-buffer | [manifest] locked block-buffer 0.10.4; reached via analysis-201 -> hmac -> digest -> block-buffer
+  occ crypto-common | pkg:cargo/crypto-common@0.1.7 | Cargo.lock:38:0 | crypto-common | [manifest] locked crypto-common 0.1.7; reached via analysis-201 -> hmac -> digest -> crypto-common
+  occ digest | pkg:cargo/digest@0.10.7 | Cargo.lock:48:0 | digest | [manifest] locked digest 0.10.7; reached via analysis-201 -> hmac -> digest
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.lock:69:0 | hmac | [manifest] locked hmac 0.12.1; reached via analysis-201 -> hmac
+  occ hmac | pkg:cargo/hmac@0.12.1 | Cargo.toml:14:0 | hmac | [manifest] declared by analysis-201 (dependencies)
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.lock:84:0 | sha2 | [manifest] locked sha2 0.10.9; reached via analysis-201 -> sha2
+  occ sha2 | pkg:cargo/sha2@0.10.9 | Cargo.toml:15:0 | sha2 | [manifest] declared by analysis-201 (dependencies)
+  occ subtle | pkg:cargo/subtle@2.6.1 | Cargo.lock:95:0 | subtle | [manifest] locked subtle 2.6.1; reached via analysis-201 -> hmac -> digest -> subtle
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:confidence=high
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:detection:method=type-resolved
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:finding=hard-coded-key
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:functions:source=observed
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:kb:version=0.2.0
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:occurrences=4
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:provenance:key=hard-coded,parameter
+  prop HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | rcbom:reachability=reachable
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:confidence=high
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:detection:method=type-resolved
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:functions:source=knowledge-base
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:kb:version=0.2.0
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:occurrences=4
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:only-as-component=true
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:quantum-level:source=NIST IR 8547, Table 8: SHA-256 and SHA-512/256, collision category (preimage: 5)
+  prop SHA-256 | crypto:algorithm:SHA-256 | rcbom:reachability=reachable
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:crypto-role=support
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:kb-coverage=unmodelled
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:scope=required
+  prop block-buffer | pkg:cargo/block-buffer@0.10.4 | rcbom:usage=reachable
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:crypto-role=trait
+  prop crypto-common | pkg:cargo/crypto-common@0.1.7 | rcbom:scope=required
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:crypto-role=trait
+  prop digest | pkg:cargo/digest@0.10.7 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:crypto-role=algorithm
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:scope=required
+  prop hmac | pkg:cargo/hmac@0.12.1 | rcbom:usage=reachable
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:crypto-role=algorithm
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:scope=required
+  prop sha2 | pkg:cargo/sha2@0.10.9 | rcbom:usage=reachable
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:crypto-role=support
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:kb-coverage=unmodelled
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:scope=required
+  prop subtle | pkg:cargo/subtle@2.6.1 | rcbom:usage=present
+asset HMAC-SHA-256 | crypto:algorithm:HMAC-SHA-256 | {"algorithmProperties": {"algorithmFamily": "HMAC", "cryptoFunctions": ["tag"], "primitive": "mac"}, "assetType": "algorithm"}
+asset SHA-256 | crypto:algorithm:SHA-256 | {"algorithmProperties": {"algorithmFamily": "SHA-2", "cryptoFunctions": ["digest"], "nistQuantumSecurityLevel": 2, "primitive": "hash"}, "assetType": "algorithm"}
+component library block-buffer 0.10.4 | pkg:cargo/block-buffer@0.10.4 | purl pkg:cargo/block-buffer@0.10.4
+component library crypto-common 0.1.7 | pkg:cargo/crypto-common@0.1.7 | purl pkg:cargo/crypto-common@0.1.7
+component library digest 0.10.7 | pkg:cargo/digest@0.10.7 | purl pkg:cargo/digest@0.10.7
+component library hmac 0.12.1 | pkg:cargo/hmac@0.12.1 | purl pkg:cargo/hmac@0.12.1
+component library sha2 0.10.9 | pkg:cargo/sha2@0.10.9 | purl pkg:cargo/sha2@0.10.9
+component library subtle 2.6.1 | pkg:cargo/subtle@2.6.1 | purl pkg:cargo/subtle@2.6.1
+dep crypto:algorithm:HMAC-SHA-256 -> crypto:algorithm:SHA-256
+dep pkg:cargo/analysis-201@0.1.0 -> pkg:cargo/hmac@0.12.1
+dep pkg:cargo/analysis-201@0.1.0 -> pkg:cargo/sha2@0.10.9
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/block-buffer@0.10.4
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/crypto-common@0.1.7
+dep pkg:cargo/digest@0.10.7 -> pkg:cargo/subtle@2.6.1
+dep pkg:cargo/hmac@0.12.1 -> pkg:cargo/digest@0.10.7
+dep pkg:cargo/sha2@0.10.9 -> pkg:cargo/digest@0.10.7
+dependency crypto:algorithm:HMAC-SHA-256
+dependency crypto:algorithm:SHA-256
+dependency pkg:cargo/analysis-201@0.1.0
+dependency pkg:cargo/block-buffer@0.10.4
+dependency pkg:cargo/crypto-common@0.1.7
+dependency pkg:cargo/digest@0.10.7
+dependency pkg:cargo/hmac@0.12.1
+dependency pkg:cargo/sha2@0.10.9
+dependency pkg:cargo/subtle@2.6.1
+doc bomFormat="CycloneDX"
+doc specVersion="1.7"
+doc version=1
+provides pkg:cargo/hmac@0.12.1 -> crypto:algorithm:HMAC-SHA-256
+provides pkg:cargo/sha2@0.10.9 -> crypto:algorithm:SHA-256
+root {"bom-ref": "pkg:cargo/analysis-201@0.1.0", "name": "analysis-201", "properties": [{"name": "rcbom:scope", "value": "required"}], "purl": "pkg:cargo/analysis-201@0.1.0", "type": "application", "version": "0.1.0"}
+run rcbom:kb:version=0.2.0
+run rcbom:run:artifact=bin analysis-201
+run rcbom:run:boundary-check=5 calls into crypto packages: 4 cited, 0 cited by the check as unknown, 1 excused (format 1)
+run rcbom:run:features=
+run rcbom:run:packages=12
+run rcbom:run:profile=release
+run rcbom:run:reachable-instances=168
+run rcbom:run:sandbox=none (draft: run only on trusted code)
+run rcbom:run:target=x86_64-unknown-linux-gnu
+run rcbom:run:toolchain=nightly-2026-09-25
+tools {"components": [{"name": "cargo-cbom", "type": "application", "version": "0.1.0"}]}

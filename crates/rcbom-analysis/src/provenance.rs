@@ -246,6 +246,29 @@ fn of_param(
     if func.is_empty() {
         return;
     }
+    // Asked once for a function's argument and the fields read of it (`links::Kept`): a
+    // parameter is reached through each of its function's callers, and each caller's own
+    // through each of its callers, so the same is asked along every way up, as many times as
+    // there are ways (`regress/analysis-201`: 6^11 of them).
+    let key: ParamKey = (
+        func.to_string(),
+        index,
+        fields
+            .iter()
+            .filter_map(|f| match f {
+                Origin::Field {
+                    adt, field, args, ..
+                } => Some((adt.clone(), *field, args.clone())),
+                _ => None,
+            })
+            .collect(),
+    );
+    if let Some(known) = links.param_classes(&key, depth) {
+        out.extend(known.iter().cloned());
+        return;
+    }
+    let outer = links.deepest.replace(depth);
+    let mut found = BTreeSet::new();
     for (caller, args) in links.callers_of(func).iter() {
         let Some(a) = args.get(index) else {
             continue;
@@ -273,10 +296,21 @@ fn of_param(
                     .detail
                     .replace("the enclosing function", &short(&strip_generics(caller)));
             }
-            out.insert(c);
+            found.insert(c);
         }
     }
+    out.extend(found.iter().cloned());
+    let reached = links.deepest.get();
+    links.deepest.set(outer.max(reached));
+    links.keep_param_classes(key, depth, reached, found);
 }
+
+/// What `of_param` is asked of the callers: the function, the argument, and the fields read of
+/// it (struct, field, type arguments) outermost first.
+pub(crate) type ParamKey = (String, usize, Vec<(String, usize, Option<String>)>);
+
+/// How deep a classification follows a value: past it, the value is `unknown`, `too deep`.
+pub(crate) const MAX_CLASS_DEPTH: usize = 12;
 
 fn classify(
     kb: &Kb,
@@ -290,7 +324,8 @@ fn classify(
         kind: kind.to_string(),
         detail,
     };
-    if depth > 12 {
+    links.deepest.set(links.deepest.get().max(depth));
+    if depth > MAX_CLASS_DEPTH {
         out.insert(class("unknown", "too deep".into()));
         return;
     }
@@ -347,21 +382,38 @@ fn classify(
         // a field of a value a method wrote or fields were written into: what is in that field
         // (`self.key` after a method replaced it, not the counter beside it); of any other
         // value, as for that value (a parameter's field is the parameter's)
+        // (Asked once for a value and the function it is read in (`links::Kept`): what is in a
+        // field is each value written there, a field of another value as often as not, and
+        // the same field is reached again through every one of them. justssh 0.4.0's cipher
+        // state, a field of its transport written at every key exchange: half a million such
+        // questions in a hundred seconds, few of them different.)
         Origin::Field {
             adt, field, base, ..
-        } => match links.field_parts(crate::links::peel(base), adt, *field) {
-            Some(parts) => parts
-                .iter()
-                .for_each(|p| classify(kb, links, "", p, depth + 1, out)),
-            // (a parameter's field, `&self.kdf_salt`: that field of what the callers pass, not
-            // the fields beside it)
-            None => match param_fields(o) {
-                Some((index, of, fields)) => {
-                    of_param(kb, links, owner, index, of, &fields, depth, out)
-                }
-                None => classify(kb, links, owner, base, depth + 1, out),
-            },
-        },
+        } => {
+            if let Some(known) = links.field_classes(owner, o, depth) {
+                out.extend(known.iter().cloned());
+                return;
+            }
+            let outer = links.deepest.replace(depth);
+            let mut found = BTreeSet::new();
+            match links.field_parts(crate::links::peel(base), adt, *field) {
+                Some(parts) => parts
+                    .iter()
+                    .for_each(|p| classify(kb, links, "", p, depth + 1, &mut found)),
+                // (a parameter's field, `&self.kdf_salt`: that field of what the callers pass,
+                // not the fields beside it)
+                None => match param_fields(o) {
+                    Some((index, of, fields)) => {
+                        of_param(kb, links, owner, index, of, &fields, depth, &mut found)
+                    }
+                    None => classify(kb, links, owner, base, depth + 1, &mut found),
+                },
+            }
+            out.extend(found.iter().cloned());
+            let reached = links.deepest.get();
+            links.deepest.set(outer.max(reached));
+            links.keep_field_classes(owner, o, depth, reached, found);
+        }
         Origin::Param { index, owner: of } => {
             of_param(kb, links, owner, *index, of.as_deref(), &[], depth, out)
         }
