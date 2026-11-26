@@ -1091,6 +1091,20 @@ does not model (minisign under rsign2, bcrypt, the ciphers and modes pgp uses be
 pgp's and miniserve's `Box<dyn DynDigest>` hashers are named now, one member for each hash the
 build boxes.
 
+After the nineteenth batch the packages of earlier batches were run again on its build,
+versions pinned: the 119 of the first five batches, the 114 of the sixth, seventh and eighth,
+the 34 of the eighteenth that build, and the 32 a fix was made for in the ninth to the
+seventeenth. Twelve of the sixth to eighth batches do not build here, as when they were first
+run. The 287 others complete: 90,615 positions verified and 14 within a range; all 955,857
+shifted positions and spans rejected; no walk gap in their 89 binaries (what is counted apart,
+as uncalled objects, behind a constant or kept with a section, is in six of the packages);
+75,081 calls into crypto packages, 24,664 cited, 255 cited by the check by name, 2,053 as
+unknown, 48,109 excused. Ten positions are rejected, nine in raddy-http and one in
+pq-objectstore, and fifty-two are verified with a fact not shown: fifty-one in those two and in
+apple-codesign, the three packages that hold two versions of one crate (Limitations), and the
+`fill_bytes` on a boxed `dyn CryptoRng` in justssh. No package does worse than when it last
+ran: the re-run called for no fix.
+
 ## Limitations
 
 What the CBOM covers, what it reports differently from a reading of the labelling rules, and
@@ -1291,11 +1305,10 @@ what it does not do yet. A reviewer meeting one of these meets a known limit, no
   and 0.14.10; pq-objectstore 0.2.0 holds two of rustls and two of rustls-webpki), what one
   version's functions pass and return is attributed to the other's too. The members found are
   then too many, never too few, and a witness function can be named in the wrong version: the
-  verifier rejects those positions (22 in apple-codesign, 9 in raddy-http, 1 in
-  pq-objectstore), and where it looks for a function only one version declares in the text of
-  the other, it finds none and counts the fact as not shown (4 in raddy-http, 25 in
-  pq-objectstore). The driver records which crates each unit is compiled against; the analysis
-  does not use it yet.
+  verifier rejects those positions (9 in raddy-http, 1 in pq-objectstore), and where it looks
+  for a function only one version declares in the text of the other, it finds none and counts
+  the fact as not shown (22 in apple-codesign, 4 in raddy-http, 25 in pq-objectstore). The
+  driver records which crates each unit is compiled against; the analysis does not use it yet.
 - *What the walk check rests on.* The linker keeps what code that runs refers to, a section at
   a time. Each function has a section of its own as the compiler emits it, and the check then
   shows every function the walk missed. Where the source names the section of several functions
